@@ -5,8 +5,17 @@ const config: CapacitorConfig = {
   appName: 'mente360',
   webDir: 'dist',
   server: {
-    androidScheme: 'https'
-  }
+    androidScheme: 'https',
+    allowNavigation: []
+  },
+  plugins: {
+    CapacitorHttp: {
+      enabled: true,
+    },
+  },
+  android: {
+    allowMixedContent: true
+  },
 };
 
 export default config;

@@ -1,0 +1,22 @@
+@import "@/styles.scss";
+
+.ion-header {
+    --background: var(--bg-main-gradient);
+}
+
+.ion-content {      
+    --background: url('assets/images/modal.png') no-repeat cover fixed center;
+
+    background: url('assets/images/modal.png') no-repeat fixed center; 
+    background-size: cover;
+
+    ion-segment-button {
+        text-transform: capitalize;
+        font-family: 'arya-bold';
+        font-weight: bold;
+        color: #444;
+        --indicator-color: var(--color-main);
+
+        margin-bottom: 20px;
+    }
+}

@@ -1,0 +1,25 @@
+@import "@/styles.scss";
+
+.ion-header {
+  --background: var(--bg-secondary);
+
+  .title {
+    display: flex;
+    flex-direction: column;
+
+    ion-title {
+        .name {
+            color: var(--color-secondary);
+        }
+    }
+
+    ion-text {
+        font-size: 15px;
+    }
+  }
+}
+
+
+.ion-content {
+    --background: var(--bg-main-gradient);
+}

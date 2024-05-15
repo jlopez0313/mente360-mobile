@@ -1,0 +1,13 @@
+
+.ion-footer {
+  --background: var(--bg-main-gradient);
+
+  ion-buttons {
+    display: flex;
+
+    ion-button {
+      --background: none;
+    }
+  }
+}
+  

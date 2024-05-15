@@ -1,0 +1,49 @@
+@font-face {
+    font-family: "arya";
+    src: local("arya"),
+      url("../assets/fonts/Arya/Arya-Regular.ttf") format("woff");
+}
+
+@font-face {
+    font-family: "arya-bold";
+    src: local("arya-bold"),
+      url("../assets/fonts/Arya/Arya-Bold.ttf") format("woff");
+}
+
+
+:root {
+    --bg-main-gradient: linear-gradient(193.17deg, #FFB347 9.48%, #FFCC33 63.67%);
+    --bg-card: linear-gradient(193.17deg, #FFD599 20%, #FFE08F 80%);
+    --bg-main: #ffc547;
+
+    --color-main-gradient: linear-gradient(to left bottom, #9E9E9E, #FFC90A);
+    --color-main: #FFC90A;
+    
+    --ion-font-family: arya;
+
+    --bg-secondary: #FFF5EC;
+    --color-secondary: #F2B10A;
+}
+
+
+html, body {
+    font-family: arya;
+}
+
+ion-header {
+ 
+    ion-button {
+      color: #000;
+    }
+  
+    ion-title {
+      font-weight: 500;
+      color: #fff;;
+    }
+}
+
+
+ion-button,
+ion-fab-button {
+    --background: linear-gradient(to left bottom, #9E9E9E, #FFC90A);
+}

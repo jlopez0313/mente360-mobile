@@ -1,7 +1,6 @@
 import { Redirect, Route } from 'react-router-dom';
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import Home from './pages/Home';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -22,21 +21,46 @@ import '@ionic/react/css/display.css';
 /* Theme variables */
 import './theme/variables.css';
 
-setupIonicReact();
+import Home from './pages/Home/Home';
+import Crecimiento from './pages/Crecimiento/Crecimiento';
+import Login from './pages/Login/Login';
+import Configuracion from './pages/Configuracion/Configuración';
+import Perfil from './pages/Perfil/Perfil';
+import Notifications from './pages/Notifications/Notifications';
+import Chat from './pages/Chat/Chat';
+import Musicaterapia from './pages/Musicaterapia/Musicaterapia';
+import Test from './pages/Test/Test';
 
-const App: React.FC = () => (
-  <IonApp>
-    <IonReactRouter>
-      <IonRouterOutlet>
-        <Route exact path="/home">
-          <Home />
-        </Route>
-        <Route exact path="/">
-          <Redirect to="/home" />
-        </Route>
-      </IonRouterOutlet>
-    </IonReactRouter>
-  </IonApp>
-);
+setupIonicReact({
+  innerHTMLTemplatesEnabled: true,
+});
+
+const App: React.FC = () => {
+
+  const isLoggedIn = false;
+
+  return (
+    <IonApp>
+      <IonReactRouter>
+        <IonRouterOutlet>
+          <Route exact path="/">
+              <Redirect to="/login" />
+          </Route>
+          
+          <Route exact={true} path="/chat" component={Chat} />
+          <Route exact={true} path="/configuracion" component={Configuracion} />
+          <Route exact={true} path="/crecimiento" component={Crecimiento} />
+          <Route exact={true} path="/home" component={Home} />
+          <Route exact={true} path="/login" component={Login} />
+          <Route exact={true} path="/musicaterapia" component={Musicaterapia} />
+          <Route exact={true} path="/notificaciones" component={Notifications} />
+          <Route exact={true} path="/perfil" component={Perfil} />
+          <Route exact={true} path="/test" component={Test} />
+        </IonRouterOutlet>
+      </IonReactRouter>
+    </IonApp>
+  );
+
+}
 
 export default App;

@@ -1,0 +1,13 @@
+@import "@/styles.scss";
+
+.custom-toast {
+    background: var(--bg-main);
+    box-shadow: 3px 3px 10px 0 rgba(0, 0, 0, 0.2);
+    --color: #4b4a50;
+    
+    position: absolute;
+    bottom: 70px;
+    z-index: 90;
+    width: calc(100% - 32px);
+    
+}

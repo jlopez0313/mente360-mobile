@@ -1,0 +1,38 @@
+@import "@/styles.scss";
+
+.ion-content { 
+    .chips {
+        ion-chip {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 5px 12px;
+        }
+    }
+    ion-list {
+        ion-item-group {
+            --background: var(--bg-secondary);
+
+            ion-item-divider {
+                --background: var(--bg-secondary);
+                border-bottom: none;
+                padding: 0;
+
+                ion-label {
+                    color: #787878 !important;
+                    font-weight: bold;
+                }
+            }
+        }
+    }
+
+    ion-item {
+        background: var(--bg-secondary);
+        --background: var(--bg-main-gradient);
+        --border-radius: 10px;
+
+        ion-note {
+            font-size: 12px;
+            font-weight: bold;
+        }
+    }
+}

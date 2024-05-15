@@ -1,0 +1,28 @@
+@import url('@/styles.scss');
+
+
+.ion-content {
+    .nivel {
+        --background: var(--bg-main)
+    }
+
+    .slider {
+
+        .ion-progress-bar {
+            padding: 5px;
+            --background: #787878;
+            --progress-background: var(--bg-main);
+            position: relative;
+        }
+
+        .time {
+            display: flex;
+            justify-content: end;
+        }
+    }
+
+    .swiper {
+        padding: 0 15% !important;
+    }
+
+}
