@@ -6,17 +6,18 @@
     --border-radius: 10px;
     --box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 
-    ion-toolbar {
-        --background: none;
-        --color: var(--color-main);
-        margin-top: 20px;
-    }
-
     ion-content {
         --background: url('assets/images/modal.png') no-repeat cover fixed center;
-
+        
         background: url('assets/images/modal.png') no-repeat fixed center; 
         background-size: cover;
         text-align: center;
+        position: relative;
+
+        ion-toolbar {
+            --background: none;
+            --color: var(--color-main);
+            margin-top: 20px;
+        }
     }
 }

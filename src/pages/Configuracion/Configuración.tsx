@@ -21,7 +21,7 @@ const Configuracion: React.FC = () => {
       <IonHeader>
         <IonToolbar className={styles['ion-header']}>
           <IonButtons slot="start">
-            <Link to='/perfil'>
+            <Link to='/perfil' replace={true}>
               <IonButton fill="clear"  className={styles.backButton}>
                 <IonIcon slot="start" icon={arrowBack} />
               </IonButton>

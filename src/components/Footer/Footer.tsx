@@ -19,25 +19,25 @@ export const Footer = ( props: any ) => {
     <IonFooter {...props}>
       <IonToolbar className={styles["ion-footer"]}>
         <IonButtons class="ion-justify-content-around">
-          <Link to='/crecimiento' >
+          <Link to='/crecimiento' replace={true} >
             <IonButton>
               <IonIcon slot="icon-only" src={crecimiento}></IonIcon>
             </IonButton>
           </Link>
 
-          <Link to='/musicaterapia' >
+          <Link to='/musicaterapia' replace={true} >
             <IonButton>
               <IonIcon slot="icon-only" src={auriculares}></IonIcon>
             </IonButton>
           </Link>
 
-          <Link to='/home'>
+          <Link to='/home' replace={true}>
             <IonButton>
               <IonIcon slot="icon-only" src={calendario}></IonIcon>
             </IonButton>
           </Link>
 
-          <Link to='/chat'>
+          <Link to='/chat' replace={true}>
             <IonButton>
               <IonIcon slot="icon-only" src={grupo}></IonIcon>
             </IonButton>

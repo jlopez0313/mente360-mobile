@@ -30,6 +30,7 @@ import Notifications from './pages/Notifications/Notifications';
 import Chat from './pages/Chat/Chat';
 import Musicaterapia from './pages/Musicaterapia/Musicaterapia';
 import Test from './pages/Test/Test';
+import Registro from './pages/Registro/Registro';
 
 setupIonicReact({
   innerHTMLTemplatesEnabled: true,
@@ -52,6 +53,7 @@ const App: React.FC = () => {
           <Route exact={true} path="/crecimiento" component={Crecimiento} />
           <Route exact={true} path="/home" component={Home} />
           <Route exact={true} path="/login" component={Login} />
+          <Route exact={true} path="/registro" component={Registro} />
           <Route exact={true} path="/musicaterapia" component={Musicaterapia} />
           <Route exact={true} path="/notificaciones" component={Notifications} />
           <Route exact={true} path="/perfil" component={Perfil} />

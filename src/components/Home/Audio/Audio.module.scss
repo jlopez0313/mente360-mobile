@@ -15,10 +15,14 @@
     }
 
     ion-card-content {
-        ion-progress-bar {
-            --background: #787878;
-            --progress-background: var(--bg-main);
+        padding-bottom: 10px;
+
+        ion-range {
+            --bar-background: #787878;
+            --bar-background-active: var(--bg-main);
+            --knob-background: var(--bg-main);
             position: relative;
+            --height: 30px;
         }
 
         .time {

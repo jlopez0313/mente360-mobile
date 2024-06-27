@@ -30,13 +30,15 @@ import { IonFab, IonFabButton, IonIcon } from "@ionic/react";
 import { arrowBack, search, shareSocialOutline } from "ionicons/icons";
 
 import { Footer } from "@/components/Footer/Footer";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Clips as ClipsComponent } from "@/components/Musicaterapia/Clips/Clips";
 import { Playlist as PlaylistComponent } from "@/components/Musicaterapia/Playlist/Playlist";
 import { Toast } from "@/components/Toast/Toast";
+import UIContext from "@/context/Context";
 import { Link } from "react-router-dom";
 
 const Musicaterapia: React.FC = () => {
+
   const [tab, setTab] = useState("clips");
 
   const onSetTab = (e) => {
@@ -48,14 +50,14 @@ const Musicaterapia: React.FC = () => {
       <IonHeader>
         <IonToolbar className={styles["ion-header"]}>
           <IonButtons slot="start">
-            <Link to='/home'>
+            <Link to='/home' replace={true}>
               <IonButton fill="clear"  className={styles.backButton}>
                 <IonIcon slot="start" icon={arrowBack} />
               </IonButton>
             </Link>
           </IonButtons>
 
-          <IonTitle className="ion-no-padding ion-padding-end ion-text-center"> Musicaterapia </IonTitle>
+          <IonTitle className="ion-no-padding ion-padding-end ion-text-center"> Musicoterapia </IonTitle>
 
         </IonToolbar>
       </IonHeader>
@@ -63,7 +65,7 @@ const Musicaterapia: React.FC = () => {
       <IonContent fullscreen className={`ion-padding ${styles["ion-content"]}`}>
         <IonHeader collapse="condense">
           <IonToolbar>
-            <IonTitle size="large">Musicaterapia</IonTitle>
+            <IonTitle size="large">Musicoterapia</IonTitle>
           </IonToolbar>
         </IonHeader>
 
@@ -78,9 +80,6 @@ const Musicaterapia: React.FC = () => {
 
         {tab == "clips" ? <ClipsComponent /> : <PlaylistComponent />}
         
-
-        <Toast />
-
       </IonContent>
 
       <Footer  id="footer"/>

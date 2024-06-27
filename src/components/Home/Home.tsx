@@ -8,6 +8,8 @@ import {
   IonFabList,
   IonIcon,
   IonLabel,
+  useIonAlert,
+  useIonLoading,
 } from "@ionic/react";
 import {
   add,
@@ -21,12 +23,30 @@ import { Card } from "./Card";
 import { Modal } from "@/components/Modal/Modal";
 import { Texto } from "./Texto/Texto";
 import { Audio } from "./Audio/Audio";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import {
+  getHome,
+  confirmAudio,
+  confirmMensaje,
+  confirmTarea,
+} from "@/services/home";
+import { localDB } from "@/helpers/localStore";
+
+import { useContext } from "react";
+import UIContext from "@/context/Context";
+import { Toast } from "@/components/Toast/Toast";
 
 export const Home = () => {
+  
+  const { globalAudio }: any = useContext(UIContext);
 
-    const [show, setShow] = useState(false)
+  const [present, dismiss] = useIonLoading();
+  const [presentAlert] = useIonAlert();
+  const localHome = localDB("home");
+  
+  const [show, setShow] = useState(false);
+  const [data, setData] = useState<any>({ mensaje: {}, tarea: {}, audio: {} });
 
   const fechaHoy = new Date();
   const today = fechaHoy.getDay();
@@ -34,15 +54,134 @@ export const Home = () => {
   const daysOfWeek = ["D", "L", "M", "M", "J", "V", "S"];
 
   const onToggleShow = () => {
-    setShow( !show );
-  }
+    setShow(!show);
+  };
+
+  const onGetHome = async () => {
+    try {
+      const localData = localHome.get();
+
+      if (!localData.data || new Date(localData.endTime) < new Date()) {
+        present({
+          message: "Loading ...",
+        });
+
+        const { data: info } = await getHome({});
+
+        const endTime = new Date();
+        endTime.setHours(23, 59, 59, 0o0);
+
+        localHome.set({ data: info, endTime });
+        setData(info);
+      } else {
+        setData({ ...localData.data });
+      }
+    } catch (error: any) {
+      presentAlert({
+        header: "Alerta!",
+        subHeader: "Mensaje importante.",
+        message: error.data?.message || "Error Interno",
+        buttons: ["OK"],
+      });
+    } finally {
+      dismiss();
+    }
+  };
+
+  const onConfirmAudio = async () => {
+    try {
+      present({
+        message: "Loading ...",
+      });
+
+      const formData = {
+        audios_id: data.audio.id,
+      };
+
+      await confirmAudio(formData);
+
+      data.audio.done = true;
+      setData({ ...data });
+
+      const localData = localHome.get();
+      localHome.set({ ...localData, data: { ...data } });
+    } catch (error: any) {
+      presentAlert({
+        header: "Alerta!",
+        subHeader: "Mensaje importante.",
+        message: error.data?.message || "Error Interno",
+        buttons: ["OK"],
+      });
+    } finally {
+      dismiss();
+    }
+  };
+
+  const onConfirmMensaje = async () => {
+    try {
+      present({
+        message: "Loading ...",
+      });
+
+      const formData = {
+        mensajes_id: data.mensaje.id,
+      };
+
+      await confirmMensaje(formData);
+
+      data.mensaje.done = true;
+
+      setData({ ...data });
+
+      const localData = localHome.get();
+      localHome.set({ ...localData, data: { ...data } });
+    } catch (error: any) {
+      presentAlert({
+        header: "Alerta!",
+        subHeader: "Mensaje importante.",
+        message: error.data?.message || "Error Interno",
+        buttons: ["OK"],
+      });
+    } finally {
+      dismiss();
+    }
+  };
+
+  const onConfirmTarea = async () => {
+    try {
+      present({
+        message: "Loading ...",
+      });
+
+      const formData = {
+        tareas_id: data.tarea.id,
+      };
+
+      await confirmTarea(formData);
+
+      data.tarea.done = true;
+      setData({ ...data });
+
+      const localData = localHome.get();
+      localHome.set({ ...localData, data: { ...data } });
+    } catch (error: any) {
+      presentAlert({
+        header: "Alerta!",
+        subHeader: "Mensaje importante.",
+        message: error.data?.message || "Error Interno",
+        buttons: ["OK"],
+      });
+    } finally {
+      dismiss();
+    }
+  };
+
+  useEffect(() => {
+    onGetHome();
+  }, []);
 
   return (
     <>
-        { show && 
-            <IonBackdrop visible={true}></IonBackdrop>
-        }
-
       <IonCard
         className={`ion-no-margin ion-no-padding ${styles["card-calendar"]}`}
       >
@@ -80,6 +219,7 @@ export const Home = () => {
           buttonTitle="Ver"
           icon="assets/images/tarea.png"
           title="Tarea del día"
+          done={data.tarea?.done || false}
         />
 
         <Card
@@ -87,28 +227,46 @@ export const Home = () => {
           buttonTitle="Ver"
           icon="assets/images/comentario.png"
           title="Mensaje del día"
+          done={data.mensaje?.done || false}
         />
 
         <Card
           buttonID="modal-auricular"
           buttonTitle="Escuchar"
           icon="assets/images/auricular.png"
-          title="Audio del día"
+          title="Audio de la noche"
+          done={data.audio?.done || false}
         />
       </div>
 
-      <Modal trigger="modal-tarea" title="Tarea del día">
-        <Texto />
+      <Modal
+        trigger="modal-tarea"
+        title="Tarea del día"
+        hideButtons={data.tarea?.done || false}
+        onConfirm={() => onConfirmTarea()}
+      >
+        <Texto descripcion={data.tarea?.tarea || ''} />
       </Modal>
 
-      <Modal trigger="modal-comentario" title="Mensaje del día">
-        <Texto />
+      <Modal
+        trigger="modal-comentario"
+        title="Mensaje del día"
+        hideButtons={data.mensaje?.done || false}
+        onConfirm={() => onConfirmMensaje()}
+      >
+        <Texto descripcion={data.mensaje?.mensaje || ''} />
       </Modal>
 
-      <Modal trigger="modal-auricular" title="Audio del día">
-        <Audio />
+      <Modal
+        trigger="modal-auricular"
+        title="Audio de la noche"
+        hideButtons={data.audio?.done || false}
+        onConfirm={() => onConfirmAudio()}
+      >
+        <Audio audio={data.audio} onConfirm={() => onConfirmAudio()} />
       </Modal>
 
+      {/*
       <IonFab
         slot="fixed"
         vertical="bottom"
@@ -137,6 +295,8 @@ export const Home = () => {
           </Link>
         </IonFabList>
       </IonFab>
+      */}
+
     </>
   );
 };

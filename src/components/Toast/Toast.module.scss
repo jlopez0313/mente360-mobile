@@ -4,10 +4,35 @@
     background: var(--bg-main);
     box-shadow: 3px 3px 10px 0 rgba(0, 0, 0, 0.2);
     --color: #4b4a50;
+    min-height: 48px;
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     
     position: absolute;
-    bottom: 70px;
+    bottom: 60px;
+    right: 16px;
     z-index: 90;
     width: calc(100% - 32px);
+
+    ion-label {
+        font-size: 12px !important;
+    }
     
 }
+
+.unread-indicator {
+    width: calc(100% - 16px);
+    height: 5px;
+  
+    position: absolute;
+  
+    inset-inline-start: 12px;
+    bottom: 0;
+    left: 0;
+
+    ion-progress-bar {
+        height: 2px;
+    }
+  }

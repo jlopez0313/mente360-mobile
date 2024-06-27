@@ -38,20 +38,29 @@ import {
 import { Footer } from "@/components/Footer/Footer";
 import { Link } from "react-router-dom";
 
+import UIContext from "@/context/Context";
+import { useContext, useEffect } from "react";
+
 const Crecimiento: React.FC = () => {
+  const { setShowGlobalAudio }: any = useContext(UIContext);
+
+  useEffect(() => {
+    setShowGlobalAudio( true )
+  }, [])
+
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar className={styles["ion-header"]}>
           <IonButtons slot="start">
-            <Link to='/home'>
+            <Link to='/home' replace={true}>
               <IonButton fill="clear"  className={styles.backButton}>
                 <IonIcon slot="start" icon={arrowBack} />
               </IonButton>
             </Link>
           </IonButtons>
 
-          <IonTitle class='ion-no-padding ion-padding-end ion-text-center'> Crecimiento </IonTitle>
+          <IonTitle class='ion-no-padding ion-padding-end ion-text-center'> Podcast 360 </IonTitle>
         </IonToolbar>
       </IonHeader>
 

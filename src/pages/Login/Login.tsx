@@ -12,16 +12,24 @@ import {
 } from "@ionic/react";
 
 import { Login as LoginComponent } from "@/components/Login/Login/Login";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Register } from "@/components/Login/Register/Register";
 import styles from "./Login.module.scss";
+import UIContext from "@/context/Context";
 
 const Login: React.FC = () => {
   const [tab, setTab] = useState("login");
 
+  const { setGlobalAudio }: any = useContext(UIContext);
+
   const onSetTab = (e) => {
     setTab(e.detail.value);
   };
+
+  useEffect(() => {
+    setGlobalAudio(null)
+    localStorage.clear();
+  }, [])
 
   return (
     <IonPage>

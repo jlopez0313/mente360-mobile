@@ -1,8 +1,18 @@
 import { IonAvatar, IonItem, IonItemDivider, IonItemGroup, IonLabel, IonList } from '@ionic/react'
-import React from 'react'
 import styles from "./Notifications.module.scss";
 
+
+import UIContext from "@/context/Context";
+import { useContext, useEffect } from "react";
+
 export const Notifications = () => {
+
+  const { setShowGlobalAudio }: any = useContext(UIContext);
+
+  useEffect(() => {
+    setShowGlobalAudio( false )
+  }, [])
+  
   return (
     <div className={styles['ion-content']}>
         <IonList inset={true}>

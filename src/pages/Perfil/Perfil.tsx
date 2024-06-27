@@ -11,20 +11,27 @@ import {
 
 import { IonIcon } from "@ionic/react";
 import { arrowBack, settingsOutline } from "ionicons/icons";
-import Configuracion from "../Configuracion/Configuración";
 import { Perfil as PerfilComponent} from "@/components/Perfil/Perfil";
-
 
 import styles from "./Perfil.module.scss";
 import { Link } from "react-router-dom";
+import UIContext from "@/context/Context";
+import { useContext, useEffect } from "react";
+
 
 const Perfil: React.FC = () => {
+  const { setShowGlobalAudio }: any = useContext(UIContext);
+
+  useEffect(() => {
+    setShowGlobalAudio( false )
+  }, [])
+
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar className={styles["ion-header"]}>
           <IonButtons slot="start">
-            <Link to='/home'>
+            <Link to='/home' replace={true}>
               <IonButton fill="clear"  className={styles.backButton}>
                 <IonIcon slot="start" icon={arrowBack} />
               </IonButton>
@@ -34,7 +41,7 @@ const Perfil: React.FC = () => {
           <IonTitle> Mi Perfil </IonTitle>
 
           <IonButtons slot="end">
-            <Link to='/configuracion'>
+            <Link to='/configuracion' replace={true}>
               <IonButton>
                 <IonIcon slot="icon-only" icon={settingsOutline} />
               </IonButton>
