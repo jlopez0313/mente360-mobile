@@ -5,6 +5,7 @@ import {
   IonCol,
   IonDatetime,
   IonGrid,
+  IonIcon,
   IonImg,
   IonInput,
   IonItem,
@@ -27,6 +28,7 @@ import { all } from "@/services/constants";
 import { getUser, setUser } from "@/helpers/onboarding";
 import { useHistory } from "react-router";
 import { useEffect, useState } from "react";
+import { helpCircleOutline } from "ionicons/icons";
 
 export const Registro = () => {
   const [present, dismiss] = useIonLoading();
@@ -40,6 +42,14 @@ export const Registro = () => {
   const [eneatipo, setEneatipo] = useState("");
   const [fecha_nacimiento, setFechaNacimiento] = useState("");
   const [constants, setConstants] = useState({ eneatipos: [], generos: [] });
+
+  const showAlert = () => {
+    presentAlert({
+      subHeader: "Mensaje importante!",
+      message: "Si no conoces tu eneatipo, puedes realizar el test una vez te registres.",
+      buttons: ["OK"],
+    });
+  }
 
   const getMaxDate = () => {
     const today = new Date();
@@ -178,13 +188,12 @@ export const Registro = () => {
 
               <IonSelect
                 interface="popover"
-                label="Genero"
-                labelPlacement="floating"
-                shape="round"
+                labelPlacement="stacked"
+                placeholder="Genero"
                 fill="outline"
-                placeholder="Enter text"
-                className={`ion-margin-bottom ${styles.profile}`}
+                shape="round"
                 value={genero}
+                className={`ion-margin-bottom ${styles.login}`}
                 onIonChange={(e) => setGenero(e.target.value)}
               >
                 {constants.generos.map((item: any, idx: any) => {
@@ -197,28 +206,34 @@ export const Registro = () => {
                 })}
               </IonSelect>
 
-              <IonSelect
-                interface="popover"
-                labelPlacement="stacked"
-                placeholder="Eneatipo"
-                shape="round"
-                fill="outline"
-                className={`ion-margin-bottom ${styles.login}`}
-                value={eneatipo}
-                onIonChange={(e) => setEneatipo(e.target.value)}
-              >
-                {constants.eneatipos.map((item: any, idx: any) => {
-                  return (
-                    <IonSelectOption key={idx} value={item.key}>
-                      {" "}
-                      {item.valor}{" "}
-                    </IonSelectOption>
-                  );
-                })}
-              </IonSelect>
+              <IonItem className="ion-no-padding" lines="none">
+
+                <IonSelect
+                  interface="popover"
+                  labelPlacement="stacked"
+                  placeholder="Eneatipo"
+                  shape="round"
+                  fill="outline"
+                  className={`ion-margin-bottom ${styles.login}`}
+                  value={eneatipo}
+                  onIonChange={(e) => setEneatipo(e.target.value)}
+                  cancelText={'clear'}
+                >
+                  {constants.eneatipos.map((item: any, idx: any) => {
+                    return (
+                      <IonSelectOption key={idx} value={item.key}>
+                        {" "}
+                        {item.valor}{" "}
+                      </IonSelectOption>
+                    );
+                  })}
+                </IonSelect>
+                
+                <IonIcon slot="end" icon={helpCircleOutline} onClick={showAlert} />
+              </IonItem>
+
 
               <IonLoading
-                trigger="open-loading"
                 message="Dismissing after 3 seconds..."
                 duration={3000}
               />

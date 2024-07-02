@@ -106,7 +106,6 @@ export const Register = () => {
               <IonNote> &nbsp; </IonNote>
 
               <IonLoading
-                trigger="open-loading"
                 message="Dismissing after 3 seconds..."
                 duration={3000}
               />

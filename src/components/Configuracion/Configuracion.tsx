@@ -38,10 +38,13 @@ export const Configuracion = () => {
             </IonToggle>
           </IonItem>
 
-          <IonItem button={true}>
-            <IonIcon slot="start" icon={cogOutline} />
-            <IonLabel>Realizar Test Eneagrama</IonLabel>
-          </IonItem>
+          <Link to='/test'>
+            <IonItem button={true}>
+              <IonIcon slot="start" icon={cogOutline} />
+                <IonLabel>Realizar Test Eneagrama</IonLabel>
+            </IonItem>
+          </Link>
+          
         </IonItemGroup>
       </IonList>
 
@@ -87,7 +90,7 @@ export const Configuracion = () => {
       </IonList>
 
       <div className="ion-text-center ion-margin-bottom">
-        <Link to='/login'>
+        <Link to='/login' replace={true}>
           <IonButton shape="round">
             <IonLabel>Cerrar Sesión</IonLabel>
           </IonButton>

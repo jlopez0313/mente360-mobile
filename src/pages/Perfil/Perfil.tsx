@@ -38,7 +38,7 @@ const Perfil: React.FC = () => {
             </Link>
           </IonButtons>
 
-          <IonTitle> Mi Perfil </IonTitle>
+          <IonTitle className="ion-text-center"> Mi Perfil </IonTitle>
 
           <IonButtons slot="end">
             <Link to='/configuracion' replace={true}>

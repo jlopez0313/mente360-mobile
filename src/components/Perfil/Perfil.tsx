@@ -21,6 +21,7 @@ import { getUser, setUser } from "@/helpers/onboarding";
 import { useEffect, useState } from "react";
 import { all } from "@/services/constants";
 import { update } from "@/services/user";
+import { Link } from "react-router-dom";
 
 export const Perfil = () => {
 
@@ -261,9 +262,11 @@ export const Perfil = () => {
       <IonGrid>
         <IonRow>
           <IonCol size="6">
-            <IonButton shape="round" expand="block">
-              Cancelar
-            </IonButton>
+            <Link to='/home' replace={true}>
+              <IonButton shape="round" expand="block">
+                Cancelar
+              </IonButton>
+            </Link>
           </IonCol>
           <IonCol size="6">
             <IonButton shape="round" expand="block" onClick={onUpdateUser}>

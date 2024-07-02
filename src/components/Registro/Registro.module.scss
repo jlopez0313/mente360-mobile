@@ -23,6 +23,13 @@ ion-select.login {
     border-radius: 16px;
     width: 100%;
     --background: linear-gradient(#FFCC33, #FFB347);
+
+    &::part(placeholder),
+    &::part(text) {
+        font-size: 14px;
+        color: #777;
+        text-align: justify;
+    }
 }
 
 
