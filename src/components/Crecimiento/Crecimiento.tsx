@@ -183,6 +183,7 @@ export const Crecimiento = () => {
       </div>
 
       <Swiper
+        allowTouchMove={false}
         spaceBetween={10}
         slidesPerView={1}
         centeredSlides={true}

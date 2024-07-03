@@ -22,6 +22,7 @@ import { useEffect, useState } from "react";
 import { all } from "@/services/constants";
 import { update } from "@/services/user";
 import { Link } from "react-router-dom";
+import { localDB } from "@/helpers/localStore";
 
 export const Perfil = () => {
 
@@ -29,6 +30,7 @@ export const Perfil = () => {
   const [presentAlert] = useIonAlert();
 
   const user = getUser();
+  const homeDB = localDB('home');
 
   const [usuario, setUsuario] = useState(user.user);
   const [edad, setEdad] = useState(0);
@@ -91,6 +93,10 @@ export const Perfil = () => {
       present({
         message: "Loading ...",
       });
+
+      if ( usuario.eneatipo != user.user.eneatipo ) {
+        homeDB.clear();
+      }
 
       const { data } = await update(usuario, user.user.id);
       setUser({...user, user: data.data});

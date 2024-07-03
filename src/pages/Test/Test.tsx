@@ -18,9 +18,11 @@ import { arrowBack } from "ionicons/icons";
 
 import UIContext from "@/context/Context";
 import { useContext, useEffect } from "react";
+import { getUser } from "@/helpers/onboarding";
 
 const Test: React.FC = () => {
   const { setShowGlobalAudio }: any = useContext(UIContext);
+  const { user } = getUser();
 
   useEffect(() => {
     setShowGlobalAudio( false )
@@ -41,7 +43,7 @@ const Test: React.FC = () => {
           <div className={`ion-padding ${styles.title}`}>
             <IonTitle className="ion-text-center">
               {" "}
-              Hola, <strong className={styles.name}> Leonardo </strong>{" "}
+              Hola, <strong className={styles.name}> {user.name} </strong>{" "}
             </IonTitle>
             <IonText className="ion-text-center">
               Por favor, realiza el test de eneagrama para conocer tu Eneatipo

@@ -26,7 +26,7 @@ export const add = async( payload: {} ) => {
         const { post } = baseApi();
     
         try {
-            resolve ( await post('/playlist/', payload, {"Accept": "application/json", "Content-type": "application/json" } ) )
+            resolve ( await post('/playlist', payload, {"Accept": "application/json", "Content-type": "application/json" } ) )
         } catch( error: any ) {
             if (error.response) {
                 reject(error.response)

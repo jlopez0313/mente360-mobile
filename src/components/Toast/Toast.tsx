@@ -5,11 +5,16 @@ import {
   IonNote,
   IonProgressBar,
   IonToast,
+  useIonAlert,
+  useIonLoading,
 } from "@ionic/react";
-import React, { useContext, useEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { getUser } from "@/helpers/onboarding";
+import { add, trash } from "@/services/playlist";
 
 import styles from "./Toast.module.scss";
 import {
+  closeCircle,
   pauseCircle,
   pauseCircleOutline,
   playBack,
@@ -18,6 +23,7 @@ import {
   playForward,
   playSkipBack,
   playSkipForward,
+  star,
   starOutline,
 } from "ionicons/icons";
 
@@ -43,7 +49,26 @@ export const Toast = () => {
     setGlobalAudio,
     globalPos,
     setGlobalPos,
+    setShowGlobalAudio,
   }: any = useContext(UIContext);
+
+  const { user } = getUser();
+  const [present, dismiss] = useIonLoading();
+  const [presentAlert] = useIonAlert();
+
+  const [hasClip, setHasClip] = useState<boolean>( false)
+
+  const hasThisUser = (usuarios_clips: any[]) => {
+    const hasUserClip = usuarios_clips?.find( item => item.users_id == user?.id )
+    setHasClip( hasUserClip )
+  }
+
+  const onClear = () => {
+    // setShowGlobalAudio( false );
+    onEnd();
+    setGlobalPos(0);
+    setGlobalAudio( null );
+  }
 
   const goToPrev = async () => {
     onEnd();
@@ -65,57 +90,129 @@ export const Toast = () => {
     setGlobalAudio(next);
   };
 
+
+  const onTrash = async () => {
+    try {
+      present({
+        message: "Loading ...",
+      });
+
+      const userClip = hasThisUser(globalAudio.usuarios_clips);
+      
+      await trash( userClip?.id );
+      
+      const clip = {...globalAudio, usuarios_clips: globalAudio.usuarios_clips.filter( (uc: any) => uc != userClip ) }
+      setGlobalAudio( clip );
+      // onGetClips();
+
+    } catch (error: any) {
+      presentAlert({
+        header: "Alerta!",
+        subHeader: "Mensaje importante.",
+        message: error.data?.message || "Error Interno",
+        buttons: ["OK"],
+      });
+    } finally {
+      dismiss();
+    }
+  }
+
+  const onAdd = async () => {
+    try {
+      present({
+        message: "Loading ...",
+      });
+
+      const formData = {
+        clips_id: globalAudio.id,
+        users_id: user.id
+      }
+
+      const {data: {data}} = await add( formData );
+      
+      globalAudio.usuarios_clips.push({ id: data.id, clips_id: data.clip.id, users_id: user.id });
+
+      console.log( globalAudio );
+      setGlobalAudio( { ...globalAudio } )
+
+    } catch (error: any) {
+      presentAlert({
+        header: "Alerta!",
+        subHeader: "Mensaje importante.",
+        message: error.data?.message || "Error Interno",
+        buttons: ["OK"],
+      });
+    } finally {
+      dismiss();
+    }
+  }
+
   useEffect(() => {
-    onPlay()
+    onPlay();
+    hasThisUser(globalAudio.usuarios_clips)
   }, [globalAudio])
 
   return (
-    <IonItem lines="none" button={true} className={`${styles["custom-toast"]}`}>
-      <IonLabel class="ion-text-left"> {globalAudio.titulo} </IonLabel>
-
+    <>
       <IonIcon
-        onClick={goToPrev}
+        onClick={onClear}
         aria-hidden="true"
-        slot="end"
-        icon={playSkipBack}
+        icon={closeCircle}
+        className={`${styles["custom-close"]}`}
       />
 
-      {isPlaying ? (
+      <IonItem lines="none" button={true} className={`${styles["custom-toast"]}`}>
+        <IonLabel class="ion-text-left"> {globalAudio.titulo} </IonLabel>
+
         <IonIcon
-          onClick={onPause}
+          onClick={goToPrev}
           aria-hidden="true"
           slot="end"
-          icon={pauseCircle}
-        ></IonIcon>
-      ) : (
+          icon={playSkipBack}
+        />
+
+        {isPlaying ? (
+          <IonIcon
+            onClick={onPause}
+            aria-hidden="true"
+            slot="end"
+            icon={pauseCircle}
+          ></IonIcon>
+        ) : (
+          <IonIcon
+            onClick={onPlay}
+            aria-hidden="true"
+            slot="end"
+            icon={playCircle}
+          ></IonIcon>
+        )}
+
         <IonIcon
-          onClick={onPlay}
+          onClick={goToNext}
           aria-hidden="true"
           slot="end"
-          icon={playCircle}
-        ></IonIcon>
-      )}
+          icon={playSkipForward}
+        />
 
-      <IonIcon
-        onClick={goToNext}
-        aria-hidden="true"
-        slot="end"
-        icon={playSkipForward}
-      />
-      <IonIcon aria-hidden="true" slot="end" icon={starOutline} />
+        {
+          hasClip ?
+          <IonIcon aria-hidden="true" slot="end" icon={star} onClick={() => onTrash()} /> : 
+          <IonIcon aria-hidden="true" slot="end" icon={starOutline} onClick={() => onAdd()}  />
+        }
 
-      <audio
-        ref={audioRef}
-        src={baseURL + globalAudio.audio}
-        onLoadedMetadata={onLoadedMetadata}
-        onTimeUpdate={onTimeUpdate}
-        onEnded={goToNext}
-      />
-      
-      <div className={`${styles['unread-indicator']}`}>
-        <IonProgressBar value={progress/100} color="dark" />
-      </div>
-      
-    </IonItem>
+        <audio
+          ref={audioRef}
+          src={baseURL + globalAudio.audio}
+          onLoadedMetadata={onLoadedMetadata}
+          onTimeUpdate={onTimeUpdate}
+          onEnded={goToNext}
+        />
+        
+        <div className={`${styles['unread-indicator']}`}>
+          <IonProgressBar value={progress/100} color="dark" />
+        </div>
+        
+      </IonItem>
+    </>
   );
 };

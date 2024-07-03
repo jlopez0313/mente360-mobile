@@ -47,11 +47,16 @@ export const useAudio: any = (audioRef: any, onConfirm: any = () => {}) => {
   }
 
   const onPlay = () => {
-    audioRef.current?.play()
-    .catch( (error: any) => {
+    try {
+      audioRef.current?.play()
+      .catch((error: any) => {
+        console.log("Chrome cannot play sound without user interaction first");
+        onStart();
+      })
+    }catch(error: any) {
       console.log("Chrome cannot play sound without user interaction first");
       onStart();
-    });
+    };
 
     setIsPlaying( true );
   }

@@ -47,6 +47,8 @@ export const Home = () => {
   
   const [show, setShow] = useState(false);
   const [data, setData] = useState<any>({ mensaje: {}, tarea: {}, audio: {} });
+  const [dateEnd, setDateEnd] = useState<string>('');
+  const [currentDate, setCurrentDate] = useState<string>('');
 
   const fechaHoy = new Date();
   const today = fechaHoy.getDay();
@@ -57,9 +59,16 @@ export const Home = () => {
     setShow(!show);
   };
 
+  setTimeout(() => { 
+    console.log('object');
+    setCurrentDate( new Date().toLocaleTimeString() )
+  }, 1000);
+  
   const onGetHome = async () => {
     try {
       const localData = localHome.get();
+
+      console.log( new Date(localData.endTime), new Date() );
 
       if (!localData.data || new Date(localData.endTime) < new Date()) {
         present({
@@ -70,11 +79,14 @@ export const Home = () => {
 
         const endTime = new Date();
         endTime.setHours(23, 59, 59, 0o0);
+        setDateEnd( endTime.toLocaleString() )
 
         localHome.set({ data: info, endTime });
         setData(info);
       } else {
         setData({ ...localData.data });
+        const endTime = new Date( localData.endTime ); 
+        setDateEnd( endTime.toLocaleString() )
       }
     } catch (error: any) {
       presentAlert({
@@ -190,11 +202,11 @@ export const Home = () => {
             <div>
               <img src="assets/images/calendario.png" />
               <IonLabel>
-                <strong> &nbsp; {fechaHoy.toLocaleDateString()} </strong>
+                <strong> &nbsp; {fechaHoy.toLocaleDateString()} { currentDate } </strong>
               </IonLabel>
             </div>
             <IonLabel>
-              <strong> CALENDARIO </strong>
+              <strong> {/* CALENDARIO */} {dateEnd} </strong>
             </IonLabel>
           </div>
           <div className={styles.daysOfWeek}>

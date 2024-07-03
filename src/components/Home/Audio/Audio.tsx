@@ -93,11 +93,14 @@ export const Audio: React.FC<Props> = ({ audio, onConfirm }) => {
         </div>
 
         <div className={`${styles.controls}`}>
-          <IonIcon
-            onClick={onStart}
-            className={styles.previous}
-            icon={playSkipBack}
-          ></IonIcon>
+          {/*
+            <IonIcon
+              onClick={onStart}
+              className={styles.previous}
+              icon={playSkipBack}
+            ></IonIcon>
+           */}
+
           <div className={`${styles.play}`}>
             {isPlaying ? (
               <IonIcon onClick={onPause} icon={pause}></IonIcon>
@@ -105,11 +108,14 @@ export const Audio: React.FC<Props> = ({ audio, onConfirm }) => {
               <IonIcon onClick={onPlay} icon={play}></IonIcon>
             )}
           </div>
-          <IonIcon
-            onClick={onEnd}
-            className={styles.next}
-            icon={playSkipForward}
-          ></IonIcon>
+          
+          {/*
+            <IonIcon
+              onClick={onEnd}
+              className={styles.next}
+              icon={playSkipForward}
+            ></IonIcon>
+           */}
         </div>
 
         <audio

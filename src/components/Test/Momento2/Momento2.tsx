@@ -14,10 +14,12 @@ import {
 } from "@ionic/react";
 
 import styles from "../Test.module.scss";
-import { memo } from "react";
+import { memo, useEffect, useState } from "react";
 import { test } from "@/services/test";
 import { useHistory } from "react-router";
 import { setUser, getUser } from "@/helpers/onboarding";
+import { all } from "@/services/constants";
+import { localDB } from "@/helpers/localStore";
 
 const Momento2: React.FC<any> = memo(
   ({momentos, onSetMomento}) => {
@@ -26,11 +28,35 @@ const Momento2: React.FC<any> = memo(
   const [presentAlert] = useIonAlert();
   const history = useHistory();
   const user = getUser();
+  const homeDB = localDB('home');
+
+  const [constants, setConstants] = useState({ eneatipos: [], generos: [] });
 
   const onClearMomentos = () => {
     onSetMomento('dos', null)
     onSetMomento('uno', null)
   }
+
+  const onGetConstants = async () => {
+    try {
+      present({
+        message: "Loading ...",
+      });
+
+      const { data } = await all();
+      setConstants(data);
+
+    } catch (error: any) {
+      presentAlert({
+        header: "Alerta!",
+        subHeader: "Mensaje importante.",
+        message: error.data?.message || "Error Interno",
+        buttons: ["OK"],
+      });
+    } finally {
+      dismiss();
+    }
+  };
 
   const send = async (evt: any) => {
     evt.preventDefault();
@@ -40,9 +66,21 @@ const Momento2: React.FC<any> = memo(
         message: "Loading ...",
       });
 
-      const { data } = await test( momentos );
+      const { data: { data } } = await test( momentos );
 
-      await setUser({...user, user: data.data});
+      await setUser({...user, user: data});
+      homeDB.clear();
+
+      const eneatipo: any = constants.eneatipos.find( (item: any) => item.key == data.eneatipo );
+
+      presentAlert({
+        header: "Alerta!",
+        subHeader: "Mensaje importante.",
+        message: "Tu resultado es " + data.eneatipo + ". " + eneatipo?.descripcion,
+        buttons: ["OK"],
+      });
+
+
 
       setTimeout(() => {
         history.replace("/home");
@@ -59,6 +97,10 @@ const Momento2: React.FC<any> = memo(
       dismiss();
     }
   };
+
+  useEffect(() => {
+    onGetConstants();
+  }, []);
 
   return (
     <>

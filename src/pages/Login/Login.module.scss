@@ -5,7 +5,7 @@
 }
 
 .ion-content {
-    --background: url('assets/images/login.png');
+    --background: url('assets/images/login.png') no-repeat 50% 50% / cover;
 
     ion-grid {
         height: 100%;

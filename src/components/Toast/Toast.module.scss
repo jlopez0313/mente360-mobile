@@ -1,5 +1,15 @@
 @import "@/styles.scss";
 
+.custom-close {
+    font-size: 24px;
+    color: #4b4a50;
+
+    position: absolute;
+    bottom: 72px;
+    left: 5px;
+    z-index: 99;
+}
+
 .custom-toast {
     background: var(--bg-main);
     box-shadow: 3px 3px 10px 0 rgba(0, 0, 0, 0.2);

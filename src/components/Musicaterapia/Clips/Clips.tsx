@@ -167,6 +167,16 @@ export const Clips = () => {
       onPlay()
   }
 
+  const onUpdateList = () => {
+    onPlay();
+
+    const tmpClips = clips.map( (item: any) => {
+      return item.id == globalAudio.id ? globalAudio : item
+    }) 
+
+    setClips( tmpClips );
+  }
+
   useEffect(() => {
     onGetCategorias();
 
@@ -174,7 +184,7 @@ export const Clips = () => {
   }, []);
 
   useEffect( () => {
-    onPlay()
+    globalAudio && onUpdateList();
   }, [globalAudio])
 
   return (
