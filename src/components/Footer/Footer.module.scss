@@ -7,7 +7,18 @@
 
     ion-button {
       --background: none;
+
+      &.active {
+        border-radius: 50%;
+        background-color: rgba(80, 80, 80, 0.2);
+      }
     }
   }
+}
+
+.texto {
+  text-align: justify;
+  padding: 30px 50px;
+  font-size: 15 px;
 }
   

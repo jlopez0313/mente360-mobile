@@ -17,10 +17,14 @@ import { Register } from "@/components/Login/Register/Register";
 import styles from "./Login.module.scss";
 import UIContext from "@/context/Context";
 
-const Login: React.FC = () => {
-  const [tab, setTab] = useState("login");
+import { useHistory } from "react-router";
 
-  const { setGlobalAudio }: any = useContext(UIContext);
+const Login: React.FC = () => {
+  
+  const [tab, setTab] = useState("login");
+  const history = useHistory();
+
+  const { db, setGlobalAudio }: any = useContext(UIContext);
 
   const onSetTab = (e) => {
     setTab(e.detail.value);
@@ -28,8 +32,19 @@ const Login: React.FC = () => {
 
   useEffect(() => {
     setGlobalAudio(null)
-    localStorage.clear();
   }, [])
+
+  
+  const runGet = async () => {
+    const val = await db.get('user');
+    console.log( 'VAL ', val );
+    val && history.replace("/home");
+  }
+  
+  useEffect(() => {
+    console.log(db, history);
+    db && history && runGet();
+  }, [db, history])
 
   return (
     <IonPage>

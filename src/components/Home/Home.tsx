@@ -60,15 +60,12 @@ export const Home = () => {
   };
 
   setTimeout(() => { 
-    console.log('object');
-    setCurrentDate( new Date().toLocaleTimeString() )
+    setCurrentDate( new Date().toLocaleString() )
   }, 1000);
   
   const onGetHome = async () => {
     try {
       const localData = localHome.get();
-
-      console.log( new Date(localData.endTime), new Date() );
 
       if (!localData.data || new Date(localData.endTime) < new Date()) {
         present({
@@ -190,7 +187,7 @@ export const Home = () => {
 
   useEffect(() => {
     onGetHome();
-  }, []);
+  }, [currentDate]);
 
   return (
     <>
@@ -202,7 +199,7 @@ export const Home = () => {
             <div>
               <img src="assets/images/calendario.png" />
               <IonLabel>
-                <strong> &nbsp; {fechaHoy.toLocaleDateString()} { currentDate } </strong>
+                <strong> &nbsp; { currentDate } </strong>
               </IonLabel>
             </div>
             <IonLabel>

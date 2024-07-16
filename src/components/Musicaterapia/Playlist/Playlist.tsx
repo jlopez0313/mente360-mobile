@@ -119,13 +119,14 @@ export const Playlist = () => {
         {
           playlist.map( (item: any, idx: any) => {
             return (
+              item.clip && 
               <IonItem key={idx} button={true} className="ion-margin-bottom">
                 {
-                  globalAudio?.id == item.clip.id && isPlaying ?
+                  globalAudio?.id == item.clip?.id && isPlaying ?
                   <IonIcon aria-hidden="true" slot="start" icon={pauseCircle} onClick={onPause} /> :
                   <IonIcon aria-hidden="true" slot='start' icon={playCircle}  onClick={() => onPlay( idx, item )} />
                 }
-                <IonLabel class="ion-text-left"> {item.clip.titulo} </IonLabel>
+                <IonLabel class="ion-text-left"> {item.clip?.titulo} </IonLabel>
                 <IonIcon aria-hidden="true" slot='end' icon={trashOutline} onClick={() => onTrash(item.id)} />
               </IonItem>
             )

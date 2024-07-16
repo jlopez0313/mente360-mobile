@@ -21,9 +21,18 @@ import {
 import React from "react";
 import Login from "@/pages/Login/Login";
 import styles from "./Configuracion.module.scss";
-import { Link } from "react-router-dom";
+import { Link} from "react-router-dom";
+import { useHistory } from "react-router";
 
 export const Configuracion = () => {
+
+  const history = useHistory();
+
+  const onLogout = () => {
+    localStorage.clear();
+    history.replace("/login");
+  }
+
   return (
     <div className={styles['ion-content']}>
       <IonList inset={true}>
@@ -90,11 +99,9 @@ export const Configuracion = () => {
       </IonList>
 
       <div className="ion-text-center ion-margin-bottom">
-        <Link to='/login' replace={true}>
-          <IonButton shape="round">
+          <IonButton shape="round" onClick={onLogout}>
             <IonLabel>Cerrar Sesión</IonLabel>
           </IonButton>
-        </Link>
       </div>
     </div>
   );

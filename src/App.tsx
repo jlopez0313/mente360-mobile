@@ -38,8 +38,6 @@ setupIonicReact({
 
 const App: React.FC = () => {
 
-  const isLoggedIn = false;
-
   return (
     <IonApp>
       <IonReactRouter>

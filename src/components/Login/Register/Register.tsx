@@ -18,11 +18,17 @@ import styles from "../Login.module.scss";
 
 import { setUser, clearUser } from "@/helpers/onboarding";
 import { register } from "@/services/auth";
+import { login } from "@/services/auth";
+import { GmailLogin } from '@/firebase/auth';
 
 import { useHistory } from "react-router";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import UIContext from "@/context/Context";
 
 export const Register = () => {
+
+  const { db }: any = useContext(UIContext);
+
   const [present, dismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();
   const history = useHistory();
@@ -45,6 +51,7 @@ export const Register = () => {
       });
 
       await setUser(data);
+      db.set('user', email);
 
       setTimeout(() => {
         history.replace("/registro");
@@ -60,6 +67,70 @@ export const Register = () => {
       dismiss();
     }
   };
+
+  const onGmailLogin = async () => {
+    try {
+      present({
+        message: "Loading...",
+      });
+
+      GmailLogin()
+      .then( async (gmailData: any) => {
+
+        try {
+          const { data } = await login({
+            email: gmailData.email,
+            password: 'gmail',
+            device: "gmail",
+          });
+
+          await setUser(data);
+          db.set('user', gmailData.email);
+
+          setTimeout(() => {
+            history.replace("/home");
+          }, 1000);
+
+          dismiss();
+
+        } catch ( error: any ) {
+          if ( error.status == '401' ) {
+
+            const { data: data2 } = await register({
+              name: gmailData.displayName, 
+              email: gmailData.email,
+              password: 'gmail',
+              device: "gmail",
+            });
+  
+            await setUser(data2);
+            db.set('user', gmailData.email);
+
+            setTimeout(() => {
+              history.replace("/perfil");
+            }, 1000);
+            
+            dismiss();
+
+          }
+        }
+          
+      }).catch( (error: any) => {
+        console.log( error )
+        dismiss();
+      })
+
+    } catch (error: any) {
+      presentAlert({
+        header: "Alerta!",
+        subHeader: "Mensaje importante.",
+        message: error.data?.message || "Error Interno",
+        buttons: ["OK"],
+      });
+    } finally {
+      dismiss();
+    }
+  }
 
   useEffect(() => {
     clearUser()
@@ -111,11 +182,12 @@ export const Register = () => {
               />
             </IonCardContent>
           </IonCard>
-          <IonLabel>O iniciar sesión con </IonLabel> <br />
+          <IonLabel>O ingresa con </IonLabel> <br />
           <br />
           <img
             className={styles["logo-google"]}
             src="assets/images/logoGoogle.png"
+            onClick={onGmailLogin}
           />
         </IonCol>
       </IonRow>
