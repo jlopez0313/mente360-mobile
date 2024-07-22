@@ -2,14 +2,9 @@ import { auth } from './config';
 import { getAuth, signInWithPopup, GoogleAuthProvider, FacebookAuthProvider } from 'firebase/auth';
 
 export const GmailLogin = () => {
-
     const provider = new GoogleAuthProvider();
 
     return new Promise( (resolve, reject) => {
-        
-        FirebaseAuthentication.signInWithGoogle({
-            mode: 'redirect',
-        });
         signInWithPopup(auth, provider)
         .then((result) => {
             const credential = GoogleAuthProvider.credentialFromResult(result);
@@ -24,7 +19,6 @@ export const GmailLogin = () => {
             reject( error );
         });
     })
-
 }
 
 export const FacebookLogin = () => {
