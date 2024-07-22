@@ -172,21 +172,19 @@ export const Perfil = () => {
       </div>
 
       <IonInput
-        label="Nombre de Usuario"
-        labelPlacement="floating"
+        labelPlacement="stacked"
         fill="outline"
         shape="round"
-        placeholder="Enter text"
+        placeholder="Nombre de Usuario"
         className={`ion-margin-bottom ${styles.profile}`}
         value={usuario.name}
       ></IonInput>
 
       <IonInput
-        label="Correo Electrónico"
         labelPlacement="floating"
         shape="round"
         fill="outline"
-        placeholder="Enter text"
+        placeholder="Correo Electrónico"
         className={`ion-margin-bottom ${styles.profile}`}
         value={usuario.email}
         readonly={true}
@@ -194,11 +192,10 @@ export const Perfil = () => {
 
       <IonInput
         id="open_cal"
-        label="Fecha de Nacimiento"
-        labelPlacement="floating"
+        labelPlacement="stacked"
         shape="round"
         fill="outline"
-        placeholder="Enter text"
+        placeholder="Fecha de Nacimiento"
         value={usuario.fecha_nacimiento}
         className={`ion-margin-bottom ${styles.profile}`}
       ></IonInput>
@@ -223,11 +220,10 @@ export const Perfil = () => {
 
       <IonSelect
         interface="popover"
-        label="Genero"
-        labelPlacement="floating"
+        labelPlacement="stacked"
         shape="round"
         fill="outline"
-        placeholder="Enter text"
+        placeholder="Genero"
         className={`ion-margin-bottom ${styles.profile}`}
         value={usuario.genero}
         compareWith={compareWithFn}
@@ -245,11 +241,10 @@ export const Perfil = () => {
 
       <IonSelect
         interface="popover"
-        label="Eneatipo"
-        labelPlacement="floating"
+        labelPlacement="stacked"
         shape="round"
         fill="outline"
-        placeholder="Enter text"
+        placeholder="Eneatipo"
         className={`ion-margin-bottom ${styles.profile}`}
         value={usuario.eneatipo}
         compareWith={compareWithFn}

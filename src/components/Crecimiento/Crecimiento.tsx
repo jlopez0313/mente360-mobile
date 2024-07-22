@@ -153,8 +153,8 @@ export const Crecimiento = () => {
   return (
     <div className={`ion-no-padding ${styles["ion-content"]}`}>
       <IonSelect
-        label="Nivel"
-        labelPlacement="floating"
+        placeholder="Nivel"
+        labelPlacement="stacked"
         interface="popover"
         shape="round"
         value={nivelID}

@@ -18,15 +18,16 @@ import styles from "../Login.module.scss";
 
 import { setUser } from "@/helpers/onboarding";
 import { login } from "@/services/auth";
-import { GmailLogin } from '@/firebase/auth';
+import { GmailLogin } from "@/firebase/auth";
 import { register } from "@/services/auth";
 
 import { useContext, useEffect, useState } from "react";
 import UIContext from "@/context/Context";
+import { useHistory } from "react-router";
 
 export const Login = () => {
-
   const { db }: any = useContext(UIContext);
+  const history = useHistory();
 
   const [present, dismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();
@@ -49,7 +50,7 @@ export const Login = () => {
       });
 
       await setUser(data);
-      db.set('user', email);
+      db.set("user", email);
 
       setTimeout(() => {
         history.replace("/home");
@@ -73,50 +74,46 @@ export const Login = () => {
       });
 
       GmailLogin()
-      .then( async (gmailData: any) => {
-
-        try {
-          const { data } = await login({
-            email: gmailData.email,
-            password: 'gmail',
-            device: "gmail",
-          });
-
-          await setUser(data);
-          db.set('user', gmailData.email);
-
-          setTimeout(() => {
-            history.replace("/home");
-          }, 1000);
-
-          dismiss();
-
-        } catch ( error: any ) {
-          if ( error.status == '401' ) {
-
-            const { data: data2 } = await register({
-              name: gmailData.displayName, 
+        .then(async (gmailData: any) => {
+          try {
+            const { data } = await login({
               email: gmailData.email,
-              password: 'gmail',
+              password: "gmail",
               device: "gmail",
             });
-  
-            await setUser(data2);
-            db.set('user', gmailData.email);
-  
+
+            await setUser(data);
+            db.set("user", gmailData.email);
+
             setTimeout(() => {
-              history.replace("/perfil");
+              history.replace("/home");
             }, 1000);
 
             dismiss();
+          } catch (error: any) {
+            if (error.status == "401") {
+              const { data: data2 } = await register({
+                name: gmailData.displayName,
+                email: gmailData.email,
+                password: "gmail",
+                device: "gmail",
+              });
+
+              await setUser(data2);
+              db.set("user", gmailData.email);
+
+              setTimeout(() => {
+                history.replace("/perfil");
+              }, 1000);
+
+              dismiss();
+            }
           }
-        }
-
-      }).catch( (error: any) => {
-        console.log( error )
-        dismiss();
-      })
-
+        })
+        .catch((error: any) => {
+          console.log(error);
+          dismiss();
+        });
     } catch (error: any) {
       presentAlert({
         header: "Alerta!",
@@ -127,8 +124,7 @@ export const Login = () => {
     } finally {
       dismiss();
     }
-  }
-
+  };
 
   return (
     <IonGrid class="ion-text-center">
@@ -145,7 +141,7 @@ export const Login = () => {
                 shape="round"
                 onIonInput={(evt: any) => setEmail(evt.target.value)}
               ></IonInput>
-              
+
               <IonInput
                 className={`ion-margin-bottom ${styles.login}`}
                 type="password"
@@ -174,14 +170,17 @@ export const Login = () => {
                 message="Dismissing after 3 seconds..."
                 duration={3000}
               />
-
             </IonCardContent>
           </IonCard>
-
-          <IonLabel>O ingresa con </IonLabel> <br />
-          <br />
-          <img className={styles['logo-google'] } src="assets/images/logoGoogle.png" onClick={onGmailLogin}/>
-          
+          {/* 
+            <IonLabel>O ingresa con </IonLabel> <br />
+            <br />
+            <img
+              className={styles['logo-google'] }
+              src="assets/images/logoGoogle.png"
+              onClick={onGmailLogin}
+            />
+          */}
         </IonCol>
       </IonRow>
     </IonGrid>

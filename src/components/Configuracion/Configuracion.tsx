@@ -18,18 +18,22 @@ import {
   hammerOutline,
   peopleOutline,
 } from "ionicons/icons";
-import React from "react";
+import React, { useContext } from "react";
 import Login from "@/pages/Login/Login";
 import styles from "./Configuracion.module.scss";
 import { Link} from "react-router-dom";
 import { useHistory } from "react-router";
+import UIContext from "@/context/Context";
 
 export const Configuracion = () => {
 
   const history = useHistory();
 
-  const onLogout = () => {
+  const { db }: any = useContext(UIContext);
+
+  const onLogout = async () => {
     localStorage.clear();
+    await db.clear();
     history.replace("/login");
   }
 

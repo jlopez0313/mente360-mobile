@@ -182,13 +182,15 @@ export const Register = () => {
               />
             </IonCardContent>
           </IonCard>
-          <IonLabel>O ingresa con </IonLabel> <br />
-          <br />
-          <img
-            className={styles["logo-google"]}
-            src="assets/images/logoGoogle.png"
-            onClick={onGmailLogin}
-          />
+          {/* 
+            <IonLabel>O ingresa con </IonLabel> <br />
+            <br />
+            <img
+              className={styles["logo-google"]}
+              src="assets/images/logoGoogle.png"
+              onClick={onGmailLogin}
+            />
+          */}
         </IonCol>
       </IonRow>
     </IonGrid>
