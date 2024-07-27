@@ -62,7 +62,7 @@ export const Audio: React.FC<Props> = memo(({ crecimiento, audio, onGoBack, onGo
   };
 
   const onMoveNext = () => {
-    onEnd();
+    // onEnd();
     onGoNext();
   };
 

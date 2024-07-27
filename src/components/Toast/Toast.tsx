@@ -81,7 +81,7 @@ export const Toast = () => {
   };
 
   const goToNext = async () => {
-    onEnd();
+    // onEnd();
 
     const nextIdx = globalPos == listAudios.length - 1 ? 0 : globalPos + 1;
     setGlobalPos(nextIdx);

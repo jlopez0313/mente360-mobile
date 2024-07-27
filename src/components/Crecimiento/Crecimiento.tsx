@@ -114,7 +114,7 @@ export const Crecimiento = () => {
         await setUser({ ...user, user: data });
       }
     }
-
+    console.log('going next');
     swiper.slideNext();
   }
 
