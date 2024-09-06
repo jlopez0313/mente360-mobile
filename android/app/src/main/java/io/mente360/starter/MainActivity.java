@@ -1,4 +1,4 @@
-package io.ionic.starter;
+package io.mente360.starter;
 
 import com.getcapacitor.BridgeActivity;
 

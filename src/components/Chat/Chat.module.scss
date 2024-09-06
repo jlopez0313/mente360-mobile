@@ -2,10 +2,14 @@
 
 .ion-content { 
     ion-list {
+        background: none;
+
         ion-item-group {
+            background: none;
             --background: var(--bg-secondary);
 
             ion-item-divider {
+                background: none;
                 --background: var(--bg-secondary);
                 border-bottom: none;
                 padding: 0;
@@ -15,17 +19,50 @@
                     font-weight: bold;
                 }
             }
+
+            ion-searchbar {
+                --border-radius: 25px;
+
+                input {
+                    padding-top: 10px !important;
+                    padding-bottom: 10px !important;
+                }
+            }
         }
     }
 
     ion-item {
-        background: var(--bg-secondary);
+        background: none;
         --background: var(--bg-main-gradient);
         --border-radius: 50px;
-
+        
         ion-note {
-            font-size: 12px;
+            font-size: 15px;
             font-weight: bold;
+            align-self: center;
+            padding-top: 14px;
+            padding-bottom: 14px;
+        }
+
+        &.contact {
+            ion-label {
+                margin: 5px 0;
+                
+                span {
+                    display: block;
+                    text-align: justify;
+                    color: #666;
+                    &.name {
+                        font-weight: bold;
+                        font-size: 15px;
+                    }
+                    
+                    &.phone {        
+                        font-size: 14px;
+                    }
+                }
+            }
+            
         }
     }
 }

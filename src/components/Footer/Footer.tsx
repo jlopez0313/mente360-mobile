@@ -55,32 +55,34 @@ export const Footer = (props: any) => {
               <IonIcon slot="icon-only" src={calendario}></IonIcon>
             </IonButton>
           </Link>
+          
+          {/*
+            <IonButton
+              className={tab == "grupo" ? styles.active : ""}
+              id="modal-chat"
+            >
+              <IonIcon slot="icon-only" src={grupo}></IonIcon>
+            </IonButton>
 
-          <IonButton
-            className={tab == "grupo" ? styles.active : ""}
-            id="modal-chat"
-          >
-            <IonIcon slot="icon-only" src={grupo}></IonIcon>
-          </IonButton>
+            <Modal
+              trigger="modal-chat"
+              title="Mensaje importante!"
+              hideButtons={true}
+            >
+              <div className={styles.texto}>
+                <p>
+                Lo sentimos, esta funcionalidad aún no se encuentra disponible.. ¡Esperala pronto!
+                </p>
+              </div>
+            </Modal>
+          */}
 
-          <Modal
-            trigger="modal-chat"
-            title="Mensaje importante!"
-            hideButtons={true}
-          >
-            <div className={styles.texto}>
-              <p>
-              Lo sentimos, esta funcionalidad aún no se encuentra disponible.. ¡Esperala pronto!
-              </p>
-            </div>
-          </Modal>
-
-          {/*<Link to='/chat' replace={true} onClick={() => setTab('grupo')}>
+          <Link to='/chat' replace={true} onClick={() => setTab('grupo')}>
             <IonButton className={ tab == 'grupo' ? styles.active : ''} >
               <IonIcon slot="icon-only" src={grupo}></IonIcon>
             </IonButton>
           </Link>
-          */}
+          
         </IonButtons>
       </IonToolbar>
     </IonFooter>
