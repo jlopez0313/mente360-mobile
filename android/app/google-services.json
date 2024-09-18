@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "29037902198",
+    "firebase_url": "https://mente-360-default-rtdb.firebaseio.com",
+    "project_id": "mente-360",
+    "storage_bucket": "mente-360.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:29037902198:android:b24d3c16d723b5ca766257",
+        "android_client_info": {
+          "package_name": "io.mente360.starter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "29037902198-m17o52uqartvhfbujtb3hmfic38oifas.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDpD0zSOxsJXTAisRHw0ixvqOCYhWiSqU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "29037902198-m17o52uqartvhfbujtb3hmfic38oifas.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
