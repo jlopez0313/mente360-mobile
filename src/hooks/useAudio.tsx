@@ -24,31 +24,35 @@ export const useAudio: any = (audioRef: any, onConfirm: any = () => {}) => {
   };
 
   const onTimeUpdate = () => {
-    const minutes = Math.floor(audioRef.current.currentTime / 60);
-    const seconds = Math.floor(audioRef.current.currentTime - minutes * 60);
+    const minutes = Math.floor(audioRef.current?.currentTime / 60);
+    const seconds = Math.floor(audioRef.current?.currentTime - minutes * 60);
     const currentTime =
       String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
     setCurrentTime(currentTime);
 
     setProgress(
-      (audioRef.current.currentTime / audioRef.current.duration) * 100
+      (audioRef.current?.currentTime / audioRef.current.duration) * 100
     );
   };
 
   const onStart = () => {
-    audioRef.current.currentTime = 0;
+    if ( audioRef.current ) {
+      audioRef.current.currentTime = 0;
+    }
     onPause();
   };
 
   const onEnd = () => {
-    audioRef.current.currentTime = audioRef.current.duration;
+    if ( audioRef.current ) {
+      audioRef.current.currentTime = audioRef.current.duration;
+    }
     setIsPlaying(false);
     onPause();
     onConfirm();
   };
 
   const onPause = () => {
-    audioRef.current.pause();
+    audioRef.current?.pause();
     setIsPlaying(false);
   };
 
@@ -67,7 +71,9 @@ export const useAudio: any = (audioRef: any, onConfirm: any = () => {}) => {
   };
 
   const onLoad = (time: any) => {
-    audioRef.current.currentTime = (audioRef.current.duration * time) / 100;
+    if ( audioRef.current ) {
+      audioRef.current.currentTime = (audioRef.current.duration * time) / 100;
+    }
     onPlay();
   };
 

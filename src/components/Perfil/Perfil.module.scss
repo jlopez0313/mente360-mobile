@@ -17,6 +17,22 @@ ion-item {
     }
 }
 
+div.phone {
+    border-radius: 30px;
+    background: linear-gradient(#FFCC33, #FFB347);
+    padding: 16px 30px !important;
+
+    input {
+        background: none;
+        border: none;
+        margin-left: 5px;
+
+        &:focus {
+            outline: 0;
+        }
+    }
+}
+
 .profile {
     display: flex;
 

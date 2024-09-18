@@ -30,6 +30,13 @@ export const Footer = (props: any) => {
     <IonFooter {...props}>
       <IonToolbar className={styles["ion-footer"]}>
         <IonButtons class="ion-justify-content-around">
+          
+          <Link to="/home" replace={true} onClick={() => setTab("calendario")}>
+            <IonButton className={tab == "calendario" ? styles.active : ""}>
+              <IonIcon slot="icon-only" src={calendario}></IonIcon>
+            </IonButton>
+          </Link>
+          
           <Link
             to="/crecimiento"
             replace={true}
@@ -47,12 +54,6 @@ export const Footer = (props: any) => {
           >
             <IonButton className={tab == "auriculares" ? styles.active : ""}>
               <IonIcon slot="icon-only" src={auriculares}></IonIcon>
-            </IonButton>
-          </Link>
-
-          <Link to="/home" replace={true} onClick={() => setTab("calendario")}>
-            <IonButton className={tab == "calendario" ? styles.active : ""}>
-              <IonIcon slot="icon-only" src={calendario}></IonIcon>
             </IonButton>
           </Link>
           

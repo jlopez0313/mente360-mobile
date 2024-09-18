@@ -31,6 +31,7 @@ import { arrowBack, search, shareSocialOutline } from "ionicons/icons";
 import { Footer } from "@/components/Footer/Footer";
 import { Comunidad as ComunidadComponent } from "@/components/Chat/Comunidad/Comunidad";
 import { Chat as ChatComponent } from "@/components/Chat/Chat/Chat";
+import { Grupos as GruposComponent } from "@/components/Chat/Grupos/Grupos";
 import { Link } from "react-router-dom";
 
 import UIContext from "@/context/Context";
@@ -85,9 +86,18 @@ const Chat: React.FC = () => {
           <IonSegmentButton value="chat">
             <IonLabel> Chat </IonLabel>
           </IonSegmentButton>
+          <IonSegmentButton value="grupos">
+            <IonLabel> Grupos </IonLabel>
+          </IonSegmentButton>
         </IonSegment>
 
-        {tab == "chat" ? <ChatComponent /> : <ComunidadComponent />}
+        {
+          (() => {
+            if (tab == "chat")  return (<ChatComponent />)
+            else if (tab == "comunidad") return (<ComunidadComponent />)
+            else return (<GruposComponent />)
+          })()
+        }
         
       </IonContent>
 

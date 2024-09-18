@@ -33,7 +33,7 @@ export const Card: React.FC<Props> = memo(
         >
           <IonCardHeader className="ion-no-padding">
             <IonCardContent>
-              <img src={icon} slot="start" />
+              <img src={icon} slot="start" className="ion-no-margin" />
               <strong> {title} </strong>
               {
                 done ?

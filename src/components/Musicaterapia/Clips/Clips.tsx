@@ -5,6 +5,7 @@ import {
   IonItem,
   IonLabel,
   IonList,
+  IonSearchbar,
   useIonAlert,
   useIonLoading,
 } from "@ionic/react";
@@ -25,7 +26,6 @@ import { useContext, useEffect, useState } from "react";
 import UIContext from "@/context/Context";
 
 export const Clips = () => {
-
   const {
     globalAudio,
     isPlaying,
@@ -36,7 +36,7 @@ export const Clips = () => {
     setListAudios,
     globalPos,
     setGlobalPos,
-    setShowGlobalAudio
+    setShowGlobalAudio,
   }: any = useContext(UIContext);
 
   const [present, dismiss] = useIonLoading();
@@ -45,13 +45,16 @@ export const Clips = () => {
   const { user } = getUser();
 
   const [categorias, setCategorias] = useState<any>([]);
-  const [categoria, setCategoria] = useState('All');
+  const [categoria, setCategoria] = useState("All");
+  const [todosClips, setTodosClips] = useState<any>([]);
   const [clips, setClips] = useState<any>([]);
 
   const hasThisUser = (usuarios_clips: any[]) => {
-    const hasUserClip = usuarios_clips.find( item => item.users_id == user?.id )
-    return hasUserClip
-  }
+    const hasUserClip = usuarios_clips.find(
+      (item) => item.users_id == user?.id
+    );
+    return hasUserClip;
+  };
 
   const onGetCategorias = async () => {
     try {
@@ -61,8 +64,7 @@ export const Clips = () => {
 
       const { data } = await allCategorias();
       setCategorias(data.data);
-      onGetClips('0');
-
+      onGetClips("0", allClips);
     } catch (error: any) {
       presentAlert({
         header: "Alerta!",
@@ -81,16 +83,21 @@ export const Clips = () => {
         message: "Loading ...",
       });
 
-      if (categoriasID == '0') {
-        setCategoria('All')
+      if (categoriasID == "0") {
+        setCategoria("All");
       } else {
-        setCategoria( categorias.find( (item: any) => item.id == categoriasID )?.categoria )
+        setCategoria(
+          categorias.find((item: any) => item.id == categoriasID)?.categoria
+        );
       }
 
       const { data } = await fn(categoriasID);
-      setClips(data.data);
+
+      setTodosClips(data.data);
       setListAudios(data.data);
     } catch (error: any) {
+      console.error(error);
+
       presentAlert({
         header: "Alerta!",
         subHeader: "Mensaje importante.",
@@ -110,11 +117,12 @@ export const Clips = () => {
 
       const userClip = hasThisUser(usuarios_clips);
 
-      await trash( userClip?.id );
-      clips[idx].usuarios_clips = clips[idx].usuarios_clips.filter( (item: any) => item.id != userClip?.id )
-      setClips( [ ...clips ] )
+      await trash(userClip?.id);
+      clips[idx].usuarios_clips = clips[idx].usuarios_clips.filter(
+        (item: any) => item.id != userClip?.id
+      );
+      setClips([...clips]);
       // onGetClips();
-
     } catch (error: any) {
       presentAlert({
         header: "Alerta!",
@@ -125,7 +133,7 @@ export const Clips = () => {
     } finally {
       dismiss();
     }
-  }
+  };
 
   const onAdd = async (idx: number, id: any) => {
     try {
@@ -135,18 +143,17 @@ export const Clips = () => {
 
       const data = {
         clips_id: id,
-        users_id: user.id
-      }
+        users_id: user.id,
+      };
 
-      await add( data );
+      await add(data);
       clips[idx].usuarios_clips.push({
         users_id: user.id,
-        clips_id: id
-      })
-      
-      setClips( [...clips ] )
-      // onGetPlaylist();
+        clips_id: id,
+      });
 
+      setClips([...clips]);
+      // onGetPlaylist();
     } catch (error: any) {
       presentAlert({
         header: "Alerta!",
@@ -157,68 +164,118 @@ export const Clips = () => {
     } finally {
       dismiss();
     }
-  }
+  };
 
   const onPlayClicked = (idx: number, audio: any) => {
     if (!globalAudio || audio != globalAudio) {
-      setGlobalAudio( audio )
-      setGlobalPos( idx )
-    } 
-      onPlay()
-  }
+      setGlobalAudio(audio);
+      setGlobalPos(idx);
+    }
+    onPlay();
+  };
 
   const onUpdateList = () => {
     onPlay();
 
-    const tmpClips = clips.map( (item: any) => {
-      return item.id == globalAudio.id ? globalAudio : item
-    }) 
+    const tmpClips = clips.map((item: any) => {
+      return item.id == globalAudio.id ? globalAudio : item;
+    });
 
-    setClips( tmpClips );
-  }
+    setClips(tmpClips);
+  };
+
+  const onSearchClips = (evt: any) => {
+    setClips(
+      todosClips.filter((item: any) =>
+        item.titulo.toLowerCase().includes(evt.target.value.toLowerCase())
+      )
+    );
+  };
 
   useEffect(() => {
     onGetCategorias();
 
-    setShowGlobalAudio( true )
+    setShowGlobalAudio(true);
   }, []);
 
-  useEffect( () => {
+  useEffect(() => {
+    setClips(todosClips);
+  }, [todosClips]);
+
+  useEffect(() => {
     globalAudio && onUpdateList();
-  }, [globalAudio])
+  }, [globalAudio]);
 
   return (
     <div className={styles["ion-content"]}>
       <div className={`ion-margin-bottom ${styles.chips}`}>
-        <IonChip onClick={() => onGetClips('0')} className={ categoria == 'All' ? styles.checked : ''}> All </IonChip>
-        {
-          categorias.map( (item: any, idx: any) => {
-            return <IonChip key={idx} onClick={() => onGetClips(item.id, byCategory)} className={ categoria == item.categoria ? styles.checked : ''}> { item.categoria } </IonChip>
-          })
-        }
+        <IonChip
+          onClick={() => onGetClips("0", allClips)}
+          className={categoria == "All" ? styles.checked : ""}
+        >
+          {" "}
+          All{" "}
+        </IonChip>
+        {categorias.map((item: any, idx: any) => {
+          return (
+            <IonChip
+              key={idx}
+              onClick={() => onGetClips(item.id, byCategory)}
+              className={categoria == item.categoria ? styles.checked : ""}
+            >
+              {" "}
+              {item.categoria}{" "}
+            </IonChip>
+          );
+        })}
+
+        <IonSearchbar
+          className={`ion-no-padding ion-margin-top ion-margin-bottom ${styles["searc"]}`}
+          placeholder="Buscar"
+          color="warning"
+          onIonInput={(ev) => onSearchClips(ev)}
+        ></IonSearchbar>
       </div>
 
       <IonList className="ion-no-padding ion-margin-bottom" lines="none">
-        {
-          clips.map( (item: any, idx: any) => {
-            return (
-              <IonItem key={idx} button={true} className="ion-margin-bottom">
-                <IonLabel class="ion-text-left"> {item.titulo} </IonLabel>
-                {
-                  globalAudio?.id == item.id && isPlaying ?
-                  <IonIcon aria-hidden="true" slot="end" icon={pauseCircle} onClick={onPause} /> : 
-                  <IonIcon aria-hidden="true" slot="end" icon={playCircle} onClick={() => onPlayClicked( idx, item )} />
-                }
-                
-                {
-                  hasThisUser( item.usuarios_clips ) ?
-                  <IonIcon aria-hidden="true" slot="end" icon={star} onClick={() => onTrash(idx, item.usuarios_clips)} /> : 
-                  <IonIcon aria-hidden="true" slot="end" icon={starOutline} onClick={() => onAdd(idx, item.id)}  />
-                }
-              </IonItem>
-            )
-          })
-        }
+        {clips.map((item: any, idx: any) => {
+          return (
+            <IonItem key={idx} button={true} className="ion-margin-bottom">
+              <IonLabel class="ion-text-left"> {item.titulo} </IonLabel>
+              {globalAudio?.id == item.id && isPlaying ? (
+                <IonIcon
+                  aria-hidden="true"
+                  slot="end"
+                  icon={pauseCircle}
+                  onClick={onPause}
+                />
+              ) : (
+                <IonIcon
+                  aria-hidden="true"
+                  slot="end"
+                  icon={playCircle}
+                  onClick={() => onPlayClicked(idx, item)}
+                />
+              )}
+
+              {hasThisUser(item.usuarios_clips) ? (
+                <IonIcon
+                  aria-hidden="true"
+                  slot="end"
+                  icon={star}
+                  onClick={() => onTrash(idx, item.usuarios_clips)}
+                />
+              ) : (
+                <IonIcon
+                  aria-hidden="true"
+                  slot="end"
+                  icon={starOutline}
+                  onClick={() => onAdd(idx, item.id)}
+                />
+              )}
+            </IonItem>
+          );
+        })}
       </IonList>
     </div>
   );

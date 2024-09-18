@@ -11,6 +11,15 @@
                 --background: var(--bg-main-gradient);
             }
         }
+
+        ion-searchbar {
+            --border-radius: 25px;
+
+            input {
+                padding-top: 10px !important;
+                padding-bottom: 10px !important;
+            }
+        }
     }
     ion-list {
         background: transparent;

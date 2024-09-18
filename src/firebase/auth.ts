@@ -8,7 +8,7 @@ export const GmailLogin = () => {
         signInWithPopup(auth, provider)
         .then((result) => {
             const credential = GoogleAuthProvider.credentialFromResult(result);
-            const token = credential.accessToken;
+            const token = credential?.accessToken;
             const user = result.user;
             resolve( user );
         }).catch((error) => {
@@ -28,7 +28,7 @@ export const FacebookLogin = () => {
         signInWithPopup(auth, provider)
         .then((result) => {
             const credential = FacebookAuthProvider.credentialFromResult(result);
-            const token = credential.accessToken;
+            const token = credential?.accessToken;
             const user = result.user;
             resolve( user );
         }).catch((error) => {

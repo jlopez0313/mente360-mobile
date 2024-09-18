@@ -25,8 +25,10 @@ import { Link } from "react-router-dom";
 import { localDB } from "@/helpers/localStore";
 import Avatar from "@/assets/images/avatar.jpg";
 
-export const Perfil = () => {
+import "react-phone-number-input/style.css";
+import PhoneInput, { isPossiblePhoneNumber } from "react-phone-number-input";
 
+export const Perfil = () => {
   const fileRef = useRef(null);
   const baseURL = import.meta.env.VITE_BASE_BACK;
 
@@ -34,7 +36,7 @@ export const Perfil = () => {
   const [presentAlert] = useIonAlert();
 
   const user = getUser();
-  const homeDB = localDB('home');
+  const homeDB = localDB("home");
 
   const [photo, setPhoto] = useState(null);
   const [usuario, setUsuario] = useState(user.user);
@@ -43,9 +45,9 @@ export const Perfil = () => {
 
   const getMaxDate = () => {
     const today = new Date();
-    today.setFullYear( today.getFullYear() - 14 )
-    return today.toISOString()
-  }
+    today.setFullYear(today.getFullYear() - 14);
+    return today.toISOString();
+  };
 
   const onGetConstants = async () => {
     try {
@@ -53,13 +55,10 @@ export const Perfil = () => {
         message: "Loading ...",
       });
 
-      setPhoto( baseURL + usuario.photo )
-
-      console.log( baseURL + usuario.photo );
+      setPhoto(usuario.photo ? baseURL + usuario.photo : Avatar);
 
       const { data } = await all();
       setConstants(data);
-
     } catch (error: any) {
       presentAlert({
         header: "Alerta!",
@@ -72,21 +71,22 @@ export const Perfil = () => {
     }
   };
 
-  const onSetUser = (idx: string, value: string) => {
+  const onSetUser = (idx: string, value: string | boolean) => {
     usuario[idx] = value;
     setUsuario({ ...usuario });
   };
 
   const onClickFile = () => {
     fileRef.current?.click();
-  }
+  };
 
   const onUploadImage = (evt: any) => {
     const reader = new FileReader();
     reader.readAsDataURL(evt.target.files[0]);
     reader.onload = function (event: any) {
-      onSetUser('photo', event.target.result);
-      setPhoto( event.target.result )
+      onSetUser("photo", event.target.result);
+      onSetUser("newPhoto", true);
+      setPhoto(event.target.result);
     };
     reader.onerror = function () {
       // notify(t("profile.alerts.error-image"), "error");
@@ -98,20 +98,19 @@ export const Perfil = () => {
   };
 
   const onGetEdad = () => {
-
-    if ( !usuario.fecha_nacimiento ) {
-      setEdad(0)
-      return 
+    if (!usuario.fecha_nacimiento) {
+      setEdad(0);
+      return;
     }
 
-    const date = new Date( usuario.fecha_nacimiento );
+    const date = new Date(usuario.fecha_nacimiento);
     const today = new Date();
 
     const diffInMs = today - date;
 
-    const diffInDays = diffInMs / (1000 * 60 * 60 * 24 );
-    setEdad( Math.floor (diffInDays / 365.25) );
-  }
+    const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+    setEdad(Math.floor(diffInDays / 365.25));
+  };
 
   const onUpdateUser = async () => {
     try {
@@ -119,16 +118,16 @@ export const Perfil = () => {
         message: "Loading ...",
       });
 
-      if ( usuario.eneatipo != user.user.eneatipo ) {
+      if (usuario.eneatipo != user.user.eneatipo) {
         homeDB.clear();
       }
 
       const { data } = await update(usuario, user.user.id);
-      setUser({...user, user: data.data});
-      setUsuario(data.data);
 
+      setUser({ ...user, user: data.data });
+      setUsuario(data.data);
     } catch (error: any) {
-      console.log( error );
+      console.log(error);
 
       presentAlert({
         header: "Alerta!",
@@ -139,7 +138,7 @@ export const Perfil = () => {
     } finally {
       dismiss();
     }
-  }
+  };
 
   useEffect(() => {
     onGetConstants();
@@ -153,13 +152,19 @@ export const Perfil = () => {
     <div className="">
       <div>
         <IonItem lines="none">
-          <input type="file" className="ion-hide" ref={fileRef} onChange={onUploadImage} accept="image/png, image/jpeg"/>
+          <input
+            type="file"
+            className="ion-hide"
+            ref={fileRef}
+            onChange={onUploadImage}
+            accept="image/png, image/jpeg"
+          />
           <IonAvatar slot="start">
-            <div 
-                style={{
-                backgroundImage: `url(${photo || Avatar})`,
+            <div
+              style={{
+                backgroundImage: `url(${photo})`,
               }}
-              className={`${styles['avatar-container']}`}
+              className={`${styles["avatar-container"]}`}
               onClick={onClickFile}
             ></div>
           </IonAvatar>
@@ -174,9 +179,7 @@ export const Perfil = () => {
 
       <div className={`ion-margin-bottom ${styles.profile}`}>
         <div className={styles.info}>
-          <IonChip outline={true}>
-            { edad  || '00' }
-          </IonChip>
+          <IonChip outline={true}>{edad || "00"}</IonChip>
           <IonNote>
             {" "}
             <strong> Edad </strong>{" "}
@@ -184,7 +187,7 @@ export const Perfil = () => {
         </div>
         <div className={styles.info}>
           <IonChip outline={true} className="ion-padding-start ion-padding-end">
-            {usuario.eneatipo || '-'}
+            {usuario.eneatipo || "-"}
           </IonChip>
           <IonNote>
             {" "}
@@ -192,9 +195,7 @@ export const Perfil = () => {
           </IonNote>
         </div>
         <div className={styles.info}>
-          <IonChip outline={true}>
-            {usuario.genero || '--' }
-          </IonChip>
+          <IonChip outline={true}>{usuario.genero || "--"}</IonChip>
           <IonNote>
             {" "}
             <strong> Género </strong>{" "}
@@ -209,7 +210,18 @@ export const Perfil = () => {
         placeholder="Nombre de Usuario"
         className={`ion-margin-bottom ${styles.profile}`}
         value={usuario.name}
+        onIonChange={(e) => onSetUser("name", e.target.value)}
       ></IonInput>
+
+      <PhoneInput
+        defaultCountry={usuario.country}
+        className={`ion-margin-top ion-margin-bottom ${styles.phone}`}
+        placeholder="Teléfono"
+        value={usuario.phone}
+        onChange={(e) => onSetUser("phone", e)}
+        onCountryChange={(e) => onSetUser("country", e)}
+        initialValueFormat="national"
+      />
 
       <IonInput
         labelPlacement="floating"
@@ -294,14 +306,19 @@ export const Perfil = () => {
       <IonGrid>
         <IonRow>
           <IonCol size="6">
-            <Link to='/home' replace={true}>
+            <Link to="/home" replace={true}>
               <IonButton shape="round" expand="block">
                 Cancelar
               </IonButton>
             </Link>
           </IonCol>
           <IonCol size="6">
-            <IonButton shape="round" expand="block" onClick={onUpdateUser}>
+            <IonButton
+              shape="round"
+              expand="block"
+              onClick={onUpdateUser}
+              disabled={!usuario.phone || (usuario.phone && !isPossiblePhoneNumber(usuario.phone))}
+            >
               Guardar
             </IonButton>
           </IonCol>

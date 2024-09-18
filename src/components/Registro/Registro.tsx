@@ -6,14 +6,10 @@ import {
   IonDatetime,
   IonGrid,
   IonIcon,
-  IonImg,
   IonInput,
   IonItem,
-  IonLabel,
-  IonList,
   IonLoading,
   IonModal,
-  IonNote,
   IonRow,
   IonSelect,
   IonSelectOption,
@@ -31,29 +27,29 @@ import { useHistory } from "react-router";
 import { useEffect, useRef, useState } from "react";
 import { helpCircleOutline } from "ionicons/icons";
 
-export const Registro = () => {
+import "react-phone-number-input/style.css";
+import PhoneInput, { isPossiblePhoneNumber } from "react-phone-number-input";
 
+export const Registro = () => {
   const fileRef = useRef(null);
   const [present, dismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();
   const history = useHistory();
 
   const user = getUser();
+  const [usuario, setUsuario] = useState({ ...user.user, country: "CO" });
 
   const [photo, setPhoto] = useState("");
-  const [name, setNombre] = useState("");
-  const [genero, setGenero] = useState("");
-  const [eneatipo, setEneatipo] = useState("");
-  const [fecha_nacimiento, setFechaNacimiento] = useState("");
   const [constants, setConstants] = useState({ eneatipos: [], generos: [] });
 
   const showAlert = () => {
     presentAlert({
       subHeader: "Mensaje importante!",
-      message: "Si no conoces tu eneatipo, puedes realizar el test una vez te registres.",
+      message:
+        "Si no conoces tu eneatipo, puedes realizar el test una vez te registres.",
       buttons: ["OK"],
     });
-  }
+  };
 
   const getMaxDate = () => {
     const today = new Date();
@@ -69,12 +65,19 @@ export const Registro = () => {
 
   const onClickFile = () => {
     fileRef.current?.click();
-  }
+  };
+
+  const onSetUser = (idx: string, value: string | boolean | any) => {
+    usuario[idx] = value;
+    setUsuario({ ...usuario });
+  };
 
   const onUploadImage = (evt: any) => {
     const reader = new FileReader();
     reader.readAsDataURL(evt.target.files[0]);
     reader.onload = function (event: any) {
+      onSetUser("photo", event.target.result);
+      onSetUser("newPhoto", true);
       setPhoto(event.target.result);
     };
     reader.onerror = function () {
@@ -112,17 +115,7 @@ export const Registro = () => {
 
       const {
         data: { data },
-      } = await update(
-        {
-          photo,
-          name,
-          eneatipo,
-          genero,
-          fecha_nacimiento,
-          device: "app",
-        },
-        user.user.id
-      );
+      } = await update(usuario, user.user.id);
 
       await setUser({ ...user, user: data });
 
@@ -160,16 +153,21 @@ export const Registro = () => {
         <IonCol size="12" class="ion-no-padding">
           <IonCard className={`ion-no-padding`}>
             <IonCardContent>
-              <input type="file" className="ion-hide" ref={fileRef} onChange={onUploadImage} accept="image/png, image/jpeg"/>
-              <div 
+              <input
+                type="file"
+                className="ion-hide"
+                ref={fileRef}
+                onChange={onUploadImage}
+                accept="image/png, image/jpeg"
+              />
+              <div
                 style={{
                   backgroundImage: `url(${photo || Avatar})`,
                 }}
-                className={`${styles['avatar-container']}`}
+                className={`${styles["avatar-container"]}`}
                 onClick={onClickFile}
-              >
-              </div>
-                <span className={`${styles['upload-text']}`}> Subir Imágen</span>
+              ></div>
+              <span className={`${styles["upload-text"]}`}> Subir Imágen</span>
               <br />
 
               <IonInput
@@ -179,8 +177,17 @@ export const Registro = () => {
                 placeholder="Nombre"
                 fill="outline"
                 shape="round"
-                onIonInput={(evt: any) => setNombre(evt.target.value)}
+                onIonInput={(evt: any) => onSetUser("nombre", evt.target.value)}
               ></IonInput>
+
+              <PhoneInput
+                defaultCountry={usuario.country}
+                className={`ion-margin-top ion-margin-bottom ${styles.login}`}
+                placeholder="Teléfono"
+                onChange={(e) => onSetUser("phone", e)}
+                onCountryChange={(e) => onSetUser("country", e)}
+                initialValueFormat="national"
+              />
 
               <IonInput
                 id="open_cal"
@@ -188,7 +195,7 @@ export const Registro = () => {
                 placeholder="Fecha de Nacimiento"
                 fill="outline"
                 shape="round"
-                value={fecha_nacimiento}
+                value={usuario.fecha_nacimiento}
                 className={`ion-margin-bottom ${styles.login}`}
               ></IonInput>
 
@@ -204,8 +211,8 @@ export const Registro = () => {
                   cancelText="Cancelar"
                   id="datetime"
                   max={getMaxDate()}
-                  onIonChange={(e) =>
-                    setFechaNacimiento(e.target.value?.split("T")[0])
+                  onIonChange={(e: any) =>
+                    onSetUser("fecha_nacimiento", e.target.value?.split("T")[0])
                   }
                 ></IonDatetime>
               </IonModal>
@@ -216,9 +223,9 @@ export const Registro = () => {
                 placeholder="Genero"
                 fill="outline"
                 shape="round"
-                value={genero}
+                value={usuario.genero}
                 className={`ion-margin-bottom ${styles.login}`}
-                onIonChange={(e) => setGenero(e.target.value)}
+                onIonChange={(e) => onSetUser("genero", e.target.value)}
               >
                 {constants.generos.map((item: any, idx: any) => {
                   return (
@@ -231,7 +238,6 @@ export const Registro = () => {
               </IonSelect>
 
               <IonItem className="ion-no-padding" lines="none">
-
                 <IonSelect
                   interface="popover"
                   labelPlacement="stacked"
@@ -239,9 +245,9 @@ export const Registro = () => {
                   shape="round"
                   fill="outline"
                   className={`ion-margin-bottom ${styles.login}`}
-                  value={eneatipo}
-                  onIonChange={(e) => setEneatipo(e.target.value)}
-                  cancelText={'clear'}
+                  value={usuario.eneatipo}
+                  onIonChange={(e) => onSetUser("eneatipo", e.target.value)}
+                  cancelText={"clear"}
                 >
                   {constants.eneatipos.map((item: any, idx: any) => {
                     return (
@@ -252,10 +258,13 @@ export const Registro = () => {
                     );
                   })}
                 </IonSelect>
-                
-                <IonIcon slot="end" icon={helpCircleOutline} onClick={showAlert} />
-              </IonItem>
 
+                <IonIcon
+                  slot="end"
+                  icon={helpCircleOutline}
+                  onClick={showAlert}
+                />
+              </IonItem>
 
               <IonLoading
                 message="Dismissing after 3 seconds..."
@@ -269,7 +278,13 @@ export const Registro = () => {
             className="ion-margin-top ion-margin-bottom"
             expand="block"
             shape="round"
-            disabled={!name || !fecha_nacimiento || !genero}
+            disabled={
+              !usuario.name ||
+              !usuario.fecha_nacimiento ||
+              !usuario.genero ||
+              !usuario.phone ||
+              (usuario.phone && !isPossiblePhoneNumber(usuario.phone))
+            }
             onClick={(evt) => doRegister(evt)}
           >
             {" "}
