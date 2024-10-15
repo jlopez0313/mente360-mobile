@@ -21,22 +21,26 @@ import {
   useIonLoading,
 } from "@ionic/react";
 import styles from "./Registro.module.scss";
+import Avatar from "@/assets/images/avatar.jpg";
 
 import { update } from "@/services/user";
 import { all } from "@/services/constants";
 
 import { getUser, setUser } from "@/helpers/onboarding";
 import { useHistory } from "react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { helpCircleOutline } from "ionicons/icons";
 
 export const Registro = () => {
+
+  const fileRef = useRef(null);
   const [present, dismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();
   const history = useHistory();
 
   const user = getUser();
 
+  const [photo, setPhoto] = useState("");
   const [name, setNombre] = useState("");
   const [genero, setGenero] = useState("");
   const [eneatipo, setEneatipo] = useState("");
@@ -61,6 +65,21 @@ export const Registro = () => {
     setTimeout(() => {
       history.replace("/home");
     }, 1000);
+  };
+
+  const onClickFile = () => {
+    fileRef.current?.click();
+  }
+
+  const onUploadImage = (evt: any) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(evt.target.files[0]);
+    reader.onload = function (event: any) {
+      setPhoto(event.target.result);
+    };
+    reader.onerror = function () {
+      // notify(t("profile.alerts.error-image"), "error");
+    };
   };
 
   const onGetConstants = async () => {
@@ -95,8 +114,10 @@ export const Registro = () => {
         data: { data },
       } = await update(
         {
+          photo,
           name,
           eneatipo,
+          genero,
           fecha_nacimiento,
           device: "app",
         },
@@ -139,13 +160,16 @@ export const Registro = () => {
         <IonCol size="12" class="ion-no-padding">
           <IonCard className={`ion-no-padding`}>
             <IonCardContent>
-              <img
-                src="./assets/images/avatar.png"
-                className={`ion-margin-bottom`}
-              />
-              <br />
-
-              <span> Subir Imágen </span>
+              <input type="file" className="ion-hide" ref={fileRef} onChange={onUploadImage} accept="image/png, image/jpeg"/>
+              <div 
+                style={{
+                  backgroundImage: `url(${photo || Avatar})`,
+                }}
+                className={`${styles['avatar-container']}`}
+                onClick={onClickFile}
+              >
+              </div>
+                <span className={`${styles['upload-text']}`}> Subir Imágen</span>
               <br />
 
               <IonInput

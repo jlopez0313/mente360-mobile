@@ -18,13 +18,17 @@ import {
 } from "@ionic/react";
 import styles from "./Perfil.module.scss";
 import { getUser, setUser } from "@/helpers/onboarding";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { all } from "@/services/constants";
 import { update } from "@/services/user";
 import { Link } from "react-router-dom";
 import { localDB } from "@/helpers/localStore";
+import Avatar from "@/assets/images/avatar.jpg";
 
 export const Perfil = () => {
+
+  const fileRef = useRef(null);
+  const baseURL = import.meta.env.VITE_BASE_BACK;
 
   const [present, dismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();
@@ -32,6 +36,7 @@ export const Perfil = () => {
   const user = getUser();
   const homeDB = localDB('home');
 
+  const [photo, setPhoto] = useState(null);
   const [usuario, setUsuario] = useState(user.user);
   const [edad, setEdad] = useState(0);
   const [constants, setConstants] = useState({ eneatipos: [], generos: [] });
@@ -47,6 +52,10 @@ export const Perfil = () => {
       present({
         message: "Loading ...",
       });
+
+      setPhoto( baseURL + usuario.photo )
+
+      console.log( baseURL + usuario.photo );
 
       const { data } = await all();
       setConstants(data);
@@ -66,6 +75,22 @@ export const Perfil = () => {
   const onSetUser = (idx: string, value: string) => {
     usuario[idx] = value;
     setUsuario({ ...usuario });
+  };
+
+  const onClickFile = () => {
+    fileRef.current?.click();
+  }
+
+  const onUploadImage = (evt: any) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(evt.target.files[0]);
+    reader.onload = function (event: any) {
+      onSetUser('photo', event.target.result);
+      setPhoto( event.target.result )
+    };
+    reader.onerror = function () {
+      // notify(t("profile.alerts.error-image"), "error");
+    };
   };
 
   const compareWithFn = (o1: any, o2: any) => {
@@ -103,6 +128,8 @@ export const Perfil = () => {
       setUsuario(data.data);
 
     } catch (error: any) {
+      console.log( error );
+
       presentAlert({
         header: "Alerta!",
         subHeader: "Mensaje importante.",
@@ -126,11 +153,15 @@ export const Perfil = () => {
     <div className="">
       <div>
         <IonItem lines="none">
+          <input type="file" className="ion-hide" ref={fileRef} onChange={onUploadImage} accept="image/png, image/jpeg"/>
           <IonAvatar slot="start">
-            <img
-              alt="Silhouette of a person's head"
-              src="https://ionicframework.com/docs/img/demos/avatar.svg"
-            />
+            <div 
+                style={{
+                backgroundImage: `url(${photo || Avatar})`,
+              }}
+              className={`${styles['avatar-container']}`}
+              onClick={onClickFile}
+            ></div>
           </IonAvatar>
           <IonLabel>
             {usuario.name}

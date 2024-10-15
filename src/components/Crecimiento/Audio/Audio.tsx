@@ -94,7 +94,7 @@ export const Audio: React.FC<Props> = memo(({ crecimiento, audio, onGoBack, onGo
 
   return (
     <IonCard className={`ion-margin-top ion-text-center ${styles.card}`}>
-      <img alt="Silhouette of mountains" src={baseURL + audio.imagen} />
+      <img alt="" src={baseURL + audio.imagen} />
 
       <IonCardHeader className="ion-no-padding ion-margin-bottom">
         <IonCardSubtitle className="ion-no-padding">
