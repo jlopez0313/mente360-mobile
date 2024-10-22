@@ -108,7 +108,7 @@ export const Info = ({ grupoID }) => {
         title="Agregar Miembro"
         hideButtons={true}
       >
-        <Add users={grupo.users} />
+        <Add grupoID={grupoID} users={grupo.users} />
       </Modal>
     </div>
   );

@@ -1,7 +1,6 @@
-ion-list {
+.lista {
     --background: none;
     background: none;
-
 
     ion-searchbar {
         --border-radius: 25px;
@@ -9,6 +8,41 @@ ion-list {
         input {
             padding-top: 10px !important;
             padding-bottom: 10px !important;
+        }
+    }
+
+    ion-item {
+        background: none;
+        --background: var(--bg-main-gradient);
+        --border-radius: 50px;
+        
+        ion-note {
+            font-size: 15px;
+            font-weight: bold;
+            align-self: center;
+            padding-top: 14px;
+            padding-bottom: 14px;
+        }
+
+        &.contact {
+            ion-label {
+                margin: 5px 0;
+                
+                span {
+                    display: block;
+                    text-align: justify;
+                    color: #666;
+                    &.name {
+                        font-weight: bold;
+                        font-size: 15px;
+                    }
+                    
+                    &.phone {        
+                        font-size: 14px;
+                    }
+                }
+            }
+            
         }
     }
     

@@ -16,13 +16,18 @@ import { Add } from "./Add/Add";
 import { create, getAll } from "@/services/grupos";
 import { useHistory } from "react-router";
 import { getUser } from "@/helpers/onboarding";
+import { onValue } from "firebase/database";
+import { readData, getData } from "@/services/realtime-db";
 
 export const Grupos = () => {
+  
   const history = useHistory();
   const { user } = getUser();
+  const baseURL = import.meta.env.VITE_BASE_BACK;
 
   const [grupos, setGrupos] = useState([]);
-  const baseURL = import.meta.env.VITE_BASE_BACK;
+  const [messages, setMessages] = useState([]);
+  
 
   const addDocument = (grupo: any) => {
     const updates = {};
@@ -51,10 +56,48 @@ export const Grupos = () => {
   };
 
   const onGetAll = async () => {
-    const {
-      data: { data },
-    } = await getAll();
-    setGrupos(data);
+    onValue(readData(`user_rooms/${user.id}/grupos`), (snapshot) => {
+      const data = snapshot.val();
+      
+      const rooms: any = data
+      ? Object.keys(data).map((key) => ({
+          id: key,
+          ...data[key],
+        }))
+      : [];
+
+      rooms.forEach(async (room, idx) => {
+        const data = await getData(`grupos/${room.id}`);
+        const val = data.val();
+
+        const grupo = {
+          photo: val.photo,
+          grupo: val.grupo,
+          id: room.id
+        }
+        setGrupos(grupos => [...grupos, grupo]);
+
+        onValue(readData(`grupos/${room.id}/messages`), (snapshot) => {
+          const data2 = snapshot.val();
+
+          const listaMensajes: any = data2
+            ? Object.keys(data2).map((key) => ({
+                id: key,
+                ...data2[key],
+              }))
+            : [];
+
+          const lastMsg = listaMensajes.slice(-1);
+          
+          const mensajes = [...messages];
+          mensajes[idx] = lastMsg[0]
+
+          setMessages(mensajes);
+        });
+
+      });
+
+    });
   };
 
   const goToGrupo = (id: number) => {
@@ -96,7 +139,13 @@ export const Grupos = () => {
                 </IonAvatar>
                 <IonLabel className="ion-no-margin">
                   <span className={styles["name"]}> {grupo.grupo} </span>
-                  <span className={styles["phone"]}> {"mensaje"} </span>
+                  <span className={styles["phone"]}>
+                    {" "}
+                    {messages[idx]?.user?.id == user.id
+                      ? "tu"
+                      : messages[idx]?.user?.name}
+                    : {messages[idx]?.mensaje}{" "}
+                  </span>
                 </IonLabel>
               </IonItem>
             );

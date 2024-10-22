@@ -37,9 +37,14 @@ import { useContext } from "react";
 import UIContext from "@/context/Context";
 import { Toast } from "@/components/Toast/Toast";
 
+import { FCM } from '@capacitor-community/fcm';
+import { getUser, setUser } from "@/helpers/onboarding";
+import { update } from "@/services/user";
+
 export const Home = () => {
   
   const { globalAudio }: any = useContext(UIContext);
+  const user = getUser();
 
   const [present, dismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();
@@ -185,9 +190,29 @@ export const Home = () => {
     }
   };
 
+  
+  const onUpdateFCM = async () => {
+    
+    // Obtener el token FCM del dispositivo
+    const token = await FCM.getToken();
+    console.log('FCM Token:', token.token);
+    console.log('USER:', user);
+
+    const formData = {
+      fcm_token: token.token
+    }
+
+    const { data } = await update( formData, user.user.id );
+    setUser({ ...user, user: data.data });
+  }
+
   useEffect(() => {
     onGetHome();
   }, [currentDate]);
+  
+  useEffect(() => {
+    onUpdateFCM();
+  }, []);
 
   return (
     <>

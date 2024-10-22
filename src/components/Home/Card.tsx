@@ -38,7 +38,7 @@ export const Card: React.FC<Props> = memo(
               {
                 done ?
                 <IonIcon icon={checkbox} slot="end" /> : 
-                <IonText></IonText>
+                <IonText style={{width: '20px'}}></IonText>
               }
             </IonCardContent>
           </IonCardHeader>

@@ -8,17 +8,19 @@ import Avatar from "@/assets/images/avatar.jpg";
 import { parsePhoneNumber } from "react-phone-number-input";
 import { Contacts } from "@capacitor-community/contacts";
 import { misContactos } from "@/services/user";
+import { updateData, writeData } from "@/services/realtime-db";
 
 interface Props {
+  grupoID: any;
   users: any;
   doChild?: (params?: any) => {};
 }
 
-export const Add = ({ users, doChild }: Props) => {
+export const Add = ({ grupoID, users, doChild }: Props) => {
   const baseURL = import.meta.env.VITE_BASE_BACK;
   const {user} = getUser();
 
-  const [present, dismiss] = useIonLoading();
+  const [present, onDismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();
 
   const [userContacts, setUserContacts] = useState<any>([]);
@@ -87,7 +89,7 @@ export const Add = ({ users, doChild }: Props) => {
         buttons: ["OK"],
       });
     } finally {
-      dismiss();
+      onDismiss();
     }
   };
 
@@ -101,8 +103,17 @@ export const Add = ({ users, doChild }: Props) => {
     );
   };
 
-  const addToGrupo = (contact: any) => {
-    console.log( contact )
+  const addToGrupo = async (contact: any) => {
+    await writeData("grupos/" + grupoID + "/users/" + contact.id, {
+      name: contact.name,
+      id: contact.id,
+      phone: contact.phone || "",
+      photo: contact.photo || "",
+    });
+
+    const updates = {};
+    updates[`user_rooms/${contact.id}/grupos/${grupoID}`] = true;
+    await updateData(updates);
   }
 
 
@@ -113,7 +124,7 @@ export const Add = ({ users, doChild }: Props) => {
   return (
     <div className="ion-padding">
     <IonList
-        className="ion-no-padding"
+        className={`ion-no-padding ${styles['lista']}`}
         lines="none"
       >
           <IonSearchbar

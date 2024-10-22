@@ -18,7 +18,6 @@ export const update = async( formData: {}, userID: string ) => {
             }
         }    
     })
-    
 }
 
 export const invitar = async( formData: {} ) => {
