@@ -3,7 +3,16 @@
 
 .ion-content {
     .nivel {
-        --background: var(--bg-main)
+        --background: var(--bg-main);
+
+        &::part(text),
+        &::part(placeholder) {
+            padding-left: 15px;
+        }
+        
+        &::part(icon) {
+            padding-right: 10px;
+        }
     }
 
     .slider {
@@ -22,7 +31,7 @@
     }
 
     .swiper {
-        padding: 0 15% !important;
+        padding: 0 10% !important;
     }
 
 }

@@ -69,7 +69,7 @@ export const Home = () => {
 
       if (!localData.data || new Date(localData.endTime) < new Date()) {
         present({
-          message: "Loading ...",
+          message: "Cargando ...",
         });
 
         const { data: info } = await getHome({});
@@ -100,7 +100,7 @@ export const Home = () => {
   const onConfirmAudio = async () => {
     try {
       present({
-        message: "Loading ...",
+        message: "Cargando ...",
       });
 
       const formData = {
@@ -129,7 +129,7 @@ export const Home = () => {
   const onConfirmMensaje = async () => {
     try {
       present({
-        message: "Loading ...",
+        message: "Cargando ...",
       });
 
       const formData = {
@@ -159,7 +159,7 @@ export const Home = () => {
   const onConfirmTarea = async () => {
     try {
       present({
-        message: "Loading ...",
+        message: "Cargando ...",
       });
 
       const formData = {

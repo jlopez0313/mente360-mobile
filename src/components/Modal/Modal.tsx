@@ -8,7 +8,7 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import React, { memo, useRef } from "react";
+import React, { cloneElement, memo, useRef, useState } from "react";
 import styles from './Modal.module.scss';
 import { close, closeCircle } from "ionicons/icons";
 
@@ -17,17 +17,22 @@ interface Props {
     title?: string;
     children: any;
     hideButtons: boolean;
-    onConfirm: () => void;
+    onConfirm: (params?: any) => void;
 }
 
 export const Modal: React.FC<Props> = memo(
   ({ trigger, title, children, onConfirm, hideButtons = false }) => {
 
     const modal = useRef<HTMLIonModalElement>(null);
+    const [data, setData] = useState();
     
     function dismiss() {
-      onConfirm();
+      onConfirm(data);
       modal.current?.dismiss();
+    }
+
+    const doChild = (params: any) => {
+      setData(params);
     }
 
     return (
@@ -38,7 +43,9 @@ export const Modal: React.FC<Props> = memo(
             <IonTitle> {title} </IonTitle>
           </IonToolbar>
           
-          {children}
+          {
+            cloneElement(children, {doChild})
+          }
 
           {
             !hideButtons ?

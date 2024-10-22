@@ -22,7 +22,6 @@ export const UIProvider = ({ children }: Props) => {
     fastSeek: (time: number) => {},
   });
 
-  const [tab, setTab] = useState<string>('calendario');
   const [isGobalPlaying, setIsGlobalPlaying] = useState<any>( false );
   const [globalAudio, setGlobalAudio] = useState<any>( null );
   const [listAudios, setListAudios] = useState<any>( [] );
@@ -79,7 +78,6 @@ export const UIProvider = ({ children }: Props) => {
     setListAudios,
     setGlobalAudio,
     setIsGlobalPlaying,
-    tab, setTab
   };
 
   return <Context.Provider value={state}> 

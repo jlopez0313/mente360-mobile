@@ -52,7 +52,7 @@ export const Perfil = () => {
   const onGetConstants = async () => {
     try {
       present({
-        message: "Loading ...",
+        message: "Cargando ...",
       });
 
       setPhoto(usuario.photo ? baseURL + usuario.photo : Avatar);
@@ -115,7 +115,7 @@ export const Perfil = () => {
   const onUpdateUser = async () => {
     try {
       present({
-        message: "Loading ...",
+        message: "Cargando ...",
       });
 
       if (usuario.eneatipo != user.user.eneatipo) {

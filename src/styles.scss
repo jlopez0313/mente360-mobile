@@ -23,6 +23,8 @@
 
     --bg-secondary: #FFF5EC;
     --color-secondary: #F2B10A;
+
+    font-size: 15px;
 }
 
 
@@ -45,7 +47,7 @@ ion-header {
 
 ion-button,
 ion-fab-button {
-    --background: linear-gradient(to left bottom, #9E9E9E, #FFC90A);
+    --background: linear-gradient(to left bottom, #e6b711, #FFC90A);
 }
 
 ion-datetime::part(calendar-day):focus {

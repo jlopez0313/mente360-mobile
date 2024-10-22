@@ -94,7 +94,7 @@ export const Toast = () => {
   const onTrash = async () => {
     try {
       present({
-        message: "Loading ...",
+        message: "Cargando ...",
       });
 
       const userClip = hasThisUser(globalAudio.usuarios_clips);
@@ -120,7 +120,7 @@ export const Toast = () => {
   const onAdd = async () => {
     try {
       present({
-        message: "Loading ...",
+        message: "Cargando ...",
       });
 
       const formData = {

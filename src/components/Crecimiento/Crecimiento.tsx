@@ -44,7 +44,7 @@ export const Crecimiento = () => {
   const onGetNiveles = async () => {
     try {
       present({
-        message: "Loading ...",
+        message: "Cargando ...",
       });
 
       const { data } = await allNiveles();
@@ -67,7 +67,7 @@ export const Crecimiento = () => {
     try {
       
       present({
-        message: "Loading ...",
+        message: "Cargando ...",
       });
 
       const nivel = niveles.find( (item: any) => item.id == nivelesID )
@@ -159,7 +159,7 @@ export const Crecimiento = () => {
         shape="round"
         value={nivelID}
         compareWith={compareWithFn}
-        className={`ion-padding-end ion-padding-start ion-margin-bottom ${styles["nivel"]}`}
+        className={`ion-margin-bottom ${styles["nivel"]}`}
         onIonChange={(e) => setNivelID(e.target.value)}
       >
         {niveles.map((item: any, idx: number) => {

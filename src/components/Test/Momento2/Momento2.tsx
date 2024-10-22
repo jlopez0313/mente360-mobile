@@ -40,7 +40,7 @@ const Momento2: React.FC<any> = memo(
   const onGetConstants = async () => {
     try {
       present({
-        message: "Loading ...",
+        message: "Cargando ...",
       });
 
       const { data } = await all();
@@ -63,7 +63,7 @@ const Momento2: React.FC<any> = memo(
 
     try {
       present({
-        message: "Loading ...",
+        message: "Cargando ...",
       });
 
       const { data: { data } } = await test( momentos );

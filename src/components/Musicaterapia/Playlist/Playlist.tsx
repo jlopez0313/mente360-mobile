@@ -31,7 +31,7 @@ export const Playlist = () => {
   const onGetPlaylist = async () => {
     try {
       present({
-        message: "Loading ...",
+        message: "Cargando ...",
       });
 
       const { data: { data } } = await all();
@@ -53,7 +53,7 @@ export const Playlist = () => {
   const onTrash = async (id: any) => {
     try {
       present({
-        message: "Loading ...",
+        message: "Cargando ...",
       });
 
       await trash( id );

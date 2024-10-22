@@ -1,24 +1,27 @@
 
 .ion-footer {
   --background: var(--bg-main-gradient);
+  --min-height: 50px;
 
   ion-buttons {
     display: flex;
 
     ion-button {
       --background: none;
-
+      
       &.active {
-        border-radius: 50%;
-        background-color: rgba(80, 80, 80, 0.2);
+        border-radius: 50%;        
+        
+        ion-icon {
+          opacity: 1;
+          transform: scale(1.25);
+        }
+      }
+
+      ion-icon {
+        opacity: 0.6;
       }
     }
   }
-}
-
-.texto {
-  text-align: justify;
-  padding: 30px 50px;
-  font-size: 15 px;
 }
   

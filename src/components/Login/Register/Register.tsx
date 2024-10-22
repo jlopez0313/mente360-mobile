@@ -41,7 +41,7 @@ export const Register = () => {
 
     try {
       present({
-        message: "Loading ...",
+        message: "Cargando ...",
       });
 
       const { data } = await register({

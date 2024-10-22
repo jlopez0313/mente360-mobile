@@ -1,0 +1,43 @@
+.avatar-container {
+    margin-right: auto;
+    margin-left: auto;
+    background-position: 50%;
+    background-size: cover;
+    height: 200px;
+    width: 200px;
+    border-radius: 20%;
+    border: 1px solid #444;
+    overflow: hidden;
+
+    .no-photo {
+        display: flex;
+        align-items: center;
+        vertical-align: middle;
+        justify-content: center;
+        flex-direction: column;
+        height: 100%;
+        width: 100%;
+        background:  linear-gradient( rgba(0,0,0,.95) , rgba(0,0,0,.95) ), url('/assets/icons/grupo.svg');
+        filter: invert(30%);
+
+        color: #fff;
+        background-size: 100% auto;
+    }
+}
+
+ion-item {
+    --background: none;
+
+    ion-label {
+        text-align: center;
+    }
+}
+
+ion-input.profile,
+ion-select.profile {
+    input {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+    --background: linear-gradient(#FFCC33, #FFB347);
+}

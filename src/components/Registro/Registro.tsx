@@ -88,7 +88,7 @@ export const Registro = () => {
   const onGetConstants = async () => {
     try {
       present({
-        message: "Loading ...",
+        message: "Cargando ...",
       });
 
       const { data } = await all();
@@ -110,7 +110,7 @@ export const Registro = () => {
 
     try {
       present({
-        message: "Loading ...",
+        message: "Cargando ...",
       });
 
       const {

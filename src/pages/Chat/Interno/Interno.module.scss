@@ -2,6 +2,11 @@
 
 .ion-header {
     --background: var(--bg-main-gradient);
+
+    .avatar {
+        width: 35px;
+        height: 35px;
+    }
 }
 
 .ion-content {      
@@ -15,13 +20,8 @@
         font-family: 'arya-bold';
         font-weight: bold;
         color: #444;
-        margin-bottom: 15px;
-        min-height: 0;
         --indicator-color: var(--color-main);
 
-        ion-label {
-            margin-bottom: 10px;
-            margin-top: 10px;
-        }
+        margin-bottom: 20px;
     }
 }

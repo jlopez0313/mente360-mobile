@@ -13,7 +13,7 @@ import {
 } from "@ionic/react";
 import { shareSocialOutline } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
-import styles from "../Chat.module.scss";
+import styles from "./Comunidad.module.scss";
 import { Contacts } from "@capacitor-community/contacts";
 import avatar from "/assets/icons/avatar.svg";
 import { invitar } from "@/services/user";
@@ -23,8 +23,13 @@ import { parsePhoneNumber } from "react-phone-number-input";
 import { misContactos } from "@/services/user";
 import Avatar from "@/assets/images/avatar.jpg";
 
+import { writeData } from "@/services/realtime-db";
+import { useHistory } from "react-router";
+
 export const Comunidad = () => {
   const baseURL = import.meta.env.VITE_BASE_BACK;
+
+  const history = useHistory();
   const { user } = getUser();
 
   const [present, dismiss] = useIonLoading();
@@ -47,7 +52,7 @@ export const Comunidad = () => {
   const getContacts = async () => {
     try {
       present({
-        message: "Loading ...",
+        message: "Cargando ...",
       });
 
       const projection = {
@@ -113,7 +118,7 @@ export const Comunidad = () => {
   const onInvitar = async (contact: any) => {
     try {
       present({
-        message: "Loading ...",
+        message: "Cargando ...",
       });
 
       const body = {
@@ -144,6 +149,29 @@ export const Comunidad = () => {
     });
   };
 
+  const goToInterno = async (otroUser: any) => {
+    const roomArray = [Number(user.id), Number(otroUser.id)];
+    const roomID = roomArray.sort((a, b) => a - b).join("_");
+
+    await writeData("rooms/" + roomID + "/users/" + user.id, {
+      id: user.id,
+      name: user.name,
+      photo: user.photo || "",
+      phone: user.phone || "",
+    });
+    await writeData("rooms/" + roomID + "/users/" + otroUser.id, {
+      id: otroUser.id,
+      name: otroUser.name,
+      photo: otroUser.photo || "",
+      phone: otroUser.phone || "",
+    });
+
+    await writeData("user_rooms/" + user.id + "/rooms/" + roomID, true);
+    await writeData("user_rooms/" + otroUser.id + "/rooms/" + roomID, true);
+
+    history.replace("/chat/" + roomID);
+  };
+
   useEffect(() => {
     getContacts();
   }, []);
@@ -151,7 +179,6 @@ export const Comunidad = () => {
   return (
     <div className={styles["ion-content"]}>
       <IonItem
-        className="ion-margin-bottom"
         button={true}
         lines="none"
         onClick={onShareLink}
@@ -165,14 +192,17 @@ export const Comunidad = () => {
         <IonLabel>Enviar Enlace de Invitación</IonLabel>
       </IonItem>
 
-      <IonList className="ion-no-padding ion-margin-bottom" lines="none">
+      <IonList
+        className="ion-no-padding"
+        lines="none"
+      >
         <IonItemGroup>
           <IonItemDivider>
             <IonLabel>Personas en Mente360</IonLabel>
           </IonItemDivider>
 
           <IonSearchbar
-            className={`ion-no-padding ion-margin-bottom ${styles["searc"]}`}
+            className={`ion-no-padding ion-margin-bottom`}
             placeholder="Buscar"
             color="warning"
             onIonInput={(ev) => onSearchContacts(ev)}
@@ -185,6 +215,7 @@ export const Comunidad = () => {
                   key={idx}
                   button={true}
                   className={`ion-margin-bottom ${styles["contact"]}`}
+                  onClick={() => goToInterno(contact)}
                 >
                   <IonAvatar aria-hidden="true" slot="start">
                     <img
@@ -202,7 +233,6 @@ export const Comunidad = () => {
                       {contact.phone || "-"}{" "}
                     </span>
                   </IonLabel>
-                  <IonNote slot="end"> Añadir </IonNote>
                 </IonItem>
               )
             );

@@ -1,0 +1,33 @@
+@import "@/styles.scss";
+
+.ion-content { 
+    ion-list {
+        background: none;
+    }
+
+    ion-item {
+        background: none;
+        --background: var(--bg-main-gradient);
+        --border-radius: 20px;
+        
+        &.contact {
+            ion-label {
+                margin: 5px 0;
+                
+                span {
+                    display: block;
+                    text-align: justify;
+                    color: #666;
+                    &.name {
+                        font-weight: bold;
+                        font-size: 15px;
+                    }
+                    
+                    &.phone {        
+                        font-size: 14px;
+                    }
+                }
+            }
+        }
+    }
+}

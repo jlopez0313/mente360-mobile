@@ -40,7 +40,7 @@ export const Login = () => {
 
     try {
       present({
-        message: "Loading ...",
+        message: "Cargando ...",
       });
 
       const { data } = await login({

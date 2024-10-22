@@ -59,7 +59,7 @@ export const Clips = () => {
   const onGetCategorias = async () => {
     try {
       present({
-        message: "Loading ...",
+        message: "Cargando ...",
       });
 
       const { data } = await allCategorias();
@@ -80,7 +80,7 @@ export const Clips = () => {
   const onGetClips = async (categoriasID: string, fn = allClips) => {
     try {
       present({
-        message: "Loading ...",
+        message: "Cargando ...",
       });
 
       if (categoriasID == "0") {
@@ -112,7 +112,7 @@ export const Clips = () => {
   const onTrash = async (idx: number, usuarios_clips: any) => {
     try {
       present({
-        message: "Loading ...",
+        message: "Cargando ...",
       });
 
       const userClip = hasThisUser(usuarios_clips);
@@ -138,7 +138,7 @@ export const Clips = () => {
   const onAdd = async (idx: number, id: any) => {
     try {
       present({
-        message: "Loading ...",
+        message: "Cargando ...",
       });
 
       const data = {
