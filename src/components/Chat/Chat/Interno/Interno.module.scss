@@ -28,13 +28,20 @@
             &.receiver {
             }
 
-            .message {
+            div {
                 flex-grow: 1;
-            }
+                padding-top: 5px;
 
-            .time {
-                font-size: .6rem;
-                align-self: flex-end;
+                .message {
+                    display: block;
+                    line-height: 16px;
+                }
+
+                .time {
+                    float: right;
+                    font-size: .6rem;
+                    margin-top: -10px;
+                }
             }
         }
         

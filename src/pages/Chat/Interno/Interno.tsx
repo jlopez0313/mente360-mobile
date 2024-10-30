@@ -93,7 +93,8 @@ const Interno: React.FC = () => {
           <IonTitle className="ion-no-padding ion-padding-end ion-text-justify ion-padding-start">
             {otherUser.name}
           </IonTitle>
-
+          
+          {/*
           <IonButtons slot="end">
             <IonButton id="popover-button">
               <IonIcon
@@ -102,6 +103,8 @@ const Interno: React.FC = () => {
               ></IonIcon>
             </IonButton>
           </IonButtons>
+          */}
+          
         </IonToolbar>
       </IonHeader>
 

@@ -2,6 +2,11 @@
 
 .ion-header {
   --background: var(--bg-main-gradient);
+
+  .large-icon {
+    
+    font-size: 24px !important;
+  }
 }
 
 .ion-content {      

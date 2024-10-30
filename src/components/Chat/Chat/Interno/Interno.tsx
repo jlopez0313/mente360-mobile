@@ -80,8 +80,10 @@ export const Interno = ({ roomID }) => {
                     : styles["receiver"]
                 } `}
               >
-                <IonText className={styles["message"]}> {msg.mensaje} </IonText>
-                <span className={styles["time"]}> {msg.hora} </span>
+                <div>
+                  <IonText className={styles["message"]}> {msg.mensaje} </IonText>
+                  <span className={styles["time"]}> {msg.hora} </span>
+                </div>
               </IonItem>
             );
           })}

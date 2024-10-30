@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import UIContext from "@/context/Context";
 // import { create, handleControlsEvent, destroy } from "@/helpers/musicControls";
+import { BackgroundMode } from '@anuradev/capacitor-background-mode';
 
 export const useAudio: any = (audioRef: any, onConfirm: any = () => {}) => {
   const baseURL = import.meta.env.VITE_BASE_BACK;
@@ -42,22 +43,34 @@ export const useAudio: any = (audioRef: any, onConfirm: any = () => {}) => {
     onPause();
   };
 
-  const onEnd = () => {
+  const onEnd = async () => {
     if ( audioRef.current ) {
       audioRef.current.currentTime = audioRef.current.duration;
     }
     setIsPlaying(false);
+
     onPause();
     onConfirm();
   };
 
-  const onPause = () => {
+  const onPause = async () => {
     audioRef.current?.pause();
     setIsPlaying(false);
+
+    await BackgroundMode.disable();
   };
 
-  const onPlay = () => {
+  const onPlay = async () => {
     try {
+      await BackgroundMode.enable();
+
+      BackgroundMode.setSettings({
+        title: 'Reproduciendo Podcast',
+        text: 'Tu podcast está en reproducción.',
+        icon: 'icon', // Nombre del archivo del ícono
+        color: 'F14F4D', // Color de la notificación
+      });
+
       audioRef.current?.play().catch((error: any) => {
         console.log("Chrome cannot play sound without user interaction first");
         onStart();

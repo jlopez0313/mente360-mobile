@@ -34,7 +34,7 @@
     ion-item {
         background: none;
         --background: var(--bg-main-gradient);
-        --border-radius: 50px;
+        --border-radius: 15px;
         
         ion-note {
             font-size: 15px;
@@ -45,6 +45,8 @@
         }
 
         &.contact {
+            margin-bottom: 5px;
+
             ion-label {
                 margin: 5px 0;
                 

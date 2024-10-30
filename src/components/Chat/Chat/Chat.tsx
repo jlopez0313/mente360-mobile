@@ -118,7 +118,7 @@ export const Chat = () => {
               <IonItem
                 key={idx}
                 button={true}
-                className={`ion-margin-bottom ${styles["contact"]}`}
+                className={`${styles["contact"]}`}
                 onClick={() => goToInterno(usuario)}
               >
                 <IonAvatar aria-hidden="true" slot="start">
@@ -131,10 +131,7 @@ export const Chat = () => {
                   <span className={styles["name"]}> {usuario?.name} </span>
                   <span className={styles["phone"]}>
                     {" "}
-                    {messages[idx]?.user?.id == user.id
-                      ? "tu"
-                      : messages[idx]?.user?.name}
-                    : {messages[idx]?.mensaje}{" "}
+                    {messages[idx]?.mensaje}{" "}
                   </span>
                 </IonLabel>
               </IonItem>

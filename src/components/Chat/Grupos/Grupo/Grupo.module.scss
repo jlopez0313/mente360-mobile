@@ -28,14 +28,33 @@
             &.receiver {
             }
 
-            .message {
+            div {
                 flex-grow: 1;
+
+                .name,
+                .message { display: block; }
+
+                .message {
+                    line-height: 16px;
+                }
+
+                .time {
+                    float: right;
+                    font-size: .6rem;
+                    margin-top: -10px;
+                }
+
+                span {
+                    
+                    text-align: justify;
+                    color: #666;
+                    &.name {
+                        font-weight: bold;
+                        font-size: 15px;
+                    }
+                }
             }
 
-            .time {
-                font-size: .6rem;
-                align-self: flex-end;
-            }
         }
         
     }

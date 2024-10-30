@@ -7,6 +7,7 @@ import {
   IonFabButton,
   IonFabList,
   IonIcon,
+  IonImg,
   IonLabel,
   useIonAlert,
   useIonLoading,
@@ -40,6 +41,10 @@ import { Toast } from "@/components/Toast/Toast";
 import { FCM } from '@capacitor-community/fcm';
 import { getUser, setUser } from "@/helpers/onboarding";
 import { update } from "@/services/user";
+import calendario from "/assets/icons/calendario.svg";
+import auriculares from "/assets/icons/auriculares.svg";
+import tarea from "/assets/icons/tarea.svg";
+import mensaje from "/assets/icons/mensaje.svg";
 
 export const Home = () => {
   
@@ -222,7 +227,7 @@ export const Home = () => {
         <IonCardContent>
           <div className={styles.header}>
             <div>
-              <img src="assets/images/calendario.png" />
+              <img src={calendario} style={{width: '20px', height: '20px'}} />
               <IonLabel>
                 <strong> &nbsp; { currentDate } </strong>
               </IonLabel>
@@ -251,15 +256,15 @@ export const Home = () => {
         <Card
           buttonID="modal-tarea"
           buttonTitle="Ver"
-          icon="assets/images/tarea.png"
-          title="Tarea del día"
+          icon={tarea}
+          title="Tarea de la semana"
           done={data.tarea?.done || false}
         />
 
         <Card
           buttonID="modal-comentario"
           buttonTitle="Ver"
-          icon="assets/images/comentario.png"
+          icon={mensaje}
           title="Mensaje del día"
           done={data.mensaje?.done || false}
         />
@@ -267,7 +272,7 @@ export const Home = () => {
         <Card
           buttonID="modal-auricular"
           buttonTitle="Escuchar"
-          icon="assets/images/auricular.png"
+          icon={auriculares}
           title="Audio de la noche"
           done={data.audio?.done || false}
         />
@@ -275,7 +280,7 @@ export const Home = () => {
 
       <Modal
         trigger="modal-tarea"
-        title="Tarea del día"
+        title="Tarea de la semana"
         hideButtons={data.tarea?.done || false}
         onConfirm={() => onConfirmTarea()}
       >

@@ -84,13 +84,13 @@ export const Grupo = ({ grupoID }) => {
                     />
                   </IonAvatar>
                 )}
-                
+                  <div>
                   {msg.user.id !== user.id && (
                     <span className={styles["name"]}> {msg.user.name} </span>
                   )}
                   <IonText className={styles["message"]}> {msg.mensaje} </IonText>
                   <span className={styles["time"]}> {msg.hora} </span>
-                
+                </div>
               </IonItem>
             );
           })}

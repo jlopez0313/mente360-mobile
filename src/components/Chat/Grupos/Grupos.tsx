@@ -20,14 +20,12 @@ import { onValue } from "firebase/database";
 import { readData, getData } from "@/services/realtime-db";
 
 export const Grupos = () => {
-  
   const history = useHistory();
   const { user } = getUser();
   const baseURL = import.meta.env.VITE_BASE_BACK;
 
   const [grupos, setGrupos] = useState([]);
   const [messages, setMessages] = useState([]);
-  
 
   const addDocument = (grupo: any) => {
     const updates = {};
@@ -58,13 +56,13 @@ export const Grupos = () => {
   const onGetAll = async () => {
     onValue(readData(`user_rooms/${user.id}/grupos`), (snapshot) => {
       const data = snapshot.val();
-      
+
       const rooms: any = data
-      ? Object.keys(data).map((key) => ({
-          id: key,
-          ...data[key],
-        }))
-      : [];
+        ? Object.keys(data).map((key) => ({
+            id: key,
+            ...data[key],
+          }))
+        : [];
 
       rooms.forEach(async (room, idx) => {
         const data = await getData(`grupos/${room.id}`);
@@ -73,9 +71,9 @@ export const Grupos = () => {
         const grupo = {
           photo: val.photo,
           grupo: val.grupo,
-          id: room.id
-        }
-        setGrupos(grupos => [...grupos, grupo]);
+          id: room.id,
+        };
+        setGrupos((grupos) => [...grupos, grupo]);
 
         onValue(readData(`grupos/${room.id}/messages`), (snapshot) => {
           const data2 = snapshot.val();
@@ -88,15 +86,13 @@ export const Grupos = () => {
             : [];
 
           const lastMsg = listaMensajes.slice(-1);
-          
+
           const mensajes = [...messages];
-          mensajes[idx] = lastMsg[0]
+          mensajes[idx] = lastMsg[0];
 
           setMessages(mensajes);
         });
-
       });
-
     });
   };
 
@@ -131,7 +127,7 @@ export const Grupos = () => {
               <IonItem
                 key={idx}
                 button={true}
-                className={`ion-margin-bottom ${styles["contact"]}`}
+                className={`${styles["grupo"]}`}
                 onClick={() => goToGrupo(grupo.id)}
               >
                 <IonAvatar aria-hidden="true" slot="start">
@@ -140,11 +136,14 @@ export const Grupos = () => {
                 <IonLabel className="ion-no-margin">
                   <span className={styles["name"]}> {grupo.grupo} </span>
                   <span className={styles["phone"]}>
-                    {" "}
-                    {messages[idx]?.user?.id == user.id
-                      ? "tu"
-                      : messages[idx]?.user?.name}
-                    : {messages[idx]?.mensaje}{" "}
+                    {messages[idx] && (
+                      <>
+                        {messages[idx]?.user?.id == user.id
+                          ? "tu"
+                          : messages[idx]?.user?.name}
+                        : {messages[idx]?.mensaje}{" "}
+                      </>
+                    )}{" "}
                   </span>
                 </IonLabel>
               </IonItem>

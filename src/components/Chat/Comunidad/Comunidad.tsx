@@ -101,6 +101,7 @@ export const Comunidad = () => {
 
       setAllContacts(lista);
       setContacts(lista);
+
     } catch (error: any) {
       console.error(error);
 
@@ -239,7 +240,7 @@ export const Comunidad = () => {
           })}
         </IonItemGroup>
       </IonList>
-
+{/* 
       <IonList className="ion-no-padding" lines="none">
         <IonItemGroup>
           <IonItemDivider>
@@ -284,6 +285,8 @@ export const Comunidad = () => {
           })}
         </IonItemGroup>
       </IonList>
+*/}
+
     </div>
   );
 };

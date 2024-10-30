@@ -40,7 +40,7 @@ import { useContext, useEffect, useState } from "react";
 const Chat: React.FC = () => {
   const { setShowGlobalAudio }: any = useContext(UIContext);
 
-  const [tab, setTab] = useState("comunidad");
+  const [tab, setTab] = useState("chat");
 
   const onSetTab = (e) => {
     setTab(e.detail.value);
@@ -80,14 +80,14 @@ const Chat: React.FC = () => {
         </IonHeader>
 
         <IonSegment value={tab} onIonChange={onSetTab}>
-          <IonSegmentButton value="comunidad">
-            <IonLabel> Comunidad </IonLabel>
-          </IonSegmentButton>
           <IonSegmentButton value="chat">
             <IonLabel> Chat </IonLabel>
           </IonSegmentButton>
           <IonSegmentButton value="grupos">
             <IonLabel> Grupos </IonLabel>
+          </IonSegmentButton>
+          <IonSegmentButton value="comunidad">
+            <IonLabel> Comunidad </IonLabel>
           </IonSegmentButton>
         </IonSegment>
 
