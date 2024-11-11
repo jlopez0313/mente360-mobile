@@ -30,6 +30,18 @@
             --background: var(--bg-main-gradient);
             --border-radius: 10px;
     
+            .titulo {
+                font-size: 15px;
+            }
+
+            .categoria {
+                font-size: .6rem;
+            }
+
+            .titulo, .categoria {
+                line-height: 15px;
+            }
+
             ion-note {
                 font-size: 12px;
                 font-weight: bold;

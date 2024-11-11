@@ -215,7 +215,7 @@ export const Perfil = () => {
 
       <PhoneInput
         defaultCountry={usuario.country}
-        className={`ion-margin-top ion-margin-bottom ${styles.phone}`}
+        className={`ion-margin-bottom ${styles.phone}`}
         placeholder="Teléfono"
         value={usuario.phone}
         onChange={(e) => onSetUser("phone", e)}

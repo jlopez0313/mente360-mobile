@@ -23,11 +23,22 @@ import { Popover } from "./Popover";
 
 import UIContext from "@/context/Context";
 import { useContext, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getNotifications } from "../../store/thunks/notifications";
 
 const Home: React.FC = () => {
   const { setShowGlobalAudio }: any = useContext(UIContext);
 
+  const dispatch = useDispatch();
+
+  const { isGeneral } = useSelector((state: any) => state.notifications);
+
+  const onGetNotifications = async () => {
+    dispatch(getNotifications());
+  };
+
   useEffect(() => {
+    onGetNotifications();
     setShowGlobalAudio(true);
   }, []);
 
@@ -52,6 +63,9 @@ const Home: React.FC = () => {
             <Link to="/notificaciones" replace={true}>
               <IonButton>
                 <IonIcon slot="icon-only" icon={notificationsOutline}></IonIcon>
+                {isGeneral && (
+                  <div className={styles["has-notification"]}></div>
+                )}
               </IonButton>
             </Link>
             <IonButton id="popover-button">

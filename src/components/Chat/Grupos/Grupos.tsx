@@ -7,6 +7,7 @@ import {
   IonItemGroup,
   IonLabel,
   IonList,
+  IonNote,
 } from "@ionic/react";
 import { writeData, updateData } from "@/services/realtime-db";
 import styles from "./Grupos.module.scss";
@@ -19,13 +20,19 @@ import { getUser } from "@/helpers/onboarding";
 import { onValue } from "firebase/database";
 import { readData, getData } from "@/services/realtime-db";
 
+import { useDispatch } from "react-redux";
+import { setGrupo } from "@/store/slices/notificationSlice";
+
 export const Grupos = () => {
   const history = useHistory();
   const { user } = getUser();
   const baseURL = import.meta.env.VITE_BASE_BACK;
 
+  const dispatch = useDispatch();
+
   const [grupos, setGrupos] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [unreadList, setUnreadList] = useState([]);
 
   const addDocument = (grupo: any) => {
     const updates = {};
@@ -75,22 +82,39 @@ export const Grupos = () => {
         };
         setGrupos((grupos) => [...grupos, grupo]);
 
-        onValue(readData(`grupos/${room.id}/messages`), (snapshot) => {
+        onValue(readData(`grupos/${room.id}`), (snapshot) => {
           const data2 = snapshot.val();
 
           const listaMensajes: any = data2
-            ? Object.keys(data2).map((key) => ({
+            ? Object.keys(data2.messages || {})
+              .map((key) => ({
                 id: key,
-                ...data2[key],
+                ...data2.messages[key],
               }))
             : [];
 
-          const lastMsg = listaMensajes.slice(-1);
+            
+            
+            if ( data2.users?.[ user.id ]?.exit_time ) {
+              const targetDate = new Date(data2.users[ user.id ]?.exit_time);
+              
+            const unreads: any = listaMensajes.filter((message) => {
+                  const messageDate = new Date(`${message.date}`);
+                  return messageDate > targetDate && message.user.id != user.id;
+                });
 
-          const mensajes = [...messages];
-          mensajes[idx] = lastMsg[0];
+            const mensajes = [...unreadList];
+            mensajes[idx] = unreads.length || 0;
+            setUnreadList( mensajes )
+          }
 
-          setMessages(mensajes);
+          const lastMsg = listaMensajes.pop();
+          if(lastMsg) {
+            const mensajes = [...messages];
+            mensajes[idx] = {...lastMsg};
+            setMessages(mensajes);
+          }
+
         });
       });
     });
@@ -104,9 +128,21 @@ export const Grupos = () => {
     history.replace(`/grupo/${id}`);
   };
 
+  
+  const onCheckUnreads = () => {
+    const noUnreads = unreadList.every( x => x === 0 );
+    if (noUnreads) {
+      dispatch( setGrupo( false ) );
+    }
+  }
+
   useEffect(() => {
     onGetAll();
   }, []);
+
+  useEffect(() => {
+    onCheckUnreads()
+  }, [unreadList])
 
   return (
     <div className={styles["ion-content"]}>
@@ -146,6 +182,13 @@ export const Grupos = () => {
                     )}{" "}
                   </span>
                 </IonLabel>
+                <IonNote className={styles['note']}>
+                  <span className={styles["time"]}> {messages[idx]?.hora} </span>
+                  {
+                    unreadList[idx] ?
+                    <span className={styles["unreads"]}> {unreadList[idx]} </span> : null
+                  }
+                </IonNote>
               </IonItem>
             );
           })}

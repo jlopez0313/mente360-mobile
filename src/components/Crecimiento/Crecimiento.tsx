@@ -30,6 +30,7 @@ export const Crecimiento = () => {
 
   const user = getUser();
 
+  const [activeIdx, setActiveIdx] = useState(0);
   const [nivelID, setNivelID] = useState<any>(null);
   const [progress, setProgress] = useState(0);
   const [niveles, setNiveles] = useState<any[]>([]);
@@ -38,9 +39,11 @@ export const Crecimiento = () => {
 
   const onSetActiveIdx = () => {
     if (crecimientos.length) {
-      setProgress(swiper.activeIndex + 1);
+      setActiveIdx( swiper.activeIndex + 1 )
+      setProgress((swiper.activeIndex + 1) / crecimientos.length);
       setCrecimiento(crecimientos[swiper.activeIndex]);
     } else {
+      setActiveIdx( 0 )
       setProgress(0);
       setCrecimiento({});
     }
@@ -64,7 +67,7 @@ export const Crecimiento = () => {
     } finally {
       dismiss();
 
-      setNivelID(user.user.niveles_id || 1);
+      setNivelID(user.user.crecimiento?.niveles_id || 1);
     }
   };
 
@@ -80,11 +83,16 @@ export const Crecimiento = () => {
       setNivelID(nivelesID);
 
       const { data } = await allCrecimientos(nivelesID);
-      const lista = data.data.map((item: any) => {
+      const lista: any[] = data.data.map((item: any) => {
         return { ...item, playing: false };
       });
 
       setCrecimientos(lista);
+
+      if (user.user.crecimientos_id) {
+        const idx = lista.findIndex((x: any) => x.id == user.user.crecimientos_id)
+        swiper.slideTo( idx )
+      }
     } catch (error: any) {
       presentAlert({
         header: "Alerta!",
@@ -116,7 +124,7 @@ export const Crecimiento = () => {
         await setUser({ ...user, user: data });
       }
     }
-    console.log("going next");
+
     swiper.slideNext();
   };
 
@@ -131,6 +139,22 @@ export const Crecimiento = () => {
     }
 
     swiper.slidePrev();
+  };
+
+  const onSaveNext = async (idx: number) => {
+    if (crecimientos[idx + 1 ]) {
+      const {
+        data: { data },
+      } = await update(
+        {
+          crecimientos_id: crecimientos[idx + 1].id,
+        },
+        user.user.id
+      );
+
+      await setUser({ ...user, user: data });
+    }
+    onGoNext();
   };
 
   const compareWithFn = (o1: any, o2: any) => {
@@ -182,12 +206,13 @@ export const Crecimiento = () => {
         <div className={`${styles.time}`}>
           <span>
             {" "}
-            {progress}/{crecimientos.length}{" "}
+            {progress * crecimientos.length}/{crecimientos.length}{" "}
           </span>
         </div>
       </div>
 
       <Swiper
+        initialSlide={activeIdx}
         allowTouchMove={false}
         spaceBetween={10}
         slidesPerView={1}
@@ -201,10 +226,13 @@ export const Crecimiento = () => {
           return (
             <SwiperSlide key={idx}>
               <Audio
+                activeIndex={swiper.activeIndex}
+                active={idx == swiper.activeIndex}
                 crecimiento={crecimiento}
                 audio={item}
                 onGoBack={onGoBack}
                 onGoNext={onGoNext}
+                onSaveNext={(e) => onSaveNext(e)}
               />
             </SwiperSlide>
           );

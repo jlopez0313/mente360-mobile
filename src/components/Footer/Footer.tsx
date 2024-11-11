@@ -22,10 +22,13 @@ import { IonReactRouter } from "@ionic/react-router";
 import { library, playCircle, radio, search } from "ionicons/icons";
 import UIContext from "@/context/Context";
 import { Modal } from "@/components/Modal/Modal";
+import { useSelector } from "react-redux";
 
 export const Footer = (props: any) => {
   const history = useHistory();
   const [tab, setTab] = useState(history.location.pathname);
+
+  const { isRoom, isGrupo } = useSelector( (state: any) => state.notifications)
 
   return (
     <IonFooter {...props}>
@@ -77,6 +80,8 @@ export const Footer = (props: any) => {
                   : ""
               }
             >
+              { (isRoom || isGrupo) &&
+                <div className={styles["has-notification"]}></div>}
               <IonIcon slot="icon-only" src={grupo}></IonIcon>
             </IonButton>
           </Link>

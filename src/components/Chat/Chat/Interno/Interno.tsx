@@ -15,12 +15,12 @@ import {
   IonText,
   IonTextarea,
 } from "@ionic/react";
-import { addData, readData } from "@/services/realtime-db";
+import { addData, readData, writeData } from "@/services/realtime-db";
 import styles from "./Interno.module.scss";
 import { add, send, sendOutline } from "ionicons/icons";
 import { Modal } from "../../../Modal/Modal";
 import { Add } from "../Add";
-import { create, getAll } from "@/services/grupos";
+import { sendPush } from "@/services/push";
 import { useHistory } from "react-router";
 import { onValue } from "firebase/database";
 import { getUser } from "@/helpers/onboarding";
@@ -32,8 +32,6 @@ export const Interno = ({ roomID }) => {
   const [messagesList, setMessagesList] = useState<any>([]);
 
   const onGetChat = async () => {
-
-
     onValue(readData("rooms/"+roomID+"/messages"), (snapshot) => {
       const data = snapshot.val();
 
@@ -46,20 +44,45 @@ export const Interno = ({ roomID }) => {
   };
 
   const onSendMessage = () => {
+    const fecha = new Date();
+
     const message = {
       user: {id: user.id, photo: user.photo, name: user.name},
-      fecha: new Date().toLocaleDateString(),
-      hora: new Date().toLocaleTimeString([], {
+      fecha: fecha.toLocaleDateString(),
+      hora: fecha.toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
       }),
+      date: fecha.toISOString(),
       mensaje,
     };
 
-    addData("rooms/"+roomID+"/messages", message).then(() => {
+    addData("rooms/"+roomID+"/messages", message)
+    .then( async () => {
+
+      const otherUsers = roomID.split('_').filter( (x: number) => x != user.id ) || []
+
+      await sendPush({
+        users_id: otherUsers,
+        title: user.name,
+        description: message,
+        room: roomID
+      });
+      
       setMensaje("");
     });
   };
+
+  const onCheckInput = async ( e ) => {
+    setMensaje( e.target.value );
+    
+    if ( e.target.value ) {
+      await writeData(`rooms/${ roomID }/${user.id}/writing`, true);
+    } else {
+      await writeData(`rooms/${ roomID }/${user.id}/writing`, false);
+    }
+
+  }
 
   useEffect(() => {
     onGetChat();
@@ -96,7 +119,7 @@ export const Interno = ({ roomID }) => {
             <IonTextarea
               rows={1}
               placeholder="Mensaje..."
-              onIonInput={(e) => setMensaje(e.detail.value)}
+              onIonInput={onCheckInput}
               value={mensaje}
               autoGrow={true}
             />

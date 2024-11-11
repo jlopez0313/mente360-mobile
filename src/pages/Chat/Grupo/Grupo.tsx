@@ -1,60 +1,43 @@
 import {
   IonAvatar,
-  IonBackButton,
   IonButton,
   IonButtons,
-  IonCol,
   IonContent,
-  IonFabList,
-  IonGrid,
   IonHeader,
-  IonImg,
-  IonInput,
   IonItem,
-  IonItemDivider,
-  IonItemGroup,
-  IonLabel,
   IonList,
-  IonModal,
-  IonNote,
   IonPage,
   IonPopover,
-  IonRow,
-  IonSegment,
-  IonSegmentButton,
-  IonText,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
 import styles from "./Grupo.module.scss";
 
-import { IonFab, IonFabButton, IonIcon } from "@ionic/react";
+import { IonIcon } from "@ionic/react";
 import {
   arrowBack,
-  ellipsisVertical,
   ellipsisVerticalOutline,
-  search,
-  shareSocialOutline,
 } from "ionicons/icons";
 
 import { Footer } from "@/components/Footer/Footer";
-import { Comunidad as ComunidadComponent } from "@/components/Chat/Comunidad/Comunidad";
-import { Chat as ChatComponent } from "@/components/Chat/Chat/Chat";
 import { Grupo as GrupoComponent } from "@/components/Chat/Grupos/Grupo/Grupo";
 import { Link, useHistory, useParams } from "react-router-dom";
 
-import UIContext from "@/context/Context";
-import { useContext, useEffect, useRef, useState } from "react";
-import { find } from "@/services/grupos";
-import { getData } from "@/services/realtime-db";
+import { useEffect, useRef, useState } from "react";
+import { getData, writeData, removeData } from "@/services/realtime-db";
+import { getUser } from "@/helpers/onboarding";
 import Avatar from "@/assets/images/avatar.jpg";
 
 const Grupo: React.FC = () => {
+
   const { id } = useParams();
+  const { user } = getUser();
   const baseURL = import.meta.env.VITE_BASE_BACK;
 
   const history = useHistory();
   const modal = useRef<HTMLIonModalElement>(null);
+
+  const [removed, setRemoved] = useState(false);
 
   const [grupo, setGrupo] = useState({ grupo: "", photo: "", users: [] });
   const [presentingElement, setPresentingElement] =
@@ -79,9 +62,30 @@ const Grupo: React.FC = () => {
     history.replace("/grupo/info/" + id);
   };
 
+  const onEnter = async () => {
+    await writeData(`grupos/${ id }/users/${user.id}/exit_time`, null);
+  }
+
+  const onExit = async () => {
+    await writeData(`grupos/${ id }/users/${user.id}/exit_time`, new Date().toISOString());
+  }
+
+  const onExitGroup = async () => {
+    await removeData(`user_rooms/${ user.id }/grupos/${ id }`)
+    setRemoved(true)
+  }
+
   useEffect(() => {
     onGetGrupo(id);
   }, [id]);
+
+  useEffect(() => {
+    onEnter()
+
+    return () => {
+      onExit()
+    }
+  }, [])
 
   return (
     <IonPage>
@@ -126,14 +130,17 @@ const Grupo: React.FC = () => {
           </IonToolbar>
         </IonHeader>
 
-        <GrupoComponent grupoID={id} />
+        <GrupoComponent removed={removed} grupo={grupo} grupoID={id} />
       </IonContent>
 
       <IonPopover trigger="popover-button" dismissOnSelect={true}>
         <IonContent>
           <IonList lines="none">
             <IonItem button={true} detail={false} onClick={goToDetalle}>
-              {grupo.users.length} Usuarios
+              Info. del Grupo
+            </IonItem>
+            <IonItem button={true} detail={false} onClick={onExitGroup}>
+              Salir del Grupo
             </IonItem>
           </IonList>
         </IonContent>

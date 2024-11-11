@@ -1,6 +1,8 @@
 .ion-content { 
     ion-list {
         background: none;
+        padding-top: 0;
+        padding-bottom: 0;
 
         ion-item-group {
             --background: none;
@@ -21,10 +23,18 @@
     ion-item {
         background: none;
         --background: var(--bg-main-gradient);
-        --border-radius: 50px;
+        --border-radius: 15px;
+        margin-bottom: 5px;
 
         ion-label {
             text-align: justify;
+            line-height: 16px;
+            font-size: 13px !important;
+        }
+
+        ion-note {
+            font-size: 11px;
+            align-self: end;
         }
     }
 }

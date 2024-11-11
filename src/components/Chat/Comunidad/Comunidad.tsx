@@ -215,7 +215,7 @@ export const Comunidad = () => {
                 <IonItem
                   key={idx}
                   button={true}
-                  className={`ion-margin-bottom ${styles["contact"]}`}
+                  className={`${styles["contact"]}`}
                   onClick={() => goToInterno(contact)}
                 >
                   <IonAvatar aria-hidden="true" slot="start">

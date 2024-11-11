@@ -2,6 +2,8 @@ import styles from "../Musicaterapia.module.scss";
 import {
   IonChip,
   IonIcon,
+  IonInfiniteScroll,
+  IonInfiniteScrollContent,
   IonItem,
   IonLabel,
   IonList,
@@ -48,6 +50,17 @@ export const Clips = () => {
   const [categoria, setCategoria] = useState("All");
   const [todosClips, setTodosClips] = useState<any>([]);
   const [clips, setClips] = useState<any>([]);
+  const [chip, setChip] = useState<any>("0");
+  const [page, setPage] = useState<any>(1);
+  const [search, setSearch] = useState<any>("");
+
+  const oSetSearch = (e: any) => {
+    setSearch(e.target.value);
+  };
+
+  const onSetPage = (page: any) => {
+    setPage(page);
+  };
 
   const hasThisUser = (usuarios_clips: any[]) => {
     const hasUserClip = usuarios_clips.find(
@@ -59,12 +72,13 @@ export const Clips = () => {
   const onGetCategorias = async () => {
     try {
       present({
-        message: "Cargando ...",
+        message: "Cargando1 ...",
       });
 
       const { data } = await allCategorias();
       setCategorias(data.data);
-      onGetClips("0", allClips);
+      await onGetClips(allClips);
+      dismiss();
     } catch (error: any) {
       presentAlert({
         header: "Alerta!",
@@ -77,24 +91,20 @@ export const Clips = () => {
     }
   };
 
-  const onGetClips = async (categoriasID: string, fn = allClips) => {
+  const onGetClips = async (fn = allClips) => {
     try {
-      present({
-        message: "Cargando ...",
-      });
-
-      if (categoriasID == "0") {
+      if (chip == "0") {
         setCategoria("All");
       } else {
         setCategoria(
-          categorias.find((item: any) => item.id == categoriasID)?.categoria
+          categorias.find((item: any) => item.id == chip)?.categoria
         );
       }
 
-      const { data } = await fn(categoriasID);
+      const { data } = await fn(chip, page, search);
 
-      setTodosClips(data.data);
-      setListAudios(data.data);
+      setTodosClips((lista) => [...lista, ...(data.data || [])]);
+      // setListAudios( (lista: any) =>[...lista, data.data]);
     } catch (error: any) {
       console.error(error);
 
@@ -104,8 +114,6 @@ export const Clips = () => {
         message: error.data?.message || "Error Interno",
         buttons: ["OK"],
       });
-    } finally {
-      dismiss();
     }
   };
 
@@ -184,23 +192,50 @@ export const Clips = () => {
     setClips(tmpClips);
   };
 
-  const onSearchClips = (evt: any) => {
-    setClips(
-      todosClips.filter((item: any) =>
-        item.titulo.toLowerCase().includes(evt.target.value.toLowerCase())
-      )
-    );
+  const onRefreshList = () => {
+    if (chip == "0") {
+      onGetClips(allClips);
+    } else {
+      onGetClips(byCategory);
+    }
   };
 
   useEffect(() => {
     onGetCategorias();
-
     setShowGlobalAudio(true);
   }, []);
 
   useEffect(() => {
     setClips(todosClips);
   }, [todosClips]);
+
+  useEffect(() => {
+    setTodosClips([]);
+
+    if (page != 1) {
+      setPage(1);
+    } else {
+      onRefreshList();
+    }
+  }, [chip]);
+
+  useEffect(() => {
+    setTodosClips([]);
+
+    const delayDebounceFn = setTimeout(() => {
+      if (page != 1) {
+        setPage(1);
+      } else {
+        onRefreshList();
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [search]);
+
+  useEffect(() => {
+    onRefreshList();
+  }, [page]);
 
   useEffect(() => {
     globalAudio && onUpdateList();
@@ -210,7 +245,7 @@ export const Clips = () => {
     <div className={styles["ion-content"]}>
       <div className={`ion-margin-bottom ${styles.chips}`}>
         <IonChip
-          onClick={() => onGetClips("0", allClips)}
+          onClick={() => setChip("0")}
           className={categoria == "All" ? styles.checked : ""}
         >
           {" "}
@@ -220,7 +255,7 @@ export const Clips = () => {
           return (
             <IonChip
               key={idx}
-              onClick={() => onGetClips(item.id, byCategory)}
+              onClick={() => setChip(item.id)}
               className={categoria == item.categoria ? styles.checked : ""}
             >
               {" "}
@@ -233,7 +268,7 @@ export const Clips = () => {
           className={`ion-no-padding ion-margin-top ion-margin-bottom ${styles["searc"]}`}
           placeholder="Buscar"
           color="warning"
-          onIonInput={(ev) => onSearchClips(ev)}
+          onIonInput={(ev) => oSetSearch(ev)}
         ></IonSearchbar>
       </div>
 
@@ -241,7 +276,16 @@ export const Clips = () => {
         {clips.map((item: any, idx: any) => {
           return (
             <IonItem key={idx} button={true} className="ion-margin-bottom">
-              <IonLabel class="ion-text-left"> {item.titulo} </IonLabel>
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <IonLabel className={`ion-text-left ${styles["titulo"]}`}>
+                  {" "}
+                  {item.titulo}{" "}
+                </IonLabel>
+                <span className={styles["categoria"]}>
+                  {" "}
+                  {item.categoria?.categoria}{" "}
+                </span>
+              </div>
               {globalAudio?.id == item.id && isPlaying ? (
                 <IonIcon
                   aria-hidden="true"
@@ -277,6 +321,18 @@ export const Clips = () => {
           );
         })}
       </IonList>
+
+      <IonInfiniteScroll
+        onIonInfinite={(ev) => {
+          onSetPage(page + 1);
+          setTimeout(() => ev.target.complete(), 1000);
+        }}
+      >
+        <IonInfiniteScrollContent
+          loadingText="Cargando..."
+          loadingSpinner="bubbles"
+        ></IonInfiniteScrollContent>
+      </IonInfiniteScroll>
     </div>
   );
 };

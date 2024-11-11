@@ -153,7 +153,7 @@ export const Toast = () => {
   }, [globalAudio])
 
   return (
-    <>
+    <div className={`${styles["custom-toast"]}`}>
       <IonIcon
         onClick={onClear}
         aria-hidden="true"
@@ -161,7 +161,7 @@ export const Toast = () => {
         className={`${styles["custom-close"]}`}
       />
 
-      <IonItem lines="none" button={true} className={`${styles["custom-toast"]}`}>
+      <IonItem lines="none" button={true}>
         <IonLabel class="ion-text-left"> {globalAudio.titulo} </IonLabel>
 
         <IonIcon
@@ -213,6 +213,6 @@ export const Toast = () => {
         </div>
         
       </IonItem>
-    </>
+    </div>
   );
 };

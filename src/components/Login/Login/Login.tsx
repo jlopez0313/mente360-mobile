@@ -24,6 +24,7 @@ import { register } from "@/services/auth";
 import { useContext, useEffect, useState } from "react";
 import UIContext from "@/context/Context";
 import { useHistory } from "react-router";
+import { FCM } from "@capacitor-community/fcm";
 
 export const Login = () => {
   const { db }: any = useContext(UIContext);
@@ -48,6 +49,11 @@ export const Login = () => {
         password,
         device: "app",
       });
+
+      const token = await FCM.getToken();
+      console.log("FCM Token:", token.token);
+      
+      data.fcm_token = token.token;
 
       await setUser(data);
       db.set("user", email);

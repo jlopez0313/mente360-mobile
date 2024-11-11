@@ -23,9 +23,9 @@ import { useHistory } from "react-router";
 import { onValue } from "firebase/database";
 import { getUser } from "@/helpers/onboarding";
 import Avatar from "@/assets/images/avatar.jpg";
+import { sendPush } from "@/services/push";
 
-export const Grupo = ({ grupoID }) => {
-
+export const Grupo = ({ grupoID, grupo, removed }) => {
   const { user } = getUser();
   const [mensaje, setMensaje] = useState("");
   const baseURL = import.meta.env.VITE_BASE_BACK;
@@ -43,16 +43,31 @@ export const Grupo = ({ grupoID }) => {
   };
 
   const onSendMessage = () => {
+    const fecha = new Date();
+
     const message = {
-      user: {id: user.id, photo: user.photo, name: user.name},
-      fecha: new Date().toLocaleDateString(),
-      hora: new Date().toLocaleTimeString([], {
+      user: { id: user.id, photo: user.photo, name: user.name },
+      fecha: fecha.toLocaleDateString(),
+      hora: fecha.toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
       }),
+      date: fecha.toISOString(),
       mensaje,
     };
-    addData("grupos/" + grupoID + "/messages", message).then(() => {
+
+    addData("grupos/" + grupoID + "/messages", message)
+    .then( async () => {
+
+      const otherUsers = grupo.users.filter( (x: any) => x.id != user.id ) || []
+      
+      await sendPush({
+        users_id: otherUsers,
+        title: grupo.grupo,
+        description: user.name + ': ' + message,
+        grupo: grupoID
+      });
+
       setMensaje("");
     });
   };
@@ -84,11 +99,14 @@ export const Grupo = ({ grupoID }) => {
                     />
                   </IonAvatar>
                 )}
-                  <div>
+                <div>
                   {msg.user.id !== user.id && (
                     <span className={styles["name"]}> {msg.user.name} </span>
                   )}
-                  <IonText className={styles["message"]}> {msg.mensaje} </IonText>
+                  <IonText className={styles["message"]}>
+                    {" "}
+                    {msg.mensaje}{" "}
+                  </IonText>
                   <span className={styles["time"]}> {msg.hora} </span>
                 </div>
               </IonItem>
@@ -97,22 +115,30 @@ export const Grupo = ({ grupoID }) => {
         </IonItemGroup>
       </IonList>
 
-      <IonRow className={styles["chatbox"]}>
-        <IonCol size="10">
-          <IonItem>
-            <IonInput
-              placeholder="Mensaje..."
-              onIonInput={(e) => setMensaje(e.target.value)}
-              value={mensaje}
-            />
-          </IonItem>
-        </IonCol>
-        <IonCol size="2">
-          <IonButton disabled={!mensaje} onClick={onSendMessage}>
-            <IonIcon icon={sendOutline} />
-          </IonButton>
-        </IonCol>
-      </IonRow>
+      {removed ? (
+        <IonRow>
+          <IonCol size="12" className="ion-text-center">
+            <i style={{ margin: "0 auto" }}> Saliste del grupo </i>
+          </IonCol>
+        </IonRow>
+      ) : (
+        <IonRow className={styles["chatbox"]}>
+          <IonCol size="10">
+            <IonItem>
+              <IonInput
+                placeholder="Mensaje..."
+                onIonInput={(e) => setMensaje(e.target.value)}
+                value={mensaje}
+              />
+            </IonItem>
+          </IonCol>
+          <IonCol size="2">
+            <IonButton disabled={!mensaje} onClick={onSendMessage}>
+              <IonIcon icon={sendOutline} />
+            </IonButton>
+          </IonCol>
+        </IonRow>
+      )}
     </div>
   );
 };

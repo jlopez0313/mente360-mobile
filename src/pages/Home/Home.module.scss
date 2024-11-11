@@ -7,6 +7,16 @@
     
     font-size: 24px !important;
   }
+
+  .has-notification {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #615617;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
 }
 
 .ion-content {      

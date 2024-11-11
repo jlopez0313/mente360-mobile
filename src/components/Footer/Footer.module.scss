@@ -18,10 +18,19 @@
         }
       }
 
-      ion-icon {
-        opacity: 0.6;
+      &:not(.active) {
+        opacity: .3;
+      }
+
+      .has-notification {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: #615617;
+        position: absolute;
+        right: 0;
+        top: 0;
       }
     }
   }
 }
-  

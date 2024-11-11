@@ -22,13 +22,16 @@ import styles from "./Audio.module.scss";
 import UIContext from "@/context/Context";
 
 interface Props {
+  activeIndex: any;
+  active: any;
   crecimiento: any;
   audio: any;
   onGoBack: () => void;
   onGoNext: () => void;
+  onSaveNext: (e: any) => void;
 }
 
-export const Audio: React.FC<Props> = memo(({ crecimiento, audio, onGoBack, onGoNext }) => {
+export const Audio: React.FC<Props> = memo(({ active, activeIndex, crecimiento, audio, onGoBack, onGoNext, onSaveNext }) => {
   
   const { isPlaying: isGlobalPlaying, onPause: onGlobalPause }: any =
     useContext(UIContext);
@@ -54,43 +57,18 @@ export const Audio: React.FC<Props> = memo(({ crecimiento, audio, onGoBack, onGo
     onPause,
     onPlay,
     onLoad,
-  } = useAudio(audioRef, () => {}, onGoBack, onGoNext);
-
-  const onMoveBack = () => {
-    onStart();
-    onGoBack();
-  };
-
-  const onMoveNext = () => {
-    // onEnd();
-    onGoNext();
-  };
-
-  useEffect(()=> {
-    onStart()
-    
-    if ( !isPlaying && crecimiento.id == audio.id ) {
-      if ( isGlobalPlaying ) {
-        onGlobalPause()
-      }
-
-      setTimeout(() => {
-        onPlay();
-      }, 1000)
-    }
-  }, [crecimiento])
+  } = useAudio(audioRef, () => {});
 
   useEffect(() => {
     if (isPlaying && isGlobalPlaying) {
       onGlobalPause();
     }
-  }, [isPlaying]);
+  }, [isPlaying, isGlobalPlaying]);
 
   useEffect(() => {
-    if (isPlaying && isGlobalPlaying) {
-      onPause();
-    }
-  }, [isGlobalPlaying]);
+    onStart();
+    active ? onPlay() : onPause();
+  }, [active]);
 
   return (
     <IonCard className={`ion-margin-top ion-text-center ${styles.card}`}>
@@ -119,7 +97,7 @@ export const Audio: React.FC<Props> = memo(({ crecimiento, audio, onGoBack, onGo
 
         <div className={`${styles.controls}`}>
           <IonIcon
-            onClick={crecimiento.id == audio.id ? onMoveBack : () => {} }
+            onClick={active ? onGoBack : () => {} }
             className={styles.previous}
             icon={playSkipBack}
           ></IonIcon>
@@ -131,7 +109,7 @@ export const Audio: React.FC<Props> = memo(({ crecimiento, audio, onGoBack, onGo
             )}
           </div>
           <IonIcon
-            onClick={crecimiento.id == audio.id ? onMoveNext :  () => {} }
+            onClick={crecimiento.id == audio.id ? onGoNext :  () => {} }
             className={styles.next}
             icon={playSkipForward}
           ></IonIcon>
@@ -142,7 +120,7 @@ export const Audio: React.FC<Props> = memo(({ crecimiento, audio, onGoBack, onGo
           src={baseURL + audio.audio}
           onLoadedMetadata={onLoadedMetadata}
           onTimeUpdate={onTimeUpdate}
-          onEnded={onMoveNext}
+          onEnded={() => onSaveNext( activeIndex )}
         />
       </IonCardContent>
     </IonCard>

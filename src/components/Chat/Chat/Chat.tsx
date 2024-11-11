@@ -16,16 +16,23 @@ import { useHistory } from "react-router";
 import { getUser } from "@/helpers/onboarding";
 import { getData, writeData, readData } from "@/services/realtime-db";
 import { onValue, off } from "firebase/database";
+import { setRoom } from "@/store/slices/notificationSlice";
 
 import Avatar from "@/assets/images/avatar.jpg";
+import { useDispatch } from "react-redux";
 
 export const Chat = () => {
-  
+  const baseURL = import.meta.env.VITE_BASE_BACK;
+
   const history = useHistory();
   const { user } = getUser();
 
+  const dispatch = useDispatch();
+
+  const [isWriting, setIsWriting] = useState([]);
   const [users, setUsers] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [unreadList, setUnreadList] = useState([]);
 
   const goToInterno = async (otroUser: any) => {
     const roomArray = [Number(user.id), Number(otroUser.id)];
@@ -37,6 +44,7 @@ export const Chat = () => {
       photo: user.photo || "",
       phone: user.phone || "",
     });
+    
     await writeData("rooms/" + roomID + "/users/" + otroUser.id, {
       id: otroUser.id,
       name: otroUser.name,
@@ -52,7 +60,6 @@ export const Chat = () => {
 
   const onGetRooms = async () => {
     onValue(readData(`user_rooms/${user.id}/rooms`), (snapshot) => {
-
       const data = snapshot.val();
 
       const rooms: any = data
@@ -75,33 +82,63 @@ export const Chat = () => {
 
         const usuarios = [...users];
         usuarios[idx] = listaUsuarios.find((u) => u.id != user.id);
-
         setUsers(usuarios);
 
-        onValue(readData(`rooms/${room.id}/messages`), (snapshot) => {
+        onValue(readData(`rooms/${room.id}`), (snapshot) => {
           const data2 = snapshot.val();
 
+          const escribiendo = [...isWriting];
+          escribiendo[idx] = data2[ usuarios[idx].id ]?.writing;
+          setIsWriting( escribiendo )
+
           const listaMensajes: any = data2
-            ? Object.keys(data2).map((key) => ({
+            ? Object.keys(data2.messages).map((key) => ({
+
                 id: key,
-                ...data2[key],
+                ...data2.messages[key],
               }))
             : [];
 
-          const lastMsg = listaMensajes.slice(-1);
-          
-          const mensajes = [...messages];
-          mensajes[idx] = lastMsg[0]
 
-          setMessages(mensajes);
+          if ( data2[ user.id ]?.exit_time ) {
+            const targetDate = new Date(data2[ user.id ]?.exit_time);
+            
+            const unreads: any = listaMensajes.filter((message) => {
+                  const messageDate = new Date(`${message.date}`);
+                  return messageDate > targetDate && message.user.id != user.id;
+                });
+            
+            const mensajes = [...unreadList];
+            mensajes[idx] = unreads.length || 0;
+            setUnreadList( mensajes )
+          }
+
+          const lastMsg = listaMensajes.pop();
+          if (lastMsg) {
+            const mensajes = [...messages];
+            mensajes[idx] = {...lastMsg};
+            setMessages(mensajes);
+          }
+
         });
       });
     });
   };
 
+  const onCheckUnreads = () => {
+    const noUnreads = unreadList.every( x => x === 0 );
+    if (noUnreads) {
+      dispatch( setRoom( false ) );
+    }
+  }
+
   useEffect(() => {
     onGetRooms();
   }, []);
+
+  useEffect(() => {
+    onCheckUnreads()
+  }, [unreadList])
 
   return (
     <div className={styles["ion-content"]}>
@@ -124,35 +161,27 @@ export const Chat = () => {
                 <IonAvatar aria-hidden="true" slot="start">
                   <img
                     alt=""
-                    src="https://ionicframework.com/docs/img/demos/avatar.svg"
+                    src={ usuario.photo ? baseURL + usuario.photo : Avatar }
                   />
                 </IonAvatar>
                 <IonLabel className="ion-no-margin">
                   <span className={styles["name"]}> {usuario?.name} </span>
                   <span className={styles["phone"]}>
                     {" "}
-                    {messages[idx]?.mensaje}{" "}
+                    { isWriting[idx] ? 'Escribiendo...' :  messages[idx]?.mensaje}{" "}
                   </span>
                 </IonLabel>
+                <IonNote className={styles['note']}>
+                  <span className={styles["time"]}> {messages[idx]?.hora} </span>
+                  {
+                    unreadList[idx] ? 
+                    <span className={styles["unreads"]}> {unreadList[idx]} </span> : null
+                  }
+                </IonNote>
               </IonItem>
             );
           })}
 
-          <IonItem
-            button={true}
-            className={`ion-margin-bottom ${styles["contact"]}`}
-          >
-            <IonAvatar aria-hidden="true" slot="start">
-              <img
-                alt=""
-                src="https://ionicframework.com/docs/img/demos/avatar.svg"
-              />
-            </IonAvatar>
-            <IonLabel className="ion-no-margin">
-              <span className={styles["name"]}> {"GRUPO"} </span>
-              <span className={styles["phone"]}> {"mensaje"} </span>
-            </IonLabel>
-          </IonItem>
         </IonItemGroup>
       </IonList>
     </div>

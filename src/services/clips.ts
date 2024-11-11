@@ -3,13 +3,13 @@
 import {baseApi} from './api';
 import { HttpHeaders } from '@capacitor/core';
 
-export const all = async( categoriasID: string ) => {
+export const all = async( categoriasID: string, page = 0, search='' ) => {
 
     return new Promise( async (resolve, reject) => {
         const { get } = baseApi();
     
         try {
-            resolve ( await get('/clips', { "Content-type": "application/json" } ) )
+            resolve ( await get(`/clips?page=${page}&search=${search}`, { "Content-type": "application/json" } ) )
         } catch( error: any ) {
             if (error.response) {
                 reject(error.response)
@@ -23,13 +23,13 @@ export const all = async( categoriasID: string ) => {
     
 }
 
-export const byCategory = async( categoriasID: string ) => {
+export const byCategory = async( categoriasID: string, page = 0, search = '' ) => {
 
     return new Promise( async (resolve, reject) => {
         const { get } = baseApi();
     
         try {
-            resolve ( await get('/clips/by-categoria/' + categoriasID, { "Content-type": "application/json" } ) )
+            resolve ( await get(`/clips/by-categoria/${categoriasID}?page=${page}&search=${search}`, { "Content-type": "application/json" } ) )
         } catch( error: any ) {
             if (error.response) {
                 reject(error.response)

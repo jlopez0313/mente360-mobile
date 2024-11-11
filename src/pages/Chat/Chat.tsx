@@ -36,33 +36,39 @@ import { Link } from "react-router-dom";
 
 import UIContext from "@/context/Context";
 import { useContext, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 const Chat: React.FC = () => {
   const { setShowGlobalAudio }: any = useContext(UIContext);
+
+  const { isRoom, isGrupo } = useSelector((state: any) => state.notifications);
 
   const [tab, setTab] = useState("chat");
 
   const onSetTab = (e) => {
     setTab(e.detail.value);
   };
-  
+
   useEffect(() => {
-    setShowGlobalAudio( false )
-  }, [])
+    setShowGlobalAudio(false);
+  }, []);
 
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar className={styles["ion-header"]}>
           <IonButtons slot="start">
-            <Link to='/home' replace={true}>
-              <IonButton fill="clear"  className={styles.backButton}>
+            <Link to="/home" replace={true}>
+              <IonButton fill="clear" className={styles.backButton}>
                 <IonIcon slot="start" icon={arrowBack} />
               </IonButton>
             </Link>
           </IonButtons>
 
-          <IonTitle className="ion-no-padding ion-padding-end ion-text-center"> Comunidad </IonTitle>
+          <IonTitle className="ion-no-padding ion-padding-end ion-text-center">
+            {" "}
+            Comunidad{" "}
+          </IonTitle>
 
           <IonButtons slot="end">
             <IonButton>
@@ -81,24 +87,28 @@ const Chat: React.FC = () => {
 
         <IonSegment value={tab} onIonChange={onSetTab}>
           <IonSegmentButton value="chat">
-            <IonLabel> Chat </IonLabel>
+            <IonLabel>
+              Chat
+              {isRoom && <div className={styles["has-notification"]}></div>}
+            </IonLabel>
           </IonSegmentButton>
           <IonSegmentButton value="grupos">
-            <IonLabel> Grupos </IonLabel>
+            <IonLabel>
+              {" "}
+              Grupos
+              {isGrupo && <div className={styles["has-notification"]}></div>}
+            </IonLabel>
           </IonSegmentButton>
           <IonSegmentButton value="comunidad">
             <IonLabel> Comunidad </IonLabel>
           </IonSegmentButton>
         </IonSegment>
 
-        {
-          (() => {
-            if (tab == "chat")  return (<ChatComponent />)
-            else if (tab == "comunidad") return (<ComunidadComponent />)
-            else return (<GruposComponent />)
-          })()
-        }
-        
+        {(() => {
+          if (tab == "chat") return <ChatComponent />;
+          else if (tab == "comunidad") return <ComunidadComponent />;
+          else return <GruposComponent />;
+        })()}
       </IonContent>
 
       <Footer />

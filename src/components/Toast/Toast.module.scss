@@ -1,36 +1,35 @@
 @import "@/styles.scss";
 
-.custom-close {
-    font-size: 24px;
-    color: #4b4a50;
-
-    position: absolute;
-    bottom: 72px;
-    left: 5px;
-    z-index: 99;
-}
-
 .custom-toast {
+    position: absolute;
     background: var(--bg-main);
     box-shadow: 3px 3px 10px 0 rgba(0, 0, 0, 0.2);
     --color: #4b4a50;
     min-height: 48px;
-    
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    
-    position: absolute;
     bottom: 60px;
     right: 16px;
     z-index: 90;
     width: calc(100% - 32px);
+    padding: 5px;
 
     ion-label {
         font-size: 12px !important;
     }
-    
+
 }
+
+.custom-close {
+    font-size: 20px;
+    color: #4b4a50;
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    z-index: 99;
+}
+
 
 .unread-indicator {
     width: calc(100% - 16px);

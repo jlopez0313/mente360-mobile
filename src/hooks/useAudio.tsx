@@ -11,29 +11,22 @@ export const useAudio: any = (audioRef: any, onConfirm: any = () => {}) => {
   const [currentTime, setCurrentTime] = useState("00:00");
   const [isPlaying, setIsPlaying] = useState(false);
 
+  const formatTime = (time) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  };
+
   const onLoadedMetadata = () => {
     if (audioRef.current) {
-      const minutes = Math.floor(audioRef.current.duration / 60);
-      const seconds = Math.floor(audioRef.current.duration - minutes * 60);
-      const duration =
-        String(minutes).padStart(2, "0") +
-        ":" +
-        String(seconds).padStart(2, "0");
-
-      setDuration(duration);
+      setDuration( formatTime(audioRef.current.duration) );
     }
   };
 
   const onTimeUpdate = () => {
-    const minutes = Math.floor(audioRef.current?.currentTime / 60);
-    const seconds = Math.floor(audioRef.current?.currentTime - minutes * 60);
-    const currentTime =
-      String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
-    setCurrentTime(currentTime);
-
-    setProgress(
-      (audioRef.current?.currentTime / audioRef.current.duration) * 100
-    );
+    const current = audioRef.current?.currentTime || 0;
+    setCurrentTime(formatTime(current));
+    setProgress((current / (audioRef.current?.duration || 1)) * 100);
   };
 
   const onStart = () => {
@@ -57,20 +50,20 @@ export const useAudio: any = (audioRef: any, onConfirm: any = () => {}) => {
     audioRef.current?.pause();
     setIsPlaying(false);
 
-    await BackgroundMode.disable();
+    // await BackgroundMode.disable();
   };
 
   const onPlay = async () => {
     try {
-      await BackgroundMode.enable();
-
+      // await BackgroundMode.enable();
+/*
       BackgroundMode.setSettings({
         title: 'Reproduciendo Podcast',
         text: 'Tu podcast está en reproducción.',
         icon: 'icon', // Nombre del archivo del ícono
         color: 'F14F4D', // Color de la notificación
       });
-
+*/
       audioRef.current?.play().catch((error: any) => {
         console.log("Chrome cannot play sound without user interaction first");
         onStart();
@@ -89,11 +82,6 @@ export const useAudio: any = (audioRef: any, onConfirm: any = () => {}) => {
     }
     onPlay();
   };
-
-  useEffect( ()=> {
-    // destroy();
-    // create();
-  }, [])
 
   return {
     baseURL,

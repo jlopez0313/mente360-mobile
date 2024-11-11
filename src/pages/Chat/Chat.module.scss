@@ -23,5 +23,15 @@
             margin-bottom: 10px;
             margin-top: 10px;
         }
+
+        .has-notification {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #615617;
+            position: absolute;
+            right: 5px;
+            top: 10px;
+          }
     }
 }

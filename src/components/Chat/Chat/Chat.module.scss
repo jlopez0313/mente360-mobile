@@ -54,7 +54,9 @@
                     display: block;
                     text-align: justify;
                     color: #666;
+                    
                     &.name {
+                        line-height: 16px;
                         font-weight: bold;
                         font-size: 15px;
                     }
@@ -62,6 +64,23 @@
                     &.phone {        
                         font-size: 14px;
                     }
+                }
+            }
+
+            ion-note {
+                display: flex;
+                flex-direction: column;
+                font-weight: normal;
+
+                span {
+                    font-size: 11px;
+                }
+
+                .unreads {
+                    text-align: center;
+                    border-radius: 1.1rem;
+                    background: #777;
+                    color: #fff;
                 }
             }
             
