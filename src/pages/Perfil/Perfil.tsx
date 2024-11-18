@@ -14,13 +14,29 @@ import { arrowBack, settingsOutline } from "ionicons/icons";
 import { Perfil as PerfilComponent} from "@/components/Perfil/Perfil";
 
 import styles from "./Perfil.module.scss";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import UIContext from "@/context/Context";
 import { useContext, useEffect } from "react";
 
 
 const Perfil: React.FC = () => {
   const { setShowGlobalAudio }: any = useContext(UIContext);
+
+  const history = useHistory();
+
+  useEffect(() => {
+    const handleBackButton = (ev: Event) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      history.replace("/home");
+    };
+
+    document.addEventListener("ionBackButton", handleBackButton);
+
+    return () => {
+      document.removeEventListener("ionBackButton", handleBackButton);
+    };
+  }, [history]);
 
   useEffect(() => {
     setShowGlobalAudio( false )

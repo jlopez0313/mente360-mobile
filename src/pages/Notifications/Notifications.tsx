@@ -13,11 +13,29 @@ import {
 import { Notifications as NotificationsComponent } from '@/components/Notifications/Notifications';
 import styles from "./Notifications.module.scss";
 import { Footer } from "@/components/Footer/Footer";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { arrowBack } from "ionicons/icons";
+import { useEffect } from "react";
 
 
 const Notifications: React.FC = () => {
+  
+  const history = useHistory();
+
+  useEffect(() => {
+    const handleBackButton = (ev: Event) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      history.replace("/home");
+    };
+
+    document.addEventListener("ionBackButton", handleBackButton);
+
+    return () => {
+      document.removeEventListener("ionBackButton", handleBackButton);
+    };
+  }, [history]);
+
   return (
     <IonPage>
       <IonHeader>

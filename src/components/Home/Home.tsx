@@ -1,23 +1,14 @@
 import {
-  IonBackdrop,
+  IonButton,
   IonCard,
   IonCardContent,
   IonChip,
-  IonFab,
-  IonFabButton,
-  IonFabList,
-  IonIcon,
-  IonImg,
+  IonCol,
   IonLabel,
+  IonRow,
   useIonAlert,
   useIonLoading,
 } from "@ionic/react";
-import {
-  add,
-  helpCircleOutline,
-  logoWhatsapp,
-  readerOutline,
-} from "ionicons/icons";
 
 import styles from "./Home.module.scss";
 import { Card } from "./Card";
@@ -25,7 +16,6 @@ import { Modal } from "@/components/Modal/Modal";
 import { Texto } from "./Texto/Texto";
 import { Audio } from "./Audio/Audio";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import {
   getHome,
   confirmAudio,
@@ -36,29 +26,32 @@ import { localDB } from "@/helpers/localStore";
 
 import { useContext } from "react";
 import UIContext from "@/context/Context";
-import { Toast } from "@/components/Toast/Toast";
 
-import { FCM } from '@capacitor-community/fcm';
+import { FCM } from "@capacitor-community/fcm";
 import { getUser, setUser } from "@/helpers/onboarding";
 import { update } from "@/services/user";
 import calendario from "/assets/icons/calendario.svg";
 import auriculares from "/assets/icons/auriculares.svg";
 import tarea from "/assets/icons/tarea.svg";
 import mensaje from "/assets/icons/mensaje.svg";
+import { useHistory } from "react-router";
 
 export const Home = () => {
-  
   const { globalAudio }: any = useContext(UIContext);
+
   const user = getUser();
+  const history = useHistory();
+
 
   const [present, dismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();
   const localHome = localDB("home");
-  
+
+  const [isOpen, setIsOpen] = useState(false);
   const [show, setShow] = useState(false);
   const [data, setData] = useState<any>({ mensaje: {}, tarea: {}, audio: {} });
-  const [dateEnd, setDateEnd] = useState<string>('');
-  const [currentDate, setCurrentDate] = useState<string>('');
+  const [dateEnd, setDateEnd] = useState<string>("");
+  const [currentDate, setCurrentDate] = useState<string>("");
 
   const fechaHoy = new Date();
   const today = fechaHoy.getDay();
@@ -69,31 +62,33 @@ export const Home = () => {
     setShow(!show);
   };
 
-  setTimeout(() => { 
-    setCurrentDate( new Date().toLocaleString() )
+  setTimeout(() => {
+    setCurrentDate(new Date().toLocaleString());
   }, 1000);
-  
+
   const onGetHome = async () => {
     try {
-      const localData = localHome.get();
+      if (user.user.eneatipo) {
+        const localData = localHome.get();
 
-      if (!localData.data || new Date(localData.endTime) < new Date()) {
-        present({
-          message: "Cargando ...",
-        });
+        if (!localData.data || new Date(localData.endTime) < new Date()) {
+          present({
+            message: "Cargando ...",
+          });
 
-        const { data: info } = await getHome({});
+          const { data: info } = await getHome({});
 
-        const endTime = new Date();
-        endTime.setHours(23, 59, 59, 0o0);
-        setDateEnd( endTime.toLocaleString() )
+          const endTime = new Date();
+          endTime.setHours(23, 59, 59, 0o0);
+          setDateEnd(endTime.toLocaleString());
 
-        localHome.set({ data: info, endTime });
-        setData(info);
-      } else {
-        setData({ ...localData.data });
-        const endTime = new Date( localData.endTime ); 
-        setDateEnd( endTime.toLocaleString() )
+          localHome.set({ data: info, endTime });
+          setData(info);
+        } else {
+          setData({ ...localData.data });
+          const endTime = new Date(localData.endTime);
+          setDateEnd(endTime.toLocaleString());
+        }
       }
     } catch (error: any) {
       presentAlert({
@@ -125,6 +120,7 @@ export const Home = () => {
       const localData = localHome.get();
       localHome.set({ ...localData, data: { ...data } });
     } catch (error: any) {
+      console.error(error);
       presentAlert({
         header: "Alerta!",
         subHeader: "Mensaje importante.",
@@ -195,27 +191,32 @@ export const Home = () => {
     }
   };
 
-  
   const onUpdateFCM = async () => {
-    
     // Obtener el token FCM del dispositivo
     const token = await FCM.getToken();
-    console.log('FCM Token:', token.token);
-    console.log('USER:', user);
+    console.log("FCM Token:", token.token);
+    console.log("USER:", user);
 
     const formData = {
-      fcm_token: token.token
-    }
+      fcm_token: token.token,
+    };
 
-    const { data } = await update( formData, user.user.id );
+    const { data } = await update(formData, user.user.id);
     setUser({ ...user, user: data.data });
-  }
+  };
+
+  const onCheckEneatipo = () => {
+    if (!user.user.eneatipo) {
+      setIsOpen(true);
+    }
+  };
 
   useEffect(() => {
     onGetHome();
   }, [currentDate]);
-  
+
   useEffect(() => {
+    onCheckEneatipo();
     onUpdateFCM();
   }, []);
 
@@ -227,13 +228,16 @@ export const Home = () => {
         <IonCardContent>
           <div className={styles.header}>
             <div>
-              <img src={calendario} style={{width: '20px', height: '20px'}} />
+              <img src={calendario} style={{ width: "20px", height: "20px" }} />
               <IonLabel>
-                <strong> &nbsp; { currentDate } </strong>
+                <strong> &nbsp; {currentDate} </strong>
               </IonLabel>
             </div>
             <IonLabel>
-              <strong> {/* CALENDARIO */} {dateEnd} </strong>
+              <strong>
+                {" "}
+                {/* CALENDARIO */} {dateEnd}{" "}
+              </strong>
             </IonLabel>
           </div>
           <div className={styles.daysOfWeek}>
@@ -284,7 +288,7 @@ export const Home = () => {
         hideButtons={data.tarea?.done || false}
         onConfirm={() => onConfirmTarea()}
       >
-        <Texto descripcion={data.tarea?.tarea || ''} />
+        <Texto descripcion={data.tarea?.tarea || ""} children={null} />
       </Modal>
 
       <Modal
@@ -293,7 +297,7 @@ export const Home = () => {
         hideButtons={data.mensaje?.done || false}
         onConfirm={() => onConfirmMensaje()}
       >
-        <Texto descripcion={data.mensaje?.mensaje || ''} />
+        <Texto descripcion={data.mensaje?.mensaje || ""} children={null} />
       </Modal>
 
       <Modal
@@ -303,6 +307,27 @@ export const Home = () => {
         onConfirm={() => onConfirmAudio()}
       >
         <Audio audio={data.audio} onConfirm={() => onConfirmAudio()} />
+      </Modal>
+
+      <Modal
+        trigger="modal-eneatipo"
+        isOpen={isOpen}
+        showButtons={false}
+        canDismiss={false}
+        title="¿Aún no conoces tu eneatipo?"
+        hideButtons={data.mensaje?.done || false}
+        onConfirm={() => onConfirmMensaje()}
+      >
+        <Texto descripcion="Completa nuestro test y descúbrelo. ¡Es el primer paso para entenderte mejor!">
+          <IonRow>
+            <IonCol size="6">
+              <IonButton onClick={() => { history.replace('/perfil') }} shape="round" style={{width: '100%'}}>Sí lo conozco</IonButton>
+            </IonCol>
+            <IonCol size="6">
+              <IonButton onClick={() => { history.replace('/test') }} shape="round" style={{width: '100%'}}>Quiero descubrirlo</IonButton>
+            </IonCol>
+          </IonRow>
+        </Texto>
       </Modal>
 
       {/*
@@ -335,7 +360,6 @@ export const Home = () => {
         </IonFabList>
       </IonFab>
       */}
-
     </>
   );
 };

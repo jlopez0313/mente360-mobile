@@ -20,18 +20,18 @@ import { memo, useContext, useEffect, useRef, useState } from "react";
 import { useAudio } from "@/hooks/useAudio";
 import styles from "./Audio.module.scss";
 import UIContext from "@/context/Context";
+import { BackgroundMode } from '@anuradev/capacitor-background-mode';
+import { create, toggle, destroy } from "@/helpers/musicControls";
 
 interface Props {
   activeIndex: any;
-  active: any;
-  crecimiento: any;
   audio: any;
   onGoBack: () => void;
   onGoNext: () => void;
   onSaveNext: (e: any) => void;
 }
 
-export const Audio: React.FC<Props> = memo(({ active, activeIndex, crecimiento, audio, onGoBack, onGoNext, onSaveNext }) => {
+export const Audio: React.FC<Props> = memo(({ activeIndex, audio, onGoBack, onGoNext, onSaveNext }) => {
   
   const { isPlaying: isGlobalPlaying, onPause: onGlobalPause }: any =
     useContext(UIContext);
@@ -59,6 +59,35 @@ export const Audio: React.FC<Props> = memo(({ active, activeIndex, crecimiento, 
     onLoad,
   } = useAudio(audioRef, () => {});
 
+  const onDoPlay = () => {
+    // toggle(true)
+    onPlay();
+  }
+
+  const onDoPause = () => {
+    // toggle(false)
+    onPause();
+  }
+
+  const goStart = async () => {
+    await BackgroundMode.disable();
+    onPause();
+    onStart();
+      
+      BackgroundMode.setSettings({
+        title: 'Reproduciendo Podcast',
+        text: 'Tu podcast está en reproducción.',
+        icon: 'icon', // Nombre del archivo del ícono
+        color: 'F14F4D', // Color de la notificación
+      });
+      
+
+    await BackgroundMode.enable();
+
+    // create( audio.titulo, duration, onPlay, onPause, onGoBack, onGoNext );
+    onPlay()
+  }
+
   useEffect(() => {
     if (isPlaying && isGlobalPlaying) {
       onGlobalPause();
@@ -66,9 +95,8 @@ export const Audio: React.FC<Props> = memo(({ active, activeIndex, crecimiento, 
   }, [isPlaying, isGlobalPlaying]);
 
   useEffect(() => {
-    onStart();
-    active ? onPlay() : onPause();
-  }, [active]);
+    goStart()
+  }, []);
 
   return (
     <IonCard className={`ion-margin-top ion-text-center ${styles.card}`}>
@@ -84,7 +112,7 @@ export const Audio: React.FC<Props> = memo(({ active, activeIndex, crecimiento, 
 
       <IonCardContent className="ion-no-padding">
         <IonRange
-          disabled={ crecimiento.id != audio.id }
+          disabled={ false }
           value={progress}
           onIonKnobMoveStart={onPause}
           onIonKnobMoveEnd={(e) => onLoad(e.detail.value)}
@@ -97,19 +125,19 @@ export const Audio: React.FC<Props> = memo(({ active, activeIndex, crecimiento, 
 
         <div className={`${styles.controls}`}>
           <IonIcon
-            onClick={active ? onGoBack : () => {} }
+            onClick={onGoBack}
             className={styles.previous}
             icon={playSkipBack}
           ></IonIcon>
           <div className={`${styles.play}`}>
             {isPlaying ? (
-              <IonIcon onClick={onPause} icon={pause}></IonIcon>
+              <IonIcon onClick={onDoPause} icon={pause}></IonIcon>
             ) : (
-              <IonIcon onClick={onPlay} icon={play}></IonIcon>
+              <IonIcon onClick={onDoPlay} icon={play}></IonIcon>
             )}
           </div>
           <IonIcon
-            onClick={crecimiento.id == audio.id ? onGoNext :  () => {} }
+            onClick={ onGoNext }
             className={styles.next}
             icon={playSkipForward}
           ></IonIcon>

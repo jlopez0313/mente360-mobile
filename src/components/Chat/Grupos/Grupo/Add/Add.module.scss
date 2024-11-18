@@ -5,6 +5,11 @@
     ion-searchbar {
         --border-radius: 25px;
 
+        ion-icon {
+            margin-top: 4px;
+            opacity: .25;
+        }
+
         input {
             padding-top: 10px !important;
             padding-bottom: 10px !important;
@@ -14,7 +19,7 @@
     ion-item {
         background: none;
         --background: var(--bg-main-gradient);
-        --border-radius: 50px;
+        --border-radius: 15px;
         
         ion-note {
             font-size: 15px;
@@ -25,6 +30,8 @@
         }
 
         &.contact {
+            margin-bottom: 5px;
+
             ion-label {
                 margin: 5px 0;
                 

@@ -59,8 +59,9 @@ export const Grupo = ({ grupoID, grupo, removed }) => {
     addData("grupos/" + grupoID + "/messages", message)
     .then( async () => {
 
+      setMensaje("");
+
       const otherUsers = grupo.users.filter( (x: any) => x.id != user.id ) || []
-      
       await sendPush({
         users_id: otherUsers,
         title: grupo.grupo,
@@ -68,7 +69,6 @@ export const Grupo = ({ grupoID, grupo, removed }) => {
         grupo: grupoID
       });
 
-      setMensaje("");
     });
   };
 
@@ -85,7 +85,7 @@ export const Grupo = ({ grupoID, grupo, removed }) => {
               <IonItem
                 key={idx}
                 button={true}
-                className={`ion-margin-bottom ${styles["message"]} ${
+                className={`${styles["message"]} ${
                   msg.user.id === user.id
                     ? styles["sender"]
                     : styles["receiver"]

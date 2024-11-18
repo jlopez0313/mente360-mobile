@@ -36,13 +36,29 @@ import {
   readerOutline,
 } from "ionicons/icons";
 import { Footer } from "@/components/Footer/Footer";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 
 import UIContext from "@/context/Context";
 import { useContext, useEffect } from "react";
 
 const Crecimiento: React.FC = () => {
   const { setShowGlobalAudio }: any = useContext(UIContext);
+
+  const history = useHistory();
+
+  useEffect(() => {
+    const handleBackButton = (ev: Event) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      history.replace("/home");
+    };
+
+    document.addEventListener("ionBackButton", handleBackButton);
+
+    return () => {
+      document.removeEventListener("ionBackButton", handleBackButton);
+    };
+  }, [history]);
 
   useEffect(() => {
     setShowGlobalAudio( true )

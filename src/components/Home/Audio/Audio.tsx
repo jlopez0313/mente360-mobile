@@ -56,6 +56,11 @@ export const Audio: React.FC<Props> = ({ audio, onConfirm }) => {
     onLoad,
   } = useAudio(audioRef, onConfirm);
 
+  const onDoPause = () => {
+    onPause();
+    onConfirm();
+  }
+
   useEffect(()=> {
     if ( isPlaying && isGlobalPlaying ) {
       onGlobalPause()
@@ -123,7 +128,7 @@ export const Audio: React.FC<Props> = ({ audio, onConfirm }) => {
           src={baseURL + audio.audio}
           onLoadedMetadata={onLoadedMetadata}
           onTimeUpdate={onTimeUpdate}
-          onEnded={onEnd}
+          onEnded={onDoPause}
         />
       </IonCardContent>
     </IonCard>

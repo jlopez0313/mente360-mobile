@@ -60,8 +60,9 @@ export const Interno = ({ roomID }) => {
     addData("rooms/"+roomID+"/messages", message)
     .then( async () => {
 
+      setMensaje("");
+      
       const otherUsers = roomID.split('_').filter( (x: number) => x != user.id ) || []
-
       await sendPush({
         users_id: otherUsers,
         title: user.name,
@@ -69,7 +70,6 @@ export const Interno = ({ roomID }) => {
         room: roomID
       });
       
-      setMensaje("");
     });
   };
 

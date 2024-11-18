@@ -32,7 +32,7 @@ import { Footer } from "@/components/Footer/Footer";
 import { Comunidad as ComunidadComponent } from "@/components/Chat/Comunidad/Comunidad";
 import { Chat as ChatComponent } from "@/components/Chat/Chat/Chat";
 import { Grupos as GruposComponent } from "@/components/Chat/Grupos/Grupos";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 
 import UIContext from "@/context/Context";
 import { useContext, useEffect, useState } from "react";
@@ -41,6 +41,8 @@ import { useSelector } from "react-redux";
 const Chat: React.FC = () => {
   const { setShowGlobalAudio }: any = useContext(UIContext);
 
+  const history = useHistory();
+
   const { isRoom, isGrupo } = useSelector((state: any) => state.notifications);
 
   const [tab, setTab] = useState("chat");
@@ -48,6 +50,20 @@ const Chat: React.FC = () => {
   const onSetTab = (e) => {
     setTab(e.detail.value);
   };
+
+  useEffect(() => {
+    const handleBackButton = (ev: Event) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      history.replace("/home");
+    };
+
+    document.addEventListener("ionBackButton", handleBackButton);
+
+    return () => {
+      document.removeEventListener("ionBackButton", handleBackButton);
+    };
+  }, [history]);
 
   useEffect(() => {
     setShowGlobalAudio(false);

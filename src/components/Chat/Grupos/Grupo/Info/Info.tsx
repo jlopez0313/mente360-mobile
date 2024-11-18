@@ -49,21 +49,6 @@ export const Info = ({ grupoID }) => {
     setGrupo({ grupo: grupo.grupo, photo: grupo.photo, users: users });
   };
 
-  const onSendMessage = () => {
-    const message = {
-      user: { id: user.id, photo: user.photo, name: user.name },
-      fecha: new Date().toLocaleDateString(),
-      hora: new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      mensaje,
-    };
-    addData("grupos/" + grupoID + "/messages", message).then(() => {
-      setMensaje("");
-    });
-  };
-
   useEffect(() => {
     onGetGrupo(grupoID);
   }, [grupoID]);
@@ -78,7 +63,7 @@ export const Info = ({ grupoID }) => {
 
           {grupo.users.map((user: any, idx: number) => {
             return (
-              <IonItem key={idx} button={true} className={`ion-margin-bottom ${styles["message"]}`}>
+              <IonItem key={idx} button={true} className={`${styles["message"]}`}>
                 <IonAvatar aria-hidden="true" slot="start">
                   <img
                     alt=""
@@ -107,6 +92,7 @@ export const Info = ({ grupoID }) => {
         trigger="modal-add"
         title="Agregar Miembro"
         hideButtons={true}
+        onWillDismiss = { () => { onGetGrupo( grupoID ) } }
       >
         <Add grupoID={grupoID} users={grupo.users} />
       </Modal>

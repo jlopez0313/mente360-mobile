@@ -12,10 +12,28 @@ import {
 
 import {Configuracion as ConfiguracionComponent} from "@/components/Configuracion/Configuracion";
 import styles from "./Configuracion.module.scss";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { arrowBack } from "ionicons/icons";
+import { useEffect } from "react";
 
 const Configuracion: React.FC = () => {
+  
+  const history = useHistory();
+
+  useEffect(() => {
+    const handleBackButton = (ev: Event) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      history.replace("/perfil");
+    };
+
+    document.addEventListener("ionBackButton", handleBackButton);
+
+    return () => {
+      document.removeEventListener("ionBackButton", handleBackButton);
+    };
+  }, [history]);
+
   return (
     <IonPage>
       <IonHeader>

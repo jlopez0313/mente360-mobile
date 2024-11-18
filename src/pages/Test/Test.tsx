@@ -13,7 +13,7 @@ import {
 
 import { Test as TestComponent } from "@/components/Test/Test";
 import styles from "./Test.module.scss";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { arrowBack } from "ionicons/icons";
 
 import UIContext from "@/context/Context";
@@ -23,6 +23,22 @@ import { getUser } from "@/helpers/onboarding";
 const Test: React.FC = () => {
   const { setShowGlobalAudio }: any = useContext(UIContext);
   const { user } = getUser();
+
+  const history = useHistory();
+
+  useEffect(() => {
+    const handleBackButton = (ev: Event) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      history.replace("/home");
+    };
+
+    document.addEventListener("ionBackButton", handleBackButton);
+
+    return () => {
+      document.removeEventListener("ionBackButton", handleBackButton);
+    };
+  }, [history]);
 
   useEffect(() => {
     setShowGlobalAudio( false )

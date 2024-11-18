@@ -236,7 +236,7 @@ export const Registro = () => {
                   );
                 })}
               </IonSelect>
-
+{/* 
               <IonItem className="ion-no-padding" lines="none">
                 <IonSelect
                   interface="popover"
@@ -265,7 +265,7 @@ export const Registro = () => {
                   onClick={showAlert}
                 />
               </IonItem>
-
+*/}
               <IonLoading
                 message="Dismissing after 3 seconds..."
                 duration={3000}

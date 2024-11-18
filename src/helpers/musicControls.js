@@ -1,10 +1,17 @@
 import { CapacitorMusicControls } from "capacitor-music-controls-plugin";
-import { Plugins } from '@capacitor/core';
+import { Plugins } from "@capacitor/core";
 const { Media } = Plugins;
 
-export const create = () => {
+let elapsedTime = 0;
+let intervalId = null;
+let isPlaying = true;
+
+export const create = ( title, duration, onPlay, onPause, onGoBack, onGoNext ) => {
+
+  destroy();
+
   CapacitorMusicControls.create({
-    track: "Time is Running Out", // optional, default : ''
+    track: title, // optional, default : ''
     artist: "Mente360", // optional, default : ''
     album: "Absolution", // optional, default: ''
     cover:
@@ -19,8 +26,8 @@ export const create = () => {
     hasClose: true, // show close button, optional, default: false
 
     // iOS only, all optional
-    duration: 60, // default: 0
-    elapsed: 10, // default: 0
+    duration: 5000, // default: 0
+    elapsed: elapsedTime, // default: 0
     hasSkipForward: true, // default: false. true value overrides hasNext.
     hasSkipBackward: true, // default: false. true value overrides hasPrev.
     skipForwardInterval: 15, // default: 15.
@@ -28,10 +35,10 @@ export const create = () => {
     hasScrubbing: false, // default: false. Enable scrubbing from control center progress bar
 
     // Android only, all optional
-    isPlaying: false, // default : true
+    isPlaying: isPlaying, // default : true
     dismissable: false, // default : false
     // text displayed in the status bar when the notification (and the ticker) are updated
-    ticker: 'Now playing "Time is Running Out"',
+    ticker: title,
     // All icons default to their built-in android equivalents
     // The supplied drawable name, e.g. 'media_play', is the name of a drawable found under android/res/drawable* folders
     playIcon: "media_play",
@@ -43,48 +50,69 @@ export const create = () => {
   })
     .then(() => {
       console.log("created");
+
+      intervalId = setInterval(() => {
+        elapsedTime++;
+        CapacitorMusicControls.updateElapsed({
+          elapsed: elapsedTime,
+          isPlaying: isPlaying,
+          duration: 5000, // default: 0
+        })
+        .then(() => {
+          console.log('success elapsed')
+        })
+        .catch((e) => {
+          console.error(e);
+        });
+      }, 1000);
+
+      CapacitorMusicControls.addListener('controlsNotification', (action) => {
+        console.log("controlsNotification was fired", action);
+        handleControlsEvent(action, onPlay, onPause, onGoBack, onGoNext);
+      });
+
+      document.addEventListener("controlsNotification", (event) => {
+        console.log("controlsNotification was fired", event);
+        const info = { message: event.message, position: 0 };
+        handleControlsEvent(info, onPlay, onPause, onGoBack, onGoNext);
+      });
+
     })
     .catch((e) => {
-      console.log(e);
+      console.error(e);
     });
-
-    
-    CapacitorMusicControls.addListener("controls", (action) => {
-        console.log("controlsNotification was fired", action);
-        handleControlsEvent(action);
-      });
 };
 
-export const toggle = (isPlaying) => {
-  CapacitorMusicControls.updateIsPlaying(isPlaying); // toggle the play/pause notification button
-  CapacitorMusicControls.updateDismissable(isPlaying);
+export const toggle = (_isPlaying = true) => {
+  isPlaying = _isPlaying
+  CapacitorMusicControls.updateIsPlaying({_isPlaying}); // toggle the play/pause notification button
+  // CapacitorMusicControls.updateDismissable(isPlaying ? false : true);
 };
 
-export const handleControlsEvent = (action) => {
+export const handleControlsEvent = (action, onPlay = () => {}, onPause = () => {}, onGoBack = () => {}, onGoNext = () => {}) => {
   console.log("hello from handleControlsEvent", action);
   const message = action.message;
 
   switch (message) {
     case "music-controls-next":
-      // next
+      onGoNext();
       console.log(" music-controls-next ");
       break;
     case "music-controls-previous":
-      // previous
+      onGoBack();
       console.log(" music-controls-previous ");
       break;
     case "music-controls-pause":
-      // paused
       console.log(" music-controls-pause ");
       toggle(false);
+      onPause();
       break;
     case "music-controls-play":
-      // resumed
+      onPlay();
       console.log(" music-controls-play ");
       toggle(true);
       break;
     case "music-controls-destroy":
-      // controls were destroyed
       console.log(" music-controls-destroy ");
       break;
 

@@ -65,13 +65,13 @@ export const Toast = () => {
 
   const onClear = () => {
     // setShowGlobalAudio( false );
-    onEnd();
+    onPause();
     setGlobalPos(0);
     setGlobalAudio( null );
   }
 
   const goToPrev = async () => {
-    onEnd();
+    onPause();
 
     const prevIdx = globalPos == 0 ? listAudios.length - 1 : globalPos - 1;
     setGlobalPos(prevIdx);
@@ -82,12 +82,12 @@ export const Toast = () => {
 
   const goToNext = async () => {
     // onEnd();
-
     const nextIdx = globalPos == listAudios.length - 1 ? 0 : globalPos + 1;
     setGlobalPos(nextIdx);
 
     const next = listAudios[nextIdx];
     setGlobalAudio(next);
+
   };
 
 

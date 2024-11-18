@@ -62,11 +62,11 @@ const Login: React.FC = () => {
         console.log("Push notification received:", notification.data);
         // alert("Push Notification received: " + notification);
 
-        if ( data.general ) {
+        if ( data.is_general ) {
           setGeneral( true );
         } else if ( data.room ) {
           setRoom( true );
-        } else {
+        } else if ( data.grupo ) {
           setGrupo( true );
         }
 
@@ -81,11 +81,11 @@ const Login: React.FC = () => {
         console.log("Push notification action performed:", notification);
         // alert( "Notification action: " + JSON.stringify(notification) );
         
-        if ( data.general ) {
+        if ( data.is_general ) {
           history.replace("/notificaciones");
         } else if ( data.room ) {
           history.replace("/chat/" + data.room);
-        } else {
+        } else if ( data.grupo ) {
           history.replace("/grupo/" + data.grupo);
         }
 

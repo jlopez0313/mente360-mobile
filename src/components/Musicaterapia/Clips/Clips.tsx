@@ -72,7 +72,7 @@ export const Clips = () => {
   const onGetCategorias = async () => {
     try {
       present({
-        message: "Cargando1 ...",
+        message: "Cargando ...",
       });
 
       const { data } = await allCategorias();
@@ -103,8 +103,9 @@ export const Clips = () => {
 
       const { data } = await fn(chip, page, search);
 
-      setTodosClips((lista) => [...lista, ...(data.data || [])]);
-      // setListAudios( (lista: any) =>[...lista, data.data]);
+      setTodosClips( (lista: any) => [...lista, ...(data.data || [])]);
+      setListAudios( (lista: any) => [...lista, ...(data.data || [])]);
+
     } catch (error: any) {
       console.error(error);
 
@@ -266,7 +267,7 @@ export const Clips = () => {
 
         <IonSearchbar
           className={`ion-no-padding ion-margin-top ion-margin-bottom ${styles["searc"]}`}
-          placeholder="Buscar"
+          placeholder="Buscar..."
           color="warning"
           onIonInput={(ev) => oSetSearch(ev)}
         ></IonSearchbar>
@@ -275,7 +276,7 @@ export const Clips = () => {
       <IonList className="ion-no-padding ion-margin-bottom" lines="none">
         {clips.map((item: any, idx: any) => {
           return (
-            <IonItem key={idx} button={true} className="ion-margin-bottom">
+            <IonItem key={idx} button={true}>
               <div style={{ display: "flex", flexDirection: "column" }}>
                 <IonLabel className={`ion-text-left ${styles["titulo"]}`}>
                   {" "}

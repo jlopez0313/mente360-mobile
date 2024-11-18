@@ -30,20 +30,36 @@ import { IonFab, IonFabButton, IonIcon } from "@ionic/react";
 import { arrowBack, search, shareSocialOutline } from "ionicons/icons";
 
 import { Footer } from "@/components/Footer/Footer";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Clips as ClipsComponent } from "@/components/Musicaterapia/Clips/Clips";
 import { Playlist as PlaylistComponent } from "@/components/Musicaterapia/Playlist/Playlist";
 import { Toast } from "@/components/Toast/Toast";
 import UIContext from "@/context/Context";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 
 const Musicaterapia: React.FC = () => {
+
+  const history = useHistory();
 
   const [tab, setTab] = useState("clips");
 
   const onSetTab = (e) => {
     setTab(e.detail.value);
   };
+
+  useEffect(() => {
+    const handleBackButton = (ev: Event) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      history.replace("/home");
+    };
+
+    document.addEventListener("ionBackButton", handleBackButton);
+
+    return () => {
+      document.removeEventListener("ionBackButton", handleBackButton);
+    };
+  }, [history]);
 
   return (
     <IonPage>

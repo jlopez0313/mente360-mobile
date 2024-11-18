@@ -17,6 +17,10 @@ import { all as allNiveles } from "@/services/niveles";
 import { all as allCrecimientos } from "@/services/crecimientos";
 import { update } from "@/services/user";
 
+import { BackgroundMode } from "@anuradev/capacitor-background-mode";
+import { create, destroy } from "@/helpers/musicControls";
+import { Card } from "./Card/Card";
+
 export const Crecimiento = () => {
   const [swiper, setSwiper] = useState({
     activeIndex: 0,
@@ -38,12 +42,15 @@ export const Crecimiento = () => {
   const [crecimiento, setCrecimiento] = useState<any>({});
 
   const onSetActiveIdx = () => {
+    // BackgroundMode.disable();
+    // destroy();
+
     if (crecimientos.length) {
-      setActiveIdx( swiper.activeIndex + 1 )
+      setActiveIdx(swiper.activeIndex + 1);
       setProgress((swiper.activeIndex + 1) / crecimientos.length);
       setCrecimiento(crecimientos[swiper.activeIndex]);
     } else {
-      setActiveIdx( 0 )
+      setActiveIdx(0);
       setProgress(0);
       setCrecimiento({});
     }
@@ -90,8 +97,10 @@ export const Crecimiento = () => {
       setCrecimientos(lista);
 
       if (user.user.crecimientos_id) {
-        const idx = lista.findIndex((x: any) => x.id == user.user.crecimientos_id)
-        swiper.slideTo( idx )
+        const idx = lista.findIndex(
+          (x: any) => x.id == user.user.crecimientos_id
+        );
+        swiper.slideTo(idx);
       }
     } catch (error: any) {
       presentAlert({
@@ -142,7 +151,7 @@ export const Crecimiento = () => {
   };
 
   const onSaveNext = async (idx: number) => {
-    if (crecimientos[idx + 1 ]) {
+    if (crecimientos[idx + 1]) {
       const {
         data: { data },
       } = await update(
@@ -163,6 +172,12 @@ export const Crecimiento = () => {
 
   useEffect(() => {
     onGetNiveles();
+    return () => {
+      console.log("chao cmponente");
+
+      // BackgroundMode.disable();
+      // destroy();
+    };
   }, []);
 
   useEffect(() => {
@@ -225,15 +240,17 @@ export const Crecimiento = () => {
         {crecimientos.map((item: any, idx: number) => {
           return (
             <SwiperSlide key={idx}>
-              <Audio
-                activeIndex={swiper.activeIndex}
-                active={idx == swiper.activeIndex}
-                crecimiento={crecimiento}
-                audio={item}
-                onGoBack={onGoBack}
-                onGoNext={onGoNext}
-                onSaveNext={(e) => onSaveNext(e)}
-              />
+              {idx == swiper.activeIndex ? (
+                <Audio
+                  activeIndex={swiper.activeIndex}
+                  audio={item}
+                  onGoBack={onGoBack}
+                  onGoNext={onGoNext}
+                  onSaveNext={(e) => onSaveNext(e)}
+                />
+              ) : (
+                <Card audio={item} />
+              )}
             </SwiperSlide>
           );
         })}

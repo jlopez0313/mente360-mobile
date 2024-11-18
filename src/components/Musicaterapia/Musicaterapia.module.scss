@@ -15,12 +15,18 @@
         ion-searchbar {
             --border-radius: 25px;
 
+            ion-icon {
+                margin-top: 4px;
+                opacity: .25;
+            }
+
             input {
                 padding-top: 10px !important;
                 padding-bottom: 10px !important;
             }
         }
     }
+
     ion-list {
         background: transparent;
         --background: transparent;
@@ -29,6 +35,8 @@
             background: transparent;
             --background: var(--bg-main-gradient);
             --border-radius: 10px;
+
+            margin-bottom: 5px;
     
             .titulo {
                 font-size: 15px;
