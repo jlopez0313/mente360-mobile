@@ -97,7 +97,7 @@ export const Interno = ({ roomID }) => {
               <IonItem
                 key={idx}
                 button={true}
-                className={`ion-margin-bottom ${styles["message"]} ${
+                className={`${styles["message"]} ${
                   msg.user.id === user.id
                     ? styles["sender"]
                     : styles["receiver"]
