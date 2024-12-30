@@ -1,42 +1,66 @@
 import { useContext, useEffect, useState } from "react";
 import UIContext from "@/context/Context";
+import { useDispatch, useSelector } from "react-redux";
+import { updateCurrentTime } from "@/store/slices/audioSlice";
 
-export const useAudio: any = (audioRef: any, onConfirm: any = () => {}) => {
-  const baseURL = import.meta.env.VITE_BASE_BACK;
+export const useAudio: any = ( audio: any, onConfirm: any = () => {}) => {
+
+  const dispatch = useDispatch();
+  const { baseURL, audioRef, myCurrentTime } = useSelector( (state: any) => state.audio )
 
   const [progress, setProgress] = useState(0);
+  const [buffer, setBuffer] = useState(0);
   const [duration, setDuration] = useState("0");
+  const [real_duration, setRealDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState("00:00");
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const formatTime = (time) => {
+  const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
     return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
   };
 
   const onLoadedMetadata = () => {
-    if (audioRef.current) {
-      setDuration( formatTime(audioRef.current.duration) );
+    if (audio.current) {
+      onUpdateBuffer();
+      setRealDuration( audio.current.duration );
+      setDuration( formatTime(audio.current.duration) );
+    }
+  };
+
+  const onUpdateBuffer = () => {
+    
+    if (audio.current?.buffered?.length > 0) {
+      const bufferedEnd = audio.current.buffered.end(audio.current.buffered.length - 1);
+      const duration = audio.current.duration;
+    
+      setBuffer(duration > 0 ? bufferedEnd / duration : 0);
     }
   };
 
   const onTimeUpdate = () => {
-    const current = audioRef.current?.currentTime || 0;
+
+    dispatch( updateCurrentTime( audio.current?.currentTime ) )
+    
+    const current = audio.current?.currentTime || 0;
     setCurrentTime(formatTime(current));
-    setProgress((current / (audioRef.current?.duration || 1)) * 100);
+    setProgress((current / (audio.current?.duration || 1)) * 100);
+
+    // console.log('updating time', current, audio.current)
+
   };
 
   const onStart = () => {
-    if ( audioRef.current ) {
-      audioRef.current.currentTime = 0;
+    if ( audio.current ) {
+      audio.current.currentTime = 0;
     }
     onPause();
   };
 
   const onEnd = async () => {
-    if ( audioRef.current ) {
-      audioRef.current.currentTime = audioRef.current.duration;
+    if ( audio.current ) {
+      audio.current.currentTime = audio.current.duration;
     }
     setIsPlaying(false);
 
@@ -45,21 +69,23 @@ export const useAudio: any = (audioRef: any, onConfirm: any = () => {}) => {
   };
 
   const onPause = async () => {
-    audioRef.current?.pause();
+    audio.current?.pause();
     setIsPlaying(false);
-
   };
 
   const onPlay = async () => {
     try {
-      audioRef.current?.play()
+      if ( myCurrentTime && audio.current) {
+        audio.current.currentTime = myCurrentTime
+      }
+      audio.current?.play()
       .catch((error: any) => {
         console.log("Chrome cannot play sound without user interaction first");
         onStart();
       });
     } catch (error: any) {
       console.error( error )
-      console.log("Chrome cannot play sound without user interaction first");
+      console.log("Error Chrome cannot play sound without user interaction first");
       onStart();
     }
 
@@ -67,8 +93,8 @@ export const useAudio: any = (audioRef: any, onConfirm: any = () => {}) => {
   };
 
   const onLoad = (time: any) => {
-    if ( audioRef.current ) {
-      audioRef.current.currentTime = (audioRef.current.duration * time) / 100;
+    if ( audio.current ) {
+      audio.current.currentTime = (audio.current.duration * time) / 100;
     }
     onPlay();
   };
@@ -76,10 +102,13 @@ export const useAudio: any = (audioRef: any, onConfirm: any = () => {}) => {
   return {
     baseURL,
     progress,
+    buffer,
     duration,
+    real_duration,
     currentTime,
     isPlaying,
     onLoadedMetadata,
+    onUpdateBuffer,
     onTimeUpdate,
     onStart,
     onEnd,

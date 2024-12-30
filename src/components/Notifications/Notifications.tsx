@@ -6,6 +6,7 @@ import {
   IonLabel,
   IonList,
   IonNote,
+  IonText,
 } from "@ionic/react";
 import styles from "./Notifications.module.scss";
 
@@ -13,14 +14,13 @@ import UIContext from "@/context/Context";
 import { useContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setGeneral } from "@/store/slices/notificationSlice";
-
+import Logo from "@/assets/images/logo.png";
 import dayjs from "dayjs";
+import { setShowGlobalAudio } from "@/store/slices/audioSlice";
 
 export const Notifications = () => {
-  const { setShowGlobalAudio }: any = useContext(UIContext);
-
-  const { notificaciones } = useSelector((state: any) => state.notifications);
   const dispatch = useDispatch();
+  const { notificaciones } = useSelector((state: any) => state.notifications);
 
   const [todayNotifications, setTodayNotifications] = useState([]);
   const [otherNotifications, setOtherNotifications] = useState([]);
@@ -42,7 +42,7 @@ export const Notifications = () => {
   };
 
   useEffect(() => {
-    setShowGlobalAudio(false);
+    dispatch(setShowGlobalAudio(false));
     dispatch(setGeneral(false));
   }, []);
 
@@ -61,10 +61,7 @@ export const Notifications = () => {
             return (
               <IonItem lines="none" button={true} key={idx}>
                 <IonAvatar aria-hidden="true" slot="start">
-                  <img
-                    alt=""
-                    src="https://ionicframework.com/docs/img/demos/avatar.svg"
-                  />
+                  <img alt="" src={Logo} />
                 </IonAvatar>
                 <IonLabel>{item.notificacion}</IonLabel>
                 <IonNote>
@@ -89,15 +86,16 @@ export const Notifications = () => {
                 key={idx}
               >
                 <IonAvatar aria-hidden="true" slot="start">
-                  <img
-                    alt=""
-                    src="https://ionicframework.com/docs/img/demos/avatar.svg"
-                  />
+                  <img alt="" src={Logo} />
                 </IonAvatar>
-                <IonLabel>{item.notificacion}</IonLabel>
-                <IonNote>
-                  {new Date(item.created_at).toLocaleDateString()}
-                </IonNote>
+                <div>
+                  <IonText className={styles["message"]}>
+                    {item.notificacion}
+                  </IonText>
+                  <span className={styles["time"]}>
+                    {new Date(item.created_at).toLocaleDateString()}
+                  </span>
+                </div>
               </IonItem>
             );
           })}

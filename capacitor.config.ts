@@ -1,7 +1,7 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.mente360.starter',
+  appId: 'io.soymente360.app',
   appName: 'mente360',
   webDir: 'dist',
   server: {

@@ -9,8 +9,8 @@ export const addData = (route: string, data: any) => {
   return push(ref(rtDatabase, route), data)
 }
 
-export const updateData = (data: any) => {
-  return update(ref(rtDatabase), data)
+export const updateData = (route: string, data: any) => {
+  return update(ref(rtDatabase, route), data)
 }
 
 export const getData = (route: string) => {

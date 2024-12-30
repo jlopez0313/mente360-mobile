@@ -18,7 +18,9 @@
         padding-bottom: 10px;
 
         ion-range {
-            --bar-background: #787878;
+            --track-background: linear-gradient(to right, #ccc 1px, transparent 1px) 0 100%;
+            --track-background-size: 10px 100%;
+            
             --bar-background-active: var(--bg-main);
             --knob-background: var(--bg-main);
             position: relative;

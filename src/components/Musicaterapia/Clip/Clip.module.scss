@@ -1,0 +1,71 @@
+@import "@/styles.scss";
+
+.ion-content { 
+        
+    .card {
+        --background: none;
+        box-shadow: none;
+
+        ion-card-header {
+            .share-icon {
+                width: 20px;
+                height: 20px;
+            }
+        }
+        
+        ion-card-subtitle {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            
+            ion-text {
+                font-size: 15px;
+                color: var(--bg-main);
+            }
+        }
+
+        ion-card-content {
+            
+            .unread-indicator {
+                margin-top: 15px;
+                height: 5px;
+                
+                ion-progress-bar {
+                    height: 2px;
+
+                }
+              }
+
+            .time {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            .controls {
+                display: flex;
+                justify-content: space-around;
+                align-items: center;
+
+                .play {
+                    border-radius: 50%;
+                    padding: 5px;
+                    width: 60px;
+                    height: 60px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 20px;
+                    
+                    background: var(--bg-main-gradient);
+                    color: var(--bg-secondary);
+                }
+
+                .previous, .next {
+                    font-size: 24px;
+                    color: var(--bg-main);
+                }
+            }
+        }
+    }
+
+}

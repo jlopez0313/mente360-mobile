@@ -23,13 +23,13 @@
       }
 
       .has-notification {
-        width: 10px;
-        height: 10px;
+        width: 12px;
+        height: 12px;
         border-radius: 50%;
-        background-color: #615617;
+        background-color: #ff0000;
         position: absolute;
-        right: 0;
-        top: 0;
+        right: -5px;
+        top: -5px;
       }
     }
   }

@@ -36,19 +36,21 @@ import { Link, useHistory } from "react-router-dom";
 
 import UIContext from "@/context/Context";
 import { useContext, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setTab } from "@/store/slices/chatSlice";
+import { setShowGlobalAudio } from "@/store/slices/audioSlice";
+import { destroy } from "@/helpers/musicControls";
 
 const Chat: React.FC = () => {
-  const { setShowGlobalAudio }: any = useContext(UIContext);
-
+  
+  const dispatch = useDispatch();
   const history = useHistory();
 
   const { isRoom, isGrupo } = useSelector((state: any) => state.notifications);
-
-  const [tab, setTab] = useState("chat");
+  const { tab } = useSelector((state: any) => state.chat);
 
   const onSetTab = (e) => {
-    setTab(e.detail.value);
+    dispatch( setTab( e.detail.value ) )
   };
 
   useEffect(() => {
@@ -66,7 +68,8 @@ const Chat: React.FC = () => {
   }, [history]);
 
   useEffect(() => {
-    setShowGlobalAudio(false);
+    dispatch( setShowGlobalAudio( false ) )
+    destroy();
   }, []);
 
   return (
@@ -86,11 +89,13 @@ const Chat: React.FC = () => {
             Comunidad{" "}
           </IonTitle>
 
+          {/*
           <IonButtons slot="end">
             <IonButton>
               <IonIcon slot="icon-only" icon={search}></IonIcon>
             </IonButton>
           </IonButtons>
+          */}
         </IonToolbar>
       </IonHeader>
 

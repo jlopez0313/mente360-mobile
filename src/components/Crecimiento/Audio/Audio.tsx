@@ -20,8 +20,11 @@ import { memo, useContext, useEffect, useRef, useState } from "react";
 import { useAudio } from "@/hooks/useAudio";
 import styles from "./Audio.module.scss";
 import UIContext from "@/context/Context";
-import { BackgroundMode } from '@anuradev/capacitor-background-mode';
+import { BackgroundMode } from "@anuradev/capacitor-background-mode";
+import { startBackground } from "@/helpers/background";
 import { create, toggle, destroy } from "@/helpers/musicControls";
+import { useDispatch, useSelector } from "react-redux";
+import { setGlobalAudio, setIsGlobalPlaying, updateCurrentTime, resetStore } from "@/store/slices/audioSlice";
 
 interface Props {
   activeIndex: any;
@@ -31,126 +34,135 @@ interface Props {
   onSaveNext: (e: any) => void;
 }
 
-export const Audio: React.FC<Props> = memo(({ activeIndex, audio, onGoBack, onGoNext, onSaveNext }) => {
-  
-  const { isPlaying: isGlobalPlaying, onPause: onGlobalPause }: any =
-    useContext(UIContext);
+export const Audio: React.FC<Props> = memo(
+  ({ activeIndex, audio, onGoBack, onGoNext, onSaveNext }) => {
 
-  const audioRef = useRef({
-    currentTime: 0,
-    duration: 0,
-    pause: () => {},
-    play: () => {},
-    fastSeek: (time: number) => {},
-  });
+    const { isGlobalPlaying }: any = useSelector((state: any) => state.audio);
 
-  const {
-    baseURL,
-    progress,
-    duration,
-    currentTime,
-    isPlaying,
-    onLoadedMetadata,
-    onTimeUpdate,
-    onStart,
-    onEnd,
-    onPause,
-    onPlay,
-    onLoad,
-  } = useAudio(audioRef, () => {});
+    const audioRef = useRef({
+      currentTime: 0,
+      duration: 0,
+      pause: () => {},
+      play: () => {},
+      fastSeek: (time: number) => {},
+    });
 
-  const onDoPlay = () => {
-    // toggle(true)
-    onPlay();
-  }
+    const {
+      baseURL,
+      progress,
+      buffer,
+      duration,
+      currentTime,
+      isPlaying,
+      onLoadedMetadata,
+      onTimeUpdate,
+      onUpdateBuffer,
+      onStart,
+      onEnd,
+      onPause,
+      onPlay,
+      onLoad,
+    } = useAudio(audioRef, () => {});
 
-  const onDoPause = () => {
-    // toggle(false)
-    onPause();
-  }
+    const onDoPlay = () => {
+      // toggle(true)
+      onPlay();
+    };
 
-  const goStart = async () => {
-    await BackgroundMode.disable();
-    onPause();
-    onStart();
+    const onDoPause = () => {
+      // toggle(false)
+      onPause();
+    };
+
+    const goStart = async () => {
+      onPause();
+      onStart();
+
+      startBackground()
+      create( audio.titulo, duration, onPlay, onPause, onGoBack, onGoNext );
       
-      BackgroundMode.setSettings({
-        title: 'Reproduciendo Podcast',
-        text: 'Tu podcast está en reproducción.',
-        icon: 'icon', // Nombre del archivo del ícono
-        color: 'F14F4D', // Color de la notificación
-      });
-      
+      onPlay();
+    };
 
-    await BackgroundMode.enable();
+    useEffect(() => {
+      if (!isGlobalPlaying) {
+        onPlay()
+      } else {
+        onPause()
+      }
+    }, [isGlobalPlaying]);
 
-    // create( audio.titulo, duration, onPlay, onPause, onGoBack, onGoNext );
-    onPlay()
-  }
+    useEffect(() => {
+      goStart();
+    }, []);
 
-  useEffect(() => {
-    if (isPlaying && isGlobalPlaying) {
-      onGlobalPause();
-    }
-  }, [isPlaying, isGlobalPlaying]);
+    return (
+      <IonCard className={`ion-margin-top ion-text-center ${styles.card}`}>
+        <img alt="" src={baseURL + audio.imagen} />
 
-  useEffect(() => {
-    goStart()
-  }, []);
+        <IonCardHeader className="ion-no-padding ion-margin-bottom">
+          <IonCardSubtitle className="ion-no-padding">
+            {/*
+              <IonText> &nbsp; </IonText>
+            */}
+            <IonText> {audio.titulo} </IonText>
+            {/* 
+              <IonIcon icon={shareSocial} />
+            */}
+          </IonCardSubtitle>
+        </IonCardHeader>
 
-  return (
-    <IonCard className={`ion-margin-top ion-text-center ${styles.card}`}>
-      <img alt="" src={baseURL + audio.imagen} />
+        <IonCardContent className="ion-no-padding">
+          <IonRange
+            disabled={false}
+            value={progress}
+            onIonKnobMoveStart={onPause}
+            onIonKnobMoveEnd={(e) => onLoad(e.detail.value)}
+            style={{
+              "--bar-background":
+                "linear-gradient(to right, #787878 " +
+                (buffer * 100).toFixed(2) +
+                "%, #dddddd " +
+                (buffer * 100).toFixed(2) +
+                "%)",
+            }}
+          ></IonRange>
 
-      <IonCardHeader className="ion-no-padding ion-margin-bottom">
-        <IonCardSubtitle className="ion-no-padding">
-          <IonText> &nbsp; </IonText>
-          <IonText> {audio.titulo} </IonText>
-          <IonIcon icon={shareSocial} />
-        </IonCardSubtitle>
-      </IonCardHeader>
-
-      <IonCardContent className="ion-no-padding">
-        <IonRange
-          disabled={ false }
-          value={progress}
-          onIonKnobMoveStart={onPause}
-          onIonKnobMoveEnd={(e) => onLoad(e.detail.value)}
-        ></IonRange>
-
-        <div className={`ion-margin-top ${styles.time}`}>
-          <span> {currentTime} </span>
-          <span> {duration} </span>
-        </div>
-
-        <div className={`${styles.controls}`}>
-          <IonIcon
-            onClick={onGoBack}
-            className={styles.previous}
-            icon={playSkipBack}
-          ></IonIcon>
-          <div className={`${styles.play}`}>
-            {isPlaying ? (
-              <IonIcon onClick={onDoPause} icon={pause}></IonIcon>
-            ) : (
-              <IonIcon onClick={onDoPlay} icon={play}></IonIcon>
-            )}
+          <div className={`ion-margin-top ${styles.time}`}>
+            <span> {currentTime} </span>
+            <span> {duration} </span>
           </div>
-          <IonIcon
-            onClick={ onGoNext }
-            className={styles.next}
-            icon={playSkipForward}
-          ></IonIcon>
-        </div>
 
-        <audio
-          ref={audioRef}
-          src={baseURL + audio.audio}
-          onLoadedMetadata={onLoadedMetadata}
-          onTimeUpdate={onTimeUpdate}
-          onEnded={() => onSaveNext( activeIndex )}
-        />
-      </IonCardContent>
-    </IonCard>
-  );
-});
+          <div className={`${styles.controls}`}>
+            <IonIcon
+              onClick={onGoBack}
+              className={styles.previous}
+              icon={playSkipBack}
+            ></IonIcon>
+            <div className={`${styles.play}`}>
+              {isPlaying ? (
+                <IonIcon onClick={onDoPause} icon={pause}></IonIcon>
+              ) : (
+                <IonIcon onClick={onDoPlay} icon={play}></IonIcon>
+              )}
+            </div>
+            <IonIcon
+              onClick={onGoNext}
+              className={styles.next}
+              icon={playSkipForward}
+            ></IonIcon>
+          </div>
+
+          <audio
+            ref={audioRef}
+            src={baseURL + audio.audio}
+            onLoadedMetadata={onLoadedMetadata}
+            onTimeUpdate={onTimeUpdate}
+            onProgress={onUpdateBuffer}
+            onEnded={() => onSaveNext(activeIndex)}
+          />
+        </IonCardContent>
+      </IonCard>
+    );
+  }
+);

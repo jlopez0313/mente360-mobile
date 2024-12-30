@@ -9,31 +9,44 @@
         background: none;
         flex-grow: 1;
         overflow: auto;
-    }
 
+    }
+    
     ion-item {
         background: none;
         --background: var(--bg-main-gradient);
         --border-radius: 15px;
+        
+        .triangle {
+            position: absolute;
+            left: -16px;
+            z-index: 999;
+            width: 0;
+            height: 0;
+            border-right: 20px solid #787878;
+            border-top: 0px solid transparent;
+            border-bottom: 20px solid transparent; /* Color del triángulo */
+        }
 
         &.message{
 
             width: 75%;
             font-size: .9rem;
             margin-bottom: 5px;
-
-
+            color: #2d2d2d;
+            
             &.sender {
                 float: right;
             }
     
             &.receiver {
+                --background: rgb(255, 225, 136);
             }
 
             div {
                 flex-grow: 1;
                 padding-top: 5px;
-
+                
                 .message {
                     display: block;
                     line-height: 16px;
@@ -42,7 +55,16 @@
                 .time {
                     float: right;
                     font-size: .6rem;
-                    margin-top: -10px;
+                }
+
+                span {
+                    
+                    text-align: justify;
+                    color: #666;
+                    &.name {
+                        font-weight: bold;
+                        font-size: 15px;
+                    }
                 }
             }
         }
@@ -55,10 +77,13 @@
             --border-radius: 10px;
 
             ion-textarea {
-                --padding-top: .5rem;
-    
+                --padding-top: 1rem;
                 max-height: 100px;
                 overflow: scroll;
+                
+                textarea {
+                    line-height: 18px;
+                }
             }
         }
     }

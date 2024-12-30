@@ -10,9 +10,9 @@
     flex-direction: column;
     justify-content: space-between;
     bottom: 60px;
-    right: 16px;
+    right: 8px;
     z-index: 90;
-    width: calc(100% - 32px);
+    width: calc(100% - 16px);
     padding: 5px;
 
     ion-label {
@@ -22,11 +22,11 @@
 }
 
 .custom-close {
-    font-size: 20px;
+    font-size: 24px;
     color: #4b4a50;
     position: absolute;
-    top: -1px;
-    left: -1px;
+    top: -5px;
+    left: -5px;
     z-index: 99;
 }
 

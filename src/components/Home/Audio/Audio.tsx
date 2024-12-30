@@ -20,6 +20,8 @@ import { useContext, useEffect, useRef, useState } from "react";
 import styles from "./Audio.module.scss";
 import { useAudio } from "@/hooks/useAudio";
 import UIContext from "@/context/Context";
+import { useDispatch, useSelector } from "react-redux";
+import { setIsGlobalPlaying } from "@/store/slices/audioSlice";
 
 interface Props {
   audio: any;
@@ -28,10 +30,10 @@ interface Props {
 
 export const Audio: React.FC<Props> = ({ audio, onConfirm }) => {
   
-  const {
-    isPlaying: isGlobalPlaying,
-    onPause: onGlobalPause,
-  }: any = useContext(UIContext);
+  const dispatch = useDispatch();
+
+  const { isGlobalPlaying }: any =
+    useSelector((state: any) => state.audio);
 
   const audioRef = useRef<any>({
     currentTime: 0,
@@ -45,10 +47,12 @@ export const Audio: React.FC<Props> = ({ audio, onConfirm }) => {
     baseURL,
     progress,
     duration,
+    buffer,
     currentTime,
     isPlaying,
     onLoadedMetadata,
     onTimeUpdate,
+    onUpdateBuffer,
     onStart,
     onEnd,
     onPause,
@@ -59,19 +63,17 @@ export const Audio: React.FC<Props> = ({ audio, onConfirm }) => {
   const onDoPause = () => {
     onPause();
     onConfirm();
-  }
 
-  useEffect(()=> {
-    if ( isPlaying && isGlobalPlaying ) {
-      onGlobalPause()
-    }
-  }, [isPlaying])
+    dispatch( setIsGlobalPlaying( true ) );
+  };
 
-  useEffect(()=> {
-    if ( isPlaying && isGlobalPlaying ) {
-      onPause()
+  useEffect(() => {
+    if (isPlaying && isGlobalPlaying) {
+      dispatch( setIsGlobalPlaying( false ) );
+    } else if ( !isPlaying ) {
+      dispatch( setIsGlobalPlaying( true ) );
     }
-  }, [isGlobalPlaying])
+  }, [isPlaying]);
 
   return (
     <IonCard className={styles.card}>
@@ -79,17 +81,30 @@ export const Audio: React.FC<Props> = ({ audio, onConfirm }) => {
 
       <IonCardHeader className="ion-no-padding">
         <IonCardSubtitle className="ion-no-padding">
-          <IonText> &nbsp; </IonText>
+          {/*
+            <IonText> &nbsp; </IonText>
+          */}
           <IonText> {audio.titulo} </IonText>
-          <IonIcon icon={shareSocial} />
+          {/* 
+            <IonIcon icon={shareSocial} />
+          */}
         </IonCardSubtitle>
       </IonCardHeader>
 
       <IonCardContent>
+
         <IonRange
           value={progress}
           onIonKnobMoveStart={onPause}
           onIonKnobMoveEnd={(e) => onLoad(e.detail.value)}
+          style={{
+            "--bar-background":
+              "linear-gradient(to right, #787878" +
+              (buffer * 100).toFixed(2) +
+              "%, #dddddd " +
+              (buffer * 100).toFixed(2) +
+              "%)",
+          }}
         ></IonRange>
 
         <div className={`ion-margin-top ${styles.time}`}>
@@ -113,7 +128,7 @@ export const Audio: React.FC<Props> = ({ audio, onConfirm }) => {
               <IonIcon onClick={onPlay} icon={play}></IonIcon>
             )}
           </div>
-          
+
           {/*
             <IonIcon
               onClick={onEnd}
@@ -128,6 +143,7 @@ export const Audio: React.FC<Props> = ({ audio, onConfirm }) => {
           src={baseURL + audio.audio}
           onLoadedMetadata={onLoadedMetadata}
           onTimeUpdate={onTimeUpdate}
+          onProgress={onUpdateBuffer}
           onEnded={onDoPause}
         />
       </IonCardContent>

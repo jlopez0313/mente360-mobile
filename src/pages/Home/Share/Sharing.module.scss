@@ -1,0 +1,36 @@
+@import "@/styles.scss";
+
+ion-content {
+    
+    --background: url('assets/images/modal.png') no-repeat cover fixed center;
+    
+    background: url('assets/images/modal.png') no-repeat fixed center; 
+    background-size: cover;
+    text-align: center;
+    position: relative;
+
+    --padding-bottom: 25px;
+
+    
+    .content {
+        --height: 75%;
+        --width: 90%;
+        --border-radius: 10px;
+        --box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+
+        ion-toolbar {
+            --background: none;
+            --color: var(--color-main);
+            margin-top: 15px;
+        }
+        
+        .texto {
+            text-align: justify;
+            padding: 5px 45px;
+            font-size: 15px;
+            line-height: 1.4rem;
+        }
+    }
+}
+

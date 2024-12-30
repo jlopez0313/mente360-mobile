@@ -40,10 +40,13 @@ import { Link, useHistory } from "react-router-dom";
 
 import UIContext from "@/context/Context";
 import { useContext, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { setShowGlobalAudio } from "@/store/slices/audioSlice";
+import { destroy } from "@/helpers/musicControls";
 
 const Crecimiento: React.FC = () => {
-  const { setShowGlobalAudio }: any = useContext(UIContext);
-
+  
+  const dispatch = useDispatch();
   const history = useHistory();
 
   useEffect(() => {
@@ -61,7 +64,11 @@ const Crecimiento: React.FC = () => {
   }, [history]);
 
   useEffect(() => {
-    setShowGlobalAudio( true )
+    dispatch( setShowGlobalAudio( true ) )
+
+    return () => {
+      destroy()
+    }
   }, [])
 
   return (

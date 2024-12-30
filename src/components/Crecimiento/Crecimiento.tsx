@@ -18,10 +18,14 @@ import { all as allCrecimientos } from "@/services/crecimientos";
 import { update } from "@/services/user";
 
 import { BackgroundMode } from "@anuradev/capacitor-background-mode";
-import { create, destroy } from "@/helpers/musicControls";
 import { Card } from "./Card/Card";
 
+import { useDispatch, useSelector } from "react-redux";
+import { setGlobalAudio, setIsGlobalPlaying, updateCurrentTime, resetStore } from "@/store/slices/audioSlice";
+
 export const Crecimiento = () => {
+  const dispatch = useDispatch()
+
   const [swiper, setSwiper] = useState({
     activeIndex: 0,
     slideTo: (idx: number) => {},
@@ -40,6 +44,25 @@ export const Crecimiento = () => {
   const [niveles, setNiveles] = useState<any[]>([]);
   const [crecimientos, setCrecimientos] = useState<any[]>([]);
   const [crecimiento, setCrecimiento] = useState<any>({});
+
+  const onSetNivel = async (level: any) => {
+    setNivelID(level);
+
+    if (level == 0) {
+      const updatePromise = update(
+        {
+          niveles_id: 1,
+        },
+        user.user.id
+      );
+
+      const setUserPromise = updatePromise.then(({ data }) => {
+        return setUser({ ...user, user: data.data });
+      });
+
+      await Promise.all([updatePromise, setUserPromise]);
+    }
+  };
 
   const onSetActiveIdx = () => {
     // BackgroundMode.disable();
@@ -74,7 +97,7 @@ export const Crecimiento = () => {
     } finally {
       dismiss();
 
-      setNivelID(user.user.crecimiento?.niveles_id || 1);
+      setNivelID(user.user.crecimiento?.niveles_id || 0);
     }
   };
 
@@ -121,16 +144,18 @@ export const Crecimiento = () => {
         const _nivelID = niveles[nextNivelIdx].id;
         setNivelID(_nivelID);
 
-        const {
-          data: { data },
-        } = await update(
+        const updatePromise = update(
           {
             niveles_id: _nivelID,
           },
           user.user.id
         );
 
-        await setUser({ ...user, user: data });
+        const setUserPromise = updatePromise.then(({ data }) => {
+          return setUser({ ...user, user: data.data });
+        });
+
+        await Promise.all([updatePromise, setUserPromise]);
       }
     }
 
@@ -152,16 +177,18 @@ export const Crecimiento = () => {
 
   const onSaveNext = async (idx: number) => {
     if (crecimientos[idx + 1]) {
-      const {
-        data: { data },
-      } = await update(
+      const updatePromise = update(
         {
           crecimientos_id: crecimientos[idx + 1].id,
         },
         user.user.id
       );
 
-      await setUser({ ...user, user: data });
+      const setUserPromise = updatePromise.then(({ data }) => {
+        return setUser({ ...user, user: data.data });
+      });
+
+      await Promise.all([updatePromise, setUserPromise]);
     }
     onGoNext();
   };
@@ -171,10 +198,9 @@ export const Crecimiento = () => {
   };
 
   useEffect(() => {
+    dispatch(resetStore());
     onGetNiveles();
     return () => {
-      console.log("chao cmponente");
-
       // BackgroundMode.disable();
       // destroy();
     };
@@ -201,7 +227,7 @@ export const Crecimiento = () => {
         value={nivelID}
         compareWith={compareWithFn}
         className={`ion-margin-bottom ${styles["nivel"]}`}
-        onIonChange={(e) => setNivelID(e.target.value)}
+        onIonChange={(e) => onSetNivel(e.target.value)}
       >
         {niveles.map((item: any, idx: number) => {
           return (

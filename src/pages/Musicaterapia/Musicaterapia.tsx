@@ -33,18 +33,19 @@ import { Footer } from "@/components/Footer/Footer";
 import { useContext, useEffect, useState } from "react";
 import { Clips as ClipsComponent } from "@/components/Musicaterapia/Clips/Clips";
 import { Playlist as PlaylistComponent } from "@/components/Musicaterapia/Playlist/Playlist";
-import { Toast } from "@/components/Toast/Toast";
-import UIContext from "@/context/Context";
 import { Link, useHistory } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { setTab } from "@/store/slices/audioSlice";
 
 const Musicaterapia: React.FC = () => {
 
   const history = useHistory();
 
-  const [tab, setTab] = useState("clips");
+  const dispatch = useDispatch();
+  const {tab} = useSelector( (state: any) => state.audio);
 
   const onSetTab = (e) => {
-    setTab(e.detail.value);
+    dispatch( setTab(e.detail.value) );
   };
 
   useEffect(() => {

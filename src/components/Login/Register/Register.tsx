@@ -19,7 +19,7 @@ import styles from "../Login.module.scss";
 import { setUser, clearUser } from "@/helpers/onboarding";
 import { register } from "@/services/auth";
 import { login } from "@/services/auth";
-import { GmailLogin } from '@/firebase/auth';
+import { GmailLogin } from "@/firebase/auth";
 
 import { useHistory } from "react-router";
 import { useContext, useEffect, useState } from "react";
@@ -27,7 +27,6 @@ import UIContext from "@/context/Context";
 import { FCM } from "@capacitor-community/fcm";
 
 export const Register = () => {
-
   const { db }: any = useContext(UIContext);
 
   const [present, dismiss] = useIonLoading();
@@ -57,7 +56,7 @@ export const Register = () => {
       data.fcm_token = token.token;
 
       await setUser(data);
-      db.set('user', email);
+      db.set("user", email);
 
       setTimeout(() => {
         history.replace("/registro");
@@ -81,51 +80,60 @@ export const Register = () => {
       });
 
       GmailLogin()
-      .then( async (gmailData: any) => {
-
-        try {
-          const { data } = await login({
-            email: gmailData.email,
-            password: 'gmail',
-            device: "gmail",
-          });
-
-          await setUser(data);
-          db.set('user', gmailData.email);
-
-          setTimeout(() => {
-            history.replace("/home");
-          }, 1000);
-
-          dismiss();
-
-        } catch ( error: any ) {
-          if ( error.status == '401' ) {
-
-            const { data: data2 } = await register({
-              name: gmailData.displayName, 
+        .then(async (gmailData: any) => {
+          try {
+            const loginPromise = login({
               email: gmailData.email,
-              password: 'gmail',
+              password: "gmail",
               device: "gmail",
             });
-  
-            await setUser(data2);
-            db.set('user', gmailData.email);
+
+            const setUserPromise = loginPromise.then(({ data }) => {
+              return setUser(data);
+            });
+
+            await Promise.all([
+              loginPromise,
+              setUserPromise,
+              db.set("user", gmailData.email),
+            ]);
 
             setTimeout(() => {
-              history.replace("/perfil");
+              history.replace("/home");
             }, 1000);
-            
+
             dismiss();
+          } catch (error: any) {
+            if (error.status == "401") {
+              const registerPromise = register({
+                name: gmailData.displayName,
+                email: gmailData.email,
+                password: "gmail",
+                device: "gmail",
+              });
 
+              const setUserPromise = registerPromise.then(({ data }) => {
+                return setUser(data);
+              });
+
+              await Promise.all([
+                registerPromise,
+                setUserPromise,
+                db.set("user", gmailData.email),
+              ]);
+
+              setTimeout(() => {
+                history.replace("/perfil");
+              }, 1000);
+
+              dismiss();
+            }
           }
-        }
-          
-      }).catch( (error: any) => {
-        console.log( error )
-        dismiss();
-      })
-
+        })
+        .catch((error: any) => {
+          console.log(error);
+          dismiss();
+        });
     } catch (error: any) {
       presentAlert({
         header: "Alerta!",
@@ -136,11 +144,11 @@ export const Register = () => {
     } finally {
       dismiss();
     }
-  }
+  };
 
   useEffect(() => {
-    clearUser()
-  }, [])
+    clearUser();
+  }, []);
 
   return (
     <IonGrid class="ion-text-center">
@@ -157,7 +165,7 @@ export const Register = () => {
                 shape="round"
                 onIonInput={(evt: any) => setEmail(evt.target.value)}
               ></IonInput>
-              
+
               <IonInput
                 className={`ion-margin-bottom ${styles.login}`}
                 type="password"
@@ -167,7 +175,7 @@ export const Register = () => {
                 shape="round"
                 onIonInput={(evt: any) => setPassword(evt.target.value)}
               ></IonInput>
-              
+
               <IonButton
                 type="button"
                 className="ion-margin-top ion-margin-bottom"

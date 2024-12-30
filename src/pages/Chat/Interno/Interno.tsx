@@ -15,7 +15,7 @@ import { arrowBack } from "ionicons/icons";
 
 import { Footer } from "@/components/Footer/Footer";
 import { Interno as InternoComponent } from "@/components/Chat//Chat/Interno/Interno";
-import { Link, useParams } from "react-router-dom";
+import { Link, useHistory, useParams } from "react-router-dom";
 
 import { useEffect, useState } from "react";
 import { readData, writeData } from "@/services/realtime-db";
@@ -24,6 +24,8 @@ import Avatar from "@/assets/images/avatar.jpg";
 import { onValue } from "firebase/database";
 
 const Interno: React.FC = () => {
+  
+  const history = useHistory();
   const { user } = getUser();
   const { room } = useParams<{ room: string }>();
   const baseURL = import.meta.env.VITE_BASE_BACK;
@@ -56,12 +58,29 @@ const Interno: React.FC = () => {
   }
 
   const onExit = async () => {
-    await writeData(`rooms/${ room }/${user.id}/exit_time`, new Date().toISOString());
+    await Promise.all([
+      writeData(`rooms/${ room }/${user.id}/writing`, false),
+      writeData(`rooms/${ room }/${user.id}/exit_time`, new Date().toISOString()),
+    ])
   }
 
   useEffect(() => {
     onGetRoom();
   }, [room]);
+
+  useEffect(() => {
+    const handleBackButton = (ev: Event) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      history.replace("/chat");
+    };
+
+    document.addEventListener("ionBackButton", handleBackButton);
+
+    return () => {
+      document.removeEventListener("ionBackButton", handleBackButton);
+    };
+  }, [history]);
 
   useEffect(() => {
     onEnter()

@@ -1,27 +1,47 @@
-import { IonAvatar, IonIcon, IonItem, IonItemDivider, IonItemGroup, IonLabel, IonList, IonNote, useIonAlert, useIonLoading } from "@ionic/react";
-import { pauseCircle, playCircle, shareSocialOutline, trashOutline } from "ionicons/icons";
+import {
+  IonAvatar,
+  IonIcon,
+  IonItem,
+  IonItemDivider,
+  IonItemGroup,
+  IonLabel,
+  IonList,
+  IonNote,
+  useIonAlert,
+  useIonLoading,
+} from "@ionic/react";
+import {
+  pauseCircle,
+  playCircle,
+  shareSocialOutline,
+  trashOutline,
+} from "ionicons/icons";
 import React, { useContext, useEffect, useState } from "react";
-import styles from '../Musicaterapia.module.scss';
+import styles from "../Musicaterapia.module.scss";
 
 import { all, trash } from "@/services/playlist";
 import UIContext from "@/context/Context";
 import { getUser } from "@/helpers/onboarding";
+import { useAudio } from "@/hooks/useAudio";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  resetStore,
+  setAudioRef,
+  setGlobalAudio,
+  setGlobalPos,
+  setListAudios,
+  clearListAudios,
+  setShowGlobalAudio,
+  setIsGlobalPlaying,
+} from "@/store/slices/audioSlice";
 
 export const Playlist = () => {
-
   const { user } = getUser();
 
-  const {
-    onPause,
-    isPlaying,
-    globalAudio,
-    setGlobalAudio,
-    listAudios,
-    setListAudios,
-    globalPos,
-    setGlobalPos,
-    setShowGlobalAudio
-  }: any = useContext(UIContext);
+  const dispatch = useDispatch();
+  const { audio, listAudios, globalAudio, isGlobalPlaying } = useSelector(
+    (state: any) => state.audio
+  );
 
   const [present, dismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();
@@ -34,10 +54,11 @@ export const Playlist = () => {
         message: "Cargando ...",
       });
 
-      const { data: { data } } = await all();
+      const {
+        data: { data },
+      } = await all();
 
       setPlaylist(data);
-
     } catch (error: any) {
       presentAlert({
         header: "Alerta!",
@@ -56,9 +77,8 @@ export const Playlist = () => {
         message: "Cargando ...",
       });
 
-      await trash( id );
+      await trash(id);
       onGetPlaylist();
-
     } catch (error: any) {
       presentAlert({
         header: "Alerta!",
@@ -69,20 +89,33 @@ export const Playlist = () => {
     } finally {
       dismiss();
     }
-  }
+  };
 
   const onPlay = (idx: number, item: any) => {
-    setListAudios( playlist.map( (clip: any ) => clip.clip ) )
-    setGlobalPos( idx );
-    setGlobalAudio( item.clip )
+    dispatch(setListAudios(playlist.map((clip: any) => clip.clip)));
+
+    dispatch(setAudioRef(item.clip.audio));
+    dispatch(setGlobalAudio(item.clip));
+    dispatch(setGlobalPos(idx));
+
+    dispatch(setIsGlobalPlaying(true));
+  };
+
+  const onPause = ()=> {
+    dispatch( setIsGlobalPlaying(false) )
   }
 
   const hasThisUser = (usuarios_clips: any[]) => {
-    const hasUserClip = usuarios_clips?.find( item => item.users_id == user?.id )
-    return hasUserClip
-  }
+    const hasUserClip = usuarios_clips?.find(
+      (item) => item.users_id == user?.id
+    );
+    return hasUserClip;
+  };
 
   const onUpdateList = () => {
+    if (!listAudios.length) {
+      dispatch(setListAudios(playlist.map((clip: any) => clip.clip)));
+    }
     /*const hasClip = playlist.find( (item: any) => item.clip.id == globalAudio.id );
 
     if ( hasClip ) {
@@ -101,37 +134,60 @@ export const Playlist = () => {
       }
     }
     */
-  }
+  };
 
   useEffect(() => {
+    // dispatch(resetStore());
     onGetPlaylist();
-
-    setShowGlobalAudio( true )
+    dispatch(setShowGlobalAudio(true));
   }, []);
 
-  useEffect( () => {
+  useEffect(() => {
     globalAudio && onUpdateList();
-  }, [globalAudio])
+  }, [globalAudio]);
 
   return (
-    <div className={styles['ion-content']}>
+    <div className={styles["ion-content"]}>
       <IonList className="ion-no-padding ion-margin-bottom" lines="none">
-        {
-          playlist.map( (item: any, idx: any) => {
-            return (
-              item.clip && 
+        {playlist.map((item: any, idx: any) => {
+          return (
+            item.clip && (
               <IonItem key={idx} button={true} className="ion-margin-bottom">
-                {
-                  globalAudio?.id == item.clip?.id && isPlaying ?
-                  <IonIcon aria-hidden="true" slot="start" icon={pauseCircle} onClick={onPause} /> :
-                  <IonIcon aria-hidden="true" slot='start' icon={playCircle}  onClick={() => onPlay( idx, item )} />
-                }
-                <IonLabel class="ion-text-left"> {item.clip?.titulo} </IonLabel>
-                <IonIcon aria-hidden="true" slot='end' icon={trashOutline} onClick={() => onTrash(item.id)} />
+                {globalAudio?.id == item.clip?.id && isGlobalPlaying ? (
+                  <IonIcon
+                    aria-hidden="true"
+                    slot="start"
+                    icon={pauseCircle}
+                    onClick={onPause}
+                  />
+                ) : (
+                  <IonIcon
+                    aria-hidden="true"
+                    slot="start"
+                    icon={playCircle}
+                    onClick={() => onPlay(idx, item)}
+                  />
+                )}
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <IonLabel class={`ion-text-left ${styles["titulo"]}`}>
+                    {" "}
+                    {item.clip?.titulo}{" "}
+                  </IonLabel>
+                  <span className={styles["categoria"]}>
+                    {" "}
+                    {item.clip?.categoria?.categoria}{" "}
+                  </span>
+                </div>
+                <IonIcon
+                  aria-hidden="true"
+                  slot="end"
+                  icon={trashOutline}
+                  onClick={() => onTrash(item.id)}
+                />
               </IonItem>
             )
-          })
-        }
+          );
+        })}
       </IonList>
     </div>
   );

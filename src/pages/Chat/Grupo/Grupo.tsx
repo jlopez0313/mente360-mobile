@@ -67,13 +67,30 @@ const Grupo: React.FC = () => {
   }
 
   const onExit = async () => {
-    await writeData(`grupos/${ id }/users/${user.id}/exit_time`, new Date().toISOString());
+    await Promise.all([
+      writeData(`grupos/${ id }/users/${user.id}/writing`, false),
+      writeData(`grupos/${ id }/users/${user.id}/exit_time`, new Date().toISOString()),
+    ])
   }
 
   const onExitGroup = async () => {
     await removeData(`user_rooms/${ user.id }/grupos/${ id }`)
     setRemoved(true)
   }
+
+  useEffect(() => {
+    const handleBackButton = (ev: Event) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      history.replace("/chat");
+    };
+
+    document.addEventListener("ionBackButton", handleBackButton);
+
+    return () => {
+      document.removeEventListener("ionBackButton", handleBackButton);
+    };
+  }, [history]);
 
   useEffect(() => {
     onGetGrupo(id);
@@ -137,7 +154,7 @@ const Grupo: React.FC = () => {
         <IonContent>
           <IonList lines="none">
             <IonItem button={true} detail={false} onClick={goToDetalle}>
-              Info. del Grupo
+              Añadir Miembros
             </IonItem>
             <IonItem button={true} detail={false} onClick={onExitGroup}>
               Salir del Grupo

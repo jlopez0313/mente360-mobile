@@ -16,28 +16,34 @@ import { useContext, useEffect, useState } from "react";
 import { Register } from "@/components/Login/Register/Register";
 import styles from "./Login.module.scss";
 import UIContext from "@/context/Context";
-
 import { useHistory } from "react-router";
 
-import { FCM } from "@capacitor-community/fcm";
 import { PushNotifications } from "@capacitor/push-notifications";
 import { useDispatch } from "react-redux";
 import { getNotifications } from "@/store/thunks/notifications";
-import { setGeneral, setGrupo, setRoom } from "@/store/slices/notificationSlice";
+import {
+  setGeneral,
+  setGrupo,
+  setRoom,
+} from "@/store/slices/notificationSlice";
+
+import { Haptics } from "@capacitor/haptics";
+import { setGlobalAudio } from "@/store/slices/audioSlice";
+import { LocalNotifications } from "@capacitor/local-notifications";
 
 const Login: React.FC = () => {
   const [tab, setTab] = useState("login");
   const history = useHistory();
 
   const dispatch = useDispatch();
-  const { db, setGlobalAudio }: any = useContext(UIContext);
+  const { db }: any = useContext(UIContext);
 
-  const onSetTab = (e) => {
+  const onSetTab = (e: any) => {
     setTab(e.detail.value);
   };
 
   useEffect(() => {
-    setGlobalAudio(null);
+    dispatch(setGlobalAudio(""));
   }, []);
 
   const runGet = async () => {
@@ -47,27 +53,30 @@ const Login: React.FC = () => {
   };
 
   const initializeFCM = async () => {
+    
+    PushNotifications.removeAllListeners();
+
     const permission = await PushNotifications.requestPermissions();
     if (permission.receive === "granted") {
       PushNotifications.register();
     }
 
-    const token = await FCM.getToken();
-    console.log("FCM Token:", token.token);
-
     PushNotifications.addListener(
       "pushNotificationReceived",
-      (notification) => {
+      async (notification) => {
         const { data } = notification;
-        console.log("Push notification received:", notification.data);
-        // alert("Push Notification received: " + notification);
+        console.log("Push notification received:", data);
 
-        if ( data.is_general ) {
-          setGeneral( true );
-        } else if ( data.room ) {
-          setRoom( true );
-        } else if ( data.grupo ) {
-          setGrupo( true );
+        // await Haptics.vibrate({ duration: 900 });
+
+        await makeLocalNotification( notification );
+
+        if (data.is_general) {
+          dispatch(setGeneral(true));
+        } else if (data.room) {
+          dispatch(setRoom(true));
+        } else if (data.grupo) {
+          dispatch(setGrupo(true));
         }
 
         dispatch(getNotifications());
@@ -77,28 +86,91 @@ const Login: React.FC = () => {
     PushNotifications.addListener(
       "pushNotificationActionPerformed",
       (notification) => {
-        const { data } = notification.notification;        
+        const { data } = notification.notification;
         console.log("Push notification action performed:", notification);
         // alert( "Notification action: " + JSON.stringify(notification) );
-        
-        if ( data.is_general ) {
+
+        if (data.is_general) {
           history.replace("/notificaciones");
-        } else if ( data.room ) {
+        } else if (data.room) {
           history.replace("/chat/" + data.room);
-        } else if ( data.grupo ) {
+        } else if (data.grupo) {
           history.replace("/grupo/" + data.grupo);
         }
 
         dispatch(getNotifications());
-
       }
     );
+
+  };
+
+
+  const initializeLocalNotifications = async () => {
+    LocalNotifications.removeAllListeners();
+    
+    LocalNotifications.addListener(
+      "localNotificationReceived",
+      (notification) => {
+        const { extra } = notification;
+        console.log("Local notification action received:", notification);
+        // alert( "Notification action: " + JSON.stringify(notification) );
+
+        if (extra.is_general) {
+          dispatch(setGeneral(true));
+        } else if (extra.room) {
+          dispatch(setRoom(true));
+        } else if (extra.grupo) {
+          dispatch(setGrupo(true));
+        }
+
+        dispatch(getNotifications());
+      }
+    );
+    
+    LocalNotifications.addListener(
+      "localNotificationActionPerformed",
+      (notification) => {
+        const { extra } = notification.notification;
+        console.log("Local notification action performed:", notification);
+        // alert( "Notification action: " + JSON.stringify(notification) );
+
+        if (extra.is_general) {
+          history.replace("/notificaciones");
+        } else if (extra.room) {
+          history.replace("/chat/" + extra.room);
+        } else if (extra.grupo) {
+          history.replace("/grupo/" + extra.grupo);
+        }
+
+        dispatch(getNotifications());
+      }
+    );
+  }
+
+  const makeLocalNotification = async ( notification: any ) => {
+    await LocalNotifications.schedule({
+      notifications: [
+        {
+          title: notification.title,
+          body: notification.body,
+          id: Math.ceil(Math.random() * 100),
+          schedule: { at: new Date(Date.now() + 100) },
+          smallIcon: 'icon',
+          largeIcon: 'icon',
+          extra: notification.data
+        },
+      ],
+    });
   };
 
   useEffect(() => {
-    initializeFCM();
     db && history && runGet();
   }, [db, history]);
+  
+  useEffect(() => {
+    initializeLocalNotifications();
+    initializeFCM();
+  }, [])
 
   return (
     <IonPage>

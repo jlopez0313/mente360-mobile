@@ -22,19 +22,28 @@
 
     ion-item {
         background: none;
-        --background: var(--bg-main-gradient);
+        --background: var(--bg-card);
         --border-radius: 15px;
         margin-bottom: 5px;
 
-        ion-label {
-            text-align: justify;
-            line-height: 16px;
-            font-size: 13px !important;
-        }
+        div {
+            flex-grow: 1;
+            padding-top: 10px;
+           
+            .message {
+                text-align: justify;
+                line-height: 17px;
+                font-size: 13px !important;
+                display: block;
+            }
 
-        ion-note {
-            font-size: 11px;
-            align-self: end;
+            
+            .time {
+                float: right;
+                font-size: 11px;
+                text-align: justify;
+                color: #666;
+            }
         }
     }
 }

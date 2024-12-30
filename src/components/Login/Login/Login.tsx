@@ -49,12 +49,12 @@ export const Login = () => {
         password,
         device: "app",
       });
-
+/*
       const token = await FCM.getToken();
       console.log("FCM Token:", token.token);
-      
-      data.fcm_token = token.token;
 
+      data.fcm_token = token.token;
+*/
       await setUser(data);
       db.set("user", email);
 
@@ -62,6 +62,7 @@ export const Login = () => {
         history.replace("/home");
       }, 1000);
     } catch (error: any) {
+      console.log(error);
       presentAlert({
         header: "Alerta!",
         subHeader: "Mensaje importante.",
@@ -82,14 +83,21 @@ export const Login = () => {
       GmailLogin()
         .then(async (gmailData: any) => {
           try {
-            const { data } = await login({
+            const loginPromise = login({
               email: gmailData.email,
               password: "gmail",
               device: "gmail",
             });
 
-            await setUser(data);
-            db.set("user", gmailData.email);
+            const setUserPromise = loginPromise.then(({ data }) => {
+              return setUser(data);
+            });
+
+            await Promise.all([
+              loginPromise,
+              setUserPromise,
+              db.set("user", gmailData.email),
+            ]);
 
             setTimeout(() => {
               history.replace("/home");
@@ -98,15 +106,22 @@ export const Login = () => {
             dismiss();
           } catch (error: any) {
             if (error.status == "401") {
-              const { data: data2 } = await register({
+              const registerPromise = register({
                 name: gmailData.displayName,
                 email: gmailData.email,
                 password: "gmail",
                 device: "gmail",
               });
 
-              await setUser(data2);
-              db.set("user", gmailData.email);
+              const setUserPromise = registerPromise.then(({ data }) => {
+                return setUser(data);
+              });
+
+              await Promise.all([
+                registerPromise,
+                setUserPromise,
+                db.set("user", gmailData.email),
+              ]);
 
               setTimeout(() => {
                 history.replace("/perfil");

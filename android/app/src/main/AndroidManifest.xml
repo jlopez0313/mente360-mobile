@@ -27,6 +27,14 @@
             android:grantUriPermissions="true">
             <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />
         </provider>
+
+        <receiver
+            android:name="com.capacitorjs.plugins.share.SharePlugin$ShareBroadcastReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.capacitorjs.plugins.share.SHARE" />
+            </intent-filter>
+        </receiver>
     </application>
 
     <!-- Permissions -->
@@ -37,4 +45,7 @@
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+
+
 </manifest>

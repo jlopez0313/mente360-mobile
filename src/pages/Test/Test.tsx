@@ -19,18 +19,22 @@ import { arrowBack } from "ionicons/icons";
 import UIContext from "@/context/Context";
 import { useContext, useEffect } from "react";
 import { getUser } from "@/helpers/onboarding";
+import { useDispatch, useSelector } from "react-redux";
+import { setShowGlobalAudio } from "@/store/slices/audioSlice";
 
 const Test: React.FC = () => {
-  const { setShowGlobalAudio }: any = useContext(UIContext);
   const { user } = getUser();
-
   const history = useHistory();
+  const dispatch = useDispatch();
+
+  const { route } = useSelector((state: any)=> state.route);
 
   useEffect(() => {
+
     const handleBackButton = (ev: Event) => {
       ev.preventDefault();
       ev.stopPropagation();
-      history.replace("/home");
+      history.replace( route );
     };
 
     document.addEventListener("ionBackButton", handleBackButton);
@@ -41,7 +45,7 @@ const Test: React.FC = () => {
   }, [history]);
 
   useEffect(() => {
-    setShowGlobalAudio( false )
+    dispatch( setShowGlobalAudio( false ) )
   }, [])
 
   return (
@@ -49,7 +53,7 @@ const Test: React.FC = () => {
       <IonHeader>
         <IonToolbar className={styles["ion-header"]}>
           <IonButtons slot="start">
-            <Link to="/home" replace={true}>
+            <Link to={route} replace={true}>
               <IonButton fill="clear" className={styles.backButton}>
                 <IonIcon slot="start" icon={arrowBack} />
               </IonButton>

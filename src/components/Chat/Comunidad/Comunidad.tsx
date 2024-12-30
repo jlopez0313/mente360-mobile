@@ -101,7 +101,6 @@ export const Comunidad = () => {
 
       setAllContacts(lista);
       setContacts(lista);
-
     } catch (error: any) {
       console.error(error);
 
@@ -143,10 +142,10 @@ export const Comunidad = () => {
 
   const onShareLink = async () => {
     await Share.share({
-      title: "See cool stuff",
-      text: "Really awesome thing you need to see right meow",
-      url: "http://ionicframework.com/",
-      dialogTitle: "Share with buddies",
+      title: "¡Únete a Mente360!",
+      text: "Descubre contenido exclusivo y mejora tu bienestar con Mente360. ¡Haz clic para saber más!",
+      url: "https://soymente360.com/invitacion/",
+      dialogTitle: "Comparte Mente360 con tus amigos",
     });
   };
 
@@ -154,21 +153,22 @@ export const Comunidad = () => {
     const roomArray = [Number(user.id), Number(otroUser.id)];
     const roomID = roomArray.sort((a, b) => a - b).join("_");
 
-    await writeData("rooms/" + roomID + "/users/" + user.id, {
-      id: user.id,
-      name: user.name,
-      photo: user.photo || "",
-      phone: user.phone || "",
-    });
-    await writeData("rooms/" + roomID + "/users/" + otroUser.id, {
-      id: otroUser.id,
-      name: otroUser.name,
-      photo: otroUser.photo || "",
-      phone: otroUser.phone || "",
-    });
-
-    await writeData("user_rooms/" + user.id + "/rooms/" + roomID, true);
-    await writeData("user_rooms/" + otroUser.id + "/rooms/" + roomID, true);
+    await Promise.all([
+      writeData("rooms/" + roomID + "/users/" + user.id, {
+        id: user.id,
+        name: user.name,
+        photo: user.photo || "",
+        phone: user.phone || "",
+      }),
+      writeData("rooms/" + roomID + "/users/" + otroUser.id, {
+        id: otroUser.id,
+        name: otroUser.name,
+        photo: otroUser.photo || "",
+        phone: otroUser.phone || "",
+      }),
+      writeData("user_rooms/" + user.id + "/rooms/" + roomID, true),
+      writeData("user_rooms/" + otroUser.id + "/rooms/" + roomID, true),
+    ]);
 
     history.replace("/chat/" + roomID);
   };
@@ -179,11 +179,7 @@ export const Comunidad = () => {
 
   return (
     <div className={styles["ion-content"]}>
-      <IonItem
-        button={true}
-        lines="none"
-        onClick={onShareLink}
-      >
+      <IonItem button={true} lines="none" onClick={onShareLink}>
         <IonIcon
           className="ion-no-margin"
           slot="start"
@@ -193,10 +189,7 @@ export const Comunidad = () => {
         <IonLabel>Enviar Enlace de Invitación</IonLabel>
       </IonItem>
 
-      <IonList
-        className="ion-no-padding"
-        lines="none"
-      >
+      <IonList className="ion-no-padding" lines="none">
         <IonItemGroup>
           <IonItemDivider>
             <IonLabel>Personas en Mente360</IonLabel>
@@ -240,7 +233,7 @@ export const Comunidad = () => {
           })}
         </IonItemGroup>
       </IonList>
-{/* 
+      {/* 
       <IonList className="ion-no-padding" lines="none">
         <IonItemGroup>
           <IonItemDivider>
@@ -286,7 +279,6 @@ export const Comunidad = () => {
         </IonItemGroup>
       </IonList>
 */}
-
     </div>
   );
 };

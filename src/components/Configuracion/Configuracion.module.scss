@@ -1,12 +1,12 @@
 .ion-content { 
     ion-list {
-        background: var(--bg-secondary);
+        background: none;
 
         ion-item-group {
             --background: var(--bg-secondary);
 
             ion-item-divider {
-                --background: var(--bg-secondary);
+                --background: none;
                 border-bottom: none;
                 padding: 0;
 
@@ -19,12 +19,16 @@
     }
 
     ion-item {
-        background: var(--bg-secondary);
+        background: none;
         --background: var(--bg-main-gradient);
         --border-radius: 50px;
 
         ion-label {
             text-align: justify;
         }
+    }
+
+    .version {
+        font-size: .8rem;
     }
 }

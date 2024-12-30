@@ -27,6 +27,9 @@
     font-size: 15px;
 }
 
+:root.ion-palette-dark {
+  --bg-secondary: #333; /* Color para el fondo en modo oscuro */
+}
 
 html, body {
     font-family: arya;
@@ -71,8 +74,4 @@ ion-datetime.ios::part(calendar-day active):focus {
 
 a {
   text-decoration: none;
-}
-
-.PhoneInputCountrySelectArrow {
-  margin-left: 200px;
 }

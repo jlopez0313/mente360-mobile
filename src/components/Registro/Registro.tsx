@@ -113,11 +113,13 @@ export const Registro = () => {
         message: "Cargando ...",
       });
 
-      const {
-        data: { data },
-      } = await update(usuario, user.user.id);
+      const updatePromise = update(usuario, user.user.id);
 
-      await setUser({ ...user, user: data });
+      const setUserPromise = updatePromise.then(({ data }) => {
+        return setUser({ ...user, user: data });
+      });
+
+      await Promise.all([updatePromise, setUserPromise]);
 
       goToHome();
     } catch (error: any) {
@@ -236,7 +238,7 @@ export const Registro = () => {
                   );
                 })}
               </IonSelect>
-{/* 
+              {/* 
               <IonItem className="ion-no-padding" lines="none">
                 <IonSelect
                   interface="popover"

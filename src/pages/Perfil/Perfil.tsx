@@ -17,11 +17,13 @@ import styles from "./Perfil.module.scss";
 import { Link, useHistory } from "react-router-dom";
 import UIContext from "@/context/Context";
 import { useContext, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { setShowGlobalAudio } from "@/store/slices/audioSlice";
 
 
 const Perfil: React.FC = () => {
-  const { setShowGlobalAudio }: any = useContext(UIContext);
-
+  
+  const dispatch = useDispatch();
   const history = useHistory();
 
   useEffect(() => {
@@ -39,7 +41,7 @@ const Perfil: React.FC = () => {
   }, [history]);
 
   useEffect(() => {
-    setShowGlobalAudio( false )
+    dispatch( setShowGlobalAudio( false ) )
   }, [])
 
   return (

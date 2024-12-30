@@ -24,11 +24,11 @@ import { Popover } from "./Popover";
 import UIContext from "@/context/Context";
 import { useContext, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getNotifications } from "../../store/thunks/notifications";
+import { getNotifications } from "@/store/thunks/notifications";
+import { setShowGlobalAudio } from "@/store/slices/audioSlice";
+import { destroy } from "@/helpers/musicControls";
 
 const Home: React.FC = () => {
-  const { setShowGlobalAudio }: any = useContext(UIContext);
-
   const dispatch = useDispatch();
 
   const { isGeneral } = useSelector((state: any) => state.notifications);
@@ -36,10 +36,11 @@ const Home: React.FC = () => {
   const onGetNotifications = async () => {
     dispatch(getNotifications());
   };
-
+  
   useEffect(() => {
+    dispatch( setShowGlobalAudio( true ) )
     onGetNotifications();
-    setShowGlobalAudio(true);
+    destroy()
   }, []);
 
   return (

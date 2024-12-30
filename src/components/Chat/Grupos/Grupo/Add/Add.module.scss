@@ -5,6 +5,10 @@
     ion-searchbar {
         --border-radius: 25px;
 
+        &.search {
+            --ion-color-warning: var(--bg-card);
+        }
+
         ion-icon {
             margin-top: 4px;
             opacity: .25;

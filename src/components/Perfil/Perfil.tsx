@@ -27,6 +27,7 @@ import Avatar from "@/assets/images/avatar.jpg";
 
 import "react-phone-number-input/style.css";
 import PhoneInput, { isPossiblePhoneNumber } from "react-phone-number-input";
+import { updateData, writeData, getData } from "@/services/realtime-db";
 
 export const Perfil = () => {
   const fileRef = useRef(null);
@@ -126,6 +127,30 @@ export const Perfil = () => {
 
       setUser({ ...user, user: data.data });
       setUsuario(data.data);
+
+      const obj = {
+        name: data.data.name,
+        phone: data.data.phone,
+        photo: data.data.photo,
+      };
+
+      const [roomsResponse, gruposResponse] = await Promise.all([
+        getData(`user_rooms/${user.user.id}/rooms`),
+        getData(`user_rooms/${user.user.id}/grupos`),
+      ]);
+
+      const rt_data = roomsResponse.val();
+      const roomUpdatePromises = Object.keys(rt_data).map((room) => {
+        updateData(`rooms/${room}/users/${user.user.id}`, obj);
+      });
+
+      const rt_grupos = gruposResponse.val();
+      const grupoUpdatePromises = Object.keys(rt_grupos).map((grupo) => {
+        updateData(`grupos/${grupo}/users/${user.user.id}`, obj);
+      });
+
+      await Promise.all([...roomUpdatePromises, ...grupoUpdatePromises]);
+
     } catch (error: any) {
       console.log(error);
 
@@ -221,6 +246,7 @@ export const Perfil = () => {
         onChange={(e) => onSetUser("phone", e)}
         onCountryChange={(e) => onSetUser("country", e)}
         initialValueFormat="national"
+        inputFormat="NATIONAL"
       />
 
       <IonInput
@@ -258,6 +284,7 @@ export const Perfil = () => {
           onIonChange={(e) =>
             onSetUser("fecha_nacimiento", e.target.value?.split("T")[0])
           }
+          value={usuario.fecha_nacimiento}
         ></IonDatetime>
       </IonModal>
 
@@ -317,7 +344,10 @@ export const Perfil = () => {
               shape="round"
               expand="block"
               onClick={onUpdateUser}
-              disabled={!usuario.phone || (usuario.phone && !isPossiblePhoneNumber(usuario.phone))}
+              disabled={
+                !usuario.phone ||
+                (usuario.phone && !isPossiblePhoneNumber(usuario.phone))
+              }
             >
               Guardar
             </IonButton>

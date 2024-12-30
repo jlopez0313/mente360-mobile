@@ -121,27 +121,32 @@ export const Add = ({ grupoID, users, doChild }: Props) => {
 
   const addToGrupo = async (contact: any) => {
     try {
-      await writeData("grupos/" + grupoID + "/users/" + contact.id, {
-        name: contact.name,
-        id: contact.id,
-        phone: contact.phone || "",
-        photo: contact.photo || "",
-      });
+      const updates = { [grupoID]: true };
 
-      const updates = {};
-      updates[`user_rooms/${contact.id}/grupos/${grupoID}`] = true;
-      await updateData(updates);
+      await Promise.all([
+        writeData(`grupos/${grupoID}/users/${contact.id}`, {
+          name: contact.name,
+          id: contact.id,
+          phone: contact.phone || "",
+          photo: contact.photo || "",
+        }),
+        updateData(`user_rooms/${contact.id}/grupos`, updates),
+      ]);
 
-      setContactosAgregados((lista: any) => [...lista, contact.phone]);
+      setContactosAgregados((prev: any) => [...prev, contact.phone]);
 
-      doChild && doChild(null);
+      if (doChild) {
+        doChild(null);
+      }
     } catch (error: any) {
-      console.error(error);
+      console.error("Error al agregar al grupo:", error);
 
       presentAlert({
-        header: "Alerta!",
-        subHeader: "Mensaje importante.",
-        message: error.data?.message || "Error Interno",
+        header: "Error",
+        subHeader: "No se pudo agregar al grupo",
+        message:
+          error.data?.message ||
+          "Ha ocurrido un error interno. Intenta nuevamente.",
         buttons: ["OK"],
       });
     }
@@ -159,7 +164,7 @@ export const Add = ({ grupoID, users, doChild }: Props) => {
     <div className="ion-padding">
       <IonList className={`ion-no-padding ${styles["lista"]}`} lines="none">
         <IonSearchbar
-          className={`ion-no-padding ion-margin-bottom`}
+          className={`ion-no-padding ion-margin-bottom ${styles["search"]}`}
           placeholder="Buscar"
           color="warning"
           onIonInput={(ev) => onSearchContacts(ev)}

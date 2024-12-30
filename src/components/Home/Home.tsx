@@ -4,8 +4,10 @@ import {
   IonCardContent,
   IonChip,
   IonCol,
+  IonIcon,
   IonLabel,
   IonRow,
+  IonText,
   useIonAlert,
   useIonLoading,
 } from "@ionic/react";
@@ -36,12 +38,15 @@ import tarea from "/assets/icons/tarea.svg";
 import mensaje from "/assets/icons/mensaje.svg";
 import { useHistory } from "react-router";
 
-export const Home = () => {
-  const { globalAudio }: any = useContext(UIContext);
+import { useDispatch } from "react-redux";
+import { setRoute } from "@/store/slices/routeSlice";
+import { shareSocial, shareSocialOutline } from "ionicons/icons";
 
+export const Home = () => {
   const user = getUser();
   const history = useHistory();
 
+  const dispatch = useDispatch();
 
   const [present, dismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();
@@ -91,6 +96,7 @@ export const Home = () => {
         }
       }
     } catch (error: any) {
+      console.log(error);
       presentAlert({
         header: "Alerta!",
         subHeader: "Mensaje importante.",
@@ -216,6 +222,8 @@ export const Home = () => {
   }, [currentDate]);
 
   useEffect(() => {
+    dispatch(setRoute("/home"));
+
     onCheckEneatipo();
     onUpdateFCM();
   }, []);
@@ -228,7 +236,7 @@ export const Home = () => {
         <IonCardContent>
           <div className={styles.header}>
             <div>
-              <img src={calendario} style={{ width: "20px", height: "20px" }} />
+              <img src={calendario} style={{ width: "14px", height: "14px" }} />
               <IonLabel>
                 <strong> &nbsp; {currentDate} </strong>
               </IonLabel>
@@ -236,7 +244,7 @@ export const Home = () => {
             <IonLabel>
               <strong>
                 {" "}
-                {/* CALENDARIO */} {dateEnd}{" "}
+                {/* CALENDARIO */} {/* dateEnd */}{" "}
               </strong>
             </IonLabel>
           </div>
@@ -297,7 +305,19 @@ export const Home = () => {
         hideButtons={data.mensaje?.done || false}
         onConfirm={() => onConfirmMensaje()}
       >
-        <Texto descripcion={data.mensaje?.mensaje || ""} children={null} />
+        <Texto descripcion={data.mensaje?.mensaje || ""}>
+          <img
+            src="assets/images/logo_texto.png"
+            style={{ width: "90px", display: "block", margin: "10px auto" }}
+          />
+          <IonIcon
+            icon={shareSocialOutline}
+            style={{ width: "90px", display: "block", margin: "15px auto" }}
+            onClick={() => {
+              history.replace("/share");
+            }}
+          />
+        </Texto>
       </Modal>
 
       <Modal
@@ -310,7 +330,6 @@ export const Home = () => {
       </Modal>
 
       <Modal
-        trigger="modal-eneatipo"
         isOpen={isOpen}
         showButtons={false}
         canDismiss={false}
@@ -321,12 +340,33 @@ export const Home = () => {
         <Texto descripcion="Completa nuestro test y descúbrelo. ¡Es el primer paso para entenderte mejor!">
           <IonRow>
             <IonCol size="6">
-              <IonButton onClick={() => { history.replace('/perfil') }} shape="round" style={{width: '100%'}}>Sí lo conozco</IonButton>
+              <IonButton
+                onClick={() => {
+                  history.replace("/perfil");
+                }}
+                shape="round"
+                style={{ width: "100%" }}
+              >
+                Sí lo conozco
+              </IonButton>
             </IonCol>
             <IonCol size="6">
-              <IonButton onClick={() => { history.replace('/test') }} shape="round" style={{width: '100%'}}>Quiero descubrirlo</IonButton>
+              <IonButton
+                onClick={() => {
+                  history.replace("/test");
+                }}
+                shape="round"
+                style={{ width: "100%" }}
+              >
+                Quiero descubrirlo
+              </IonButton>
             </IonCol>
           </IonRow>
+
+          <img
+            src="assets/images/logo_texto.png"
+            style={{ width: "150px", display: "block", margin: "40px auto" }}
+          />
         </Texto>
       </Modal>
 

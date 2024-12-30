@@ -1,7 +1,7 @@
 {
   "name": "mente360",
   "private": true,
-  "version": "0.0.1",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -17,10 +17,10 @@
     "@capacitor-community/fcm": "^5.0.3",
     "@capacitor-community/media": "^5.0.0",
     "@capacitor/android": "5.7.4",
-    "@capacitor/app": "5.0.7",
     "@capacitor/core": "^5.0.0",
-    "@capacitor/haptics": "5.0.7",
+    "@capacitor/haptics": "^5.0.7",
     "@capacitor/keyboard": "5.0.8",
+    "@capacitor/local-notifications": "^5.0.8",
     "@capacitor/push-notifications": "^5.1.2",
     "@capacitor/share": "^5.0.8",
     "@capacitor/status-bar": "5.0.7",

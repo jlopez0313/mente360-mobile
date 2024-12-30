@@ -73,6 +73,20 @@ const Info: React.FC = () => {
   };
 
   useEffect(() => {
+    const handleBackButton = (ev: Event) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      history.replace("/grupo/" + id);
+    };
+
+    document.addEventListener("ionBackButton", handleBackButton);
+
+    return () => {
+      document.removeEventListener("ionBackButton", handleBackButton);
+    };
+  }, [history, id]);
+
+  useEffect(() => {
     onGetGrupo(id);
   }, [id]);
 

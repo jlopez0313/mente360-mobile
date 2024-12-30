@@ -30,22 +30,42 @@ export const Grupos = () => {
 
   const dispatch = useDispatch();
 
-  const [grupos, setGrupos] = useState([]);
-  const [messages, setMessages] = useState([]);
-  const [unreadList, setUnreadList] = useState([]);
+  const [grupos, setGrupos] = useState<any>([]);
+  const [messages, setMessages] = useState<any>([]);
+  const [unreadList, setUnreadList] = useState<any>([]);
 
-  const addDocument = (grupo: any) => {
-    const updates = {};
-    updates[`user_rooms/${user.id}/grupos/${grupo.id}`] = true;
-    updateData(updates);
+  const addDocument = async (grupo: any) => {
+    try {
+      const updates = {
+        [grupo.id]: true,
+      };
 
-    writeData("grupos/" + grupo.id + "/users/" + user.id, {
-      name: user.name,
-      id: user.id,
-      phone: user.phone || "",
-      photo: user.photo || "",
-    });
-    writeData("grupos/" + grupo.id, { grupo: grupo.grupo, photo: grupo.photo });
+      await Promise.all([
+        writeData("grupos/" + grupo.id + "/users/" + user.id, {
+          name: user.name,
+          id: user.id,
+          phone: user.phone || "",
+          photo: user.photo || "",
+        }),
+
+        writeData("grupos/" + grupo.id, {
+          grupo: grupo.grupo,
+          photo: grupo.photo,
+          users: {
+            [user.id]: {
+              name: user.name,
+              id: user.id,
+              phone: user.phone || "",
+              photo: user.photo || "",
+            },
+          },
+        }),
+
+        updateData(`user_rooms/${user.id}/grupos/`, updates),
+      ]);
+    } catch (error) {
+      console.error("Error al añadir el grupo:", error);
+    }
   };
 
   const onAddGrupo = async (grupo: any) => {
@@ -53,96 +73,101 @@ export const Grupos = () => {
       const {
         data: { data },
       } = await create(grupo);
+
       addDocument(data);
-      onGetAll();
     } catch (e) {
       console.error(e);
     }
   };
 
   const onGetAll = async () => {
-    onValue(readData(`user_rooms/${user.id}/grupos`), (snapshot) => {
+    // Escucha los datos de los grupos en tiempo real.
+    onValue(readData(`user_rooms/${user.id}/grupos`), async (snapshot) => {
       const data = snapshot.val();
 
-      const rooms: any = data
+      const rooms = data
         ? Object.keys(data).map((key) => ({
             id: key,
             ...data[key],
           }))
         : [];
 
-      rooms.forEach(async (room, idx) => {
-        const data = await getData(`grupos/${room.id}`);
-        const val = data.val();
+      const tmpGrupos: any[] = [];
+      const noLeidos: Record<string, number> = {};
+      const mensajes: Record<string, any> = {};
 
-        const grupo = {
-          photo: val.photo,
-          grupo: val.grupo,
-          id: room.id,
-        };
-        setGrupos((grupos) => [...grupos, grupo]);
+      await Promise.all(
+        rooms.map(async (room) => {
+          const grupoData = await getData(`grupos/${room.id}`);
+          const grupoVal = grupoData.val();
 
-        onValue(readData(`grupos/${room.id}`), (snapshot) => {
-          const data2 = snapshot.val();
+          if (grupoVal) {
+            tmpGrupos.push({
+              photo: grupoVal?.photo,
+              grupo: grupoVal?.grupo,
+              id: room.id,
+            });
 
-          const listaMensajes: any = data2
-            ? Object.keys(data2.messages || {})
-              .map((key) => ({
-                id: key,
-                ...data2.messages[key],
-              }))
-            : [];
+            onValue(readData(`grupos/${room.id}`), (snapshot) => {
+              const data2 = snapshot.val();
 
-            
-            
-            if ( data2.users?.[ user.id ]?.exit_time ) {
-              const targetDate = new Date(data2.users[ user.id ]?.exit_time);
-              
-            const unreads: any = listaMensajes.filter((message) => {
+              const listaMensajes = data2
+                ? Object.keys(data2.messages || {}).map((key) => ({
+                    id: key,
+                    ...data2.messages[key],
+                  }))
+                : [];
+
+              if (data2?.users?.[user.id]?.exit_time) {
+                const targetDate = new Date(data2.users[user.id]?.exit_time);
+
+                const unreads = listaMensajes.filter((message) => {
                   const messageDate = new Date(`${message.date}`);
                   return messageDate > targetDate && message.user.id != user.id;
                 });
 
-            const mensajes = [...unreadList];
-            mensajes[idx] = unreads.length || 0;
-            setUnreadList( mensajes )
-          }
+                noLeidos[room.id] = unreads.length || 0;
+              }
 
-          const lastMsg = listaMensajes.pop();
-          if(lastMsg) {
-            const mensajes = [...messages];
-            mensajes[idx] = {...lastMsg};
-            setMessages(mensajes);
-          }
+              const lastMsg = listaMensajes.pop();
+              if (lastMsg) {
+                mensajes[room.id] = { ...lastMsg };
+              }
 
-        });
-      });
+              setUnreadList(Object.values(noLeidos));
+              setMessages(Object.values(mensajes));
+            });
+          }
+        })
+      );
+
+      setGrupos(tmpGrupos);
     });
   };
 
-  const goToGrupo = (id: number) => {
-    const updates = {};
-    updates[`user_rooms/${user.id}/grupos/${id}`] = true;
-    updateData(updates);
+  const goToGrupo = async (id: number) => {
+    const updates = {
+      [id]: true,
+    };
+    await updateData(`user_rooms/${user.id}/grupos`, updates);
 
     history.replace(`/grupo/${id}`);
   };
 
-  
   const onCheckUnreads = () => {
-    const noUnreads = unreadList.every( x => x === 0 );
+    const noUnreads = unreadList.every((x) => x === 0);
     if (noUnreads) {
-      dispatch( setGrupo( false ) );
+      dispatch(setGrupo(false));
     }
-  }
+  };
 
   useEffect(() => {
     onGetAll();
   }, []);
 
   useEffect(() => {
-    onCheckUnreads()
-  }, [unreadList])
+    onCheckUnreads();
+  }, [unreadList]);
 
   return (
     <div className={styles["ion-content"]}>
@@ -177,17 +202,38 @@ export const Grupos = () => {
                         {messages[idx]?.user?.id == user.id
                           ? "tu"
                           : messages[idx]?.user?.name}
-                        : {messages[idx]?.mensaje}{" "}
+                        :{" "}
+                        {messages[idx]?.user?.id == user.id
+                          ? ("tu: " + messages[idx]?.mensaje).length > 30
+                            ? messages[idx]?.mensaje.substring(0, 27) + "..."
+                            : messages[idx]?.mensaje
+                          : (
+                              messages[idx]?.user?.name +
+                              ": " +
+                              messages[idx]?.mensaje
+                            ).length > 30
+                          ? (messages[idx]?.mensaje).substring(
+                              0,
+                              Math.abs(
+                                27 - (messages[idx]?.user?.name + ": ").length
+                              )
+                            ) + "..."
+                          : messages[idx]?.mensaje}{" "}
                       </>
                     )}{" "}
                   </span>
                 </IonLabel>
-                <IonNote className={styles['note']}>
-                  <span className={styles["time"]}> {messages[idx]?.hora} </span>
-                  {
-                    unreadList[idx] ?
-                    <span className={styles["unreads"]}> {unreadList[idx]} </span> : null
-                  }
+                <IonNote className={styles["note"]}>
+                  <span className={styles["time"]}>
+                    {" "}
+                    {messages[idx]?.hora}{" "}
+                  </span>
+                  {unreadList[idx] ? (
+                    <span className={styles["unreads"]}>
+                      {" "}
+                      {unreadList[idx]}{" "}
+                    </span>
+                  ) : null}
                 </IonNote>
               </IonItem>
             );

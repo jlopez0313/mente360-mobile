@@ -13,13 +13,13 @@ export const notificationSlice = createSlice({
             state.notificaciones = action.payload.notificaciones
         },
         setGeneral: (state, action) => {
-            state.isGeneral = action.payload.general
+            state.isGeneral = action.payload
         },
         setGrupo: (state, action) => {
-            state.isGrupo = action.payload.grupo
+            state.isGrupo = action.payload
         },
         setRoom: (state, action) => {
-            state.isRoom = action.payload.room
+            state.isRoom = action.payload
         },
     }
 });

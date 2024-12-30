@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   IonAvatar,
   IonButton,
@@ -12,6 +12,7 @@ import {
   IonList,
   IonRow,
   IonText,
+  IonTextarea,
 } from "@ionic/react";
 import { addData, readData } from "@/services/realtime-db";
 import styles from "./Grupo.module.scss";
@@ -30,6 +31,9 @@ export const Grupo = ({ grupoID, grupo, removed }) => {
   const [mensaje, setMensaje] = useState("");
   const baseURL = import.meta.env.VITE_BASE_BACK;
 
+  const chatListRef = useRef<HTMLIonListElement>(null);
+
+  const [isScrolledUp, setIsScrolledUp] = useState(false);
   const [messagesList, setMessagesList] = useState<any>([]);
 
   const onGetChat = async () => {
@@ -42,35 +46,69 @@ export const Grupo = ({ grupoID, grupo, removed }) => {
     });
   };
 
-  const onSendMessage = () => {
-    const fecha = new Date();
-
-    const message = {
-      user: { id: user.id, photo: user.photo, name: user.name },
-      fecha: fecha.toLocaleDateString(),
-      hora: fecha.toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      date: fecha.toISOString(),
-      mensaje,
-    };
-
-    addData("grupos/" + grupoID + "/messages", message)
-    .then( async () => {
-
+  const onSendMessage = async () => {
+    try {
       setMensaje("");
+      const fecha = new Date();
 
-      const otherUsers = grupo.users.filter( (x: any) => x.id != user.id ) || []
-      await sendPush({
-        users_id: otherUsers,
-        title: grupo.grupo,
-        description: user.name + ': ' + message,
-        grupo: grupoID
-      });
+      const message = {
+        user: { id: user.id, photo: user.photo, name: user.name },
+        fecha: fecha.toLocaleDateString(),
+        hora: fecha.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        date: fecha.toISOString(),
+        mensaje,
+      };
 
-    });
+      const addMessagePromise = addData(`grupos/${grupoID}/messages`, message);
+
+      const otherUsers = grupo.users.filter((x: any) => x.id != user.id) || [];
+
+      const sendPushPromise =
+        otherUsers.length > 0
+          ? sendPush({
+              users_id: otherUsers.map((u: any) => u.id),
+              title: grupo.grupo,
+              description:
+                (user.name + ": " + message.mensaje).length > 25
+                  ? `${user.name}: ${message.mensaje.substring(0, 22)}...`
+                  : `${user.name}: ${message.mensaje}`,
+              grupo: grupoID,
+            })
+          : Promise.resolve();
+
+      await Promise.all([addMessagePromise, sendPushPromise]);
+    } catch (error) {
+      console.error("Error enviando mensaje al grupo:", error);
+    }
   };
+
+  const scrollToBottom = () => {
+    if (chatListRef.current) {
+      const scrollContainer = chatListRef.current;
+      scrollContainer.scrollTo({
+        top: scrollContainer.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  const handleScroll = (e: any) => {
+    const element = e.target;
+    const isAtBottom =
+      element.scrollHeight - element.scrollTop === element.clientHeight;
+    setIsScrolledUp(!isAtBottom);
+  };
+  
+  useEffect(() => {
+    if (!isScrolledUp) {
+      setTimeout( () => {
+        scrollToBottom();
+      }, 100)
+    }
+  }, [messagesList])
 
   useEffect(() => {
     onGetChat();
@@ -78,7 +116,12 @@ export const Grupo = ({ grupoID, grupo, removed }) => {
 
   return (
     <div className={`${styles["ion-content"]}`}>
-      <IonList className={`ion-padding ${styles["chat"]}`} lines="none">
+      <IonList
+        ref={chatListRef}
+        className={`ion-padding ${styles["chat"]}`}
+        lines="none"
+        onScroll={handleScroll}
+      >
         <IonItemGroup>
           {messagesList.map((msg: any, idx: number) => {
             return (
@@ -124,11 +167,13 @@ export const Grupo = ({ grupoID, grupo, removed }) => {
       ) : (
         <IonRow className={styles["chatbox"]}>
           <IonCol size="10">
-            <IonItem>
-              <IonInput
+            <IonItem lines="none">
+              <IonTextarea
+                rows={1}
                 placeholder="Mensaje..."
                 onIonInput={(e) => setMensaje(e.target.value)}
                 value={mensaje}
+                autoGrow={true}
               />
             </IonItem>
           </IonCol>
