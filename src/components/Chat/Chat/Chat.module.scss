@@ -21,7 +21,9 @@
             }
 
             ion-searchbar {
-                --border-radius: 25px;
+                --border-radius: 5px;
+                color: var(--color) !important;
+
                 ion-icon {
                     margin-top: 5px;
                 }
@@ -40,8 +42,8 @@
 
     ion-item {
         background: none;
-        --background: var(--bg-main-gradient);
-        --border-radius: 15px;
+        border: 1px solid var(--bg-main);
+        border-radius: 3px;
         
         ion-note {
             font-size: 15px;
@@ -65,13 +67,13 @@
                     &.name {
                         line-height: 16px;
                         font-weight: bold;
-                        font-size: 15px;
+                        font-size: 13px;
                     }
                     
                     &.phone {
                         margin-right: 7px;
                         line-height: 1rem;
-                        font-size: 14px;
+                        font-size: 12px;
                     }
                 }
             }
@@ -87,7 +89,7 @@
 
                 .unreads {
                     text-align: center;
-                    border-radius: 1.1rem;
+                    border-radius: 3px;
                     background: #777;
                     color: #fff;
                 }
@@ -99,7 +101,7 @@
     .chatbox {
 
         ion-item {
-            --border-radius: 10px;
+            --border-radius: 5px;
 
             ion-textarea {
                 --padding-top: .5rem;

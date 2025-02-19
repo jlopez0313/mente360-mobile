@@ -1,11 +1,15 @@
 @import "@/styles.scss";
 
-ion-content {
+.ion-content {
+/*
+    --background: url('images/modal.png') no-repeat cover fixed center;
     
-    --background: url('assets/images/modal.png') no-repeat cover fixed center;
-    
-    background: url('assets/images/modal.png') no-repeat fixed center; 
+    background: url('/assets/images/modal.png') no-repeat fixed center; 
     background-size: cover;
+*/
+    --background: var(--bg-content);
+    background: var(--bg-content);
+
     text-align: center;
     position: relative;
 
@@ -15,9 +19,9 @@ ion-content {
     .content {
         --height: 75%;
         --width: 90%;
-        --border-radius: 10px;
+        --border-radius: 5px;
         --box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-
+        background: var(--bg-content); 
 
         ion-toolbar {
             --background: none;
@@ -30,6 +34,7 @@ ion-content {
             padding: 5px 45px;
             font-size: 15px;
             line-height: 1.4rem;
+            color: #000;
         }
     }
 }

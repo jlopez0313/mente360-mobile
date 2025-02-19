@@ -16,11 +16,10 @@ import React, { useEffect, useRef, useState } from "react";
 import styles from "./Add.module.scss";
 import { camera, cameraOutline } from "ionicons/icons";
 import { getUser } from "@/helpers/onboarding";
-import Avatar from "@/assets/images/avatar.jpg";
 import { parsePhoneNumber } from "react-phone-number-input";
 import { Contacts } from "@capacitor-community/contacts";
 import { misContactos } from "@/services/user";
-import { updateData, writeData } from "@/services/realtime-db";
+import { Item } from "./Item";
 
 interface Props {
   grupoID: any;
@@ -29,7 +28,6 @@ interface Props {
 }
 
 export const Add = ({ grupoID, users, doChild }: Props) => {
-  const baseURL = import.meta.env.VITE_BASE_BACK;
   const { user } = getUser();
 
   const [present, onDismiss] = useIonLoading();
@@ -37,7 +35,6 @@ export const Add = ({ grupoID, users, doChild }: Props) => {
 
   const [allContacts, setAllContacts] = useState<any>([]); // todos los contactos con usuario registrado
   const [userContacts, setUserContacts] = useState<any>([]); // AllContacts filtrados
-  const [contactosAgregados, setContactosAgregados] = useState<any>([]); // AllContacts agregados al grupo
 
   const getContacts = async () => {
     try {
@@ -119,42 +116,6 @@ export const Add = ({ grupoID, users, doChild }: Props) => {
     );
   };
 
-  const addToGrupo = async (contact: any) => {
-    try {
-      const updates = { [grupoID]: true };
-
-      await Promise.all([
-        writeData(`grupos/${grupoID}/users/${contact.id}`, {
-          name: contact.name,
-          id: contact.id,
-          phone: contact.phone || "",
-          photo: contact.photo || "",
-        }),
-        updateData(`user_rooms/${contact.id}/grupos`, updates),
-      ]);
-
-      setContactosAgregados((prev: any) => [...prev, contact.phone]);
-
-      if (doChild) {
-        doChild(null);
-      }
-    } catch (error: any) {
-      console.error("Error al agregar al grupo:", error);
-
-      presentAlert({
-        header: "Error",
-        subHeader: "No se pudo agregar al grupo",
-        message:
-          error.data?.message ||
-          "Ha ocurrido un error interno. Intenta nuevamente.",
-        buttons: ["OK"],
-      });
-    }
-  };
-
-  const hasBeenAdded = (contact: any) => {
-    return contactosAgregados.find((x: any) => x == contact.phone);
-  };
 
   useEffect(() => {
     getContacts();
@@ -173,30 +134,7 @@ export const Add = ({ grupoID, users, doChild }: Props) => {
         {userContacts.map((contact: any, idx: number) => {
           return (
             contact && (
-              <IonItem
-                disabled={hasBeenAdded(contact)}
-                key={idx}
-                button={true}
-                className={`${styles["contact"]}`}
-                onClick={() => addToGrupo(contact)}
-              >
-                <IonAvatar aria-hidden="true" slot="start">
-                  <img
-                    alt=""
-                    src={contact.photo ? baseURL + contact.photo : Avatar}
-                  />
-                </IonAvatar>
-                <IonLabel className="ion-no-margin">
-                  <span className={styles["name"]}>
-                    {" "}
-                    {contact.name || "-"}{" "}
-                  </span>
-                  <span className={styles["phone"]}>
-                    {" "}
-                    {contact.phone || "-"}{" "}
-                  </span>
-                </IonLabel>
-              </IonItem>
+              <Item key={idx} contact={contact} grupoID={grupoID} doChild={doChild} />
             )
           );
         })}

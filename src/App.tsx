@@ -6,6 +6,7 @@ import Home from "./pages/Home/Home";
 import Sharing from "./pages/Home/Share/Sharing";
 import Crecimiento from "./pages/Crecimiento/Crecimiento";
 import Login from "./pages/Login/Login";
+import Reset from "./pages/Reset/Reset";
 import Configuracion from "./pages/Configuracion/Configuración";
 import Perfil from "./pages/Perfil/Perfil";
 import Notifications from "./pages/Notifications/Notifications";
@@ -40,6 +41,8 @@ import "@ionic/react/css/display.css";
 import "./theme/variables.css";
 import { useSelector } from "react-redux";
 import { Toast } from "./components/Toast/Toast";
+import { CapacitorUpdater } from '@capgo/capacitor-updater';
+import { useEffect } from "react";
 
 setupIonicReact({
   innerHTMLTemplatesEnabled: true,
@@ -49,6 +52,32 @@ const App: React.FC = () => {
   const { globalAudio, showGlobalAudio } = useSelector(
     (state: any) => state.audio
   );
+
+  const checkForUpdates = async () => {
+    try {
+      const updateAvailable = await CapacitorUpdater.isAutoUpdateAvailable();
+
+      if (updateAvailable) {
+        console.log('Actualización automática disponible');
+
+        // Escucha cuando la app está lista después de la actualización
+        CapacitorUpdater.addListener('appReady', () => {
+          console.log('La aplicación se actualizó y está lista');
+          CapacitorUpdater.reload();
+        });
+
+        console.log('Esperando la aplicación actualizada...');
+      } else {
+        console.log('No hay actualizaciones automáticas disponibles');
+      }
+    } catch (error) {
+      console.error('Error verificando actualizaciones:', error);
+    }
+  };
+  
+  useEffect(() => {
+    checkForUpdates();
+  }, []);
 
   return (
     <IonReactRouter>
@@ -73,6 +102,7 @@ const App: React.FC = () => {
           <Route exact={true} path="/configuracion" component={Configuracion} />
 
           <Route exact={true} path="/login" component={Login} />
+          <Route exact={true} path="/reset" component={Reset} />
           <Route exact={true} path="/registro" component={Registro} />
 
           <Route exact={true} path="/musicaterapia" component={Musicaterapia} />

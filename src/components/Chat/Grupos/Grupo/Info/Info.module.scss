@@ -31,8 +31,8 @@
 
     ion-item {
         background: none;
-        --background: var(--bg-main-gradient);
-        --border-radius: 15px;
+        border: 1px solid var(--bg-main);
+        --border-radius: 5px;
 
         &.message{
 

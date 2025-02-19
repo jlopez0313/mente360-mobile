@@ -36,7 +36,8 @@ export const Configuracion = () => {
   const { db }: any = useContext(UIContext);
 
   const onLogout = async () => {
-    localStorage.clear();
+    localStorage.removeItem('home');
+    localStorage.removeItem('onboarding');
     await db.clear();
     history.replace("/login");
   };
@@ -138,9 +139,9 @@ export const Configuracion = () => {
         <span className={styles["version"]}> Version. { import.meta.env.VITE_VERSION } </span>
       </div>
 
-      <div className="ion-text-center ion-margin-bottom">
-        <IonButton shape="round" onClick={onLogout}>
-          <IonLabel>Cerrar Sesión</IonLabel>
+      <div className="ion-text-center ion-margin-bottom ion-padding">
+        <IonButton onClick={onLogout} expand="block">
+          Cerrar Sesión
         </IonButton>
       </div>
     </div>

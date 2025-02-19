@@ -3,7 +3,10 @@
 
 .ion-content {
     .nivel {
-        --background: var(--bg-main);
+        border: 1px solid var(--bg-main);
+        border-radius: 5px;
+        --background: var(--bg-secondary);
+        background: var(--bg-secondary);
 
         &::part(text),
         &::part(placeholder) {
@@ -20,7 +23,7 @@
         .ion-progress-bar {
             padding: 5px;
             --background: #787878;
-            --progress-background: var(--bg-main);
+            --progress-background: var(--bg-primary);
             position: relative;
         }
 

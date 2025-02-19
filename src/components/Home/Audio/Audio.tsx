@@ -7,6 +7,7 @@ import {
   IonIcon,
   IonProgressBar,
   IonRange,
+  IonSkeletonText,
   IonText,
 } from "@ionic/react";
 import {
@@ -23,6 +24,9 @@ import UIContext from "@/context/Context";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsGlobalPlaying } from "@/store/slices/audioSlice";
 
+import { startBackground } from "@/helpers/background";
+import { create, toggle, destroy } from "@/helpers/musicControls";
+
 interface Props {
   audio: any;
   onConfirm: () => void;
@@ -31,6 +35,7 @@ interface Props {
 export const Audio: React.FC<Props> = ({ audio, onConfirm }) => {
   
   const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(true);
 
   const { isGlobalPlaying }: any =
     useSelector((state: any) => state.audio);
@@ -47,6 +52,7 @@ export const Audio: React.FC<Props> = ({ audio, onConfirm }) => {
     baseURL,
     progress,
     duration,
+    real_duration,
     buffer,
     currentTime,
     isPlaying,
@@ -63,9 +69,21 @@ export const Audio: React.FC<Props> = ({ audio, onConfirm }) => {
   const onDoPause = () => {
     onPause();
     onConfirm();
+    destroy();
 
     dispatch( setIsGlobalPlaying( true ) );
   };
+
+  const onStartPlaying = () => {
+    onPlay();
+  }
+
+  useEffect(() => {
+    if ( real_duration ) {
+      startBackground()
+      create( baseURL, audio, real_duration, onPlay, onPause, () => {}, () => {} );
+    }
+  }, [real_duration])
 
   useEffect(() => {
     if (isPlaying && isGlobalPlaying) {
@@ -77,14 +95,31 @@ export const Audio: React.FC<Props> = ({ audio, onConfirm }) => {
 
   return (
     <IonCard className={styles.card}>
-      <img alt="Silhouette of mountains" src={baseURL + audio.imagen} />
+
+      {isLoading && (
+        <IonSkeletonText
+          animated
+          style={{
+            width: "100%",
+            height: "200px",
+            borderRadius: "5px",
+          }}
+        />
+      )}
+
+      <img
+        alt=""
+        src={baseURL + audio.imagen}
+        style={{ display: isLoading ? "none" : "block" }}
+        onLoad={() => setIsLoading(false)}
+      />
 
       <IonCardHeader className="ion-no-padding">
         <IonCardSubtitle className="ion-no-padding">
           {/*
             <IonText> &nbsp; </IonText>
           */}
-          <IonText> {audio.titulo} </IonText>
+          <IonText> {audio?.titulo} </IonText>
           {/* 
             <IonIcon icon={shareSocial} />
           */}
@@ -125,7 +160,7 @@ export const Audio: React.FC<Props> = ({ audio, onConfirm }) => {
             {isPlaying ? (
               <IonIcon onClick={onPause} icon={pause}></IonIcon>
             ) : (
-              <IonIcon onClick={onPlay} icon={play}></IonIcon>
+              <IonIcon onClick={onStartPlaying} icon={play}></IonIcon>
             )}
           </div>
 
@@ -140,7 +175,7 @@ export const Audio: React.FC<Props> = ({ audio, onConfirm }) => {
 
         <audio
           ref={audioRef}
-          src={baseURL + audio.audio}
+          src={baseURL + audio?.audio}
           onLoadedMetadata={onLoadedMetadata}
           onTimeUpdate={onTimeUpdate}
           onProgress={onUpdateBuffer}

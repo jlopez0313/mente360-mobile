@@ -41,6 +41,7 @@ import { useHistory } from "react-router";
 import { useDispatch } from "react-redux";
 import { setRoute } from "@/store/slices/routeSlice";
 import { shareSocial, shareSocialOutline } from "ionicons/icons";
+import { LocalNotifications } from "@capacitor/local-notifications";
 
 export const Home = () => {
   const user = getUser();
@@ -97,6 +98,7 @@ export const Home = () => {
       }
     } catch (error: any) {
       console.log(error);
+
       presentAlert({
         header: "Alerta!",
         subHeader: "Mensaje importante.",
@@ -113,13 +115,13 @@ export const Home = () => {
       present({
         message: "Cargando ...",
       });
-
+      /*
       const formData = {
         audios_id: data.audio.id,
       };
 
       await confirmAudio(formData);
-
+*/
       data.audio.done = true;
       setData({ ...data });
 
@@ -127,10 +129,13 @@ export const Home = () => {
       localHome.set({ ...localData, data: { ...data } });
     } catch (error: any) {
       console.error(error);
+
       presentAlert({
         header: "Alerta!",
         subHeader: "Mensaje importante.",
-        message: error.data?.message || "Error Interno",
+        message:
+          error.data?.message ||
+          "Tu audio ha finalizado. Cuando estés listo, presiona 'Finalizar'.",
         buttons: ["OK"],
       });
     } finally {
@@ -143,13 +148,13 @@ export const Home = () => {
       present({
         message: "Cargando ...",
       });
-
+      /*
       const formData = {
         mensajes_id: data.mensaje.id,
       };
 
       await confirmMensaje(formData);
-
+*/
       data.mensaje.done = true;
 
       setData({ ...data });
@@ -157,6 +162,8 @@ export const Home = () => {
       const localData = localHome.get();
       localHome.set({ ...localData, data: { ...data } });
     } catch (error: any) {
+      console.log(error);
+
       presentAlert({
         header: "Alerta!",
         subHeader: "Mensaje importante.",
@@ -186,6 +193,8 @@ export const Home = () => {
       const localData = localHome.get();
       localHome.set({ ...localData, data: { ...data } });
     } catch (error: any) {
+      console.log(error);
+
       presentAlert({
         header: "Alerta!",
         subHeader: "Mensaje importante.",
@@ -198,17 +207,21 @@ export const Home = () => {
   };
 
   const onUpdateFCM = async () => {
-    // Obtener el token FCM del dispositivo
-    const token = await FCM.getToken();
-    console.log("FCM Token:", token.token);
-    console.log("USER:", user);
+    try {
+      // Obtener el token FCM del dispositivo
+      const token = await FCM.getToken();
+      console.log("FCM Token:", token.token);
+      console.log("USER:", user);
 
-    const formData = {
-      fcm_token: token.token,
-    };
+      const formData = {
+        fcm_token: token.token,
+      };
 
-    const { data } = await update(formData, user.user.id);
-    setUser({ ...user, user: data.data });
+      const { data } = await update(formData, user.user.id);
+      setUser({ ...user, user: data.data });
+    } catch (error: any) {
+      console.log(error);
+    }
   };
 
   const onCheckEneatipo = () => {
@@ -312,7 +325,12 @@ export const Home = () => {
           />
           <IonIcon
             icon={shareSocialOutline}
-            style={{ width: "90px", display: "block", margin: "15px auto" }}
+            style={{
+              fontSize: "2rem",
+              width: "90px",
+              display: "block",
+              margin: "15px auto",
+            }}
             onClick={() => {
               history.replace("/share");
             }}
@@ -344,7 +362,6 @@ export const Home = () => {
                 onClick={() => {
                   history.replace("/perfil");
                 }}
-                shape="round"
                 style={{ width: "100%" }}
               >
                 Sí lo conozco
@@ -355,7 +372,6 @@ export const Home = () => {
                 onClick={() => {
                   history.replace("/test");
                 }}
-                shape="round"
                 style={{ width: "100%" }}
               >
                 Quiero descubrirlo
@@ -369,37 +385,6 @@ export const Home = () => {
           />
         </Texto>
       </Modal>
-
-      {/*
-      <IonFab
-        slot="fixed"
-        vertical="bottom"
-        horizontal="end"
-        className={styles.fab}
-      >
-        <IonFabButton onClick={onToggleShow}>
-          <IonIcon icon={add}></IonIcon>
-        </IonFabButton>
-
-        <IonFabList side="top">
-          <Link to=''>
-            <IonFabButton>
-              <IonIcon icon={helpCircleOutline}></IonIcon>
-            </IonFabButton>
-          </Link>
-          <Link to=''>
-            <IonFabButton>
-              <IonIcon icon={logoWhatsapp}></IonIcon>
-            </IonFabButton>
-          </Link>
-          <Link to='/test' onClick={() => setShow( false )}>
-            <IonFabButton>
-              <IonIcon icon={readerOutline}></IonIcon>
-            </IonFabButton>
-          </Link>
-        </IonFabList>
-      </IonFab>
-      */}
     </>
   );
 };

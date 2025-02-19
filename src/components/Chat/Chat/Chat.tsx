@@ -1,29 +1,16 @@
 import React, { useEffect, useState } from "react";
 import styles from "./Chat.module.scss";
-import {
-  IonAvatar,
-  IonIcon,
-  IonItem,
-  IonItemDivider,
-  IonItemGroup,
-  IonLabel,
-  IonList,
-  IonNote,
-  IonSearchbar,
-} from "@ionic/react";
-import { shareSocialOutline } from "ionicons/icons";
+import { IonItemGroup, IonList, IonSearchbar } from "@ionic/react";
 import { useHistory } from "react-router";
 import { getUser } from "@/helpers/onboarding";
 import { getData, writeData, readData } from "@/services/realtime-db";
-import { onValue, off } from "firebase/database";
+import { onValue } from "firebase/database";
 import { setRoom } from "@/store/slices/notificationSlice";
 
-import Avatar from "@/assets/images/avatar.jpg";
 import { useDispatch } from "react-redux";
+import { Item } from "./Item";
 
 export const Chat = () => {
-  const baseURL = import.meta.env.VITE_BASE_BACK;
-
   const history = useHistory();
   const { user } = getUser();
 
@@ -31,6 +18,7 @@ export const Chat = () => {
 
   const [isWriting, setIsWriting] = useState([]);
   const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
   const [messages, setMessages] = useState([]);
   const [unreadList, setUnreadList] = useState([]);
 
@@ -76,9 +64,9 @@ export const Chat = () => {
           }))
         : [];
 
-      const usuarios = [];
-      const mensajes = [];
-      const noLeidos = [];
+      const usuarios: any = [];
+      const mensajes: any = [];
+      const noLeidos: any = [];
 
       await Promise.all([
         rooms.map(async (room, idx) => {
@@ -131,6 +119,7 @@ export const Chat = () => {
       setUnreadList([...noLeidos]);
       setMessages([...mensajes]);
       setUsers(usuarios);
+      setFilteredUsers(usuarios);
     });
   };
 
@@ -138,6 +127,17 @@ export const Chat = () => {
     const noUnreads = unreadList.every((x) => x === 0);
     if (noUnreads) {
       dispatch(setRoom(false));
+    }
+  };
+
+  const onSearchUser = (word: string) => {
+    if (word) {
+      const lista = users.filter((u: any) =>
+        u.name.toLowerCase().includes(word.toLowerCase())
+      );
+      setFilteredUsers([...lista]);
+    } else {
+      setFilteredUsers([...users]);
     }
   };
 
@@ -157,47 +157,21 @@ export const Chat = () => {
             className={`ion-no-padding ion-margin-bottom ${styles["search"]}`}
             placeholder="Buscar"
             color="warning"
+            onIonInput={(e: any) => onSearchUser(e.target.value)}
           ></IonSearchbar>
 
-          {users.map((usuario, idx) => {
+          {filteredUsers.map((usuario, idx) => {
             return (
               usuario && (
-                <IonItem
+                <Item
                   key={idx}
-                  button={true}
-                  className={`${styles["contact"]}`}
-                  onClick={() => goToInterno(usuario)}
-                >
-                  <IonAvatar aria-hidden="true" slot="start">
-                    <img
-                      alt=""
-                      src={usuario.photo ? baseURL + usuario.photo : Avatar}
-                    />
-                  </IonAvatar>
-                  <IonLabel className="ion-no-margin">
-                    <span className={styles["name"]}> {usuario?.name} </span>
-                    <span className={styles["phone"]}>
-                      {" "}
-                      {isWriting[idx]
-                        ? "Escribiendo..."
-                        : messages[idx]?.mensaje.length > 35
-                        ? messages[idx]?.mensaje.substring(0, 32) + "..."
-                        : messages[idx]?.mensaje}{" "}
-                    </span>
-                  </IonLabel>
-                  <IonNote className={styles["note"]}>
-                    <span className={styles["time"]}>
-                      {" "}
-                      {messages[idx]?.hora}{" "}
-                    </span>
-                    {unreadList[idx] ? (
-                      <span className={styles["unreads"]}>
-                        {" "}
-                        {unreadList[idx]}{" "}
-                      </span>
-                    ) : null}
-                  </IonNote>
-                </IonItem>
+                  idx={idx}
+                  usuario={usuario}
+                  messages={messages}
+                  isWriting={isWriting}
+                  unreadList={unreadList}
+                  goToInterno={goToInterno}
+                />
               )
             );
           })}

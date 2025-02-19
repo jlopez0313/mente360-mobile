@@ -1,32 +1,21 @@
 import React, { useEffect, useState } from "react";
-import {
-  IonAvatar,
-  IonButton,
-  IonIcon,
-  IonItem,
-  IonItemGroup,
-  IonLabel,
-  IonList,
-  IonNote,
-} from "@ionic/react";
+import { IonButton, IonIcon, IonItemGroup, IonList } from "@ionic/react";
 import { writeData, updateData } from "@/services/realtime-db";
 import styles from "./Grupos.module.scss";
 import { add } from "ionicons/icons";
 import { Modal } from "../../Modal/Modal";
 import { Add } from "./Add/Add";
 import { create, getAll } from "@/services/grupos";
-import { useHistory } from "react-router";
 import { getUser } from "@/helpers/onboarding";
 import { onValue } from "firebase/database";
 import { readData, getData } from "@/services/realtime-db";
 
 import { useDispatch } from "react-redux";
 import { setGrupo } from "@/store/slices/notificationSlice";
+import { Item } from "./Item";
 
 export const Grupos = () => {
-  const history = useHistory();
   const { user } = getUser();
-  const baseURL = import.meta.env.VITE_BASE_BACK;
 
   const dispatch = useDispatch();
 
@@ -145,15 +134,6 @@ export const Grupos = () => {
     });
   };
 
-  const goToGrupo = async (id: number) => {
-    const updates = {
-      [id]: true,
-    };
-    await updateData(`user_rooms/${user.id}/grupos`, updates);
-
-    history.replace(`/grupo/${id}`);
-  };
-
   const onCheckUnreads = () => {
     const noUnreads = unreadList.every((x) => x === 0);
     if (noUnreads) {
@@ -171,12 +151,7 @@ export const Grupos = () => {
 
   return (
     <div className={styles["ion-content"]}>
-      <IonButton
-        id="add"
-        className="ion-margin-bottom"
-        shape="round"
-        expand="block"
-      >
+      <IonButton id="add" className="ion-margin-bottom" expand="block">
         <IonIcon icon={add} slot="start" />
         Nuevo Grupo Mente Maestra
       </IonButton>
@@ -185,57 +160,13 @@ export const Grupos = () => {
         <IonItemGroup>
           {grupos.map((grupo: any, idx: number) => {
             return (
-              <IonItem
+              <Item
                 key={idx}
-                button={true}
-                className={`${styles["grupo"]}`}
-                onClick={() => goToGrupo(grupo.id)}
-              >
-                <IonAvatar aria-hidden="true" slot="start">
-                  <img alt="" src={baseURL + grupo.photo} />
-                </IonAvatar>
-                <IonLabel className="ion-no-margin">
-                  <span className={styles["name"]}> {grupo.grupo} </span>
-                  <span className={styles["phone"]}>
-                    {messages[idx] && (
-                      <>
-                        {messages[idx]?.user?.id == user.id
-                          ? "tu"
-                          : messages[idx]?.user?.name}
-                        :{" "}
-                        {messages[idx]?.user?.id == user.id
-                          ? ("tu: " + messages[idx]?.mensaje).length > 30
-                            ? messages[idx]?.mensaje.substring(0, 27) + "..."
-                            : messages[idx]?.mensaje
-                          : (
-                              messages[idx]?.user?.name +
-                              ": " +
-                              messages[idx]?.mensaje
-                            ).length > 30
-                          ? (messages[idx]?.mensaje).substring(
-                              0,
-                              Math.abs(
-                                27 - (messages[idx]?.user?.name + ": ").length
-                              )
-                            ) + "..."
-                          : messages[idx]?.mensaje}{" "}
-                      </>
-                    )}{" "}
-                  </span>
-                </IonLabel>
-                <IonNote className={styles["note"]}>
-                  <span className={styles["time"]}>
-                    {" "}
-                    {messages[idx]?.hora}{" "}
-                  </span>
-                  {unreadList[idx] ? (
-                    <span className={styles["unreads"]}>
-                      {" "}
-                      {unreadList[idx]}{" "}
-                    </span>
-                  ) : null}
-                </IonNote>
-              </IonItem>
+                idx={idx}
+                grupo={grupo}
+                messages={messages}
+                unreadList={unreadList}
+              />
             );
           })}
         </IonItemGroup>

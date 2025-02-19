@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import styles from "./Clip.module.scss";
 import {
   IonCard,
@@ -10,6 +10,7 @@ import {
   IonImg,
   IonProgressBar,
   IonRange,
+  IonSkeletonText,
   IonText,
 } from "@ionic/react";
 import {
@@ -29,10 +30,20 @@ import {
   setGlobalAudio,
   setShowGlobalAudio,
 } from "@/store/slices/audioSlice";
-import { Share } from "@capacitor/share";
+
+import { startBackground } from "@/helpers/background";
+import {
+  create,
+  updateElapsed,
+  toggle,
+  destroy,
+} from "@/helpers/musicControls";
 
 export const Clip = () => {
   const dispatch = useDispatch();
+
+  const [isLoading, setIsLoading] = useState(true); 
+
   const { globalAudio, globalPos, listAudios } = useSelector(
     (state: any) => state.audio
   );
@@ -43,6 +54,7 @@ export const Clip = () => {
     baseURL,
     progress,
     duration,
+    real_duration,
     buffer,
     currentTime,
     isPlaying,
@@ -51,11 +63,17 @@ export const Clip = () => {
     onUpdateBuffer,
     onPause,
     onPlay,
+    onShareLink,
   } = useAudio(
     audioRef,
     () => {},
     () => {}
   );
+
+  const onUpdateElapsed = () => {
+    onTimeUpdate();
+    updateElapsed(audioRef.current?.currentTime);
+  };
 
   const goToPrev = async () => {
     const prevIdx = globalPos == 0 ? listAudios.length - 1 : globalPos - 1;
@@ -76,14 +94,20 @@ export const Clip = () => {
     dispatch(setGlobalAudio(next));
   };
 
-  const onShareLink = async () => {
-    await Share.share({
-      title: "¡Tienes que escuchar esto en Mente360!",
-      text: "Este audio en Mente360 está transformando mi día. Escuchalo también. ¡Se que te va a encantar!",
-      url: baseURL + "audios/" + btoa(globalAudio.id),
-      dialogTitle: "Invita a tus amigos a escuchar este audio y descubrir Mente360.",
-    });
-  };
+  useEffect(() => {
+    if (real_duration) {
+      startBackground();
+      create(
+        baseURL,
+        globalAudio,
+        real_duration,
+        onPlay,
+        onPause,
+        goToPrev,
+        goToNext
+      );
+    }
+  }, [real_duration]);
 
   useEffect(() => {
     onPlay();
@@ -93,13 +117,32 @@ export const Clip = () => {
   return (
     <div className={styles["ion-content"]}>
       <IonCard className={styles.card}>
-        <img alt="Silhouette of mountains" src={baseURL + globalAudio.imagen} />
+        {isLoading && (
+          <IonSkeletonText
+            animated
+            style={{
+              width: "100%",
+              height: "300px",
+              borderRadius: "5px",
+            }}
+          />
+        )}
+        <img
+          alt=""
+          src={baseURL + globalAudio.imagen}
+          style={{ display: isLoading ? "none" : "block" }}
+          onLoad={() => setIsLoading(false)}
+        />
 
         <IonCardHeader className="ion-no-padding">
           <IonCardSubtitle className="ion-no-padding">
             <IonText> &nbsp; </IonText>
             <IonText> {globalAudio.titulo} </IonText>
-            <IonIcon className={`${styles["share-icon"]}`} onClick={onShareLink} icon={shareSocial} />
+            <IonIcon
+              className={`${styles["share-icon"]}`}
+              onClick={() => onShareLink(globalAudio.id)}
+              icon={shareSocial}
+            />
           </IonCardSubtitle>
         </IonCardHeader>
 
@@ -141,7 +184,7 @@ export const Clip = () => {
           <audio
             ref={audioRef}
             onLoadedMetadata={onLoadedMetadata}
-            onTimeUpdate={onTimeUpdate}
+            onTimeUpdate={onUpdateElapsed}
             onProgress={onUpdateBuffer}
             onEnded={(e) => {
               e.preventDefault();
@@ -151,7 +194,16 @@ export const Clip = () => {
             src={baseURL + globalAudio.audio}
           />
 
-          <img src="assets/images/logo_texto.png" style={{width: '90px', display: 'block', marginTop: '50px', marginLeft: 'auto', marginRight: 'auto'}} />
+          <img
+            src="assets/images/logo_texto.png"
+            style={{
+              width: "90px",
+              display: "block",
+              marginTop: "50px",
+              marginLeft: "auto",
+              marginRight: "auto",
+            }}
+          />
         </IonCardContent>
       </IonCard>
     </div>

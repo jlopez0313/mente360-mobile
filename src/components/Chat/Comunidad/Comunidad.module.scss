@@ -21,7 +21,16 @@
             }
 
             ion-searchbar {
-                --border-radius: 25px;
+                --border-radius: 5px;
+                color: var(--color) !important;
+
+                ion-icon {
+                    margin-top: 5px;
+                }
+                
+                &.search {
+                    --ion-color-warning: var(--bg-card);
+                }
 
                 input {
                     padding-top: 10px !important;
@@ -33,8 +42,8 @@
 
     ion-item {
         background: none;
-        --background: var(--bg-main-gradient);
-        --border-radius: 50px;
+        border: 1px solid var(--bg-main);
+        border-radius: 3px;
         
         ion-note {
             font-size: 15px;
@@ -56,11 +65,11 @@
                     color: #666;
                     &.name {
                         font-weight: bold;
-                        font-size: 15px;
+                        font-size: 13px;
                     }
                     
                     &.phone {        
-                        font-size: 14px;
+                        font-size: 12px;
                     }
                 }
             }

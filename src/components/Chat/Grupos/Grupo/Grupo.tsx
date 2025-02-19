@@ -1,35 +1,25 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
-  IonAvatar,
   IonButton,
   IonCol,
-  IonFooter,
   IonIcon,
-  IonInput,
   IonItem,
   IonItemGroup,
-  IonLabel,
   IonList,
   IonRow,
-  IonText,
   IonTextarea,
 } from "@ionic/react";
 import { addData, readData } from "@/services/realtime-db";
 import styles from "./Grupo.module.scss";
-import { add, send, sendOutline } from "ionicons/icons";
-import { Modal } from "../../../Modal/Modal";
-import { Add } from "../Add/Add";
-import { create, getAll } from "@/services/grupos";
-import { useHistory } from "react-router";
+import { sendOutline } from "ionicons/icons";
 import { onValue } from "firebase/database";
 import { getUser } from "@/helpers/onboarding";
-import Avatar from "@/assets/images/avatar.jpg";
 import { sendPush } from "@/services/push";
+import { Item } from "./Item";
 
 export const Grupo = ({ grupoID, grupo, removed }) => {
   const { user } = getUser();
   const [mensaje, setMensaje] = useState("");
-  const baseURL = import.meta.env.VITE_BASE_BACK;
 
   const chatListRef = useRef<HTMLIonListElement>(null);
 
@@ -125,34 +115,7 @@ export const Grupo = ({ grupoID, grupo, removed }) => {
         <IonItemGroup>
           {messagesList.map((msg: any, idx: number) => {
             return (
-              <IonItem
-                key={idx}
-                button={true}
-                className={`${styles["message"]} ${
-                  msg.user.id === user.id
-                    ? styles["sender"]
-                    : styles["receiver"]
-                } `}
-              >
-                {msg.user.id !== user.id && (
-                  <IonAvatar aria-hidden="true" slot="start">
-                    <img
-                      alt=""
-                      src={msg.user.photo ? baseURL + msg.user.photo : Avatar}
-                    />
-                  </IonAvatar>
-                )}
-                <div>
-                  {msg.user.id !== user.id && (
-                    <span className={styles["name"]}> {msg.user.name} </span>
-                  )}
-                  <IonText className={styles["message"]}>
-                    {" "}
-                    {msg.mensaje}{" "}
-                  </IonText>
-                  <span className={styles["time"]}> {msg.hora} </span>
-                </div>
-              </IonItem>
+              <Item key={idx} msg={msg} />
             );
           })}
         </IonItemGroup>

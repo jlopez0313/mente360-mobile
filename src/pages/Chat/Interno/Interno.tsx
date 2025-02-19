@@ -5,6 +5,7 @@ import {
   IonContent,
   IonHeader,
   IonPage,
+  IonSkeletonText,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
@@ -24,7 +25,6 @@ import Avatar from "@/assets/images/avatar.jpg";
 import { onValue } from "firebase/database";
 
 const Interno: React.FC = () => {
-  
   const history = useHistory();
   const { user } = getUser();
   const { room } = useParams<{ room: string }>();
@@ -36,6 +36,7 @@ const Interno: React.FC = () => {
     photo: null,
   });
   const [isWriting, setIsWriting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const onGetRoom = async () => {
     onValue(readData(`rooms/${room}`), (snapshot) => {
@@ -52,17 +53,16 @@ const Interno: React.FC = () => {
     });
   };
 
-  
   const onEnter = async () => {
-    await writeData(`rooms/${ room }/${user.id}/exit_time`, null);
-  }
+    await writeData(`rooms/${room}/${user.id}/exit_time`, null);
+  };
 
   const onExit = async () => {
     await Promise.all([
-      writeData(`rooms/${ room }/${user.id}/writing`, false),
-      writeData(`rooms/${ room }/${user.id}/exit_time`, new Date().toISOString()),
-    ])
-  }
+      writeData(`rooms/${room}/${user.id}/writing`, false),
+      writeData(`rooms/${room}/${user.id}/exit_time`, new Date().toISOString()),
+    ]);
+  };
 
   useEffect(() => {
     onGetRoom();
@@ -83,12 +83,12 @@ const Interno: React.FC = () => {
   }, [history]);
 
   useEffect(() => {
-    onEnter()
+    onEnter();
 
     return () => {
-      onExit()
-    }
-  }, [])
+      onExit();
+    };
+  }, []);
 
   return (
     <IonPage>
@@ -107,21 +107,31 @@ const Interno: React.FC = () => {
             slot="start"
             className={styles["avatar"]}
           >
+            {isLoading && (
+              <IonSkeletonText
+                animated
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  borderRadius: "50%",
+                }}
+              />
+            )}
             <img
               alt=""
               src={otherUser.photo ? baseURL + otherUser.photo : Avatar}
+              style={{ display: isLoading ? "none" : "block" }}
+              onLoad={() => setIsLoading(false)}
             />
           </IonAvatar>
-          
+
           <div className={styles["title-container"]}>
-            <IonTitle className={styles["title"]}>
-              {otherUser.name}
-            </IonTitle>
+            <IonTitle className={styles["title"]}>{otherUser.name}</IonTitle>
             {isWriting && (
               <span className={styles["status"]}>Escribiendo...</span>
             )}
           </div>
-          
+
           {/*
           <IonButtons slot="end">
             <IonButton id="popover-button">

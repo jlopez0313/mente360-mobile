@@ -7,6 +7,7 @@ import {
   IonIcon,
   IonProgressBar,
   IonRange,
+  IonSkeletonText,
   IonText,
 } from "@ionic/react";
 import {
@@ -24,7 +25,12 @@ import { BackgroundMode } from "@anuradev/capacitor-background-mode";
 import { startBackground } from "@/helpers/background";
 import { create, toggle, destroy } from "@/helpers/musicControls";
 import { useDispatch, useSelector } from "react-redux";
-import { setGlobalAudio, setIsGlobalPlaying, updateCurrentTime, resetStore } from "@/store/slices/audioSlice";
+import {
+  setGlobalAudio,
+  setIsGlobalPlaying,
+  updateCurrentTime,
+  resetStore,
+} from "@/store/slices/audioSlice";
 
 interface Props {
   activeIndex: any;
@@ -36,8 +42,8 @@ interface Props {
 
 export const Audio: React.FC<Props> = memo(
   ({ activeIndex, audio, onGoBack, onGoNext, onSaveNext }) => {
-
     const { isGlobalPlaying }: any = useSelector((state: any) => state.audio);
+    const [isLoading, setIsLoading] = useState(true);
 
     const audioRef = useRef({
       currentTime: 0,
@@ -52,6 +58,7 @@ export const Audio: React.FC<Props> = memo(
       progress,
       buffer,
       duration,
+      real_duration,
       currentTime,
       isPlaying,
       onLoadedMetadata,
@@ -77,18 +84,29 @@ export const Audio: React.FC<Props> = memo(
     const goStart = async () => {
       onPause();
       onStart();
-
-      startBackground()
-      create( audio.titulo, duration, onPlay, onPause, onGoBack, onGoNext );
-      
       onPlay();
     };
 
     useEffect(() => {
+      if (real_duration) {
+        startBackground();
+        create(
+          baseURL,
+          audio,
+          real_duration,
+          onPlay,
+          onPause,
+          onGoBack,
+          onGoNext
+        );
+      }
+    }, [real_duration]);
+
+    useEffect(() => {
       if (!isGlobalPlaying) {
-        onPlay()
+        onPlay();
       } else {
-        onPause()
+        onPause();
       }
     }, [isGlobalPlaying]);
 
@@ -98,7 +116,23 @@ export const Audio: React.FC<Props> = memo(
 
     return (
       <IonCard className={`ion-margin-top ion-text-center ${styles.card}`}>
-        <img alt="" src={baseURL + audio.imagen} />
+        {isLoading && (
+          <IonSkeletonText
+            animated
+            style={{
+              width: "100%",
+              height: "200px",
+              borderRadius: "5px",
+            }}
+          />
+        )}
+
+        <img
+          alt=""
+          src={baseURL + audio.imagen}
+          style={{ display: isLoading ? "none" : "block" }}
+          onLoad={() => setIsLoading(false)}
+        />
 
         <IonCardHeader className="ion-no-padding ion-margin-bottom">
           <IonCardSubtitle className="ion-no-padding">
@@ -141,9 +175,17 @@ export const Audio: React.FC<Props> = memo(
             ></IonIcon>
             <div className={`${styles.play}`}>
               {isPlaying ? (
-                <IonIcon onClick={onDoPause} icon={pause}></IonIcon>
+                <IonIcon
+                  className={styles["icon-play"]}
+                  onClick={onDoPause}
+                  icon={pause}
+                ></IonIcon>
               ) : (
-                <IonIcon onClick={onDoPlay} icon={play}></IonIcon>
+                <IonIcon
+                  className={styles["icon-play"]}
+                  onClick={onDoPlay}
+                  icon={play}
+                ></IonIcon>
               )}
             </div>
             <IonIcon

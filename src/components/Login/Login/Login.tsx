@@ -4,6 +4,7 @@ import {
   IonCardContent,
   IonCol,
   IonGrid,
+  IonIcon,
   IonInput,
   IonItem,
   IonLabel,
@@ -25,6 +26,7 @@ import { useContext, useEffect, useState } from "react";
 import UIContext from "@/context/Context";
 import { useHistory } from "react-router";
 import { FCM } from "@capacitor-community/fcm";
+import { eye, eyeOff } from "ionicons/icons";
 
 export const Login = () => {
   const { db }: any = useContext(UIContext);
@@ -35,6 +37,15 @@ export const Login = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+  
+  const goToResetPwd = () => {
+    history.replace("/reset");
+  }
 
   const doLogin = async (evt: any) => {
     evt.preventDefault();
@@ -49,7 +60,7 @@ export const Login = () => {
         password,
         device: "app",
       });
-/*
+      /*
       const token = await FCM.getToken();
       console.log("FCM Token:", token.token);
 
@@ -63,6 +74,7 @@ export const Login = () => {
       }, 1000);
     } catch (error: any) {
       console.log(error);
+
       presentAlert({
         header: "Alerta!",
         subHeader: "Mensaje importante.",
@@ -105,6 +117,8 @@ export const Login = () => {
 
             dismiss();
           } catch (error: any) {
+            console.log(error);
+
             if (error.status == "401") {
               const registerPromise = register({
                 name: gmailData.displayName,
@@ -136,6 +150,8 @@ export const Login = () => {
           dismiss();
         });
     } catch (error: any) {
+      console.log(error);
+
       presentAlert({
         header: "Alerta!",
         subHeader: "Mensaje importante.",
@@ -159,25 +175,29 @@ export const Login = () => {
                 labelPlacement="stacked"
                 placeholder="Correo"
                 fill="outline"
-                shape="round"
                 onIonInput={(evt: any) => setEmail(evt.target.value)}
               ></IonInput>
 
               <IonInput
                 className={`ion-margin-bottom ${styles.login}`}
-                type="password"
+                type={showPassword ? "text" : "password"}
                 labelPlacement="stacked"
                 placeholder="Contraseña"
                 fill="outline"
-                shape="round"
                 onIonInput={(evt: any) => setPassword(evt.target.value)}
-              ></IonInput>
+              >
+                <IonIcon
+                  icon={showPassword ? eyeOff : eye}
+                  slot="end"
+                  onClick={togglePasswordVisibility}
+                  style={{ cursor: "pointer" }}
+                />
+              </IonInput>
 
               <IonButton
                 type="button"
                 className="ion-margin-top ion-margin-bottom"
                 expand="block"
-                shape="round"
                 disabled={!email || !password}
                 onClick={doLogin}
               >
@@ -185,7 +205,9 @@ export const Login = () => {
                 Acceder{" "}
               </IonButton>
 
-              <IonNote>Recuperar Contraseña</IonNote>
+              <IonNote
+                onClick={goToResetPwd}
+                >Recuperar Contraseña</IonNote>
 
               <IonLoading
                 message="Dismissing after 3 seconds..."

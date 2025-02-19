@@ -1,0 +1,24 @@
+@import "@/styles.scss";
+
+:host {
+    --ion-margin: auto;
+}
+
+
+.ion-content {
+
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+
+    .content {
+        background: initial;
+    }
+    
+    ion-segment-button {
+        text-transform: capitalize;
+        font-family: 'arya-bold';
+        font-weight: bold;
+        color: var(--color);
+        --indicator-color: var(--color-main);
+    }
+}

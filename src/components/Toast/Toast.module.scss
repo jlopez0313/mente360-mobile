@@ -2,21 +2,26 @@
 
 .custom-toast {
     position: absolute;
-    background: var(--bg-main);
-    box-shadow: 3px 3px 10px 0 rgba(0, 0, 0, 0.2);
-    --color: #4b4a50;
+    background: rgba(28,28,30);
     min-height: 48px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    bottom: 60px;
-    right: 8px;
+    bottom: 50px;
     z-index: 90;
-    width: calc(100% - 16px);
-    padding: 5px;
+    width: 100%;
+    padding: 5px 0;
 
-    ion-label {
+
+    .title {
         font-size: 12px !important;
+        --color: #aaa !important;
+        color: #aaa !important;
+    }
+
+    ion-icon {
+        font-size: 1.65rem !important;
+        color: #aaa !important;
     }
 
 }
@@ -25,8 +30,8 @@
     font-size: 24px;
     color: #4b4a50;
     position: absolute;
-    top: -5px;
-    left: -5px;
+    top: 0;
+    left: 0;
     z-index: 99;
 }
 

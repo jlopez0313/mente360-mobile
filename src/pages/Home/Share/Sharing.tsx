@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { localDB } from "@/helpers/localStore";
 import { IonContent, IonPage } from "@ionic/react";
 import styles from "./Sharing.module.scss";
 
-// import { App } from "@capacitor/app";
+import { App } from "@capacitor/app";
+import { FileSharer } from "@byteowls/capacitor-filesharer";
 
-import { Share } from "@capacitor/share";
-// import * as htmlToImage from "html-to-image";
+import * as htmlToImage from "html-to-image";
 import { useHistory } from "react-router";
 
 const Sharing: React.FC = () => {
@@ -18,18 +18,29 @@ const Sharing: React.FC = () => {
   const onGetData = async () => {
     const localData = localHome.get();
     setData({ ...localData.data });
-
-    await shareScreenshot();
   };
 
   const shareScreenshot = async () => {
     try {
       const modalElement = document.getElementById("content");
-      if (!modalElement) return;
-/*
-      const dataUrl = await htmlToImage.toPng(modalElement);
+      if (!modalElement) {
+        console.error("El elemento de contenido no se encontró.");
+        return;
+      }
 
-      console.log( dataUrl.length )
+      const dataUrl = await htmlToImage.toPng(modalElement, {
+        cacheBust: true,
+      });
+
+      if (!dataUrl) {
+        console.error("No se pudo generar la imagen.");
+        return;
+      }
+
+      console.log("dataURL", dataUrl);
+
+      const base64Data = dataUrl.split(",")[1];
+      const filename = `mente360-${Date.now()}.png`;
 
       const handleAppStateChange = (state: { isActive: boolean }) => {
         if (state.isActive) {
@@ -39,12 +50,11 @@ const Sharing: React.FC = () => {
       };
 
       App.addListener("appStateChange", handleAppStateChange);
-*/
-      await Share.share({
-        title: "Mensaje del día",
-        text: "Comparte este inspirador mensaje",
-        url: '',
-        dialogTitle: "Compartir en redes sociales",
+
+      await FileSharer.share({
+        filename,
+        contentType: "image/png",
+        base64Data,
       });
     } catch (error) {
       console.error("Error al compartir la imagen:", error);
@@ -55,9 +65,15 @@ const Sharing: React.FC = () => {
     onGetData();
   }, []);
 
+  useEffect(() => {
+    if (data.mensaje?.mensaje) {
+      shareScreenshot();
+    }
+  }, [data]);
+
   return (
     <IonPage>
-      <IonContent>
+      <IonContent className={styles["ion-content"]}>
         <div id="content" className={styles["content"]}>
           <div className={styles.texto}>
             <p style={{ whiteSpace: "pre-wrap" }}>{data.mensaje?.mensaje}</p>

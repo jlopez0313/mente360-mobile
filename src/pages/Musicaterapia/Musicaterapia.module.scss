@@ -4,17 +4,22 @@
     --background: var(--bg-main-gradient);
 }
 
-.ion-content {      
-    --background: url('assets/images/modal.png') no-repeat cover fixed center;
+.ion-content {
+/*
+    --background: url('/images/modal.png') no-repeat cover fixed center;
 
-    background: url('assets/images/modal.png') no-repeat fixed center; 
+    background: url('/assets/images/modal.png') no-repeat fixed center; 
     background-size: cover;
+*/
+
+    --background: var(--bg-content);
+    background: var(--bg-content);
 
     ion-segment-button {
         text-transform: capitalize;
         font-family: 'arya-bold';
         font-weight: bold;
-        color: #444;
+        color: var(--color);
         margin-bottom: 10px;
         min-height: 0;
         --indicator-color: var(--color-main);

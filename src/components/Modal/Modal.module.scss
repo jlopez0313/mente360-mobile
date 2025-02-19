@@ -3,13 +3,13 @@
 .example-modal {
     --height: 75%;
     --width: 90%;
-    --border-radius: 10px;
+    --border-radius: 5px;
     --box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 
     ion-content {
-        --background: url('assets/images/modal.png') no-repeat cover fixed center;
+        --background: url('images/modal.png') no-repeat cover fixed center;
         
-        background: url('assets/images/modal.png') no-repeat fixed center; 
+        background: url('/assets/images/modal.png') no-repeat fixed center; 
         background-size: cover;
         text-align: center;
         position: relative;

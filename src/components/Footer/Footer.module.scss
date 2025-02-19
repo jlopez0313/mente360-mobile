@@ -14,12 +14,17 @@
         
         ion-icon {
           opacity: 1;
-          transform: scale(1.35);
+          transform: scale(1.75);
         }
       }
 
       &:not(.active) {
         opacity: .3;
+
+        ion-icon {
+          opacity: 1;
+          transform: scale(1.35);
+        }
       }
 
       .has-notification {

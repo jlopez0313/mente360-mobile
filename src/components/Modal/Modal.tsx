@@ -66,11 +66,11 @@ export const Modal: React.FC<Props> = memo(
 
           {showButtons ? (
             !hideButtons ? (
-              <IonButton onClick={() => dismiss()} shape="round">
+              <IonButton onClick={() => dismiss()}>
                 Terminar
               </IonButton>
             ) : (
-              <IonButton onClick={() => modal.current?.dismiss()} shape="round">
+              <IonButton onClick={() => modal.current?.dismiss()}>
                 <IonIcon icon={close} slot="start" />
                 Cerrar
               </IonButton>

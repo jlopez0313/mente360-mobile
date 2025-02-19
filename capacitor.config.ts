@@ -1,7 +1,7 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.soymente360.app',
+  appId: 'io.mente360.app',
   appName: 'mente360',
   webDir: 'dist',
   server: {
@@ -12,6 +12,9 @@ const config: CapacitorConfig = {
     CapacitorHttp: {
       enabled: true,
     },
+    CapacitorUpdater: {
+      autoUpdate: false,
+    }
   },
   android: {
     allowMixedContent: true

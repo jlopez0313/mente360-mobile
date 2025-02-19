@@ -20,18 +20,18 @@ const Momento1: React.FC<any> = memo(
 
   return (
     <>
-      <IonText className="ion-text-center">
-        <h6>Momento 1</h6>
+      <IonText>
+        <h6> <strong> Momento 1 </strong> </h6>
       </IonText>
 
-      <IonText className="ion-text-center">
+      <IonText>
         <p>Marca la opción con la que más te sientas identificado(a)</p>
       </IonText>
 
       <div>
         <IonRadioGroup onIonChange={ (e) => setMomento(e.target.value) }>
           <IonList lines="full" className={`ion-no-padding ${styles.momentos}`}>
-            <IonItem className={styles.momento}>
+            <IonItem className={`ion-text-justify ${styles.momento}`}>
               <IonRadio value="A" slot="start">
                 A.{" "}
               </IonRadio>
@@ -43,7 +43,7 @@ const Momento1: React.FC<any> = memo(
               y a disfrutar mucho.
             </IonItem>
 
-            <IonItem className={styles.momento}>
+            <IonItem className={`ion-text-justify ${styles.momento}`}>
               <IonRadio value="B" slot="start">
                 B.{" "}
               </IonRadio>
@@ -55,7 +55,7 @@ const Momento1: React.FC<any> = memo(
               el tiempo. 
             </IonItem>
 
-            <IonItem className={styles.momento}>
+            <IonItem className={`ion-text-justify ${styles.momento}`}>
               <IonRadio value="C" slot="start">
                 C.{" "}
               </IonRadio>
@@ -69,16 +69,16 @@ const Momento1: React.FC<any> = memo(
           </IonList>
         </IonRadioGroup>
 
-        <IonGrid>
+        <IonGrid class="ion-no-padding">
           <IonRow>
-            <IonCol>
+            <IonCol class="ion-no-padding">
               <Link to='/home' className={styles.backButton} replace={true}>
                 <IonButton expand="block">
                   Atrás
                 </IonButton>
               </Link>
             </IonCol>
-            <IonCol>
+            <IonCol class="ion-no-padding">
               <IonButton disabled={!momento} expand="block" onClick={() => onSetMomento('uno', momento)} > Siguiente </IonButton>
             </IonCol>
           </IonRow>

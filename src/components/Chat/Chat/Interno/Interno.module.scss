@@ -14,8 +14,8 @@
     
     ion-item {
         background: none;
-        --background: var(--bg-main-gradient);
-        --border-radius: 15px;
+        --background: var(--bg-secondary);
+        --border-radius: 5px;
         
         .triangle {
             position: absolute;
@@ -30,13 +30,14 @@
 
         &.message{
 
-            width: 75%;
+            width: 90%;
             font-size: .9rem;
             margin-bottom: 5px;
             color: #2d2d2d;
             
             &.sender {
                 float: right;
+                color: var(--color);
             }
     
             &.receiver {
@@ -63,7 +64,7 @@
                     color: #666;
                     &.name {
                         font-weight: bold;
-                        font-size: 15px;
+                        font-size: 13px;
                     }
                 }
             }
@@ -74,7 +75,7 @@
     .chatbox {
 
         ion-item {
-            --border-radius: 10px;
+            --border-radius: 5px;
 
             ion-textarea {
                 --padding-top: 1rem;

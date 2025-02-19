@@ -2,6 +2,6 @@
 <resources>
     <string name="app_name">mente360</string>
     <string name="title_activity_main">mente360</string>
-    <string name="package_name">io.soymente360.app</string>
-    <string name="custom_url_scheme">io.soymente360.app</string>
+    <string name="package_name">io.mente360.app</string>
+    <string name="custom_url_scheme">io.mente360.app</string>
 </resources>

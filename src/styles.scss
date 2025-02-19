@@ -1,15 +1,14 @@
 @font-face {
     font-family: "arya";
     src: local("arya"),
-      url("../assets/fonts/Arya/Arya-Regular.ttf") format("woff");
+      url("../assets/fonts/Poppins/Poppins-Regular.ttf") format("woff");
 }
 
 @font-face {
     font-family: "arya-bold";
     src: local("arya-bold"),
-      url("../assets/fonts/Arya/Arya-Bold.ttf") format("woff");
+      url("../assets/fonts/Poppins/Poppins-Bold.ttf") format("woff");
 }
-
 
 :root {
     --bg-main-gradient: linear-gradient(193.17deg, #FFB347 9.48%, #FFCC33 63.67%);
@@ -18,13 +17,22 @@
 
     --color-main-gradient: linear-gradient(to left bottom, #9E9E9E, #FFC90A);
     --color-main: #FFC90A;
+
+    --color-secondary-gradient: radial-gradient(#f1c689 25%, #d3d2d2 100%);
     
     --ion-font-family: arya;
 
-    --bg-secondary: #FFF5EC;
+    --bg-primary: #ffc547;
+    --bg-secondary: #f6d17f;
+    --bg-content: #FFF5EC;
+    
     --color-secondary: #F2B10A;
+    --ion-color-primary: #ffc547;
+    --ion-color: #555;
 
-    font-size: 15px;
+    --invert: 0;
+
+    font-size: 13px;
 }
 
 :root.ion-palette-dark {
@@ -33,6 +41,26 @@
 
 html, body {
     font-family: arya;
+}
+
+body.dark {
+  --bg-card: #333;
+
+  --bg-main: none;
+
+  --color-secondary-gradient: none;
+
+  --bg-primary: #ffc547;
+  --bg-secondary: #333;
+  --invert: 100;
+  --ion-color: #fff;
+
+  --ion-backdrop-opacity: 0.75;
+  
+  ion-content {
+    --background: none;
+    background: none;
+  }
 }
 
 ion-header {
@@ -46,7 +74,6 @@ ion-header {
       color: #fff;;
     }
 }
-
 
 ion-button,
 ion-fab-button {
@@ -74,4 +101,59 @@ ion-datetime.ios::part(calendar-day active):focus {
 
 a {
   text-decoration: none;
+}
+
+ion-chip,
+ion-label,
+ion-input,
+ion-select,
+ion-text,
+ion-icon,
+p,
+span,
+input{ 
+  color: var(--ion-color) !important;
+}
+
+.custom-action-sheet {
+
+  .header-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: flex-start;
+
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--ion-color);
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 5px;
+      object-fit: cover;
+    }
+
+    .text-container {
+      display: flex;
+      flex-direction: column;
+      align-items: start;
+
+      .title {
+        font-weight: bold;
+        font-weight: bold;
+        font-size: 1rem;
+      }
+
+      .sub-title {
+        font-size: 0.8rem;
+        color: gray;
+      }
+    }
+  }
+
+  .action-sheet-button {
+    min-height: 50px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
 }

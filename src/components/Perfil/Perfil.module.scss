@@ -18,9 +18,10 @@ ion-item {
 }
 
 div.phone {
-    border-radius: 30px;
-    background: linear-gradient(#FFCC33, #FFB347);
-    padding: 16px 30px !important;
+    border-radius: 0;
+    --border-color: var(--bg-main);
+    border: 1px solid var(--ion-background-color-step-300, #b3b3b3);
+    padding: 16px !important;
 
     input {
         background: none;
@@ -35,6 +36,7 @@ div.phone {
 
 .profile {
     display: flex;
+    justify-content: left;
 
     .info {
         display: flex;
@@ -43,9 +45,7 @@ div.phone {
         width: 100%;
 
         ion-chip {
-            background: linear-gradient(#FFCC33, #FFB347);
-            box-shadow: 0px 1px 4px #444;
-            border-radius: 1.1rem;
+            border-radius: 3px;
 
         }
     }
@@ -53,16 +53,17 @@ div.phone {
 
 ion-input.profile,
 ion-select.profile {
+    text-align: justify;
+
     input {
         padding-left: 10px !important;
         padding-right: 10px !important;
     }
-    --background: linear-gradient(#FFCC33, #FFB347);
 }
 
 .date-modal {
     --height: 53%;
     --width: 90%;
-    --border-radius: 10px;
+    --border-radius: 5px;
     --box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }

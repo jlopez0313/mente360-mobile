@@ -5,40 +5,21 @@
 }
 
 .ion-content {
-    --background: url('assets/images/login.png') no-repeat 50% 50% / cover;
 
-    ion-grid {
-        height: 100%;
-
-        ion-row {
-            height: 100%;
-
-            ion-col {
-                display: flex;
-            }
-        }
-    }
-    img {
-        
-    }
-}
-
-.ion-footer {
-
-    background: linear-gradient(90deg, #787878 50%, var(--bg-main) 50%);
     box-shadow: none !important;
     -webkit-box-shadow: none !important;
 
+    
+
     .content {
-        background: white;
-        border-radius: 30px 30px 0 0 ;
+        background: initial;
     }
     
     ion-segment-button {
         text-transform: capitalize;
         font-family: 'arya-bold';
         font-weight: bold;
-        color: #444;
+        color: var(--color);
         --indicator-color: var(--color-main);
     }
 }

@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import UIContext from "@/context/Context";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentTime } from "@/store/slices/audioSlice";
+import { Share } from "@capacitor/share";
 
 export const useAudio: any = ( audio: any, onConfirm: any = () => {}) => {
 
@@ -14,6 +15,15 @@ export const useAudio: any = ( audio: any, onConfirm: any = () => {}) => {
   const [real_duration, setRealDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState("00:00");
   const [isPlaying, setIsPlaying] = useState(false);
+
+  const onShareLink = async (id: any) => {
+    await Share.share({
+      title: "¡Tienes que escuchar esto en Mente360!",
+      text: "Este audio en Mente360 está transformando mi día. Escuchalo también. ¡Se que te va a encantar!",
+      url: baseURL + "audios/" + btoa(id),
+      dialogTitle: "Invita a tus amigos a escuchar este audio y descubrir Mente360.",
+    });
+  };
 
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);
@@ -76,6 +86,7 @@ export const useAudio: any = ( audio: any, onConfirm: any = () => {}) => {
   const onPlay = async () => {
     try {
       if ( myCurrentTime && audio.current) {
+
         audio.current.currentTime = myCurrentTime
       }
       audio.current?.play()
@@ -85,6 +96,7 @@ export const useAudio: any = ( audio: any, onConfirm: any = () => {}) => {
       });
     } catch (error: any) {
       console.error( error )
+      
       console.log("Error Chrome cannot play sound without user interaction first");
       onStart();
     }
@@ -92,11 +104,12 @@ export const useAudio: any = ( audio: any, onConfirm: any = () => {}) => {
     setIsPlaying(true);
   };
 
-  const onLoad = (time: any) => {
+  const onLoad = async (time: any) => {
     if ( audio.current ) {
       audio.current.currentTime = (audio.current.duration * time) / 100;
+      onTimeUpdate();
     }
-    onPlay();
+
   };
 
   return {
@@ -107,6 +120,7 @@ export const useAudio: any = ( audio: any, onConfirm: any = () => {}) => {
     real_duration,
     currentTime,
     isPlaying,
+    onShareLink,
     onLoadedMetadata,
     onUpdateBuffer,
     onTimeUpdate,

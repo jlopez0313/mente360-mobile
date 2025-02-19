@@ -174,17 +174,10 @@ const Login: React.FC = () => {
 
   return (
     <IonPage>
-      <IonContent className={styles["ion-content"]}>
-        <IonGrid>
-          <IonRow className="ion-align-items-center">
-            <IonCol className="ion-justify-content-center">
-              <img src="assets/images/logo.png" />
-            </IonCol>
-          </IonRow>
-        </IonGrid>
-      </IonContent>
+      <IonContent className={`ion-text-center ${styles["ion-content"]}`}>
+        
+        <img src="assets/images/logo.png" className="ion-text-center ion-margin-top" />
 
-      <IonFooter className={styles["ion-footer"]}>
         <div className={`ion-padding ${styles.content}`}>
           <IonSegment value={tab} onIonChange={onSetTab}>
             <IonSegmentButton value="login">
@@ -197,7 +190,7 @@ const Login: React.FC = () => {
 
           {tab == "login" ? <LoginComponent /> : <Register />}
         </div>
-      </IonFooter>
+      </IonContent>
     </IonPage>
   );
 };

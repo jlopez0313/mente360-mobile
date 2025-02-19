@@ -3,7 +3,7 @@
     background: none;
 
     ion-searchbar {
-        --border-radius: 25px;
+        --border-radius: 5px;
 
         &.search {
             --ion-color-warning: var(--bg-card);
@@ -22,8 +22,8 @@
 
     ion-item {
         background: none;
-        --background: var(--bg-main-gradient);
-        --border-radius: 15px;
+        border: 1px solid var(--bg-main);
+        --border-radius: 5px;
         
         ion-note {
             font-size: 15px;

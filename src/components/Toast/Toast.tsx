@@ -40,7 +40,7 @@ import {
 } from "@/store/slices/audioSlice";
 
 import { startBackground } from "@/helpers/background";
-import { create, toggle, destroy } from "@/helpers/musicControls";
+import { create, updateElapsed, toggle, destroy } from "@/helpers/musicControls";
 
 export const Toast = () => {
   const history = useHistory();
@@ -54,6 +54,8 @@ export const Toast = () => {
   const audioRef = useRef();
 
   const {
+    duration,
+    real_duration,
     progress,
     buffer,
     isPlaying,
@@ -82,6 +84,7 @@ export const Toast = () => {
 
   const onClear = () => {
     // setShowGlobalAudio( false );
+    destroy();
     onPause();
     dispatch(setGlobalPos(0));
     dispatch(setGlobalAudio(""));
@@ -125,6 +128,7 @@ export const Toast = () => {
       // onGetClips();
     } catch (error: any) {
       console.error(error);
+
       presentAlert({
         header: "Alerta!",
         subHeader: "Mensaje importante.",
@@ -168,6 +172,8 @@ export const Toast = () => {
       console.log(globalAudio);
       dispatch(setGlobalAudio({ ...updatedGlobalAudio }));
     } catch (error: any) {
+      console.log( error )
+
       presentAlert({
         header: "Alerta!",
         subHeader: "Mensaje importante.",
@@ -191,15 +197,22 @@ export const Toast = () => {
     dispatch(setIsGlobalPlaying(false));
   };
 
+  const onUpdateElapsed = () => {
+    onTimeUpdate()
+    updateElapsed( audioRef.current?.currentTime )
+  }
+
   useEffect(() => {
     onPause();
     onPlay();
   }, [audio]);
 
   useEffect(() => {
-    startBackground()
-    create( baseURL, globalAudio, onPlay, onPause, goToPrev, goToNext );
-  }, [globalAudio])
+    if ( real_duration ) {
+      startBackground()
+      create( baseURL, globalAudio, real_duration, onPlay, onPause, goToPrev, goToNext );
+    }
+  }, [real_duration])
 
   useEffect(() => {
     if ( isGlobalPlaying ) {
@@ -223,7 +236,7 @@ export const Toast = () => {
       />
 
       <IonItem lines="none" button={true} detail={false} onClick={goToClip}>
-        <IonLabel class="ion-text-left"> {globalAudio.titulo} </IonLabel>
+        <IonLabel class={`ion-text-left ${styles.title}`}> {globalAudio.titulo} </IonLabel>
 
         <IonIcon
           onClick={(e) => {
@@ -296,14 +309,14 @@ export const Toast = () => {
         )}
 
         <div className={`${styles["unread-indicator"]}`}>
-          <IonProgressBar buffer={buffer} value={progress / 100} color="dark" />
+          <IonProgressBar buffer={buffer} value={progress / 100} color="warning" />
         </div>
       </IonItem>
 
       <audio
-        ref={ audioRef}
+        ref={ audioRef }
         onLoadedMetadata={onLoadedMetadata}
-        onTimeUpdate={onTimeUpdate}
+        onTimeUpdate={onUpdateElapsed}
         onProgress={onUpdateBuffer}
         onEnded={(e) => {
           e.preventDefault();

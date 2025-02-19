@@ -8,16 +8,14 @@ import {
   IonList,
   IonPage,
   IonPopover,
+  IonSkeletonText,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
 import styles from "./Grupo.module.scss";
 
 import { IonIcon } from "@ionic/react";
-import {
-  arrowBack,
-  ellipsisVerticalOutline,
-} from "ionicons/icons";
+import { arrowBack, ellipsisVerticalOutline } from "ionicons/icons";
 
 import { Footer } from "@/components/Footer/Footer";
 import { Grupo as GrupoComponent } from "@/components/Chat/Grupos/Grupo/Grupo";
@@ -29,7 +27,6 @@ import { getUser } from "@/helpers/onboarding";
 import Avatar from "@/assets/images/avatar.jpg";
 
 const Grupo: React.FC = () => {
-
   const { id } = useParams();
   const { user } = getUser();
   const baseURL = import.meta.env.VITE_BASE_BACK;
@@ -38,6 +35,7 @@ const Grupo: React.FC = () => {
   const modal = useRef<HTMLIonModalElement>(null);
 
   const [removed, setRemoved] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [grupo, setGrupo] = useState({ grupo: "", photo: "", users: [] });
   const [presentingElement, setPresentingElement] =
@@ -48,7 +46,10 @@ const Grupo: React.FC = () => {
     const grupo = data.val();
 
     const users: any = grupo.users
-      ? Object.keys(grupo.users).map((key) => ({ id: key, ...grupo.users[key] }))
+      ? Object.keys(grupo.users).map((key) => ({
+          id: key,
+          ...grupo.users[key],
+        }))
       : [];
 
     setGrupo({ grupo: grupo.grupo, photo: grupo.photo, users: users });
@@ -63,20 +64,23 @@ const Grupo: React.FC = () => {
   };
 
   const onEnter = async () => {
-    await writeData(`grupos/${ id }/users/${user.id}/exit_time`, null);
-  }
+    await writeData(`grupos/${id}/users/${user.id}/exit_time`, null);
+  };
 
   const onExit = async () => {
     await Promise.all([
-      writeData(`grupos/${ id }/users/${user.id}/writing`, false),
-      writeData(`grupos/${ id }/users/${user.id}/exit_time`, new Date().toISOString()),
-    ])
-  }
+      writeData(`grupos/${id}/users/${user.id}/writing`, false),
+      writeData(
+        `grupos/${id}/users/${user.id}/exit_time`,
+        new Date().toISOString()
+      ),
+    ]);
+  };
 
   const onExitGroup = async () => {
-    await removeData(`user_rooms/${ user.id }/grupos/${ id }`)
-    setRemoved(true)
-  }
+    await removeData(`user_rooms/${user.id}/grupos/${id}`);
+    setRemoved(true);
+  };
 
   useEffect(() => {
     const handleBackButton = (ev: Event) => {
@@ -97,12 +101,12 @@ const Grupo: React.FC = () => {
   }, [id]);
 
   useEffect(() => {
-    onEnter()
+    onEnter();
 
     return () => {
-      onExit()
-    }
-  }, [])
+      onExit();
+    };
+  }, []);
 
   return (
     <IonPage>
@@ -121,7 +125,22 @@ const Grupo: React.FC = () => {
             slot="start"
             className={styles["avatar"]}
           >
-            <img alt="" src={grupo.photo ? baseURL + grupo.photo : Avatar} />
+            {isLoading && (
+              <IonSkeletonText
+                animated
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  borderRadius: "50%",
+                }}
+              />
+            )}
+            <img
+              alt=""
+              src={grupo.photo ? baseURL + grupo.photo : Avatar}
+              style={{ display: isLoading ? "none" : "block" }}
+              onLoad={() => setIsLoading(false)}
+            />
           </IonAvatar>
 
           <IonTitle className="ion-no-padding ion-padding-end ion-text-justify ion-padding-start">

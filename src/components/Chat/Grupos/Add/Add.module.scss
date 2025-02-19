@@ -5,7 +5,7 @@
     background-size: cover;
     height: 200px;
     width: 200px;
-    border-radius: 20%;
+    border-radius: 5px;
     border: 1px solid #444;
     overflow: hidden;
 
@@ -39,5 +39,5 @@ ion-select.profile {
         padding-left: 10px !important;
         padding-right: 10px !important;
     }
-    --background: linear-gradient(#FFCC33, #FFB347);
+    --border: 1px solid linear-gradient(#FFCC33, #FFB347);
 }

@@ -50,7 +50,7 @@ const Configuracion: React.FC = () => {
         </IonToolbar>
       </IonHeader>
 
-      <IonContent fullscreen  className={styles['ion-content']}>
+      <IonContent fullscreen className={styles['ion-content']}>
 
         <ConfiguracionComponent />
 

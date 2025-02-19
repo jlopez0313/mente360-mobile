@@ -18,9 +18,9 @@ ion-img {
 }
 
 div.login {
-    border-radius: 30px;
-    background: linear-gradient(#FFCC33, #FFB347);
-    padding: 16px 30px !important;
+    border: 1px solid #aaa;
+    border-radius: 2px;
+    padding: 16px !important;
 
     input {
         background: none;
@@ -37,22 +37,18 @@ ion-input.login{
     border-radius: 16px;
     width: 100%;
     text-align: justify;
-    --background: linear-gradient(#FFCC33, #FFB347);
     
     input {
-        padding-left: 10px !important;
-        padding-right: 10px !important;
     }
 }
 
 ion-select.login {
     border-radius: 16px;
     width: 100%;
-    --background: linear-gradient(#FFCC33, #FFB347);
-
+    
     &::part(placeholder),
     &::part(text) {
-        font-size: 14px;
+        font-size: 12px;
         color: #777;
         text-align: justify;
     }
@@ -62,6 +58,6 @@ ion-select.login {
 .date-modal {
     --height: 53%;
     --width: 90%;
-    --border-radius: 10px;
+    --border-radius: 5px;
     --box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }

@@ -65,14 +65,14 @@ const Test: React.FC = () => {
               {" "}
               Hola, <strong className={styles.name}> {user.name} </strong>{" "}
             </IonTitle>
-            <IonText className="ion-text-center">
-              Por favor, realiza el test de eneagrama para conocer tu Eneatipo
-            </IonText>
           </div>
         </IonToolbar>
       </IonHeader>
 
       <IonContent fullscreen className={`ion-padding ${styles["ion-content"]}`}>
+        <IonText className="ion-text-justify">
+          Por favor, realiza el test de eneagrama para conocer tu Eneatipo
+        </IonText>
         <TestComponent />
       </IonContent>
     </IonPage>

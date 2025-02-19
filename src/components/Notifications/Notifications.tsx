@@ -59,14 +59,22 @@ export const Notifications = () => {
           </IonItemDivider>
           {todayNotifications.map((item, idx) => {
             return (
-              <IonItem lines="none" button={true} key={idx}>
+              <IonItem
+                lines="none"
+                className={styles["notificacion"]}
+                key={idx}
+              >
                 <IonAvatar aria-hidden="true" slot="start">
                   <img alt="" src={Logo} />
                 </IonAvatar>
-                <IonLabel>{item.notificacion}</IonLabel>
-                <IonNote>
-                  {new Date(item.created_at).toLocaleDateString()}
-                </IonNote>
+                <div>
+                  <IonText className={styles["message"]}>
+                    {item.notificacion}
+                  </IonText>
+                  <span className={styles["time"]}>
+                    {new Date(item.created_at).toLocaleDateString()}
+                  </span>
+                </div>
               </IonItem>
             );
           })}

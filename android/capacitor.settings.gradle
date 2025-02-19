@@ -5,6 +5,9 @@ project(':capacitor-android').projectDir = new File('../node_modules/@capacitor/
 include ':anuradev-capacitor-background-mode'
 project(':anuradev-capacitor-background-mode').projectDir = new File('../node_modules/@anuradev/capacitor-background-mode/android')
 
+include ':byteowls-capacitor-filesharer'
+project(':byteowls-capacitor-filesharer').projectDir = new File('../node_modules/@byteowls/capacitor-filesharer/android')
+
 include ':capacitor-community-contacts'
 project(':capacitor-community-contacts').projectDir = new File('../node_modules/@capacitor-community/contacts/android')
 
@@ -13,6 +16,12 @@ project(':capacitor-community-fcm').projectDir = new File('../node_modules/@capa
 
 include ':capacitor-community-media'
 project(':capacitor-community-media').projectDir = new File('../node_modules/@capacitor-community/media/android')
+
+include ':capacitor-app'
+project(':capacitor-app').projectDir = new File('../node_modules/@capacitor/app/android')
+
+include ':capacitor-filesystem'
+project(':capacitor-filesystem').projectDir = new File('../node_modules/@capacitor/filesystem/android')
 
 include ':capacitor-haptics'
 project(':capacitor-haptics').projectDir = new File('../node_modules/@capacitor/haptics/android')
@@ -31,6 +40,9 @@ project(':capacitor-share').projectDir = new File('../node_modules/@capacitor/sh
 
 include ':capacitor-status-bar'
 project(':capacitor-status-bar').projectDir = new File('../node_modules/@capacitor/status-bar/android')
+
+include ':capgo-capacitor-updater'
+project(':capgo-capacitor-updater').projectDir = new File('../node_modules/@capgo/capacitor-updater/android')
 
 include ':capacitor-music-controls-plugin'
 project(':capacitor-music-controls-plugin').projectDir = new File('../node_modules/capacitor-music-controls-plugin/android')

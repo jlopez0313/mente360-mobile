@@ -18,17 +18,19 @@
                     font-size: 11px;
                     font-weight: 600;
                     padding: 5px 12px;
+                    border-radius: 5px;
             
                     &.checked {
-                        --background: var(--bg-main-gradient);
+                        --background: var(--bg-main);
                     }
                 }
         }
     
 
         ion-searchbar {
-            --border-radius: 25px;
-
+            --border-radius: 5px;
+            color: var(--color) !important;
+            
             &.search {
                 --ion-color-warning: var(--bg-card);
             }
@@ -51,13 +53,16 @@
         
         ion-item {
             background: transparent;
-            --background: var(--bg-main-gradient);
-            --border-radius: 10px;
+            border: 1px solid var(--bg-main);
 
             margin-bottom: 5px;
+
+            ion-avatar {
+                --border-radius: 5px;
+            }
     
             .titulo {
-                font-size: 15px;
+                font-size: 13px;
             }
 
             .categoria {
@@ -65,7 +70,11 @@
             }
 
             .titulo, .categoria {
-                line-height: 15px;
+                line-height: 13px;
+            }
+
+            ion-icon {
+                font-size: 1.65rem;
             }
 
             ion-note {
@@ -74,5 +83,8 @@
             }
         }
     }
-
+    
+    .my-action-sheet {
+        --color: red;
+    }
 }

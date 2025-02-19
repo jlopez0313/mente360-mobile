@@ -94,6 +94,8 @@ export const Registro = () => {
       const { data } = await all();
       setConstants(data);
     } catch (error: any) {
+      console.log( error )
+
       presentAlert({
         header: "Alerta!",
         subHeader: "Mensaje importante.",
@@ -113,16 +115,20 @@ export const Registro = () => {
         message: "Cargando ...",
       });
 
-      const updatePromise = update(usuario, user.user.id);
 
-      const setUserPromise = updatePromise.then(({ data }) => {
-        return setUser({ ...user, user: data });
+      
+      const updatePromise = update(usuario, user.user.id);
+      
+      const setUserPromise = updatePromise.then( ({ data }) => {
+        return setUser({ ...user, user: data.data });
       });
 
       await Promise.all([updatePromise, setUserPromise]);
 
       goToHome();
     } catch (error: any) {
+      console.log( error )
+
       presentAlert({
         header: "Alerta!",
         subHeader: "Mensaje importante.",
@@ -142,7 +148,7 @@ export const Registro = () => {
     <IonGrid class="ion-text-center">
       <IonRow>
         <IonCol size="12" class="ion-no-padding">
-          <h4> Completar Perfil </h4>
+          <h4 className="ion-no-margin"> Completar Perfil </h4>
         </IonCol>
       </IonRow>
       <IonRow>
@@ -178,8 +184,7 @@ export const Registro = () => {
                 labelPlacement="stacked"
                 placeholder="Nombre"
                 fill="outline"
-                shape="round"
-                onIonInput={(evt: any) => onSetUser("nombre", evt.target.value)}
+                onIonInput={(evt: any) => onSetUser("name", evt.target.value)}
               ></IonInput>
 
               <PhoneInput
@@ -196,7 +201,6 @@ export const Registro = () => {
                 labelPlacement="stacked"
                 placeholder="Fecha de Nacimiento"
                 fill="outline"
-                shape="round"
                 value={usuario.fecha_nacimiento}
                 className={`ion-margin-bottom ${styles.login}`}
               ></IonInput>
@@ -224,7 +228,6 @@ export const Registro = () => {
                 labelPlacement="stacked"
                 placeholder="Genero"
                 fill="outline"
-                shape="round"
                 value={usuario.genero}
                 className={`ion-margin-bottom ${styles.login}`}
                 onIonChange={(e) => onSetUser("genero", e.target.value)}
@@ -244,7 +247,6 @@ export const Registro = () => {
                   interface="popover"
                   labelPlacement="stacked"
                   placeholder="Eneatipo"
-                  shape="round"
                   fill="outline"
                   className={`ion-margin-bottom ${styles.login}`}
                   value={usuario.eneatipo}
@@ -279,7 +281,6 @@ export const Registro = () => {
             type="button"
             className="ion-margin-top ion-margin-bottom"
             expand="block"
-            shape="round"
             disabled={
               !usuario.name ||
               !usuario.fecha_nacimiento ||
@@ -297,7 +298,6 @@ export const Registro = () => {
             type="button"
             className="ion-margin-top ion-margin-bottom"
             expand="block"
-            shape="round"
             onClick={goToHome}
           >
             {" "}

@@ -9,14 +9,18 @@ import "./theme/variables.css";
 import "./styles.scss";
 
 const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
-prefersDark.addEventListener("change", (e) => toggleDarkMode(e.matches));
+prefersDark.addEventListener("change", (e) => toggleDarkMode());
 
-function toggleDarkMode(shouldAdd: boolean) {
-  document.documentElement.classList.toggle("ion-palette-dark", shouldAdd);
-  document.body.classList.toggle("dark", shouldAdd);
+function toggleDarkMode() {
+  
+  const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  localStorage.setItem("darkMode", systemPrefersDark.toString());
+
+  document.documentElement.classList.toggle("ion-palette-dark", systemPrefersDark);
+  document.body.classList.toggle("dark", systemPrefersDark);
 }
 
-toggleDarkMode(localStorage.getItem("darkMode") === "true");
+toggleDarkMode();
 
 const container = document.getElementById("root");
 const root = createRoot(container!);

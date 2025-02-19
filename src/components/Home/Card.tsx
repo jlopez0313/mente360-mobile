@@ -47,7 +47,6 @@ export const Card: React.FC<Props> = memo(
               type="button"
               className="ion-margin-top ion-padding-start ion-padding-end"
               id={buttonID}
-              shape="round"
             >
               {buttonTitle}
             </IonButton>

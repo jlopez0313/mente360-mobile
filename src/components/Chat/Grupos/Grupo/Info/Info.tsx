@@ -1,38 +1,22 @@
 import React, { useEffect, useState } from "react";
 import {
-  IonAvatar,
-  IonButton,
-  IonCol,
   IonFab,
   IonFabButton,
-  IonFooter,
   IonIcon,
-  IonInput,
-  IonItem,
   IonItemDivider,
   IonItemGroup,
   IonLabel,
   IonList,
-  IonRow,
-  IonText,
 } from "@ionic/react";
-import { addData, readData } from "@/services/realtime-db";
 import styles from "./Info.module.scss";
-import { add, addOutline, send, sendOutline } from "ionicons/icons";
+import { addOutline } from "ionicons/icons";
 import { Modal } from "@/components/Modal/Modal";
 import { Add } from "../Add/Add";
-import { create, getAll } from "@/services/grupos";
-import { useHistory } from "react-router";
-import { onValue } from "firebase/database";
-import { getUser } from "@/helpers/onboarding";
 import { getData } from "@/services/realtime-db";
 
-import Avatar from "@/assets/images/avatar.jpg";
+import { Item } from "./Item";
 
 export const Info = ({ grupoID }) => {
-  const { user } = getUser();
-  const baseURL = import.meta.env.VITE_BASE_BACK;
-
   const [grupo, setGrupo] = useState({ grupo: "", photo: "", users: [] });
 
   const onGetGrupo = async (id: number) => {
@@ -62,22 +46,7 @@ export const Info = ({ grupoID }) => {
           </IonItemDivider>
 
           {grupo.users.map((user: any, idx: number) => {
-            return (
-              <IonItem key={idx} button={true} className={`${styles["message"]}`}>
-                <IonAvatar aria-hidden="true" slot="start">
-                  <img
-                    alt=""
-                    src={user.photo ? baseURL + user.photo : Avatar}
-                  />
-                </IonAvatar>
-
-                <IonLabel className="ion-no-margin">
-                  <span className={styles["name"]}> {user.name} </span>
-                  <span className={styles["phone"]}> {user.phone} </span>
-                </IonLabel>
-                
-              </IonItem>
-            );
+            return <Item key={idx} user={user} />;
           })}
         </IonItemGroup>
       </IonList>
@@ -92,7 +61,9 @@ export const Info = ({ grupoID }) => {
         trigger="modal-add"
         title="Agregar Miembro"
         hideButtons={true}
-        onWillDismiss = { () => { onGetGrupo( grupoID ) } }
+        onWillDismiss={() => {
+          onGetGrupo(grupoID);
+        }}
       >
         <Add grupoID={grupoID} users={grupo.users} />
       </Modal>

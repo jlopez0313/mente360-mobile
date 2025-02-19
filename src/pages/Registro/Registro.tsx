@@ -19,21 +19,14 @@ const Registro: React.FC = () => {
 
   return (
     <IonPage>
-      <IonContent className={styles['ion-content']}>
-        <IonGrid>
-          <IonRow className="ion-align-items-center">
-            <IonCol  className="ion-justify-content-center">
-              <img src="assets/images/logo.png" />
-            </IonCol>
-          </IonRow>
-        </IonGrid>
-      </IonContent>
+      <IonContent className={`ion-text-center ${styles["ion-content"]}`}>
+        <img src="assets/images/logo.png" className="ion-text-center ion-margin-top" style={{width:'80px'}} />
 
-      <IonFooter className={styles['ion-footer']}>
-        <div className={`ion-padding ${styles.content}`}>
+        <div className={`ion-padding-start ion-padding-end ${styles.content}`}>
           <RegistroComponent />
         </div>
-      </IonFooter>
+      </IonContent>
+
     </IonPage>
   );
 };

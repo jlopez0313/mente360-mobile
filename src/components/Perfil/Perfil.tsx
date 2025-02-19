@@ -13,6 +13,7 @@ import {
   IonRow,
   IonSelect,
   IonSelectOption,
+  IonSkeletonText,
   useIonAlert,
   useIonLoading,
 } from "@ionic/react";
@@ -39,7 +40,8 @@ export const Perfil = () => {
   const user = getUser();
   const homeDB = localDB("home");
 
-  const [photo, setPhoto] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [photo, setPhoto] = useState("");
   const [usuario, setUsuario] = useState(user.user);
   const [edad, setEdad] = useState(0);
   const [constants, setConstants] = useState({ eneatipos: [], generos: [] });
@@ -61,6 +63,8 @@ export const Perfil = () => {
       const { data } = await all();
       setConstants(data);
     } catch (error: any) {
+      console.log(error);
+
       presentAlert({
         header: "Alerta!",
         subHeader: "Mensaje importante.",
@@ -140,17 +144,16 @@ export const Perfil = () => {
       ]);
 
       const rt_data = roomsResponse.val();
-      const roomUpdatePromises = Object.keys(rt_data).map((room) => {
+      const roomUpdatePromises = Object.keys(rt_data ?? {}).map((room) => {
         updateData(`rooms/${room}/users/${user.user.id}`, obj);
       });
 
       const rt_grupos = gruposResponse.val();
-      const grupoUpdatePromises = Object.keys(rt_grupos).map((grupo) => {
+      const grupoUpdatePromises = Object.keys(rt_grupos ?? {}).map((grupo) => {
         updateData(`grupos/${grupo}/users/${user.user.id}`, obj);
       });
 
       await Promise.all([...roomUpdatePromises, ...grupoUpdatePromises]);
-
     } catch (error: any) {
       console.log(error);
 
@@ -185,13 +188,22 @@ export const Perfil = () => {
             accept="image/png, image/jpeg"
           />
           <IonAvatar slot="start">
-            <div
-              style={{
-                backgroundImage: `url(${photo})`,
-              }}
-              className={`${styles["avatar-container"]}`}
+            {isLoading && (
+              <IonSkeletonText
+                animated
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  borderRadius: "50%",
+                }}
+              />
+            )}
+            <img
+              src={photo}
+              style={{ display: isLoading ? "none" : "block" }}
               onClick={onClickFile}
-            ></div>
+              onLoad={() => setIsLoading(false)}
+            />
           </IonAvatar>
           <IonLabel>
             {usuario.name}
@@ -202,7 +214,7 @@ export const Perfil = () => {
         </IonItem>
       </div>
 
-      <div className={`ion-margin-bottom ${styles.profile}`}>
+      <div className={`ion-margin-top ion-margin-bottom ${styles.profile}`}>
         <div className={styles.info}>
           <IonChip outline={true}>{edad || "00"}</IonChip>
           <IonNote>
@@ -231,7 +243,6 @@ export const Perfil = () => {
       <IonInput
         labelPlacement="stacked"
         fill="outline"
-        shape="round"
         placeholder="Nombre de Usuario"
         className={`ion-margin-bottom ${styles.profile}`}
         value={usuario.name}
@@ -251,7 +262,6 @@ export const Perfil = () => {
 
       <IonInput
         labelPlacement="floating"
-        shape="round"
         fill="outline"
         placeholder="Correo Electrónico"
         className={`ion-margin-bottom ${styles.profile}`}
@@ -262,7 +272,6 @@ export const Perfil = () => {
       <IonInput
         id="open_cal"
         labelPlacement="stacked"
-        shape="round"
         fill="outline"
         placeholder="Fecha de Nacimiento"
         value={usuario.fecha_nacimiento}
@@ -291,7 +300,6 @@ export const Perfil = () => {
       <IonSelect
         interface="popover"
         labelPlacement="stacked"
-        shape="round"
         fill="outline"
         placeholder="Genero"
         className={`ion-margin-bottom ${styles.profile}`}
@@ -312,7 +320,6 @@ export const Perfil = () => {
       <IonSelect
         interface="popover"
         labelPlacement="stacked"
-        shape="round"
         fill="outline"
         placeholder="Eneatipo"
         className={`ion-margin-bottom ${styles.profile}`}
@@ -332,16 +339,13 @@ export const Perfil = () => {
 
       <IonGrid>
         <IonRow>
-          <IonCol size="6">
+          <IonCol size="6" class="ion-no-padding">
             <Link to="/home" replace={true}>
-              <IonButton shape="round" expand="block">
-                Cancelar
-              </IonButton>
+              <IonButton expand="block">Cancelar</IonButton>
             </Link>
           </IonCol>
-          <IonCol size="6">
+          <IonCol size="6" class="ion-no-padding">
             <IonButton
-              shape="round"
               expand="block"
               onClick={onUpdateUser}
               disabled={

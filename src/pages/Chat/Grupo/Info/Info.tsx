@@ -95,7 +95,7 @@ const Info: React.FC = () => {
       <IonHeader>
         <IonToolbar className={styles["ion-header"]}>
           <IonButtons slot="start">
-            <Link to="/chat" replace={true}>
+            <Link to={"/grupo/" + id} replace={true}>
               <IonButton fill="clear" className={styles.backButton}>
                 <IonIcon slot="start" icon={arrowBack} />
               </IonButton>

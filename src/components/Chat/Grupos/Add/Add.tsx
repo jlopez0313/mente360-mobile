@@ -63,7 +63,7 @@ export const Add = ({ doChild }: Props) => {
         {!photo && (
           <div className={`${styles["no-photo"]}`}>
             <IonIcon icon={camera} size="large"></IonIcon>
-            <div className="">Añadir imagen del grupo</div>
+            <div className="">Debes añadir una imagen al grupo</div>
           </div>
         )}
       </div>
@@ -71,7 +71,6 @@ export const Add = ({ doChild }: Props) => {
       <IonInput
         labelPlacement="stacked"
         fill="outline"
-        shape="round"
         placeholder="Nombre del grupo"
         className={`ion-margin-bottom ${styles.profile}`}
         value={grupo.grupo}

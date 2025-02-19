@@ -4,8 +4,13 @@
   --background: var(--bg-main-gradient);
 
   .large-icon {
-    
-    font-size: 24px !important;
+    font-size: 2rem !important;
+  }
+
+  ion-buttons {
+    ion-button {
+      font-size: 1.15rem !important;
+    }
   }
 
   .has-notification {
@@ -19,11 +24,15 @@
   }
 }
 
-.ion-content {      
-  --background: url('assets/images/modal.png') no-repeat cover fixed center;
+.ion-content {    
+  /*  
+  --background: url('/images/modal.png') no-repeat cover fixed center;
 
-  background: url('assets/images/modal.png') no-repeat fixed center; 
+  background: url('/assets/images/modal.png') no-repeat fixed center; 
   background-size: cover;
+  */
+  --background: var(--bg-content);
+  background: var(--bg-content);
 }
 
 ion-backdrop {

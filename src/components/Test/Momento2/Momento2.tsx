@@ -44,6 +44,8 @@ const Momento2: React.FC<any> = memo(({ momentos, onSetMomento }) => {
       const { data } = await all();
       setConstants(data);
     } catch (error: any) {
+      console.log( error )
+
       presentAlert({
         header: "Alerta!",
         subHeader: "Mensaje importante.",
@@ -90,7 +92,6 @@ const Momento2: React.FC<any> = memo(({ momentos, onSetMomento }) => {
         history.replace("/home");
       }, 1000);
     } catch (error: any) {
-
       console.error(error)
 
       presentAlert({
@@ -110,18 +111,18 @@ const Momento2: React.FC<any> = memo(({ momentos, onSetMomento }) => {
 
   return (
     <>
-      <IonText className="ion-text-center">
-        <h6>Momento 2</h6>
+      <IonText>
+        <h6> <strong> Momento 2 </strong> </h6>
       </IonText>
 
-      <IonText className="ion-text-center">
+      <IonText>
         <p>Marca la opción con la que más te sientas identificado(a)</p>
       </IonText>
 
       <div>
         <IonRadioGroup onIonChange={(e) => onSetMomento("dos", e.target.value)}>
           <IonList lines="full" className={`ion-no-padding ${styles.momentos}`}>
-            <IonItem className={styles.momento}>
+            <IonItem className={`ion-text-justify ${styles.momento}`}>
               <IonRadio value="X" slot="start">
                 X.{" "}
               </IonRadio>
@@ -135,7 +136,7 @@ const Momento2: React.FC<any> = memo(({ momentos, onSetMomento }) => {
               dejar pasar demasiado tiempo sin ocuparme de mis problemas.
             </IonItem>
 
-            <IonItem className={styles.momento}>
+            <IonItem className={`ion-text-justify ${styles.momento}`}>
               <IonRadio value="Y" slot="start">
                 Y.{" "}
               </IonRadio>
@@ -150,7 +151,7 @@ const Momento2: React.FC<any> = memo(({ momentos, onSetMomento }) => {
               hacer. Quiero decidir por mí mismo.
             </IonItem>
 
-            <IonItem className={styles.momento}>
+            <IonItem className={`ion-text-justify ${styles.momento}`}>
               <IonRadio value="Z" slot="start">
                 Z.{" "}
               </IonRadio>
@@ -166,15 +167,15 @@ const Momento2: React.FC<any> = memo(({ momentos, onSetMomento }) => {
           </IonList>
         </IonRadioGroup>
 
-        <IonGrid>
+        <IonGrid class="ion-no-padding">
           <IonRow>
-            <IonCol>
+            <IonCol class="ion-no-padding">
               <IonButton expand="block" onClick={() => onClearMomentos()}>
                 {" "}
                 Atrás{" "}
               </IonButton>
             </IonCol>
-            <IonCol>
+            <IonCol class="ion-no-padding">
               <IonButton expand="block" onClick={send}>
                 {" "}
                 Finalizar{" "}

@@ -88,16 +88,17 @@ export const Crecimiento = () => {
       const { data } = await allNiveles();
       setNiveles(data.data);
     } catch (error: any) {
+      console.log( error )
+
       presentAlert({
         header: "Alerta!",
         subHeader: "Mensaje importante.",
         message: error.data?.message || "Error Interno",
         buttons: ["OK"],
       });
-    } finally {
+    } finally {      
+      setNivelID(user.user.crecimiento?.niveles_id ?? 7); // 7 es el nivel 0
       dismiss();
-
-      setNivelID(user.user.crecimiento?.niveles_id || 0);
     }
   };
 
@@ -126,6 +127,8 @@ export const Crecimiento = () => {
         swiper.slideTo(idx);
       }
     } catch (error: any) {
+      console.log( error )
+      
       presentAlert({
         header: "Alerta!",
         subHeader: "Mensaje importante.",
@@ -157,9 +160,10 @@ export const Crecimiento = () => {
 
         await Promise.all([updatePromise, setUserPromise]);
       }
+    } else {
+      swiper.slideNext();
     }
 
-    swiper.slideNext();
   };
 
   const onGoBack = async () => {
@@ -207,7 +211,7 @@ export const Crecimiento = () => {
   }, []);
 
   useEffect(() => {
-    if (nivelID) {
+    if (nivelID !== null && nivelID !== undefined) {
       setCrecimientos([]);
       onGetCrecimientos(nivelID);
     }
@@ -223,7 +227,6 @@ export const Crecimiento = () => {
         placeholder="Nivel"
         labelPlacement="stacked"
         interface="popover"
-        shape="round"
         value={nivelID}
         compareWith={compareWithFn}
         className={`ion-margin-bottom ${styles["nivel"]}`}

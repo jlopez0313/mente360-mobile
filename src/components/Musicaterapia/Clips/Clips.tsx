@@ -1,55 +1,40 @@
 import styles from "../Musicaterapia.module.scss";
 import {
   IonChip,
-  IonIcon,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
-  IonItem,
-  IonLabel,
   IonList,
   IonSearchbar,
+  useIonActionSheet,
   useIonAlert,
   useIonLoading,
 } from "@ionic/react";
-import {
-  pauseCircle,
-  playCircle,
-  shareSocialOutline,
-  star,
-  starOutline,
-} from "ionicons/icons";
+
 
 import { all as allCategorias } from "@/services/categorias";
 import { all as allClips, byCategory } from "@/services/clips";
-import { add, trash } from "@/services/playlist";
 
-import { getUser } from "@/helpers/onboarding";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import {
-  setAudioRef,
   setGlobalAudio,
   setListAudios,
-  setGlobalPos,
   clearListAudios,
-  resetStore,
   setShowGlobalAudio,
 } from "@/store/slices/audioSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { setIsGlobalPlaying } from "@/store/slices/audioSlice";
+import { Item } from './Item';
 
 export const Clips = () => {
   const dispatch = useDispatch();
 
-  const { globalAudio, isGlobalPlaying } = useSelector(
+  const { globalAudio } = useSelector(
     (state: any) => state.audio
   );
 
   const [present, dismiss] = useIonLoading();
   const [present2, dismiss2] = useIonLoading();
   const [presentAlert] = useIonAlert();
-
-  const { user } = getUser();
 
   const [categorias, setCategorias] = useState<any>([]);
   const [categoria, setCategoria] = useState("All");
@@ -65,17 +50,8 @@ export const Clips = () => {
   };
 
   const onSetPage = (evt: any, page: any) => {
-    if ( hasMore )
-      setPage(page);
-    else 
-      evt.target.complete();
-  };
-
-  const hasThisUser = (usuarios_clips: any[]) => {
-    const hasUserClip = usuarios_clips.find(
-      (item) => item.users_id == user?.id
-    );
-    return hasUserClip;
+    if (hasMore) setPage(page);
+    else evt.target.complete();
   };
 
   const onGetCategorias = async () => {
@@ -91,6 +67,8 @@ export const Clips = () => {
 
       dismiss();
     } catch (error: any) {
+      console.log(error);
+
       presentAlert({
         header: "Alerta!",
         subHeader: "Mensaje importante.",
@@ -119,12 +97,11 @@ export const Clips = () => {
 
       setTodosClips([...clipToAdd]);
 
-      if (data.data.length === 0) {
+      if (fn == byCategory || data.data.length === 0) {
         setHasMore(false);
       } else {
         setHasMore(true);
       }
-      
     } catch (error: any) {
       console.error(error);
 
@@ -139,125 +116,6 @@ export const Clips = () => {
     }
   };
 
-  const onTrash = async (idx: number, audio: any, usuarios_clips: any) => {
-    try {
-      present({
-        message: "Cargando ...",
-      });
-
-      const updatedClips = [...clips];
-
-      const userClip = hasThisUser(usuarios_clips);
-
-      await trash(userClip?.id);
-
-      const updatedUsuariosClips = updatedClips[idx].usuarios_clips.filter(
-        (item: any) => item.id !== userClip?.id
-      );
-
-      updatedClips[idx] = {
-        ...updatedClips[idx],
-        usuarios_clips: updatedUsuariosClips,
-      };
-
-      setClips([...updatedClips]);
-
-      if (globalAudio?.id == audio.id) {
-        dispatch(
-          setGlobalAudio({
-            ...audio,
-            usuarios_clips: updatedClips[idx].usuarios_clips,
-          })
-        );
-      }
-
-      // onGetClips();
-    } catch (error: any) {
-      console.log(error);
-      presentAlert({
-        header: "Alerta!",
-        subHeader: "Mensaje importante.",
-        message: error.data?.message || "Error Interno",
-        buttons: ["OK"],
-      });
-    } finally {
-      dismiss();
-    }
-  };
-
-  const onAdd = async (idx: number, audio: any, id: any) => {
-    try {
-      present({
-        message: "Cargando ...",
-      });
-
-      const updatedClips = [...clips];
-
-      const data = {
-        clips_id: id,
-        users_id: user.id,
-      };
-
-      const {
-        data: { data: added },
-      } = await add(data);
-
-      const updatedUsuariosClips = [
-        ...updatedClips[idx].usuarios_clips,
-        {
-          users_id: user.id,
-          clips_id: id,
-          id: added.id,
-        },
-      ];
-
-      updatedClips[idx] = {
-        ...updatedClips[idx],
-        usuarios_clips: updatedUsuariosClips,
-      };
-
-      setClips([...updatedClips]);
-
-      if (globalAudio?.id == audio.id) {
-        dispatch(
-          setGlobalAudio({
-            ...audio,
-            usuarios_clips: updatedClips[idx].usuarios_clips,
-          })
-        );
-      }
-
-      // onGetPlaylist();
-    } catch (error: any) {
-      console.log(error);
-      presentAlert({
-        header: "Alerta!",
-        subHeader: "Mensaje importante.",
-        message: error.data?.message || "Error Interno",
-        buttons: ["OK"],
-      });
-    } finally {
-      dismiss();
-    }
-  };
-
-  const onPlayClicked = (idx: number, audio: any) => {
-
-    console.log( audio )
-
-    if (!globalAudio || audio.id != globalAudio.id) {
-      dispatch(setAudioRef(audio.audio));
-      dispatch(setGlobalAudio(audio));
-      dispatch(setGlobalPos(idx));
-    }
-
-    dispatch(setIsGlobalPlaying(true));
-  };
-
-  const onDoPause = () => {
-    dispatch(setIsGlobalPlaying(false));
-  };
-
   const onUpdateList = () => {
     const tmpClips = clips.map((item: any) => {
       return item.id == globalAudio.id ? globalAudio : item;
@@ -269,6 +127,7 @@ export const Clips = () => {
   const onRefreshList = () => {
     return chip == "0" ? onGetClips(allClips) : onGetClips(byCategory);
   };
+
 
   useEffect(() => {
     // dispatch(resetStore());
@@ -354,49 +213,7 @@ export const Clips = () => {
       <IonList className="ion-no-padding ion-margin-bottom" lines="none">
         {clips.map((item: any, idx: any) => {
           return (
-            <IonItem key={idx} button={true}>
-              <div style={{ display: "flex", flexDirection: "column" }}>
-                <IonLabel className={`ion-text-left ${styles["titulo"]}`}>
-                  {" "}
-                  {item.titulo}{" "}
-                </IonLabel>
-                <span className={styles["categoria"]}>
-                  {" "}
-                  {item.categoria?.categoria}{" "}
-                </span>
-              </div>
-              {globalAudio?.id == item.id && isGlobalPlaying ? (
-                <IonIcon
-                  aria-hidden="true"
-                  slot="end"
-                  icon={pauseCircle}
-                  onClick={onDoPause}
-                />
-              ) : (
-                <IonIcon
-                  aria-hidden="true"
-                  slot="end"
-                  icon={playCircle}
-                  onClick={() => onPlayClicked(idx, item)}
-                />
-              )}
-
-              {hasThisUser(item.usuarios_clips) ? (
-                <IonIcon
-                  aria-hidden="true"
-                  slot="end"
-                  icon={star}
-                  onClick={() => onTrash(idx, item, item.usuarios_clips)}
-                />
-              ) : (
-                <IonIcon
-                  aria-hidden="true"
-                  slot="end"
-                  icon={starOutline}
-                  onClick={() => onAdd(idx, item, item.id)}
-                />
-              )}
-            </IonItem>
+            <Item key={idx} idx={idx} item={item} clips={clips} setClips={setClips} />            
           );
         })}
       </IonList>

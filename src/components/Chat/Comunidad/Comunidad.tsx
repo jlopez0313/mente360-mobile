@@ -15,21 +15,16 @@ import { shareSocialOutline } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import styles from "./Comunidad.module.scss";
 import { Contacts } from "@capacitor-community/contacts";
-import avatar from "/assets/icons/avatar.svg";
 import { invitar } from "@/services/user";
 import { getUser } from "@/helpers/onboarding";
 import { Share } from "@capacitor/share";
 import { parsePhoneNumber } from "react-phone-number-input";
 import { misContactos } from "@/services/user";
-import Avatar from "@/assets/images/avatar.jpg";
 
-import { writeData } from "@/services/realtime-db";
-import { useHistory } from "react-router";
+
+import { Item } from "./Item";
 
 export const Comunidad = () => {
-  const baseURL = import.meta.env.VITE_BASE_BACK;
-
-  const history = useHistory();
   const { user } = getUser();
 
   const [present, dismiss] = useIonLoading();
@@ -38,8 +33,10 @@ export const Comunidad = () => {
   const [allContacts, setAllContacts] = useState<any>([]);
   const [contacts, setContacts] = useState<any>([]);
   const [userContacts, setUserContacts] = useState<any>([]);
+  const [filteredUserContacts, setFilteredUserContacts] = useState<any>([]);
 
-  const onSearchContacts = (evt: any) => {
+  const onSearchContacts = (word: any) => {
+    /*
     setContacts(
       allContacts.filter((item: any) =>
         item.name?.display
@@ -47,6 +44,16 @@ export const Comunidad = () => {
           .includes(evt.target.value.toLowerCase())
       )
     );
+    */
+
+    if (word) {
+      const lista = userContacts.filter((u: any) =>
+        u.name.toLowerCase().includes(word.toLowerCase())
+      );
+      setFilteredUserContacts([...lista]);
+    } else {
+      setFilteredUserContacts([...userContacts]);
+    }
   };
 
   const getContacts = async () => {
@@ -97,8 +104,11 @@ export const Comunidad = () => {
         data: { data },
       } = await misContactos(body);
 
+      // Usuarios que tienen cuenta en 360
       setUserContacts(data);
+      setFilteredUserContacts(data);
 
+      // Contactos de mi teléfono
       setAllContacts(lista);
       setContacts(lista);
     } catch (error: any) {
@@ -129,6 +139,8 @@ export const Comunidad = () => {
 
       const { data } = await invitar(body);
     } catch (error: any) {
+      console.log(error);
+
       presentAlert({
         header: "Alerta!",
         subHeader: "Mensaje importante.",
@@ -149,29 +161,7 @@ export const Comunidad = () => {
     });
   };
 
-  const goToInterno = async (otroUser: any) => {
-    const roomArray = [Number(user.id), Number(otroUser.id)];
-    const roomID = roomArray.sort((a, b) => a - b).join("_");
-
-    await Promise.all([
-      writeData("rooms/" + roomID + "/users/" + user.id, {
-        id: user.id,
-        name: user.name,
-        photo: user.photo || "",
-        phone: user.phone || "",
-      }),
-      writeData("rooms/" + roomID + "/users/" + otroUser.id, {
-        id: otroUser.id,
-        name: otroUser.name,
-        photo: otroUser.photo || "",
-        phone: otroUser.phone || "",
-      }),
-      writeData("user_rooms/" + user.id + "/rooms/" + roomID, true),
-      writeData("user_rooms/" + otroUser.id + "/rooms/" + roomID, true),
-    ]);
-
-    history.replace("/chat/" + roomID);
-  };
+  
 
   useEffect(() => {
     getContacts();
@@ -196,40 +186,14 @@ export const Comunidad = () => {
           </IonItemDivider>
 
           <IonSearchbar
-            className={`ion-no-padding ion-margin-bottom`}
+            className={`ion-no-padding ion-margin-bottom  ${styles["search"]}`}
             placeholder="Buscar"
             color="warning"
-            onIonInput={(ev) => onSearchContacts(ev)}
+            onIonInput={(ev) => onSearchContacts(ev.target.value)}
           ></IonSearchbar>
 
-          {userContacts.map((contact: any, idx: number) => {
-            return (
-              contact && (
-                <IonItem
-                  key={idx}
-                  button={true}
-                  className={`${styles["contact"]}`}
-                  onClick={() => goToInterno(contact)}
-                >
-                  <IonAvatar aria-hidden="true" slot="start">
-                    <img
-                      alt=""
-                      src={contact.photo ? baseURL + contact.photo : Avatar}
-                    />
-                  </IonAvatar>
-                  <IonLabel className="ion-no-margin">
-                    <span className={styles["name"]}>
-                      {" "}
-                      {contact.name || "-"}{" "}
-                    </span>
-                    <span className={styles["phone"]}>
-                      {" "}
-                      {contact.phone || "-"}{" "}
-                    </span>
-                  </IonLabel>
-                </IonItem>
-              )
-            );
+          {filteredUserContacts.map((contact: any, idx: number) => {
+            return contact && <Item key={idx} contact={contact} />;
           })}
         </IonItemGroup>
       </IonList>

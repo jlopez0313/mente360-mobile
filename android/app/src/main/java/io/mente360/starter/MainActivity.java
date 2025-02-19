@@ -1,4 +1,4 @@
-package io.soymente360.app;
+package io.mente360.app;
 
 import com.getcapacitor.BridgeActivity;
 

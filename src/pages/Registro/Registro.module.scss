@@ -5,33 +5,12 @@
 }
 
 .ion-content {
-    --background: url('assets/images/login.png');
 
-    ion-grid {
-        height: 100%;
-
-        ion-row {
-            height: 100%;
-
-            ion-col {
-                display: flex;
-            }
-        }
-    }
-    img {
-        width: 80px;
-    }
-}
-
-.ion-footer {
-
-    background: linear-gradient(90deg, #FFBA43 50%, #FFCC33 50%);
     box-shadow: none !important;
     -webkit-box-shadow: none !important;
 
     .content {
-        background: white;
-        border-radius: 30px 30px 0 0 ;
+        background: initial;
     }
     
     ion-segment-button {
