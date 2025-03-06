@@ -43,6 +43,7 @@ export const Card: React.FC<Props> = ({ audio }) => {
         src={baseURL + audio.imagen}
         style={{ display: isLoading ? "none" : "block" }}
         onLoad={() => setIsLoading(false)}
+        className="ion-margin-bottom"
       />
 
       <IonCardHeader className="ion-no-padding ion-margin-bottom">

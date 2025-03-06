@@ -8,12 +8,14 @@ import {
   useIonActionSheet,
   useIonAlert,
   useIonLoading,
+  useIonToast,
 } from "@ionic/react";
-import React, { useRef } from "react";
-import { useState } from "react";
+import React, { useEffect, useRef } from "react";
+import { useContext, useState } from "react";
 import { setIsGlobalPlaying } from "@/store/slices/audioSlice";
 import {
-  setAudioRef,
+  setAudioSrc,
+  setLocalAudioSrc,
   setGlobalAudio,
   setGlobalPos,
 } from "@/store/slices/audioSlice";
@@ -26,6 +28,9 @@ import {
   ellipsisVertical,
   pauseCircle,
   playCircle,
+  downloadOutline,
+  musicalNotesOutline,
+  trashBinOutline,
 } from "ionicons/icons";
 import { useHistory } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
@@ -34,24 +39,29 @@ import { getUser } from "@/helpers/onboarding";
 import { add, trash } from "@/services/playlist";
 import { dislike, like } from "@/services/likes";
 import { useAudio } from "@/hooks/useAudio";
+import UIContext from "@/context/Context";
 
 export const Item: React.FC<any> = ({ idx, item, clips, setClips }) => {
   const dispatch = useDispatch();
+  const { db }: any = useContext(UIContext);
   const { user } = getUser();
   const history = useHistory();
   const audioRef = useRef();
 
+  const [presentToast] = useIonToast();
   const [presentAlert] = useIonAlert();
   const [present, dismiss] = useIonLoading();
   const [presentSheet, dismissSheet] = useIonActionSheet();
 
   const [isLoading, setIsLoading] = useState(true);
+  const [localSrc, setLocalSrc] = useState<any>(null);
 
-  const { onShareLink } = useAudio(
-    audioRef,
-    () => {},
-    () => {}
-  );
+  const { onShareLink, downloadAudio, deleteAudio, getDownloadedAudio } =
+    useAudio(
+      audioRef,
+      () => {},
+      () => {}
+    );
 
   const { baseURL, globalAudio, isGlobalPlaying } = useSelector(
     (state: any) => state.audio
@@ -69,11 +79,16 @@ export const Item: React.FC<any> = ({ idx, item, clips, setClips }) => {
     return hasLike;
   };
 
-  const onPlayClicked = (idx: number, audio: any) => {
+  const onPlayClicked = async (idx: number, audio: any) => {
     console.log(audio);
 
     if (!globalAudio || audio.id != globalAudio.id) {
-      dispatch(setAudioRef(audio.audio));
+      if (localSrc) {
+        const audioBlob = await getDownloadedAudio(localSrc);
+        dispatch(setLocalAudioSrc(audioBlob));
+      } else {
+        dispatch(setAudioSrc(audio.audio));
+      }
       dispatch(setGlobalAudio(audio));
       dispatch(setGlobalPos(idx));
     }
@@ -293,9 +308,68 @@ export const Item: React.FC<any> = ({ idx, item, clips, setClips }) => {
     }
   };
 
+  const onDownload = async (audio: any) => {
+    try {
+      await dismissSheet();
+      onPresentToast(
+        "bottom",
+        "Descargando " + audio.titulo + "...",
+        downloadOutline
+      );
+
+      const ruta = await downloadAudio(
+        baseURL + audio.audio,
+        "audio_" + audio.id,
+        async (p) => {
+          console.log("P es ", p);
+        }
+      );
+
+      console.log("Ruta es ", ruta);
+
+      await db.set("audio_" + audio.id, ruta);
+      onPresentToast(
+        "bottom",
+        audio.titulo + " está listo para escucharse sin conexión.",
+        musicalNotesOutline
+      );
+
+      setLocalSrc(ruta);
+    } catch (error) {
+      console.log(" error ondownload", error);
+    }
+  };
+
+  const onRemoveLocal = async (audio: any) => {
+    await db.remove("audio_" + audio.id);
+
+    await deleteAudio(localSrc);
+
+    onPresentToast(
+      "bottom",
+      audio.titulo + " ha sido eliminado de tu biblioteca.",
+      musicalNotesOutline
+    );
+
+    setLocalSrc(null);
+  };
+
   const goToClip = async () => {
     await dismissSheet();
     history.replace("/musicaterapia/clip");
+  };
+
+  const onPresentToast = (
+    position: "top" | "middle" | "bottom",
+    message: string,
+    icon: any
+  ) => {
+    presentToast({
+      message: message,
+      duration: 2000,
+      position: position,
+      icon: icon,
+    });
   };
 
   const onPresentSheet = async (idx: number, audio: any) => {
@@ -332,6 +406,13 @@ export const Item: React.FC<any> = ({ idx, item, clips, setClips }) => {
           text: "Compartir",
           icon: shareSocial,
           handler: () => onShareLink(audio.id),
+        },
+        {
+          text: localSrc
+            ? "Eliminar de mis descargas"
+            : "Descargar esta canción",
+          icon: localSrc ? trashBinOutline : downloadOutline,
+          handler: () => (localSrc ? onRemoveLocal(audio) : onDownload(audio)),
         },
       ],
     });
@@ -375,6 +456,20 @@ export const Item: React.FC<any> = ({ idx, item, clips, setClips }) => {
     }, 100);
   };
 
+  const getLocalSrc = async (audioID: any) => {
+    try {
+      const ruta = await db.get("audio_" + audioID);
+      console.log(ruta);
+      setLocalSrc(ruta);
+    } catch (error) {
+      console.log("error get local src", error);
+    }
+  };
+
+  useEffect(() => {
+    getLocalSrc(item.id);
+  }, []);
+
   return (
     <IonItem button={true}>
       <IonAvatar slot="start">
@@ -398,7 +493,13 @@ export const Item: React.FC<any> = ({ idx, item, clips, setClips }) => {
       </IonAvatar>
       <div style={{ display: "flex", flexDirection: "column" }}>
         <IonLabel className={`ion-text-left ${styles["titulo"]}`}>
-          {" "}
+          {localSrc && (
+            <IonIcon
+              icon={downloadOutline}
+              className={`${styles["downloaded"]}`}
+              slot="start"
+            />
+          )}
           {item.titulo}{" "}
         </IonLabel>
         <span className={styles["categoria"]}>

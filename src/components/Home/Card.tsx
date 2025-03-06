@@ -6,7 +6,7 @@ import {
   IonIcon,
   IonText,
 } from "@ionic/react";
-import { checkbox, checkboxOutline } from "ionicons/icons";
+import { checkbox, checkboxOutline, trophy } from "ionicons/icons";
 import styles from "./Home.module.scss";
 import { memo } from "react";
 
@@ -37,7 +37,7 @@ export const Card: React.FC<Props> = memo(
               <strong> {title} </strong>
               {
                 done ?
-                <IonIcon icon={checkbox} slot="end" /> : 
+                <IonIcon icon={trophy} slot="end" className={styles.trofeo} /> : 
                 <IonText style={{width: '20px'}}></IonText>
               }
             </IonCardContent>

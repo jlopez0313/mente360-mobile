@@ -22,8 +22,11 @@ export const audioSlice = createSlice({
         setTab: (state, action) => {
             state.tab = action.payload;
         },
-        setAudioRef: (state, action) => {
+        setAudioSrc: (state, action) => {
             state.audio = state.baseURL + action.payload;
+        },
+        setLocalAudioSrc: (state, action) => {
+            state.audio = action.payload;
         },
         updateCurrentTime: (state, action) => {
             state.myCurrentTime = action.payload;
@@ -57,7 +60,8 @@ export const audioSlice = createSlice({
 export const {
     resetStore,
     setTab,
-    setAudioRef,
+    setAudioSrc,
+    setLocalAudioSrc,
     updateCurrentTime,
     setIsGlobalPlaying,
     setGlobalAudio,

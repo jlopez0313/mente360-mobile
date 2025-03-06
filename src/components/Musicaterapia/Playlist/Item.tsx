@@ -21,7 +21,7 @@ import {
 } from "ionicons/icons";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  setAudioRef,
+  setAudioSrc,
   setGlobalAudio,
   setGlobalPos,
   setListAudios,
@@ -71,7 +71,7 @@ export const Item: React.FC<any> = ({
   const onPlay = (idx: number, item: any) => {
     dispatch(setListAudios(playlist.map((clip: any) => clip.clip)));
 
-    dispatch(setAudioRef(item.clip.audio));
+    dispatch(setAudioSrc(item.clip.audio));
     dispatch(setGlobalAudio(item.clip));
     dispatch(setGlobalPos(idx));
 

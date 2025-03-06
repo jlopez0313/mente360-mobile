@@ -1,4 +1,6 @@
 import {
+  createGesture,
+  Gesture,
   IonAvatar,
   IonButton,
   IonButtons,
@@ -15,10 +17,11 @@ import { IonIcon } from "@ionic/react";
 import { arrowBack } from "ionicons/icons";
 
 import { Footer } from "@/components/Footer/Footer";
-import { Interno as InternoComponent } from "@/components/Chat//Chat/Interno/Interno";
+import { Interno as InternoComponent } from "@/components/Chat/Chat/Interno/Interno";
+import { Profile as ProfileModal } from "@/components/Chat/Profile/Profile";
 import { Link, useHistory, useParams } from "react-router-dom";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { readData, writeData } from "@/services/realtime-db";
 import { getUser } from "@/helpers/onboarding";
 import Avatar from "@/assets/images/avatar.jpg";
@@ -37,6 +40,7 @@ const Interno: React.FC = () => {
   });
   const [isWriting, setIsWriting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   const onGetRoom = async () => {
     onValue(readData(`rooms/${room}`), (snapshot) => {
@@ -125,7 +129,10 @@ const Interno: React.FC = () => {
             />
           </IonAvatar>
 
-          <div className={styles["title-container"]}>
+          <div
+            className={styles["title-container"]}
+            onClick={() => setShowProfileModal(true)}
+          >
             <IonTitle className={styles["title"]}>{otherUser.name}</IonTitle>
             {isWriting && (
               <span className={styles["status"]}>Escribiendo...</span>
@@ -154,6 +161,14 @@ const Interno: React.FC = () => {
 
         <InternoComponent roomID={room} />
       </IonContent>
+
+      {otherUser.id && (
+        <ProfileModal
+          userID={otherUser.id}
+          showProfileModal={showProfileModal}
+          setShowProfileModal={setShowProfileModal}
+        />
+      )}
 
       <Footer />
     </IonPage>

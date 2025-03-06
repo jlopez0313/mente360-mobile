@@ -56,20 +56,27 @@
         &.contact {
             margin-bottom: 5px;
 
-            ion-label {
-                margin: 5px 0;
-                
-                span {
-                    display: block;
-                    text-align: justify;
-                    color: #666;
-                    &.name {
-                        font-weight: bold;
-                        font-size: 13px;
-                    }
+            .item-content {
+
+                display: flex;
+                justify-content: space-between;
+                flex-grow: 1;
+
+                ion-label {
+                    margin: 5px 0;
                     
-                    &.phone {        
-                        font-size: 12px;
+                    span {
+                        display: block;
+                        text-align: justify;
+                        color: #666;
+                        &.name {
+                            font-weight: bold;
+                            font-size: 13px;
+                        }
+                        
+                        &.phone {        
+                            font-size: 12px;
+                        }
                     }
                 }
             }

@@ -9,13 +9,17 @@ import {
   IonRange,
   IonSkeletonText,
   IonText,
+  useIonToast,
 } from "@ionic/react";
 import {
+  downloadOutline,
+  musicalNotesOutline,
   pause,
   play,
   playSkipBack,
   playSkipForward,
   shareSocial,
+  trashBinOutline,
 } from "ionicons/icons";
 import { memo, useContext, useEffect, useRef, useState } from "react";
 import { useAudio } from "@/hooks/useAudio";
@@ -42,8 +46,14 @@ interface Props {
 
 export const Audio: React.FC<Props> = memo(
   ({ activeIndex, audio, onGoBack, onGoNext, onSaveNext }) => {
+
     const { isGlobalPlaying }: any = useSelector((state: any) => state.audio);
+    const { db }: any = useContext(UIContext);
+
+    const [presentToast] = useIonToast();
+
     const [isLoading, setIsLoading] = useState(true);
+    const [localSrc, setLocalSrc] = useState<any>(null);
 
     const audioRef = useRef({
       currentTime: 0,
@@ -69,6 +79,8 @@ export const Audio: React.FC<Props> = memo(
       onPause,
       onPlay,
       onLoad,
+      downloadAudio,
+      deleteAudio,
     } = useAudio(audioRef, () => {});
 
     const onDoPlay = () => {
@@ -85,6 +97,64 @@ export const Audio: React.FC<Props> = memo(
       onPause();
       onStart();
       onPlay();
+    };
+
+    const onDownload = async (audio: any) => {
+      try {
+        onPresentToast(
+          "bottom",
+          "Descargando " + audio.titulo + "...",
+          downloadOutline
+        );
+
+        const ruta = await downloadAudio(
+          baseURL + audio.audio,
+          "podcast_" + audio.id,
+          async (p) => {
+            console.log("P es ", p);
+          }
+        );
+
+        console.log("Ruta es ", ruta);
+
+        await db.set("podcast_" + audio.id, ruta);
+        onPresentToast(
+          "bottom",
+          audio.titulo + " está listo para escucharse sin conexión.",
+          musicalNotesOutline
+        );
+
+        setLocalSrc(ruta);
+      } catch (error) {
+        console.log(" error ondownload", error);
+      }
+    };
+
+    const onRemoveLocal = async (audio: any) => {
+      await db.remove("podcast_" + audio.id);
+
+      await deleteAudio(localSrc);
+
+      onPresentToast(
+        "bottom",
+        audio.titulo + " ha sido eliminado de tu biblioteca.",
+        musicalNotesOutline
+      );
+
+      setLocalSrc(null);
+    };
+
+    const onPresentToast = (
+      position: "top" | "middle" | "bottom",
+      message: string,
+      icon: any
+    ) => {
+      presentToast({
+        message: message,
+        duration: 2000,
+        position: position,
+        icon: icon,
+      });
     };
 
     useEffect(() => {
@@ -132,17 +202,22 @@ export const Audio: React.FC<Props> = memo(
           src={baseURL + audio.imagen}
           style={{ display: isLoading ? "none" : "block" }}
           onLoad={() => setIsLoading(false)}
+          className="ion-margin-bottom"
         />
 
         <IonCardHeader className="ion-no-padding ion-margin-bottom">
           <IonCardSubtitle className="ion-no-padding">
-            {/*
-              <IonText> &nbsp; </IonText>
-            */}
+            <IonText> &nbsp; </IonText>
+
             <IonText> {audio.titulo} </IonText>
-            {/* 
-              <IonIcon icon={shareSocial} />
-            */}
+
+            <IonIcon
+              className={`${styles["donwload-icon"]}`}
+              onClick={() =>
+                localSrc ? onRemoveLocal(audio) : onDownload(audio)
+              }
+              icon={localSrc ? trashBinOutline : downloadOutline}
+            />
           </IonCardSubtitle>
         </IonCardHeader>
 

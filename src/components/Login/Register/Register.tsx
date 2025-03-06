@@ -2,6 +2,7 @@ import {
   IonButton,
   IonCard,
   IonCardContent,
+  IonCheckbox,
   IonCol,
   IonGrid,
   IonIcon,
@@ -23,7 +24,7 @@ import { login } from "@/services/auth";
 import { GmailLogin } from "@/firebase/auth";
 
 import { useHistory } from "react-router";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import UIContext from "@/context/Context";
 import { FCM } from "@capacitor-community/fcm";
 import { eye, eyeOff } from "ionicons/icons";
@@ -37,6 +38,7 @@ export const Register = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [politicas, setPoliticas] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const togglePasswordVisibility = () => {
@@ -69,7 +71,7 @@ export const Register = () => {
         history.replace("/registro");
       }, 1000);
     } catch (error: any) {
-      console.log( error )
+      console.log(error);
 
       presentAlert({
         header: "Alerta!",
@@ -113,7 +115,7 @@ export const Register = () => {
 
             dismiss();
           } catch (error: any) {
-            console.log( error )
+            console.log(error);
 
             if (error.status == "401") {
               const registerPromise = register({
@@ -146,7 +148,7 @@ export const Register = () => {
           dismiss();
         });
     } catch (error: any) {
-      console.log( error )
+      console.log(error);
 
       presentAlert({
         header: "Alerta!",
@@ -194,11 +196,27 @@ export const Register = () => {
                 />
               </IonInput>
 
+              <IonCheckbox
+                className={`ion-margin-bottom ${styles.login}`}
+                onIonChange={(evt: any) => setPoliticas(!politicas)}
+                labelPlacement="end"
+              >
+                Acepto las &nbsp;
+                < a
+                  href="#"
+                  onClick={() => {
+                    window.open("https://soymente360.com/privacy-policy/", "_blank");
+                  }}
+                >
+                  políticas de privacidad
+                </a>
+              </IonCheckbox>
+
               <IonButton
                 type="button"
                 className="ion-margin-top ion-margin-bottom"
                 expand="block"
-                disabled={!email || !password}
+                disabled={!email || !password || !politicas}
                 onClick={(evt) => doRegister(evt)}
               >
                 {" "}

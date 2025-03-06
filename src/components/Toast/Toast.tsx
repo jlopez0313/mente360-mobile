@@ -33,7 +33,7 @@ import { useAudio } from "@/hooks/useAudio";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
-  setAudioRef,
+  setAudioSrc,
   setGlobalAudio,
   setGlobalPos,
   setIsGlobalPlaying,
@@ -95,7 +95,7 @@ export const Toast = () => {
     dispatch(setGlobalPos(prevIdx));
 
     const prev = listAudios[prevIdx];
-    dispatch(setAudioRef(prev.audio));
+    dispatch(setAudioSrc(prev.audio));
     dispatch(setGlobalAudio(prev));
   };
 
@@ -105,7 +105,7 @@ export const Toast = () => {
     dispatch(setGlobalPos(nextIdx));
 
     const next = listAudios[nextIdx];
-    dispatch(setAudioRef(next.audio));
+    dispatch(setAudioSrc(next.audio));
     dispatch(setGlobalAudio(next));
   };
 
@@ -203,6 +203,9 @@ export const Toast = () => {
   }
 
   useEffect(() => {
+
+    console.log( 'reproduciendo', audio)
+
     onPause();
     onPlay();
   }, [audio]);

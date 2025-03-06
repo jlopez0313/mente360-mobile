@@ -8,6 +8,7 @@ import {
 import React, { useState } from "react";
 import Avatar from "@/assets/images/avatar.jpg";
 import styles from "./Chat.module.scss";
+import { Profile } from "@/components/Chat/Profile/Profile";
 
 export const Item: React.FC<any> = ({
   idx,
@@ -20,14 +21,15 @@ export const Item: React.FC<any> = ({
   const baseURL = import.meta.env.VITE_BASE_BACK;
 
   const [isLoading, setIsLoading] = useState(true);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   return (
-    <IonItem
-      button={true}
-      className={`${styles["contact"]}`}
-      onClick={() => goToInterno(usuario)}
-    >
-      <IonAvatar aria-hidden="true" slot="start">
+    <IonItem button={true} className={`${styles["contact"]}`}>
+      <IonAvatar
+        aria-hidden="true"
+        slot="start"
+        onClick={() => setShowProfileModal(true)}
+      >
         {isLoading && (
           <IonSkeletonText
             animated
@@ -45,23 +47,35 @@ export const Item: React.FC<any> = ({
           onLoad={() => setIsLoading(false)}
         />
       </IonAvatar>
-      <IonLabel className="ion-no-margin">
-        <span className={styles["name"]}> {usuario?.name} </span>
-        <span className={styles["phone"]}>
-          {" "}
-          {isWriting[idx]
-            ? "Escribiendo..."
-            : messages[idx]?.mensaje.length > 35
-            ? messages[idx]?.mensaje.substring(0, 32) + "..."
-            : messages[idx]?.mensaje}{" "}
-        </span>
-      </IonLabel>
-      <IonNote className={styles["note"]}>
-        <span className={styles["time"]}> {messages[idx]?.hora} </span>
-        {unreadList[idx] ? (
-          <span className={styles["unreads"]}> {unreadList[idx]} </span>
-        ) : null}
-      </IonNote>
+
+      <div
+        className={styles["item-content"]}
+        onClick={() => goToInterno(usuario)}
+      >
+        <IonLabel className="ion-no-margin">
+          <span className={styles["name"]}> {usuario?.name} </span>
+          <span className={styles["phone"]}>
+            {" "}
+            {isWriting[idx]
+              ? "Escribiendo..."
+              : messages[idx]?.mensaje.length > 35
+              ? messages[idx]?.mensaje.substring(0, 32) + "..."
+              : messages[idx]?.mensaje}{" "}
+          </span>
+        </IonLabel>
+        <IonNote className={styles["note"]}>
+          <span className={styles["time"]}> {messages[idx]?.hora} </span>
+          {unreadList[idx] ? (
+            <span className={styles["unreads"]}> {unreadList[idx]} </span>
+          ) : null}
+        </IonNote>
+      </div>
+
+      <Profile
+        userID={usuario.id}
+        showProfileModal={showProfileModal}
+        setShowProfileModal={setShowProfileModal}
+      />
     </IonItem>
   );
 };

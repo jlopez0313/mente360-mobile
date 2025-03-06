@@ -6,14 +6,17 @@ import {
   IonPopover,
 } from "@ionic/react";
 import {
+  calendarOutline,
   helpCircleOutline,
   logoWhatsapp,
   peopleOutline,
   readerOutline,
+  timeOutline,
 } from "ionicons/icons";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { localDB } from "@/helpers/localStore";
+import { openWhatsApp } from "@/helpers/Whatsapp";
 
 export const Popover = ({ trigger = "" }) => {
   const localHome = localDB("home");
@@ -35,21 +38,60 @@ export const Popover = ({ trigger = "" }) => {
               Realizar Test
             </IonItem>
           </Link>
-          <IonItem button={true} detail={true} onClick={() => {}}>
+
+          <Link to="/recordatorios" replace={true}>
+            <IonItem button={true} detail={true}>
+              <IonIcon slot="start" icon={timeOutline}></IonIcon>
+              Mis Recordatorios
+            </IonItem>
+          </Link>
+
+          <IonItem
+            button={true}
+            detail={true}
+            onClick={() =>
+              openWhatsApp(
+                import.meta.env.VITE_WRITEUS_PHONE,
+                `¡Hola! Vi que puedo escribirles por aquí desde ${
+                  import.meta.env.VITE_WRITEUS_PHONE
+                } . Tengo una consulta y me gustaría hablar con alguien del equipo. ¡Gracias!`
+              )
+            }
+          >
             <IonIcon slot="start" icon={logoWhatsapp}></IonIcon>
             Escríbenos
           </IonItem>
-          <IonItem button={true} detail={true} onClick={() => {}}>
+
+          <IonItem
+            button={true}
+            detail={true}
+            onClick={() =>
+              openWhatsApp(
+                import.meta.env.VITE_HELP_PHONE,
+                `Hola, necesito ayuda con algo dentro de la aplicación ${
+                  import.meta.env.VITE_NAME
+                }. ¿Podrían orientarme? Gracias."`
+              )
+            }
+          >
             <IonIcon slot="start" icon={helpCircleOutline}></IonIcon>
             Ayuda
           </IonItem>
+
           {data.admin && (
             <IonItem
               button={true}
               detail={true}
-              onClick={() => {
-                window.open("https://www.google.com", "_system");
-              }}
+              onClick={() =>
+                openWhatsApp(
+                  data.admin.phone,
+                  `Hola, me gustaría contactar con ${
+                    data.admin.name
+                  } para recibir orientación desde ${
+                    import.meta.env.VITE_NAME
+                  }. ¿Podrían ayudarme?`
+                )
+              }
             >
               <IonIcon slot="start" icon={peopleOutline}></IonIcon>
               Contacta con {data.admin.name}

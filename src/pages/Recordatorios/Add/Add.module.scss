@@ -1,0 +1,32 @@
+@import "@/styles.scss";
+
+.ion-header {
+  --background: var(--bg-main-gradient);
+
+  .title {
+    display: flex;
+    flex-direction: column;
+
+    ion-title {
+        .name {
+            
+        }
+    }
+
+    ion-text {
+        font-size: 15px;
+    }
+  }
+}
+
+
+.ion-content {
+/*  
+  --background: url('/images/modal.png') no-repeat cover fixed center;
+
+  background: url('/assets/images/modal.png') no-repeat fixed center; 
+  background-size: cover;
+*/
+  --background: var(--bg-content);
+  background: var(--bg-content);
+}

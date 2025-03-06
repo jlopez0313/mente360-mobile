@@ -10,8 +10,8 @@ import {
 } from "@ionic/react";
 
 import { IonIcon } from "@ionic/react";
-import { arrowBack, settingsOutline } from "ionicons/icons";
-import { Perfil as PerfilComponent} from "@/components/Perfil/Perfil";
+import { arrowBack, calendarOutline, settingsOutline, timeOutline } from "ionicons/icons";
+import { Perfil as PerfilComponent } from "@/components/Perfil/Perfil";
 
 import styles from "./Perfil.module.scss";
 import { Link, useHistory } from "react-router-dom";
@@ -20,9 +20,7 @@ import { useContext, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setShowGlobalAudio } from "@/store/slices/audioSlice";
 
-
 const Perfil: React.FC = () => {
-  
   const dispatch = useDispatch();
   const history = useHistory();
 
@@ -41,16 +39,16 @@ const Perfil: React.FC = () => {
   }, [history]);
 
   useEffect(() => {
-    dispatch( setShowGlobalAudio( false ) )
-  }, [])
+    dispatch(setShowGlobalAudio(false));
+  }, []);
 
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar className={styles["ion-header"]}>
           <IonButtons slot="start">
-            <Link to='/home' replace={true}>
-              <IonButton fill="clear"  className={styles.backButton}>
+            <Link to="/home" replace={true}>
+              <IonButton fill="clear" className={styles.backButton}>
                 <IonIcon slot="start" icon={arrowBack} />
               </IonButton>
             </Link>
@@ -59,7 +57,13 @@ const Perfil: React.FC = () => {
           <IonTitle className="ion-text-center"> Mi Perfil </IonTitle>
 
           <IonButtons slot="end">
-            <Link to='/configuracion' replace={true}>
+            <Link to="/recordatorios" replace={true}>
+              <IonButton>
+                <IonIcon slot="icon-only" icon={timeOutline}></IonIcon>
+              </IonButton>
+            </Link>
+
+            <Link to="/configuracion" replace={true}>
               <IonButton>
                 <IonIcon slot="icon-only" icon={settingsOutline} />
               </IonButton>

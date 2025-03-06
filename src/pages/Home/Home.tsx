@@ -21,8 +21,7 @@ import { Footer } from "@/components/Footer/Footer";
 import { Link } from "react-router-dom";
 import { Popover } from "./Popover";
 
-import UIContext from "@/context/Context";
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getNotifications } from "@/store/thunks/notifications";
 import { setShowGlobalAudio } from "@/store/slices/audioSlice";
@@ -61,6 +60,7 @@ const Home: React.FC = () => {
           <IonTitle className="ion-text-center"> Hoy </IonTitle>
 
           <IonButtons slot="end">
+            
             <Link to="/notificaciones" replace={true}>
               <IonButton>
                 <IonIcon slot="icon-only" icon={notificationsOutline}></IonIcon>
@@ -69,10 +69,12 @@ const Home: React.FC = () => {
                 )}
               </IonButton>
             </Link>
+            
             <IonButton id="popover-button">
               <IonIcon slot="icon-only" icon={ellipsisVertical}></IonIcon>
               <Popover trigger="popover-button" />
             </IonButton>
+
           </IonButtons>
         </IonToolbar>
       </IonHeader>

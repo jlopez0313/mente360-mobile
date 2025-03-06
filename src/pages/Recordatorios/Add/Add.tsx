@@ -1,5 +1,4 @@
 import {
-  IonBackButton,
   IonButton,
   IonButtons,
   IonContent,
@@ -10,30 +9,23 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-
-import { Test as TestComponent } from "@/components/Test/Test";
-import styles from "./Test.module.scss";
-import { Link, useHistory } from "react-router-dom";
 import { arrowBack } from "ionicons/icons";
+import React, { useEffect } from "react";
+import { useSelector } from "react-redux";
+import { Link, useHistory } from "react-router-dom";
+import { Add as AddComponent } from '@/components/Recordatorios/Add/Add'
+import styles from "../Recordatorios.module.scss";
 
-import { useEffect } from "react";
-import { getUser } from "@/helpers/onboarding";
-import { useDispatch, useSelector } from "react-redux";
-import { setShowGlobalAudio } from "@/store/slices/audioSlice";
+const Add: React.FC = () => {
+  const { route } = useSelector((state: any) => state.route);
 
-const Test: React.FC = () => {
-  const { user } = getUser();
   const history = useHistory();
-  const dispatch = useDispatch();
-
-  const { route } = useSelector((state: any)=> state.route);
 
   useEffect(() => {
-
     const handleBackButton = (ev: Event) => {
       ev.preventDefault();
       ev.stopPropagation();
-      history.replace( route );
+      history.replace("/recordatorios");
     };
 
     document.addEventListener("ionBackButton", handleBackButton);
@@ -43,16 +35,12 @@ const Test: React.FC = () => {
     };
   }, [history]);
 
-  useEffect(() => {
-    dispatch( setShowGlobalAudio( false ) )
-  }, [])
-
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar className={styles["ion-header"]}>
           <IonButtons slot="start">
-            <Link to={route} replace={true}>
+            <Link to={"/recordatorios"} replace={true}>
               <IonButton fill="clear" className={styles.backButton}>
                 <IonIcon slot="start" icon={arrowBack} />
               </IonButton>
@@ -62,20 +50,19 @@ const Test: React.FC = () => {
           <div className={`ion-padding ${styles.title}`}>
             <IonTitle className="ion-text-center">
               {" "}
-              Hola, <strong className={styles.name}> {user.name} </strong>{" "}
+              Agregar Recordatorio{" "}
             </IonTitle>
           </div>
         </IonToolbar>
       </IonHeader>
 
       <IonContent fullscreen className={`ion-padding ${styles["ion-content"]}`}>
-        <IonText className="ion-text-justify">
-          Por favor, realiza el test de eneagrama para conocer tu Eneatipo
-        </IonText>
-        <TestComponent />
+        
+        <AddComponent />
+
       </IonContent>
     </IonPage>
   );
 };
 
-export default Test;
+export default Add;

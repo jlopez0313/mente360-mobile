@@ -12,6 +12,8 @@ import {
   ToggleCustomEvent,
 } from "@ionic/react";
 import {
+  calendar,
+  calendarOutline,
   callOutline,
   cogOutline,
   documentLockOutline,
@@ -27,6 +29,7 @@ import { useHistory } from "react-router";
 import UIContext from "@/context/Context";
 import { useDispatch } from "react-redux";
 import { setRoute } from "@/store/slices/routeSlice";
+import { openWhatsApp } from "@/helpers/Whatsapp";
 
 export const Configuracion = () => {
   const history = useHistory();
@@ -36,8 +39,8 @@ export const Configuracion = () => {
   const { db }: any = useContext(UIContext);
 
   const onLogout = async () => {
-    localStorage.removeItem('home');
-    localStorage.removeItem('onboarding');
+    localStorage.removeItem("home");
+    localStorage.removeItem("onboarding");
     await db.clear();
     history.replace("/login");
   };
@@ -51,7 +54,7 @@ export const Configuracion = () => {
   );
 
   const toggleChange = (ev: ToggleCustomEvent) => {
-    localStorage.setItem('darkMode', ev.detail.checked.toString())
+    localStorage.setItem("darkMode", ev.detail.checked.toString());
     toggleDarkPalette(ev.detail.checked);
   };
 
@@ -79,18 +82,26 @@ export const Configuracion = () => {
             <IonToggle
               checked={paletteToggle}
               onIonChange={toggleChange}
-              color={"danger"}
+              color={"warning"}
             >
               <IonLabel>Modo Oscuro</IonLabel>
             </IonToggle>
           </IonItem>
 
           <Link to="/test">
-            <IonItem button={true}>
+            <IonItem button={true} className={"ion-margin-bottom"}>
               <IonIcon slot="start" icon={cogOutline} />
               <IonLabel>Realizar Test Eneagrama</IonLabel>
             </IonItem>
           </Link>
+{/*
+          <Link to="/recordatorios">
+            <IonItem button={true}>
+              <IonIcon slot="start" icon={timeOutline} />
+              <IonLabel>Mis Recordatorios</IonLabel>
+            </IonItem>
+          </Link>
+*/}
         </IonItemGroup>
       </IonList>
 
@@ -100,17 +111,34 @@ export const Configuracion = () => {
             <IonLabel>Acerca de Mente360</IonLabel>
           </IonItemDivider>
 
-          <IonItem lines="none" className={"ion-margin-bottom"}>
+          <IonItem
+            lines="none"
+            className={"ion-margin-bottom"}
+            onClick={() => {
+              window.open("https://soymente360.com/#quienes-somos", "_blank");
+            }}
+          >
             <IonIcon slot="start" icon={peopleOutline} />
             <IonLabel>Sobre Nosotros</IonLabel>
           </IonItem>
 
-          <IonItem lines="none" className={"ion-margin-bottom"}>
+          <IonItem
+            lines="none"
+            className={"ion-margin-bottom"}
+            onClick={() => {
+              window.open("https://soymente360.com/privacy-policy/", "_blank");
+            }}
+          >
             <IonIcon slot="start" icon={documentTextOutline} />
             <IonLabel>Términos y Condiciones</IonLabel>
           </IonItem>
 
-          <IonItem>
+          <IonItem
+            lines="none"
+            onClick={() => {
+              window.open("https://soymente360.com/privacy-policy/", "_blank");
+            }}
+          >
             <IonIcon slot="start" icon={documentLockOutline} />
             <IonLabel>Política de Privacidad</IonLabel>
           </IonItem>
@@ -124,19 +152,42 @@ export const Configuracion = () => {
           </IonItemDivider>
         </IonItemGroup>
 
-        <IonItem lines="none" className={"ion-margin-bottom"}>
+        <IonItem
+          lines="none"
+          className={"ion-margin-bottom"}
+          onClick={() =>
+            openWhatsApp(
+              import.meta.env.VITE_SUPPORT_PHONE,
+              `Hola, tengo un problema con la aplicación ${
+                import.meta.env.VITE_NAME
+              } y necesito ayuda. Esto es lo que me sucede: `
+            )
+          }
+        >
           <IonIcon slot="start" icon={hammerOutline} />
           <IonLabel>Soporte</IonLabel>
         </IonItem>
 
-        <IonItem>
+        <IonItem
+          onClick={() =>
+            openWhatsApp(
+              import.meta.env.VITE_CONTACT_PHONE,
+              `¡Hola! Me gustaría obtener más información sobre su servicio en ${
+                import.meta.env.VITE_NAME
+              }. ¿Podrían ayudarme?`
+            )
+          }
+        >
           <IonIcon slot="start" icon={callOutline} />
           <IonLabel>Contáctanos</IonLabel>
         </IonItem>
       </IonList>
 
       <div className="ion-text-center">
-        <span className={styles["version"]}> Version. { import.meta.env.VITE_VERSION } </span>
+        <span className={styles["version"]}>
+          {" "}
+          Version. {import.meta.env.VITE_VERSION}{" "}
+        </span>
       </div>
 
       <div className="ion-text-center ion-margin-bottom ion-padding">

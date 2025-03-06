@@ -1,13 +1,21 @@
 import styles from "./Add.module.scss";
-import { IonAvatar, IonItem, IonLabel, IonSkeletonText, useIonAlert } from "@ionic/react";
+import {
+  IonAvatar,
+  IonItem,
+  IonLabel,
+  IonSkeletonText,
+  useIonAlert,
+} from "@ionic/react";
 import React, { useState } from "react";
 import Avatar from "@/assets/images/avatar.jpg";
 import { updateData, writeData } from "@/services/realtime-db";
+import { Profile } from "@/components/Chat/Profile/Profile";
 
 export const Item: React.FC<any> = ({ grupoID, contact, doChild }) => {
   const baseURL = import.meta.env.VITE_BASE_BACK;
 
   const [isLoading, setIsLoading] = useState(true);
+  const [showProfileModal, setShowProfileModal] = useState(false);
   const [contactosAgregados, setContactosAgregados] = useState<any>([]); // AllContacts agregados al grupo
 
   const [presentAlert] = useIonAlert();
@@ -54,9 +62,12 @@ export const Item: React.FC<any> = ({ grupoID, contact, doChild }) => {
       disabled={hasBeenAdded(contact)}
       button={true}
       className={`${styles["contact"]}`}
-      onClick={() => addToGrupo(contact)}
     >
-      <IonAvatar aria-hidden="true" slot="start">
+      <IonAvatar
+        aria-hidden="true"
+        slot="start"
+        onClick={() => setShowProfileModal(true)}
+      >
         {isLoading && (
           <IonSkeletonText
             animated
@@ -74,10 +85,18 @@ export const Item: React.FC<any> = ({ grupoID, contact, doChild }) => {
           onLoad={() => setIsLoading(false)}
         />
       </IonAvatar>
-      <IonLabel className="ion-no-margin">
+
+      <IonLabel className="ion-no-margin" onClick={() => addToGrupo(contact)}>
         <span className={styles["name"]}> {contact.name || "-"} </span>
         <span className={styles["phone"]}> {contact.phone || "-"} </span>
       </IonLabel>
+
+      <Profile
+        userID={contact.id}
+        showProfileModal={showProfileModal}
+        setShowProfileModal={setShowProfileModal}
+      />
+      
     </IonItem>
   );
 };

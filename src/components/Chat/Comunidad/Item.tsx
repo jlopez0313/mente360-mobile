@@ -5,6 +5,7 @@ import Avatar from "@/assets/images/avatar.jpg";
 import { useHistory } from "react-router";
 import { writeData } from "@/services/realtime-db";
 import { getUser } from "@/helpers/onboarding";
+import { Profile } from "@/components/Chat/Profile/Profile";
 
 export const Item: React.FC<any> = ({ contact }) => {
   const baseURL = import.meta.env.VITE_BASE_BACK;
@@ -13,6 +14,7 @@ export const Item: React.FC<any> = ({ contact }) => {
   const history = useHistory();
 
   const [isLoading, setIsLoading] = useState(true);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   const goToInterno = async (otroUser: any) => {
     const roomArray = [Number(user.id), Number(otroUser.id)];
@@ -39,12 +41,12 @@ export const Item: React.FC<any> = ({ contact }) => {
   };
 
   return (
-    <IonItem
-      button={true}
-      className={`${styles["contact"]}`}
-      onClick={() => goToInterno(contact)}
-    >
-      <IonAvatar aria-hidden="true" slot="start">
+    <IonItem button={true} className={`${styles["contact"]}`}>
+      <IonAvatar
+        aria-hidden="true"
+        slot="start"
+        onClick={() => setShowProfileModal(true)}
+      >
         {isLoading && (
           <IonSkeletonText
             animated
@@ -62,10 +64,22 @@ export const Item: React.FC<any> = ({ contact }) => {
           onLoad={() => setIsLoading(false)}
         />
       </IonAvatar>
-      <IonLabel className="ion-no-margin">
-        <span className={styles["name"]}> {contact.name || "-"} </span>
-        <span className={styles["phone"]}> {contact.phone || "-"} </span>
-      </IonLabel>
+      <div
+        className={styles["item-content"]}
+        onClick={() => goToInterno(contact)}
+      >
+        <IonLabel className="ion-no-margin">
+          <span className={styles["name"]}> {contact.name || "-"} </span>
+          <span className={styles["phone"]}> {contact.phone || "-"} </span>
+        </IonLabel>
+      </div>
+
+      <Profile
+        userID={contact.id}
+        showProfileModal={showProfileModal}
+        setShowProfileModal={setShowProfileModal}
+      />
+
     </IonItem>
   );
 };

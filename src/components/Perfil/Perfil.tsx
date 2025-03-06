@@ -29,10 +29,14 @@ import Avatar from "@/assets/images/avatar.jpg";
 import "react-phone-number-input/style.css";
 import PhoneInput, { isPossiblePhoneNumber } from "react-phone-number-input";
 import { updateData, writeData, getData } from "@/services/realtime-db";
+import { useDispatch } from "react-redux";
+import { setRoute } from "@/store/slices/routeSlice";
 
 export const Perfil = () => {
   const fileRef = useRef(null);
   const baseURL = import.meta.env.VITE_BASE_BACK;
+
+  const dispatch = useDispatch();
 
   const [present, dismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();
@@ -169,6 +173,7 @@ export const Perfil = () => {
   };
 
   useEffect(() => {
+    dispatch(setRoute("/perfil"));
     onGetConstants();
   }, []);
 
@@ -246,7 +251,7 @@ export const Perfil = () => {
         placeholder="Nombre de Usuario"
         className={`ion-margin-bottom ${styles.profile}`}
         value={usuario.name}
-        onIonChange={(e) => onSetUser("name", e.target.value)}
+        onIonInput={(e) => onSetUser("name", e.target.value)}
       ></IonInput>
 
       <PhoneInput

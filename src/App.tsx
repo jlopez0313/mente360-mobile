@@ -18,6 +18,9 @@ import Test from "./pages/Test/Test";
 import Registro from "./pages/Registro/Registro";
 import Grupo from "./pages/Chat/Grupo/Grupo";
 import Info from "./pages/Chat/Grupo/Info/Info";
+import Recordatorios from "./pages/Recordatorios/Recordatorios";
+import Add from "./pages/Recordatorios/Add/Add";
+
 
 import { UIProvider } from "./context/Context";
 
@@ -113,8 +116,12 @@ const App: React.FC = () => {
             path="/notificaciones"
             component={Notifications}
           />
+
           <Route exact={true} path="/perfil" component={Perfil} />
           <Route exact={true} path="/test" component={Test} />
+          <Route exact={true} path="/recordatorios" component={Recordatorios} />
+          <Route exact={true} path="/recordatorios/Add" component={Add} />
+
         </IonRouterOutlet>
       </UIProvider>
     </IonReactRouter>

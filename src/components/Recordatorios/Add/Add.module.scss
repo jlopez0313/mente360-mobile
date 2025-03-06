@@ -1,0 +1,19 @@
+.daysOfWeek {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+ion-chip {
+    border: 1px solid #eee;
+    border-radius: 5px;
+    
+    &.day-selected {
+        background: var(--bg-main);
+    }
+}
+
+.picker {
+    display: flex;
+    flex-direction: row;
+}

@@ -1,0 +1,49 @@
+@import "@/styles.scss";
+
+.ion-header {
+    --background: var(--bg-main-gradient);
+}
+
+.ion-content {
+    /*
+        --background: url('/images/modal.png') no-repeat cover fixed center;
+    
+        background: url('/assets/images/modal.png') no-repeat fixed center; 
+        background-size: cover;
+    */
+            
+    --background: var(--bg-content);
+    background: var(--bg-content);
+    
+    &.content-modal {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    
+        .profile-image {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            margin-right: auto;
+            margin-left: auto;
+        }
+        
+        .profile {
+            display: flex;
+            justify-content: left;
+        
+            .info {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                width: 100%;
+        
+                ion-chip {
+                    border-radius: 3px;
+        
+                }
+            }
+        }
+    }
+}
