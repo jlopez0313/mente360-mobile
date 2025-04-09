@@ -1,15 +1,14 @@
 
 
-import {baseApi} from './api';
-import { HttpHeaders } from '@capacitor/core';
+import { baseApi } from './api';
 
-export const all = async( categoriasID: string, page = 0, search='' ) => {
+export async function all( categoriasID: string, page = 0, search: string = '', fromDate: string = ''): Promise<any> {
 
     return new Promise( async (resolve, reject) => {
         const { get } = baseApi();
     
         try {
-            resolve ( await get(`/clips?page=${page}&search=${search}`, { "Content-type": "application/json" } ) )
+            resolve ( await get(`/clips?page=${page}&search=${search}&last_sync=${fromDate}`, { "Content-type": "application/json" } ) )
         } catch( error: any ) {
             if (error.response) {
                 reject(error.response)
@@ -23,7 +22,7 @@ export const all = async( categoriasID: string, page = 0, search='' ) => {
     
 }
 
-export const byCategory = async( categoriasID: string, page = 0, search = '' ) => {
+export async function byCategory ( categoriasID: string, page = 0, search = '' ) {
 
     return new Promise( async (resolve, reject) => {
         const { get } = baseApi();

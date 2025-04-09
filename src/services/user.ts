@@ -1,7 +1,6 @@
-import {baseApi} from './api';
-import { HttpHeaders } from '@capacitor/core';
+import { baseApi } from './api';
 
-export const update = async( formData: {}, userID: string ) => {
+export const update = async( formData: {}, userID: string ): Promise<any> => {
 
     return new Promise( async (resolve, reject) => {
         const { put } = baseApi();
@@ -20,7 +19,7 @@ export const update = async( formData: {}, userID: string ) => {
     })
 }
 
-export const invitar = async( formData: {} ) => {
+export const invitar = async( formData: {} ): Promise<any> => {
 
     return new Promise( async (resolve, reject) => {
         const { post } = baseApi();
@@ -40,7 +39,7 @@ export const invitar = async( formData: {} ) => {
     
 }
 
-export const misContactos = async( formData: {} ) => {
+export const misContactos = async( formData: {} ): Promise<any> => {
 
     return new Promise( async (resolve, reject) => {
         const { post } = baseApi();
@@ -61,7 +60,7 @@ export const misContactos = async( formData: {} ) => {
 }
 
 
-export const find = async(id: number) => {
+export const find = async(id: number): Promise<any> => {
 
     return new Promise( async (resolve, reject) => {
         const { get } = baseApi();

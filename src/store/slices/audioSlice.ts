@@ -3,10 +3,10 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
     tab: 'clips',
     baseURL: import.meta.env.VITE_BASE_BACK,
-    audio: '',
+    audio: '', // El src del Audio
     isGlobalPlaying: false,
     globalAudio: '',
-    listAudios: [],
+    listAudios: [] as any[],
     globalPos: 0,
     showGlobalAudio: true,
     myCurrentTime: 0,
@@ -23,9 +23,6 @@ export const audioSlice = createSlice({
             state.tab = action.payload;
         },
         setAudioSrc: (state, action) => {
-            state.audio = state.baseURL + action.payload;
-        },
-        setLocalAudioSrc: (state, action) => {
             state.audio = action.payload;
         },
         updateCurrentTime: (state, action) => {
@@ -41,11 +38,15 @@ export const audioSlice = createSlice({
         clearListAudios: (state) => {
             state.listAudios = [];
         },
-        addListAudios: (state, action) => {
-            state.listAudios = [...state.listAudios, ...action.payload];
-        },
-        setListAudios: (state, action) => {
+        setListAudios: (state, action) => {            
             state.listAudios = [...action.payload];
+        },
+        setAudioItem: (state, action) => {
+            const { index, newData } = action.payload;
+            
+            state.listAudios = state.listAudios.map((item, i) =>
+                i === index ? { ...item, ...newData } : item
+            );
         },
         setGlobalPos: (state, action) => {
             state.myCurrentTime = 0;
@@ -61,13 +62,12 @@ export const {
     resetStore,
     setTab,
     setAudioSrc,
-    setLocalAudioSrc,
     updateCurrentTime,
     setIsGlobalPlaying,
     setGlobalAudio,
     clearListAudios,
-    addListAudios,
     setListAudios,
     setGlobalPos,
-    setShowGlobalAudio
+    setShowGlobalAudio,
+    setAudioItem,
 } = audioSlice.actions

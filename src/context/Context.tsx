@@ -1,36 +1,18 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useAudio } from "@/hooks/useAudio";
-import { Toast } from "@/components/Toast/Toast";
+import { useSqliteDB } from "@/hooks/useSqliteDB";
+import React, { useContext } from "react";
 
-import { Database, Storage } from '@ionic/storage';
+export const DBContext = React.createContext<any>(undefined);
 
-export const Context = React.createContext<any>(undefined);
+export const DBProvider = ({ children }: any) => {
+  const sqlite = useSqliteDB();
 
-type Props = {
-  children: any;
+  const state = { sqlite };
+
+  return <DBContext.Provider value={state}>{children}</DBContext.Provider>;
 };
 
-export const UIProvider = ({ children }: Props) => {
-
-  const [db, setDb] = useState<Database | null>(null);
-
-  const initDb = async () => {
-    const store = new Storage();
-    const db = await store.create();
-    setDb(db);
-  }
-
-  useEffect( ( ) => {
-    initDb();
-  }, []);
-
-  const state = {
-    db,
-  };
-
-  return <Context.Provider value={state}> 
-    {children}
-  </Context.Provider>;
+export const useDB = () => {
+  const context = useContext(DBContext);
+  if (!context) throw new Error("useDB debe usarse dentro de DBProvider");
+  return context;
 };
-
-export default Context;

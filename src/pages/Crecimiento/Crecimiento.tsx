@@ -1,48 +1,26 @@
+import { Crecimiento as CrecimientoComponent } from "@/components/Crecimiento/Crecimiento";
 import {
-  IonAvatar,
-  IonBackButton,
   IonButton,
   IonButtons,
-  IonCol,
   IonContent,
-  IonFabList,
-  IonGrid,
   IonHeader,
-  IonInput,
-  IonItem,
-  IonItemDivider,
-  IonItemGroup,
-  IonLabel,
-  IonList,
   IonPage,
-  IonRow,
-  IonSelect,
-  IonSelectOption,
-  IonText,
   IonTitle,
-  IonToolbar,
+  IonToolbar
 } from "@ionic/react";
-import { Crecimiento as CrecimientoComponent } from "@/components/Crecimiento/Crecimiento";
 import styles from "./Crecimiento.module.scss";
 
-import { IonFab, IonFabButton, IonIcon } from "@ionic/react";
-import {
-  add,
-  arrowBack,
-  helpCircleOutline,
-  logoWhatsapp,
-  notificationsOutline,
-  personCircleOutline,
-  readerOutline,
-} from "ionicons/icons";
 import { Footer } from "@/components/Footer/Footer";
+import { IonIcon } from "@ionic/react";
+import {
+  arrowBack
+} from "ionicons/icons";
 import { Link, useHistory } from "react-router-dom";
 
-import UIContext from "@/context/Context";
-import { useContext, useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { setShowGlobalAudio } from "@/store/slices/audioSlice";
 import { destroy } from "@/helpers/musicControls";
+import { setShowGlobalAudio } from "@/store/slices/audioSlice";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 
 const Crecimiento: React.FC = () => {
   

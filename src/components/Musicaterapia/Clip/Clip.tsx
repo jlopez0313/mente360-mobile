@@ -1,21 +1,13 @@
-import { useContext, useEffect, useRef, useState } from "react";
-import styles from "./Clip.module.scss";
 import {
   IonCard,
   IonCardContent,
   IonCardHeader,
   IonCardSubtitle,
-  IonCardTitle,
   IonIcon,
-  IonImg,
   IonProgressBar,
-  IonRange,
   IonSkeletonText,
   IonText,
-  useIonActionSheet,
-  useIonAlert,
-  useIonLoading,
-  useIonToast,
+  useIonToast
 } from "@ionic/react";
 import {
   downloadOutline,
@@ -27,41 +19,42 @@ import {
   shareSocial,
   trashBinOutline,
 } from "ionicons/icons";
+import { useEffect, useRef, useState } from "react";
+import styles from "./Clip.module.scss";
 
-import UIContext from "@/context/Context";
 import { useAudio } from "@/hooks/useAudio";
-import { useDispatch, useSelector } from "react-redux";
 import {
-  setGlobalPos,
+  setAudioItem,
   setAudioSrc,
   setGlobalAudio,
+  setGlobalPos,
   setShowGlobalAudio,
 } from "@/store/slices/audioSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 import { startBackground } from "@/helpers/background";
 import {
   create,
-  updateElapsed,
-  toggle,
-  destroy,
+  updateElapsed
 } from "@/helpers/musicControls";
 
-export const Clip = () => {
-  const dispatch = useDispatch();
+import ClipsDB from "@/database/clips";
+import { useSqliteDB } from "@/hooks/useSqliteDB";
 
-  const { db }: any = useContext(UIContext);
+export const Clip = () => {
+
+  const dispatch = useDispatch();
+  const { db, initialized, performSQLAction } = useSqliteDB();
 
   const [presentToast] = useIonToast();
 
   const [isLoading, setIsLoading] = useState(true);
-  const [localSrc, setLocalSrc] = useState<any>(null);
-  const [audioSrc, setAudioSrc] = useState<any>(null);
 
-  const { globalAudio, globalPos, listAudios } = useSelector(
+  const { audio, globalAudio, globalPos, listAudios } = useSelector(
     (state: any) => state.audio
   );
 
-  const audioRef = useRef();
+  const audioRef = useRef<any>();
 
   const {
     baseURL,
@@ -110,21 +103,37 @@ export const Clip = () => {
       const ruta = await downloadAudio(
         baseURL + audio.audio,
         "audio_" + audio.id,
-        async (p) => {
+        async (p: any) => {
           console.log("P es ", p);
         }
       );
 
       console.log("Ruta es ", ruta);
 
-      await db.set("audio_" + audio.id, ruta);
+      const clipsDB = new ClipsDB(db);
+      await clipsDB.download(performSQLAction, () => {}, {
+        id: audio.id,
+        imagen: audio.imagen,
+        audio: ruta,
+      });
+
+      dispatch(
+        setAudioItem({
+          index: globalPos,
+          newData: {
+            imagen_local: audio.imagen,
+            audio_local: ruta,
+            downloaded: 1,
+          },
+        })
+      );
+
       onPresentToast(
         "bottom",
         audio.titulo + " está listo para escucharse sin conexión.",
         musicalNotesOutline
       );
 
-      setLocalSrc(ruta);
     } catch (error) {
       console.log(" error ondownload", error);
     }
@@ -133,15 +142,13 @@ export const Clip = () => {
   const onRemoveLocal = async (audio: any) => {
     await db.remove("audio_" + audio.id);
 
-    await deleteAudio(localSrc);
+    await deleteAudio(audio.audio_local);
 
     onPresentToast(
       "bottom",
       audio.titulo + " ha sido eliminado de tu biblioteca.",
       musicalNotesOutline
     );
-
-    setLocalSrc(null);
   };
 
   const onUpdateElapsed = () => {
@@ -154,7 +161,14 @@ export const Clip = () => {
     dispatch(setGlobalPos(prevIdx));
 
     const prev = listAudios[prevIdx];
-    dispatch(setAudioSrc(prev.audio));
+    
+    if (prev.audio_local) {
+      const audioBlob = await getDownloadedAudio(prev.audio_local);
+      dispatch(setAudioSrc(audioBlob));
+    } else {
+      dispatch(setAudioSrc(baseURL + prev.audio));
+    }
+
     dispatch(setGlobalAudio(prev));
   };
 
@@ -164,27 +178,15 @@ export const Clip = () => {
     dispatch(setGlobalPos(nextIdx));
 
     const next = listAudios[nextIdx];
-    dispatch(setAudioSrc(next.audio));
-    dispatch(setGlobalAudio(next));
-  };
-
-  const getLocalSrc = async (audioID: any) => {
-    try {
-      const ruta = await db.get("audio_" + audioID);
-      console.log(ruta);
-      setLocalSrc(ruta);
-    } catch (error) {
-      console.log("error get local src", error);
-    }
-  };
-
-  const onSetSrc = async () => {
-    if (localSrc) {
-      const audioBlob = await getDownloadedAudio(localSrc);
-      setAudioSrc( audioBlob )
+    
+    if (next.audio_local) {
+      const audioBlob = await getDownloadedAudio(next.audio_local);
+      dispatch(setAudioSrc(audioBlob));
     } else {
-      setAudioSrc( baseURL + globalAudio.audio )
+      dispatch(setAudioSrc(baseURL + next.audio));
     }
+
+    dispatch(setGlobalAudio(next));
   };
 
   useEffect(() => {
@@ -206,14 +208,6 @@ export const Clip = () => {
     onPlay();
     dispatch(setShowGlobalAudio(false));
   }, [globalAudio]);
-
-  useEffect(() => {
-    getLocalSrc(globalAudio.id);
-  }, []);
-
-  useEffect(() => {
-    onSetSrc();
-  }, [localSrc]);
 
   return (
     <div className={styles["ion-content"]}>
@@ -241,9 +235,9 @@ export const Clip = () => {
             <IonIcon
               className={`${styles["donwload-icon"]}`}
               onClick={() =>
-                localSrc ? onRemoveLocal(globalAudio) : onDownload(globalAudio)
+                globalAudio.audio_local ? onRemoveLocal(globalAudio) : onDownload(globalAudio)
               }
-              icon={localSrc ? trashBinOutline : downloadOutline}
+              icon={globalAudio.audio_local ? trashBinOutline : downloadOutline}
             />
 
             <IonText> {globalAudio.titulo} </IonText>
@@ -300,7 +294,7 @@ export const Clip = () => {
               e.stopPropagation();
               goToNext();
             }}
-            src={ audioSrc }
+            src={ audio }
           />
 
           <img

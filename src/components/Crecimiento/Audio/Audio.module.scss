@@ -8,6 +8,11 @@
         display: flex;
         justify-content: space-around;
         
+        .downloaded {
+            font-size: 1rem;
+            margin-right: 3px;
+        }
+        
         ion-text {
             font-size: 15px;
             color: var(--bg-main);

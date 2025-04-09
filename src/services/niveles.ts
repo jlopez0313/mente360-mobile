@@ -1,15 +1,14 @@
 
 
-import {baseApi} from './api';
-import { HttpHeaders } from '@capacitor/core';
+import { baseApi } from './api';
 
-export const all = async( ) => {
+export const all = async( fromDate: string = '' ): Promise<any> => {
 
     return new Promise( async (resolve, reject) => {
         const { get } = baseApi();
     
         try {
-            resolve ( await get('/niveles', { "Content-type": "application/json" } ) )
+            resolve ( await get(`/niveles?last_sync=${fromDate}`, { "Content-type": "application/json" } ) )
         } catch( error: any ) {
             if (error.response) {
                 reject(error.response)

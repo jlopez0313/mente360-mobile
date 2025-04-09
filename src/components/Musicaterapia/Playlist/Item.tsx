@@ -9,8 +9,9 @@ import {
   useIonAlert,
   useIonLoading,
 } from "@ionic/react";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
+  downloadOutline,
   ellipsisVertical,
   heart,
   heartOutline,
@@ -32,11 +33,15 @@ import { useHistory } from "react-router";
 import { trash } from "@/services/playlist";
 import { dislike, like } from "@/services/likes";
 import { useAudio } from "@/hooks/useAudio";
+import AudioNoWifi from "@/assets/images/audio_no_wifi.jpg";
+import { useNetwork } from "@/hooks/useNetwork";
+import ClipsDB from "@/database/clips";
 
 export const Item: React.FC<any> = ({
-  item,
   idx,
+  item,
   playlist,
+  sqlite,
   setPlaylist,
   setFilteredPlaylist,
   onGetPlaylist,
@@ -44,6 +49,9 @@ export const Item: React.FC<any> = ({
   const { user } = getUser();
   const history = useHistory();
   const dispatch = useDispatch();
+  const network = useNetwork();
+
+  const { db, initialized, performSQLAction } = sqlite;
 
   const { baseURL, globalAudio, isGlobalPlaying } = useSelector(
     (state: any) => state.audio
@@ -57,7 +65,7 @@ export const Item: React.FC<any> = ({
 
   const audioRef = useRef();
 
-  const { onShareLink } = useAudio(
+  const { onShareLink, getDownloadedAudio } = useAudio(
     audioRef,
     () => {},
     () => {}
@@ -68,13 +76,18 @@ export const Item: React.FC<any> = ({
     return hasLike;
   };
 
-  const onPlay = (idx: number, item: any) => {
+  const onPlay = async (idx: number, item: any) => {
     dispatch(setListAudios(playlist.map((clip: any) => clip.clip)));
 
-    dispatch(setAudioSrc(item.clip.audio));
+    if (item.clip.audio_local) {
+      const audioBlob = await getDownloadedAudio(item.clip.audio_local);
+      dispatch(setAudioSrc(audioBlob));
+    } else {
+      dispatch(setAudioSrc(baseURL + item.clip.audio));
+    }
+
     dispatch(setGlobalAudio(item.clip));
     dispatch(setGlobalPos(idx));
-
     dispatch(setIsGlobalPlaying(true));
   };
 
@@ -224,6 +237,7 @@ export const Item: React.FC<any> = ({
       subHeader: playlist.clip?.categoria?.categoria,
       buttons: [
         {
+          disabled: !network.status,
           text:
             playlist.clip?.likes.length > 0
               ? playlist.clip?.likes.length + " Me gusta"
@@ -235,11 +249,13 @@ export const Item: React.FC<any> = ({
               : onLike(idx, playlist.clip, playlist.clip?.id),
         },
         {
+          disabled: !network.status,
           text: "Remover de mi playlist",
           icon: trashOutline,
           handler: () => onTrash(playlist.id),
         },
         {
+          disabled: !network.status,
           text: "Compartir",
           icon: shareSocial,
           handler: () => onShareLink(playlist.clip?.id),
@@ -257,7 +273,13 @@ export const Item: React.FC<any> = ({
         headerContainer.classList.add("header-container");
 
         const avatar = document.createElement("img");
-        avatar.src = baseURL + playlist.clip?.imagen; // URL del avatar
+
+        if (network.status) {
+          avatar.src = baseURL + playlist.clip?.imagen;
+        } else {
+          avatar.src = AudioNoWifi;
+        }
+
         avatar.alt = "Avatar";
         avatar.classList.add("avatar");
 
@@ -303,7 +325,7 @@ export const Item: React.FC<any> = ({
 
           <img
             alt=""
-            src={baseURL + item.clip?.imagen}
+            src={network.status ? baseURL + item.clip?.imagen : AudioNoWifi}
             style={{ display: isLoading ? "none" : "block" }}
             onLoad={() => setIsLoading(false)}
           />
@@ -311,7 +333,13 @@ export const Item: React.FC<any> = ({
 
         <div style={{ display: "flex", flexDirection: "column" }}>
           <IonLabel class={`ion-text-left ${styles["titulo"]}`}>
-            {" "}
+            {item.clip?.downloaded ? (
+              <IonIcon
+                icon={downloadOutline}
+                className={`${styles["downloaded"]}`}
+                slot="start"
+              />
+            ) : null }
             {item.clip?.titulo}{" "}
           </IonLabel>
           <span className={styles["categoria"]}>

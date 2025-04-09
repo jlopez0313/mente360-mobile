@@ -1,39 +1,20 @@
 import {
-  IonAvatar,
-  IonBackButton,
   IonButton,
   IonButtons,
-  IonCol,
   IonContent,
-  IonFabList,
-  IonGrid,
   IonHeader,
-  IonInput,
-  IonItem,
-  IonItemDivider,
-  IonItemGroup,
-  IonLabel,
-  IonList,
-  IonNote,
   IonPage,
-  IonRow,
-  IonSegment,
-  IonSegmentButton,
-  IonText,
   IonTitle,
-  IonToast,
-  IonToolbar,
+  IonToolbar
 } from "@ionic/react";
 import styles from "./Clip.module.scss";
 
-import { IonFab, IonFabButton, IonIcon } from "@ionic/react";
-import { arrowBack, musicalNote, musicalNotes, search, shareSocialOutline } from "ionicons/icons";
+import { IonIcon } from "@ionic/react";
+import { arrowBack, musicalNote, musicalNotes } from "ionicons/icons";
 
 import { Footer } from "@/components/Footer/Footer";
-import { useContext, useEffect, useState } from "react";
 import { Clip as ClipComponent } from "@/components/Musicaterapia/Clip/Clip";
-import { Toast } from "@/components/Toast/Toast";
-import UIContext from "@/context/Context";
+import { useEffect } from "react";
 import { Link, useHistory } from "react-router-dom";
 
 const Clip: React.FC = () => {

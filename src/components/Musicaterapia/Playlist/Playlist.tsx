@@ -1,28 +1,26 @@
-import {
-  IonList,
-  IonSearchbar,
-  useIonAlert,
-  useIonLoading,
-} from "@ionic/react";
-import React, { useEffect, useState } from "react";
+import { IonList, IonSearchbar, useIonAlert, useIonLoading } from "@ionic/react";
+import { useEffect, useState } from "react";
 import styles from "../Musicaterapia.module.scss";
 
-import { all } from "@/services/playlist";
-
+import { setListAudios, setShowGlobalAudio } from "@/store/slices/audioSlice";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  setListAudios,
-  setShowGlobalAudio,
-} from "@/store/slices/audioSlice";
 import { Item } from "./Item";
+
+import { useDB } from "@/context/Context";
+import PlaylistDB from "@/database/playlist";
+import { getUser } from "@/helpers/onboarding";
 
 export const Playlist = () => {
   const dispatch = useDispatch();
-  const { listAudios, globalAudio } =
-    useSelector((state: any) => state.audio);
+  
+  const { sqlite } = useDB();
+  const { user } = getUser();
 
-  const [present, dismiss] = useIonLoading();
+  const { listAudios, globalAudio } = useSelector((state: any) => state.audio);
+
   const [presentAlert] = useIonAlert();
+  const [present, dismiss] = useIonLoading();
+
   const [search, setSearch] = useState<any>("");
   const [playlist, setPlaylist] = useState<any>([]);
   const [filteredPlaylist, setFilteredPlaylist] = useState<any>([]);
@@ -34,15 +32,41 @@ export const Playlist = () => {
   const onGetPlaylist = async () => {
     try {
       present({
-        message: "Cargando ...",
+        message: "Cargando...",
+        duration: 1000,
       });
 
-      const {
-        data: { data },
-      } = await all();
+      const playlistDB = new PlaylistDB(sqlite.db);
+      await playlistDB.all(
+        sqlite.performSQLAction,
+        (data: any) => {
+          const lista = data.map((item: any) => {
+            return {
+              ...item,
+              clip: {
+                id: item.id,
+                titulo: item.titulo,
+                imagen: item.imagen,
+                audio: item.audio,
+                downloaded: item.downloaded,
+                categoria: {
+                  categoria: item.categoria,
+                },
+                likes: [],
+              },
+              usuarios_clips: [],
+              likes: [],
+            };
+          });
 
-      setPlaylist(data);
-      setFilteredPlaylist(data);
+          setPlaylist(lista);
+          setFilteredPlaylist(lista);
+        },
+        {
+          search: search,
+          userID: user.id,
+        }
+      );
     } catch (error: any) {
       console.log(error);
 
@@ -76,17 +100,19 @@ export const Playlist = () => {
   };
 
   useEffect(() => {
-    onGetPlaylist();
-    dispatch(setShowGlobalAudio(true));
-  }, []);
+    if (sqlite.initialized) {
+      onGetPlaylist();
+      dispatch(setShowGlobalAudio(true));
+    }
+  }, [sqlite.initialized]);
 
   useEffect(() => {
     onFilter();
-  }, [search]);
+  }, [sqlite.initialized, search]);
 
   useEffect(() => {
     globalAudio && onUpdateList();
-  }, [globalAudio]);
+  }, [sqlite.initialized, globalAudio]);
 
   return (
     <div className={styles["ion-content"]}>
@@ -108,6 +134,7 @@ export const Playlist = () => {
               item={item}
               idx={idx}
               playlist={playlist}
+              sqlite={sqlite}
               setPlaylist={setPlaylist}
               setFilteredPlaylist={setFilteredPlaylist}
               onGetPlaylist={onGetPlaylist}

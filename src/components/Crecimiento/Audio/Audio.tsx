@@ -1,15 +1,16 @@
+import { startBackground } from "@/helpers/background";
+import { create } from "@/helpers/musicControls";
+import { useAudio } from "@/hooks/useAudio";
 import {
   IonCard,
   IonCardContent,
   IonCardHeader,
   IonCardSubtitle,
-  IonCardTitle,
   IonIcon,
-  IonProgressBar,
   IonRange,
   IonSkeletonText,
   IonText,
-  useIonToast,
+  useIonToast
 } from "@ionic/react";
 import {
   downloadOutline,
@@ -18,38 +19,32 @@ import {
   play,
   playSkipBack,
   playSkipForward,
-  shareSocial,
-  trashBinOutline,
+  trashBinOutline
 } from "ionicons/icons";
-import { memo, useContext, useEffect, useRef, useState } from "react";
-import { useAudio } from "@/hooks/useAudio";
+import { memo, useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
 import styles from "./Audio.module.scss";
-import UIContext from "@/context/Context";
-import { BackgroundMode } from "@anuradev/capacitor-background-mode";
-import { startBackground } from "@/helpers/background";
-import { create, toggle, destroy } from "@/helpers/musicControls";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  setGlobalAudio,
-  setIsGlobalPlaying,
-  updateCurrentTime,
-  resetStore,
-} from "@/store/slices/audioSlice";
+
+import AudioNoWifi from "@/assets/images/audio_no_wifi.jpg";
+import CrecimientosDB from "@/database/crecimientos";
+import { useNetwork } from "@/hooks/useNetwork";
 
 interface Props {
   activeIndex: any;
   audio: any;
+  sqlite: any;
   onGoBack: () => void;
   onGoNext: () => void;
   onSaveNext: (e: any) => void;
 }
 
 export const Audio: React.FC<Props> = memo(
-  ({ activeIndex, audio, onGoBack, onGoNext, onSaveNext }) => {
+  ({ activeIndex, audio, sqlite, onGoBack, onGoNext, onSaveNext }) => {
+    const { db, initialized, performSQLAction } = sqlite;
 
     const { isGlobalPlaying }: any = useSelector((state: any) => state.audio);
-    const { db }: any = useContext(UIContext);
 
+    const network = useNetwork();
     const [presentToast] = useIonToast();
 
     const [isLoading, setIsLoading] = useState(true);
@@ -110,14 +105,20 @@ export const Audio: React.FC<Props> = memo(
         const ruta = await downloadAudio(
           baseURL + audio.audio,
           "podcast_" + audio.id,
-          async (p) => {
+          async (p: any) => {
             console.log("P es ", p);
           }
         );
 
         console.log("Ruta es ", ruta);
 
-        await db.set("podcast_" + audio.id, ruta);
+        const crecimientosDB = new CrecimientosDB(db);
+        await crecimientosDB.download(performSQLAction, () => {}, {
+          id: audio.id,
+          imagen: audio.imagen,
+          audio: ruta,
+        });
+
         onPresentToast(
           "bottom",
           audio.titulo + " está listo para escucharse sin conexión.",
@@ -131,7 +132,8 @@ export const Audio: React.FC<Props> = memo(
     };
 
     const onRemoveLocal = async (audio: any) => {
-      await db.remove("podcast_" + audio.id);
+      const crecimientosDB = new CrecimientosDB(db);
+      await crecimientosDB.unload(performSQLAction, () => {}, { id: audio.id });
 
       await deleteAudio(localSrc);
 
@@ -155,6 +157,21 @@ export const Audio: React.FC<Props> = memo(
         position: position,
         icon: icon,
       });
+    };
+
+    const getLocalSrc = async (audioID: any) => {
+      try {
+        const crecimientosDB = new CrecimientosDB(db);
+        await crecimientosDB.find(
+          performSQLAction,
+          (clip: any) => {
+            if (clip?.downloaded == "1") setLocalSrc(clip.audio_local);
+          },
+          audioID
+        );
+      } catch (error) {
+        console.log("error get local src", error);
+      }
     };
 
     useEffect(() => {
@@ -181,6 +198,10 @@ export const Audio: React.FC<Props> = memo(
     }, [isGlobalPlaying]);
 
     useEffect(() => {
+      initialized && getLocalSrc(audio.id);
+    }, [initialized]);
+
+    useEffect(() => {
       goStart();
     }, []);
 
@@ -199,7 +220,7 @@ export const Audio: React.FC<Props> = memo(
 
         <img
           alt=""
-          src={baseURL + audio.imagen}
+          src={network.status ? baseURL + audio.imagen : AudioNoWifi}
           style={{ display: isLoading ? "none" : "block" }}
           onLoad={() => setIsLoading(false)}
           className="ion-margin-bottom"
@@ -207,17 +228,28 @@ export const Audio: React.FC<Props> = memo(
 
         <IonCardHeader className="ion-no-padding ion-margin-bottom">
           <IonCardSubtitle className="ion-no-padding">
-            <IonText> &nbsp; </IonText>
+            {localSrc ? (
+              <IonIcon
+                icon={downloadOutline}
+                className={`${styles["downloaded"]}`}
+              />
+            ) : (
+              <IonText> &nbsp; </IonText>
+            )}
 
             <IonText> {audio.titulo} </IonText>
 
-            <IonIcon
-              className={`${styles["donwload-icon"]}`}
-              onClick={() =>
-                localSrc ? onRemoveLocal(audio) : onDownload(audio)
-              }
-              icon={localSrc ? trashBinOutline : downloadOutline}
-            />
+            {network.status ? (
+              <IonIcon
+                className={`${styles["donwload-icon"]}`}
+                onClick={() =>
+                  localSrc ? onRemoveLocal(audio) : onDownload(audio)
+                }
+                icon={localSrc ? trashBinOutline : downloadOutline}
+              />
+            ) : (
+              <IonText> &nbsp; </IonText>
+            )}
           </IonCardSubtitle>
         </IonCardHeader>
 

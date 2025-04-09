@@ -1,7 +1,6 @@
-import {baseApi} from './api';
-import { HttpHeaders } from '@capacitor/core';
+import { baseApi } from './api';
 
-export const semana = async( ) => {
+export const semana = async( ): Promise<any> => {
 
     return new Promise( async (resolve, reject) => {
         const { get } = baseApi();

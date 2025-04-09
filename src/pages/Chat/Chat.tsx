@@ -1,45 +1,31 @@
 import {
-  IonAvatar,
-  IonBackButton,
   IonButton,
   IonButtons,
-  IonCol,
   IonContent,
-  IonFabList,
-  IonGrid,
   IonHeader,
-  IonInput,
-  IonItem,
-  IonItemDivider,
-  IonItemGroup,
   IonLabel,
-  IonList,
-  IonNote,
   IonPage,
-  IonRow,
   IonSegment,
   IonSegmentButton,
-  IonText,
   IonTitle,
-  IonToolbar,
+  IonToolbar
 } from "@ionic/react";
 import styles from "./Chat.module.scss";
 
-import { IonFab, IonFabButton, IonIcon } from "@ionic/react";
-import { arrowBack, search, shareSocialOutline } from "ionicons/icons";
+import { IonIcon } from "@ionic/react";
+import { arrowBack } from "ionicons/icons";
 
-import { Footer } from "@/components/Footer/Footer";
-import { Comunidad as ComunidadComponent } from "@/components/Chat/Comunidad/Comunidad";
 import { Chat as ChatComponent } from "@/components/Chat/Chat/Chat";
+import { Comunidad as ComunidadComponent } from "@/components/Chat/Comunidad/Comunidad";
 import { Grupos as GruposComponent } from "@/components/Chat/Grupos/Grupos";
+import { Footer } from "@/components/Footer/Footer";
 import { Link, useHistory } from "react-router-dom";
 
-import UIContext from "@/context/Context";
-import { useContext, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { setTab } from "@/store/slices/chatSlice";
-import { setShowGlobalAudio } from "@/store/slices/audioSlice";
 import { destroy } from "@/helpers/musicControls";
+import { setShowGlobalAudio } from "@/store/slices/audioSlice";
+import { setTab } from "@/store/slices/chatSlice";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 const Chat: React.FC = () => {
   

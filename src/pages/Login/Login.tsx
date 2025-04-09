@@ -1,43 +1,39 @@
 import {
-  IonCol,
   IonContent,
-  IonFooter,
-  IonGrid,
-  IonImg,
   IonLabel,
   IonPage,
-  IonRow,
   IonSegment,
-  IonSegmentButton,
+  IonSegmentButton
 } from "@ionic/react";
 
 import { Login as LoginComponent } from "@/components/Login/Login/Login";
-import { useContext, useEffect, useState } from "react";
 import { Register } from "@/components/Login/Register/Register";
-import styles from "./Login.module.scss";
-import UIContext from "@/context/Context";
+import { useEffect, useState } from "react";
 import { useHistory } from "react-router";
+import styles from "./Login.module.scss";
 
-import { PushNotifications } from "@capacitor/push-notifications";
-import { useDispatch } from "react-redux";
-import { getNotifications } from "@/store/thunks/notifications";
 import {
   setGeneral,
   setGrupo,
   setRoom,
 } from "@/store/slices/notificationSlice";
+import { getNotifications } from "@/store/thunks/notifications";
+import { PushNotifications } from "@capacitor/push-notifications";
+import { useDispatch } from "react-redux";
 
-import { Haptics } from "@capacitor/haptics";
+import { useSqliteDB } from "@/hooks/useSqliteDB";
 import { setGlobalAudio } from "@/store/slices/audioSlice";
 import { LocalNotifications } from "@capacitor/local-notifications";
 
 const Login: React.FC = () => {
+
+  const { db, initialized, performSQLAction } = useSqliteDB();
+
   const [tab, setTab] = useState("login");
   const history = useHistory();
 
   const dispatch = useDispatch();
-  const { db }: any = useContext(UIContext);
-
+  
   const onSetTab = (e: any) => {
     setTab(e.detail.value);
   };
@@ -47,13 +43,10 @@ const Login: React.FC = () => {
   }, []);
 
   const runGet = async () => {
-    const val = await db.get("user");
-    console.log("VAL ", val);
-    val && history.replace("/home");
+    localStorage.getItem("onboarding") && history.replace("/home");
   };
 
   const initializeFCM = async () => {
-    
     PushNotifications.removeAllListeners();
 
     const permission = await PushNotifications.requestPermissions();
@@ -69,7 +62,7 @@ const Login: React.FC = () => {
 
         // await Haptics.vibrate({ duration: 900 });
 
-        await makeLocalNotification( notification );
+        await makeLocalNotification(notification);
 
         if (data.is_general) {
           dispatch(setGeneral(true));
@@ -101,13 +94,11 @@ const Login: React.FC = () => {
         dispatch(getNotifications());
       }
     );
-
   };
-
 
   const initializeLocalNotifications = async () => {
     LocalNotifications.removeAllListeners();
-    
+
     LocalNotifications.addListener(
       "localNotificationReceived",
       (notification) => {
@@ -126,7 +117,7 @@ const Login: React.FC = () => {
         dispatch(getNotifications());
       }
     );
-    
+
     LocalNotifications.addListener(
       "localNotificationActionPerformed",
       (notification) => {
@@ -145,9 +136,9 @@ const Login: React.FC = () => {
         dispatch(getNotifications());
       }
     );
-  }
+  };
 
-  const makeLocalNotification = async ( notification: any ) => {
+  const makeLocalNotification = async (notification: any) => {
     await LocalNotifications.schedule({
       notifications: [
         {
@@ -155,28 +146,30 @@ const Login: React.FC = () => {
           body: notification.body,
           id: Math.ceil(Math.random() * 100),
           schedule: { at: new Date(Date.now() + 100) },
-          smallIcon: 'icon',
-          largeIcon: 'icon',
-          extra: notification.data
+          smallIcon: "icon",
+          largeIcon: "icon",
+          extra: notification.data,
         },
       ],
     });
   };
 
   useEffect(() => {
-    db && history && runGet();
-  }, [db, history]);
-  
+    history && runGet();
+  }, [history]);
+
   useEffect(() => {
     initializeLocalNotifications();
     initializeFCM();
-  }, [])
+  }, []);
 
   return (
     <IonPage>
       <IonContent className={`ion-text-center ${styles["ion-content"]}`}>
-        
-        <img src="assets/images/logo.png" className="ion-text-center ion-margin-top" />
+        <img
+          src="assets/images/logo.png"
+          className="ion-text-center ion-margin-top"
+        />
 
         <div className={`ion-padding ${styles.content}`}>
           <IonSegment value={tab} onIonChange={onSetTab}>

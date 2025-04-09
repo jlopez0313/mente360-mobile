@@ -1,31 +1,25 @@
+import { useAudio } from "@/hooks/useAudio";
+import { setIsGlobalPlaying } from "@/store/slices/audioSlice";
 import {
   IonCard,
   IonCardContent,
   IonCardHeader,
   IonCardSubtitle,
-  IonCardTitle,
   IonIcon,
-  IonProgressBar,
   IonRange,
   IonSkeletonText,
-  IonText,
+  IonText
 } from "@ionic/react";
 import {
   pause,
-  play,
-  playSkipBack,
-  playSkipForward,
-  shareSocial,
+  play
 } from "ionicons/icons";
-import { useContext, useEffect, useRef, useState } from "react";
-import styles from "./Audio.module.scss";
-import { useAudio } from "@/hooks/useAudio";
-import UIContext from "@/context/Context";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setIsGlobalPlaying } from "@/store/slices/audioSlice";
+import styles from "./Audio.module.scss";
 
 import { startBackground } from "@/helpers/background";
-import { create, toggle, destroy } from "@/helpers/musicControls";
+import { create, destroy } from "@/helpers/musicControls";
 
 interface Props {
   audio: any;

@@ -7,31 +7,24 @@ import {
   IonGrid,
   IonIcon,
   IonInput,
-  IonItem,
-  IonLabel,
-  IonList,
   IonLoading,
   IonNote,
   IonRow,
   useIonAlert,
-  useIonLoading,
+  useIonLoading
 } from "@ionic/react";
 import styles from "../Login.module.scss";
 
-import { setUser, clearUser } from "@/helpers/onboarding";
-import { register } from "@/services/auth";
-import { login } from "@/services/auth";
 import { GmailLogin } from "@/firebase/auth";
+import { clearUser, setUser } from "@/helpers/onboarding";
+import { login, register } from "@/services/auth";
 
-import { useHistory } from "react-router";
-import { useContext, useEffect, useRef, useState } from "react";
-import UIContext from "@/context/Context";
 import { FCM } from "@capacitor-community/fcm";
 import { eye, eyeOff } from "ionicons/icons";
+import { useEffect, useState } from "react";
+import { useHistory } from "react-router";
 
 export const Register = () => {
-  const { db }: any = useContext(UIContext);
-
   const [present, dismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();
   const history = useHistory();
@@ -65,7 +58,6 @@ export const Register = () => {
       data.fcm_token = token.token;
 
       await setUser(data);
-      db.set("user", email);
 
       setTimeout(() => {
         history.replace("/registro");
@@ -106,7 +98,6 @@ export const Register = () => {
             await Promise.all([
               loginPromise,
               setUserPromise,
-              db.set("user", gmailData.email),
             ]);
 
             setTimeout(() => {
@@ -132,7 +123,6 @@ export const Register = () => {
               await Promise.all([
                 registerPromise,
                 setUserPromise,
-                db.set("user", gmailData.email),
               ]);
 
               setTimeout(() => {

@@ -22,14 +22,14 @@ import { login } from "@/services/auth";
 import { GmailLogin } from "@/firebase/auth";
 import { register } from "@/services/auth";
 
-import { useContext, useEffect, useState } from "react";
-import UIContext from "@/context/Context";
+import { useState } from "react";
 import { useHistory } from "react-router";
 import { FCM } from "@capacitor-community/fcm";
 import { eye, eyeOff } from "ionicons/icons";
+import { useSqliteDB } from "@/hooks/useSqliteDB";
 
 export const Login = () => {
-  const { db }: any = useContext(UIContext);
+
   const history = useHistory();
 
   const [present, dismiss] = useIonLoading();
@@ -67,7 +67,6 @@ export const Login = () => {
       data.fcm_token = token.token;
 */
       await setUser(data);
-      db.set("user", email);
 
       setTimeout(() => {
         history.replace("/home");
@@ -108,7 +107,6 @@ export const Login = () => {
             await Promise.all([
               loginPromise,
               setUserPromise,
-              db.set("user", gmailData.email),
             ]);
 
             setTimeout(() => {
@@ -134,7 +132,6 @@ export const Login = () => {
               await Promise.all([
                 registerPromise,
                 setUserPromise,
-                db.set("user", gmailData.email),
               ]);
 
               setTimeout(() => {

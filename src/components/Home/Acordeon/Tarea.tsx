@@ -1,0 +1,109 @@
+import {
+  IonAccordion,
+  IonButton,
+  IonIcon,
+  IonItem,
+  IonLabel,
+  IonText,
+  useIonAlert
+} from "@ionic/react";
+
+import styles from "./Acordeon.module.scss";
+
+import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router";
+
+import { Modal } from "@/components/Modal/Modal";
+import { useDB } from "@/context/Context";
+import TareasDB from "@/database/tareas";
+import { confirmTarea } from "@/services/home";
+import { setTab } from "@/store/slices/chatSlice";
+import { setTarea } from "@/store/slices/homeSlice";
+import { trophy } from "ionicons/icons";
+import { Texto } from "../Texto/Texto";
+import tareaIcon from "/assets/icons/tarea.svg";
+
+export const Tarea: React.FC<any> = () => {
+  const dispatch = useDispatch();
+  const history = useHistory();
+
+  const [presentAlert] = useIonAlert();
+  const { sqlite } = useDB();
+
+  const { tarea, currentDay } = useSelector((state: any) => state.home);
+
+  const onConfirmTarea = async () => {
+    try {
+      if (currentDay == 1) {
+        const mensajesDB = new TareasDB(sqlite.db);
+        await mensajesDB.markAsDone(sqlite.performSQLAction, () => {}, {
+          id: tarea.id,
+          done: 1,
+        });
+
+        const formData = {
+          tareas_id: tarea.id,
+        };
+
+        await confirmTarea(formData);
+
+        const newData = {
+          ...tarea,
+          done: 1,
+        };
+
+        dispatch(setTarea({ ...newData }));
+      }
+
+      dispatch(setTab("grupos"));
+      history.replace("/chat");
+    } catch (error: any) {
+      console.log(error);
+
+      presentAlert({
+        header: "Alerta!",
+        subHeader: "Mensaje importante.",
+        message: error.data?.message || "Error Interno",
+        buttons: ["OK"],
+      });
+    }
+  };
+  return (
+    <>
+      <IonAccordion
+        value="tarea"
+        toggleIcon={tareaIcon}
+        toggleIconSlot="start"
+        className={styles["custom-accordion"]}
+      >
+        <IonItem slot="header">
+          <IonLabel>Tarea de la semana</IonLabel>
+          {tarea.done ? (
+            <IonIcon icon={trophy} slot="end" className={styles.trofeo} />
+          ) : (
+            <IonText style={{ width: "20px" }}></IonText>
+          )}
+        </IonItem>
+        <div className="ion-padding" slot="content">
+          <IonButton
+            expand="block"
+            type="button"
+            className="ion-margin-top ion-padding-start ion-padding-end"
+            id="modal-tarea"
+          >
+            Ver
+          </IonButton>
+        </div>
+      </IonAccordion>
+
+      <Modal
+        trigger="modal-tarea"
+        title="Tarea de la semana"
+        hideButtons={tarea.done || currentDay != 1 || false}
+        onConfirm={() => onConfirmTarea()}
+      >
+        <Texto descripcion={tarea.tarea || ""} children={null} />
+      </Modal>
+    </>
+  );
+};

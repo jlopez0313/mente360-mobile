@@ -1,33 +1,24 @@
 import {
-  IonCol,
   IonContent,
-  IonFooter,
-  IonGrid,
-  IonImg,
-  IonLabel,
   IonPage,
-  IonRow,
-  IonSegment,
-  IonSegmentButton,
-  IonText,
+  IonSegmentButton
 } from "@ionic/react";
 
 import { Reset as ResetComponent } from "@/components/Login/Reset/Reset";
+import { DBContext } from "@/context/Context";
 import { useContext, useEffect, useState } from "react";
-import styles from "./Reset.module.scss";
-import UIContext from "@/context/Context";
 import { useHistory } from "react-router";
+import styles from "./Reset.module.scss";
 
-import { PushNotifications } from "@capacitor/push-notifications";
-import { useDispatch } from "react-redux";
-import { getNotifications } from "@/store/thunks/notifications";
 import {
   setGeneral,
   setGrupo,
   setRoom,
 } from "@/store/slices/notificationSlice";
+import { getNotifications } from "@/store/thunks/notifications";
+import { PushNotifications } from "@capacitor/push-notifications";
+import { useDispatch } from "react-redux";
 
-import { Haptics } from "@capacitor/haptics";
 import { setGlobalAudio } from "@/store/slices/audioSlice";
 import { LocalNotifications } from "@capacitor/local-notifications";
 
@@ -36,7 +27,7 @@ const Reset: React.FC = () => {
   const history = useHistory();
 
   const dispatch = useDispatch();
-  const { db }: any = useContext(UIContext);
+  const { db }: any = useContext(DBContext);
 
   const onSetTab = (e: any) => {
     setTab(e.detail.value);

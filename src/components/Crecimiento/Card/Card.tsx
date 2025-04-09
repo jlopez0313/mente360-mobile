@@ -17,11 +17,17 @@ import {
 import styles from "./Card.module.scss";
 import { useState } from "react";
 
+import { useNetwork } from "@/hooks/useNetwork";
+import AudioNoWifi from "@/assets/images/audio_no_wifi.jpg";
+
 interface Props {
   audio: any;
 }
 
 export const Card: React.FC<Props> = ({ audio }) => {
+
+  const network = useNetwork();
+
   const baseURL = import.meta.env.VITE_BASE_BACK;
   const [isLoading, setIsLoading] = useState(true);
 
@@ -40,7 +46,7 @@ export const Card: React.FC<Props> = ({ audio }) => {
 
       <img
         alt=""
-        src={baseURL + audio.imagen}
+        src={network.status ? baseURL + audio.imagen : AudioNoWifi}
         style={{ display: isLoading ? "none" : "block" }}
         onLoad={() => setIsLoading(false)}
         className="ion-margin-bottom"

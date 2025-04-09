@@ -1,13 +1,12 @@
-import {baseApi} from './api';
-import { HttpHeaders } from '@capacitor/core';
+import { baseApi } from './api';
 
-export const all = async( ) => {
+export const all = async( fromDate: string = '' ): Promise<any> => {
 
     return new Promise( async (resolve, reject) => {
         const { get } = baseApi();
     
         try {
-            resolve ( await get('/playlist', {"Accept": "application/json", "Content-type": "application/json" } ) )
+            resolve ( await get(`/playlist?last_sync=${fromDate}`, {"Accept": "application/json", "Content-type": "application/json" } ) )
         } catch( error: any ) {
             if (error.response) {
                 reject(error.response)
@@ -20,7 +19,7 @@ export const all = async( ) => {
     })
 }
 
-export const add = async( payload: {} ) => {
+export const add = async( payload: {} ): Promise<any> => {
 
     return new Promise( async (resolve, reject) => {
         const { post } = baseApi();
@@ -39,7 +38,7 @@ export const add = async( payload: {} ) => {
     })
 }
 
-export const trash = async( id: string ) => {
+export const trash = async( id: string ): Promise<any> => {
 
     return new Promise( async (resolve, reject) => {
         const { remove } = baseApi();

@@ -1,41 +1,27 @@
 import {
-  IonAvatar,
-  IonBackButton,
   IonButton,
   IonButtons,
-  IonCol,
   IonContent,
-  IonFabList,
-  IonGrid,
   IonHeader,
-  IonInput,
-  IonItem,
-  IonItemDivider,
-  IonItemGroup,
   IonLabel,
-  IonList,
-  IonNote,
   IonPage,
-  IonRow,
   IonSegment,
   IonSegmentButton,
-  IonText,
   IonTitle,
-  IonToast,
-  IonToolbar,
+  IonToolbar
 } from "@ionic/react";
 import styles from "./Musicaterapia.module.scss";
 
-import { IonFab, IonFabButton, IonIcon } from "@ionic/react";
-import { arrowBack, search, shareSocialOutline } from "ionicons/icons";
+import { IonIcon } from "@ionic/react";
+import { arrowBack } from "ionicons/icons";
 
 import { Footer } from "@/components/Footer/Footer";
-import { useContext, useEffect, useState } from "react";
 import { Clips as ClipsComponent } from "@/components/Musicaterapia/Clips/Clips";
 import { Playlist as PlaylistComponent } from "@/components/Musicaterapia/Playlist/Playlist";
-import { Link, useHistory } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 import { setTab } from "@/store/slices/audioSlice";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useHistory } from "react-router-dom";
 
 const Musicaterapia: React.FC = () => {
 

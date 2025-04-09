@@ -1,7 +1,9 @@
+import { openWhatsApp } from "@/helpers/Whatsapp";
+import { usePreferences } from "@/hooks/usePreferences";
+import { useSqliteDB } from "@/hooks/useSqliteDB";
+import { setRoute } from "@/store/slices/routeSlice";
 import {
   IonButton,
-  IonCol,
-  IonGrid,
   IonIcon,
   IonItem,
   IonItemDivider,
@@ -10,38 +12,36 @@ import {
   IonList,
   IonToggle,
   ToggleCustomEvent,
+  useIonToast,
 } from "@ionic/react";
 import {
-  calendar,
-  calendarOutline,
   callOutline,
   cogOutline,
   documentLockOutline,
   documentTextOutline,
+  downloadOutline,
   hammerOutline,
   peopleOutline,
+  trashOutline,
 } from "ionicons/icons";
-import React, { useContext, useEffect, useState } from "react";
-import Login from "@/pages/Login/Login";
-import styles from "./Configuracion.module.scss";
-import { Link } from "react-router-dom";
-import { useHistory } from "react-router";
-import UIContext from "@/context/Context";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { setRoute } from "@/store/slices/routeSlice";
-import { openWhatsApp } from "@/helpers/Whatsapp";
+import { useHistory } from "react-router";
+import { Link } from "react-router-dom";
+import styles from "./Configuracion.module.scss";
 
 export const Configuracion = () => {
   const history = useHistory();
 
-  const dispatch = useDispatch();
+  const { makeBackup, exportJson } = useSqliteDB();
+  const { removePreference, keys } = usePreferences();
 
-  const { db }: any = useContext(UIContext);
+  const dispatch = useDispatch();
+  const [presentToast] = useIonToast();
 
   const onLogout = async () => {
     localStorage.removeItem("home");
     localStorage.removeItem("onboarding");
-    await db.clear();
     history.replace("/login");
   };
 
@@ -61,6 +61,37 @@ export const Configuracion = () => {
   const toggleDarkPalette = (shouldAdd: boolean) => {
     document.documentElement.classList.toggle("ion-palette-dark", shouldAdd);
     document.body.classList.toggle("dark", shouldAdd);
+  };
+
+  const onDownloadBackup = async () => {
+    await makeBackup();
+    onPresentToast("bottom", "El Backup ha sido descargado.", "");
+  };
+
+  const onClearPreferences = () => {
+    Object.keys(keys).forEach((key: string) => {
+      removePreference(keys[key]);
+    });
+
+    onPresentToast("bottom", "Preferencias Eliminadas.", "");
+  };
+
+  const onDownloadJson = async () => {
+    await exportJson();
+    onPresentToast("bottom", "El Backup ha sido descargado.", "");
+  };
+
+  const onPresentToast = (
+    position: "top" | "middle" | "bottom",
+    message: string,
+    icon: any
+  ) => {
+    presentToast({
+      message: message,
+      duration: 2000,
+      position: position,
+      icon: icon,
+    });
   };
 
   useEffect(() => {
@@ -94,7 +125,7 @@ export const Configuracion = () => {
               <IonLabel>Realizar Test Eneagrama</IonLabel>
             </IonItem>
           </Link>
-{/*
+          {/*
           <Link to="/recordatorios">
             <IonItem button={true}>
               <IonIcon slot="start" icon={timeOutline} />
@@ -166,6 +197,33 @@ export const Configuracion = () => {
         >
           <IonIcon slot="start" icon={hammerOutline} />
           <IonLabel>Soporte</IonLabel>
+        </IonItem>
+
+        <IonItem
+          lines="none"
+          className={"ion-margin-bottom"}
+          onClick={async () => onDownloadBackup()}
+        >
+          <IonIcon slot="start" icon={downloadOutline} />
+          <IonLabel>Backup BD</IonLabel>
+        </IonItem>
+
+        <IonItem
+          lines="none"
+          className={"ion-margin-bottom"}
+          onClick={async () => onDownloadJson()}
+        >
+          <IonIcon slot="start" icon={downloadOutline} />
+          <IonLabel>Backup JSON</IonLabel>
+        </IonItem>
+
+        <IonItem
+          lines="none"
+          className={"ion-margin-bottom"}
+          onClick={async () => onClearPreferences()}
+        >
+          <IonIcon slot="start" icon={trashOutline} />
+          <IonLabel>Limpiar Preferencias</IonLabel>
         </IonItem>
 
         <IonItem

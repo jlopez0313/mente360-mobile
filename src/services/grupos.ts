@@ -1,5 +1,4 @@
-import {baseApi} from './api';
-import { HttpHeaders } from '@capacitor/core';
+import { baseApi } from './api';
 
 export const create = async( formData: {} ) => {
 
@@ -23,13 +22,13 @@ export const create = async( formData: {} ) => {
     
 }
 
-export const getAll = async() => {
+export const getAll = async( fromDate: string = '') => {
 
     return new Promise( async (resolve, reject) => {
         const { get } = baseApi();
     
         try {
-            resolve ( await get('/grupos') )
+            resolve ( await get(`/grupos?last_sync=${fromDate}`) )
         } catch( error: any ) {
             if (error.response) {
                 reject(error.response)

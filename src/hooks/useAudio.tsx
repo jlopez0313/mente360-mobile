@@ -1,10 +1,8 @@
-import { useContext, useEffect, useState } from "react";
-import UIContext from "@/context/Context";
-import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentTime } from "@/store/slices/audioSlice";
+import { Directory, Filesystem } from "@capacitor/filesystem";
 import { Share } from "@capacitor/share";
-import { Filesystem, Directory } from "@capacitor/filesystem";
-import { Http } from "@capacitor-community/http";
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 export const useAudio: any = (audio: any, onConfirm: any = () => {}) => {
   const dispatch = useDispatch();
@@ -20,15 +18,29 @@ export const useAudio: any = (audio: any, onConfirm: any = () => {}) => {
   const [isPlaying, setIsPlaying] = useState(false);
 
   const createAudioFolder = async () => {
+
     try {
-      await Filesystem.mkdir({
+      // Intentamos leer la carpeta
+      await Filesystem.readdir({
         path: "audio",
         directory: Directory.Data,
-        recursive: true,
       });
+      console.log("La carpeta 'audio' ya existe.");
     } catch (error: any) {
-      if (error.message !== "Directory already exists") {
-        console.error("Error al crear la carpeta:", error);
+      if (error.message.includes("does not exist")) {
+        try {
+          await Filesystem.mkdir({
+            path: "audio",
+            directory: Directory.Data,
+            recursive: true,
+          });
+        } catch (error: any) {
+          if (error.message !== "Directory already exists") {
+            console.error("Error al crear la carpeta:", error);
+          }
+        }
+      } else {
+        console.error("Error al verificar la carpeta:", error);
       }
     }
   };

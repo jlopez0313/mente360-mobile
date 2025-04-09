@@ -15,11 +15,22 @@
         position: relative;
 
         --padding-bottom: 25px;
+        
+        .close-icon {
+            position: fixed;
+            right: 3px;
+            top: 3px;
+            font-size: 1.8rem;
+            pointer-events: auto;
+            z-index: 1000;
+        }
 
         ion-toolbar {
             --background: none;
             --color: var(--color-main);
             margin-top: 15px;
+
+            
         }
     }
 }

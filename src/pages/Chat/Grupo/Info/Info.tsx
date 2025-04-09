@@ -1,52 +1,25 @@
 import {
-  IonAvatar,
-  IonBackButton,
   IonButton,
   IonButtons,
-  IonCol,
   IonContent,
-  IonFabList,
-  IonGrid,
   IonHeader,
-  IonImg,
-  IonInput,
-  IonItem,
-  IonItemDivider,
-  IonItemGroup,
-  IonLabel,
-  IonList,
-  IonModal,
-  IonNote,
   IonPage,
-  IonPopover,
-  IonRow,
-  IonSegment,
-  IonSegmentButton,
-  IonText,
   IonTitle,
-  IonToolbar,
+  IonToolbar
 } from "@ionic/react";
 import styles from "./Info.module.scss";
 
-import { IonFab, IonFabButton, IonIcon } from "@ionic/react";
+import { IonIcon } from "@ionic/react";
 import {
-  arrowBack,
-  ellipsisVertical,
-  ellipsisVerticalOutline,
-  search,
-  shareSocialOutline,
+  arrowBack
 } from "ionicons/icons";
 
-import { Footer } from "@/components/Footer/Footer";
-import { Comunidad as ComunidadComponent } from "@/components/Chat/Comunidad/Comunidad";
-import { Chat as ChatComponent } from "@/components/Chat/Chat/Chat";
 import { Info as InfoComponent } from "@/components/Chat/Grupos/Grupo/Info/Info";
+import { Footer } from "@/components/Footer/Footer";
 import { Link, useHistory, useParams } from "react-router-dom";
 
-import UIContext from "@/context/Context";
-import { useContext, useEffect, useRef, useState } from "react";
-import { find } from "@/services/grupos";
 import { getData } from "@/services/realtime-db";
+import { useEffect, useRef, useState } from "react";
 
 const Info: React.FC = () => {
   const { id } = useParams();

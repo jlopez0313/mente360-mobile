@@ -1,3 +1,7 @@
+import Avatar from "@/assets/images/avatar.jpg";
+import { localDB } from "@/helpers/localStore";
+import { getUser, setUser } from "@/helpers/onboarding";
+import { update } from "@/services/user";
 import {
   IonAvatar,
   IonButton,
@@ -17,26 +21,26 @@ import {
   useIonAlert,
   useIonLoading,
 } from "@ionic/react";
-import styles from "./Perfil.module.scss";
-import { getUser, setUser } from "@/helpers/onboarding";
 import { useEffect, useRef, useState } from "react";
-import { all } from "@/services/constants";
-import { update } from "@/services/user";
 import { Link } from "react-router-dom";
-import { localDB } from "@/helpers/localStore";
-import Avatar from "@/assets/images/avatar.jpg";
+import styles from "./Perfil.module.scss";
 
-import "react-phone-number-input/style.css";
-import PhoneInput, { isPossiblePhoneNumber } from "react-phone-number-input";
-import { updateData, writeData, getData } from "@/services/realtime-db";
-import { useDispatch } from "react-redux";
+import { getData, updateData } from "@/services/realtime-db";
 import { setRoute } from "@/store/slices/routeSlice";
+import PhoneInput, { isPossiblePhoneNumber } from "react-phone-number-input";
+import "react-phone-number-input/style.css";
+import { useDispatch } from "react-redux";
+
+import { useDB } from "@/context/Context";
+import EneatiposDB from "@/database/eneatipos";
+import GenerosDB from "@/database/generos";
 
 export const Perfil = () => {
   const fileRef = useRef(null);
   const baseURL = import.meta.env.VITE_BASE_BACK;
 
   const dispatch = useDispatch();
+  const { sqlite } = useDB();
 
   const [present, dismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();
@@ -48,7 +52,8 @@ export const Perfil = () => {
   const [photo, setPhoto] = useState("");
   const [usuario, setUsuario] = useState(user.user);
   const [edad, setEdad] = useState(0);
-  const [constants, setConstants] = useState({ eneatipos: [], generos: [] });
+  const [generos, setGeneros] = useState([]);
+  const [eneatipos, setEneatipos] = useState([]);
 
   const getMaxDate = () => {
     const today = new Date();
@@ -59,13 +64,22 @@ export const Perfil = () => {
   const onGetConstants = async () => {
     try {
       present({
-        message: "Cargando ...",
+        message: "Cargando...",
+        duration: 1000,
       });
 
       setPhoto(usuario.photo ? baseURL + usuario.photo : Avatar);
 
-      const { data } = await all();
-      setConstants(data);
+      const generosDB = new GenerosDB(sqlite.db);
+      const eneatiposDB = new EneatiposDB(sqlite.db);
+
+      await generosDB.all(sqlite.performSQLAction, (data: any) => {
+        setGeneros(data);
+      });
+
+      await eneatiposDB.all(sqlite.performSQLAction, (data: any) => {
+        setEneatipos(data);
+      });
     } catch (error: any) {
       console.log(error);
 
@@ -174,8 +188,10 @@ export const Perfil = () => {
 
   useEffect(() => {
     dispatch(setRoute("/perfil"));
-    onGetConstants();
-  }, []);
+    if (sqlite.initialized) {
+      onGetConstants();
+    }
+  }, [sqlite.initialized]);
 
   useEffect(() => {
     onGetEdad();
@@ -312,7 +328,7 @@ export const Perfil = () => {
         compareWith={compareWithFn}
         onIonChange={(e) => onSetUser("genero", e.target.value)}
       >
-        {constants.generos.map((item: any, idx: any) => {
+        {generos?.map((item: any, idx: any) => {
           return (
             <IonSelectOption key={idx} value={item.key}>
               {" "}
@@ -332,7 +348,7 @@ export const Perfil = () => {
         compareWith={compareWithFn}
         onIonChange={(e) => onSetUser("eneatipo", e.target.value)}
       >
-        {constants.eneatipos.map((item: any, idx: any) => {
+        {eneatipos?.map((item: any, idx: any) => {
           return (
             <IonSelectOption key={idx} value={item.key}>
               {" "}

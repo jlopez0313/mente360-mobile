@@ -1,3 +1,5 @@
+import { localDB } from "@/helpers/localStore";
+import { openWhatsApp } from "@/helpers/Whatsapp";
 import {
   IonContent,
   IonIcon,
@@ -6,17 +8,14 @@ import {
   IonPopover,
 } from "@ionic/react";
 import {
-  calendarOutline,
   helpCircleOutline,
   logoWhatsapp,
   peopleOutline,
   readerOutline,
-  timeOutline,
+  timeOutline
 } from "ionicons/icons";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { localDB } from "@/helpers/localStore";
-import { openWhatsApp } from "@/helpers/Whatsapp";
 
 export const Popover = ({ trigger = "" }) => {
   const localHome = localDB("home");

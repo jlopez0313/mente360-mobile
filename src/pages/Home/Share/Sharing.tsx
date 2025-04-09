@@ -1,24 +1,18 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { localDB } from "@/helpers/localStore";
 import { IonContent, IonPage } from "@ionic/react";
+import React, { useEffect } from "react";
 import styles from "./Sharing.module.scss";
 
-import { App } from "@capacitor/app";
 import { FileSharer } from "@byteowls/capacitor-filesharer";
+import { App } from "@capacitor/app";
 
 import * as htmlToImage from "html-to-image";
+import { useSelector } from "react-redux";
 import { useHistory } from "react-router";
 
 const Sharing: React.FC = () => {
   const history = useHistory();
 
-  const localHome = localDB("home");
-  const [data, setData] = useState<any>({ mensaje: {}, tarea: {}, audio: {} });
-
-  const onGetData = async () => {
-    const localData = localHome.get();
-    setData({ ...localData.data });
-  };
+  const { mensaje } = useSelector((state: any) => state.home);
 
   const shareScreenshot = async () => {
     try {
@@ -62,21 +56,17 @@ const Sharing: React.FC = () => {
   };
 
   useEffect(() => {
-    onGetData();
-  }, []);
-
-  useEffect(() => {
-    if (data.mensaje?.mensaje) {
+    if (mensaje.mensaje) {
       shareScreenshot();
     }
-  }, [data]);
+  }, [mensaje]);
 
   return (
     <IonPage>
       <IonContent className={styles["ion-content"]}>
         <div id="content" className={styles["content"]}>
           <div className={styles.texto}>
-            <p style={{ whiteSpace: "pre-wrap" }}>{data.mensaje?.mensaje}</p>
+            <p style={{ whiteSpace: "pre-wrap" }}>{mensaje?.mensaje}</p>
 
             <img
               src="assets/images/logo_texto.png"

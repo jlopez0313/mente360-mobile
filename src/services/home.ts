@@ -1,7 +1,6 @@
-import {baseApi} from './api';
-import { HttpHeaders } from '@capacitor/core';
+import { baseApi } from './api';
 
-export const getHome = async( formData: {} ) => {
+export const getHome = async( formData: {} ): Promise<any> => {
 
     return new Promise( async (resolve, reject) => {
         const { post } = baseApi();
@@ -21,7 +20,7 @@ export const getHome = async( formData: {} ) => {
     
 }
 
-export const confirmAudio = async ( formData: any ) => {
+export const confirmAudio = async ( formData: any ): Promise<any> => {
     return new Promise( async (resolve, reject) => {
         const { post } = baseApi();
         try {
@@ -38,7 +37,7 @@ export const confirmAudio = async ( formData: any ) => {
     })
 }
 
-export const confirmMensaje = async ( formData: any ) => {
+export const confirmMensaje = async ( formData: any ): Promise<any> => {
     return new Promise( async (resolve, reject) => {
         const { post } = baseApi();
         try {
@@ -55,7 +54,7 @@ export const confirmMensaje = async ( formData: any ) => {
     })
 }
 
-export const confirmTarea = async ( formData: any ) => {
+export const confirmTarea = async ( formData: any ): Promise<any> => {
     return new Promise( async (resolve, reject) => {
         const { post } = baseApi();
         try {

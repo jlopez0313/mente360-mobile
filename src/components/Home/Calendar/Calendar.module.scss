@@ -1,0 +1,37 @@
+@import "@/styles.scss";
+
+.card-calendar {
+    background: var(--color-secondary-gradient);
+    border: 1px solid var(--ion-background-color-step-300, #b3b3b3);
+
+    ion-card-content {
+        .header {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+
+            ion-icon {
+                width: 14px;
+                height: 14px;
+                margin-right: 8px;
+                filter: invert( var(--invert) );
+            }
+        }
+
+        .daysOfWeek {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        ion-chip {
+            border: 1px solid #eee;
+            border-radius: 5px;
+            
+            &.today {
+                background: var(--bg-main);
+            }
+        }
+
+    }
+}

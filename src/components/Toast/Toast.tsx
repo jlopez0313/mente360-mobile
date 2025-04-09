@@ -1,36 +1,29 @@
+import { getUser } from "@/helpers/onboarding";
+import { add, trash } from "@/services/playlist";
 import {
   IonIcon,
   IonItem,
   IonLabel,
-  IonNote,
   IonProgressBar,
-  IonToast,
   useIonAlert,
-  useIonLoading,
+  useIonLoading
 } from "@ionic/react";
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { getUser } from "@/helpers/onboarding";
-import { add, trash } from "@/services/playlist";
+import { useEffect, useRef, useState } from "react";
 
-import styles from "./Toast.module.scss";
 import {
   closeCircle,
   pauseCircle,
-  pauseCircleOutline,
-  playBack,
   playCircle,
-  playCircleOutline,
-  playForward,
   playSkipBack,
   playSkipForward,
   star,
-  starOutline,
+  starOutline
 } from "ionicons/icons";
+import styles from "./Toast.module.scss";
 
-import UIContext from "@/context/Context";
-import { useHistory } from "react-router";
 import { useAudio } from "@/hooks/useAudio";
 import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router";
 
 import {
   setAudioSrc,
@@ -40,7 +33,7 @@ import {
 } from "@/store/slices/audioSlice";
 
 import { startBackground } from "@/helpers/background";
-import { create, updateElapsed, toggle, destroy } from "@/helpers/musicControls";
+import { create, destroy, updateElapsed } from "@/helpers/musicControls";
 
 export const Toast = () => {
   const history = useHistory();
@@ -64,6 +57,7 @@ export const Toast = () => {
     onUpdateBuffer,
     onPause,
     onPlay,
+    getDownloadedAudio
   } = useAudio(
     audioRef,
     () => {}
@@ -91,21 +85,35 @@ export const Toast = () => {
   };
 
   const goToPrev = async () => {
-    const prevIdx = globalPos == 0 ? listAudios.length - 1 : globalPos - 1;
+    const prevIdx = (globalPos - 1 + listAudios.length) % listAudios.length
     dispatch(setGlobalPos(prevIdx));
 
     const prev = listAudios[prevIdx];
-    dispatch(setAudioSrc(prev.audio));
+    
+    if (prev.audio_local) {
+      const audioBlob = await getDownloadedAudio(prev.audio_local);
+      dispatch(setAudioSrc(audioBlob));
+    } else {
+      dispatch(setAudioSrc(baseURL + prev.audio));
+    }
+
     dispatch(setGlobalAudio(prev));
   };
 
   const goToNext = async () => {
     // onEnd();
-    const nextIdx = globalPos == listAudios.length - 1 ? 0 : globalPos + 1;
+    const nextIdx = (globalPos + 1) % listAudios.length
     dispatch(setGlobalPos(nextIdx));
 
     const next = listAudios[nextIdx];
-    dispatch(setAudioSrc(next.audio));
+    
+    if (next.audio_local) {
+      const audioBlob = await getDownloadedAudio(next.audio_local);
+      dispatch(setAudioSrc(audioBlob));
+    } else {
+      dispatch(setAudioSrc(baseURL + next.audio));
+    }
+
     dispatch(setGlobalAudio(next));
   };
 
@@ -201,14 +209,19 @@ export const Toast = () => {
     onTimeUpdate()
     updateElapsed( audioRef.current?.currentTime )
   }
+  useEffect(() => {
+
+    console.log( 'listAudios', listAudios)
+  }, [listAudios]);
+
 
   useEffect(() => {
 
-    console.log( 'reproduciendo', audio)
+    console.log( 'reproduciendo', globalAudio)
 
     onPause();
     onPlay();
-  }, [audio]);
+  }, [globalAudio]);
 
   useEffect(() => {
     if ( real_duration ) {

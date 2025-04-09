@@ -9,22 +9,23 @@ import { useEffect, useState } from "react";
 import { Audio } from "./Audio/Audio";
 import styles from "./Crecimiento.module.scss";
 
-import { Swiper, SwiperSlide, useSwiper } from "swiper/react";
 import "swiper/css";
+import { Swiper, SwiperSlide } from "swiper/react";
 
 import { getUser, setUser } from "@/helpers/onboarding";
-import { all as allNiveles } from "@/services/niveles";
-import { all as allCrecimientos } from "@/services/crecimientos";
 import { update } from "@/services/user";
-
-import { BackgroundMode } from "@anuradev/capacitor-background-mode";
+import { resetStore } from "@/store/slices/audioSlice";
+import { useDispatch } from "react-redux";
 import { Card } from "./Card/Card";
 
-import { useDispatch, useSelector } from "react-redux";
-import { setGlobalAudio, setIsGlobalPlaying, updateCurrentTime, resetStore } from "@/store/slices/audioSlice";
+import { useDB } from "@/context/Context";
+import CrecimientosDB from "@/database/crecimientos";
+import NivelesDB from "@/database/niveles";
 
 export const Crecimiento = () => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+
+  const { sqlite } = useDB();
 
   const [swiper, setSwiper] = useState({
     activeIndex: 0,
@@ -83,12 +84,16 @@ export const Crecimiento = () => {
     try {
       present({
         message: "Cargando ...",
+        duration: 1000,
       });
 
-      const { data } = await allNiveles();
-      setNiveles(data.data);
+      const nivelesDB = new NivelesDB(sqlite.db);
+      await nivelesDB.all(sqlite.performSQLAction, (data: any) => {
+        console.warn("data", data);
+        setNiveles(data);
+      });
     } catch (error: any) {
-      console.log( error )
+      console.log(error);
 
       presentAlert({
         header: "Alerta!",
@@ -96,7 +101,7 @@ export const Crecimiento = () => {
         message: error.data?.message || "Error Interno",
         buttons: ["OK"],
       });
-    } finally {      
+    } finally {
       setNivelID(user.user.crecimiento?.niveles_id ?? 7); // 7 es el nivel 0
       dismiss();
     }
@@ -106,29 +111,36 @@ export const Crecimiento = () => {
     try {
       present({
         message: "Cargando ...",
+        duration: 1000,
       });
-
-      const nivel = niveles.find((item: any) => item.id == nivelesID);
 
       swiper.slideTo(0);
       setNivelID(nivelesID);
 
-      const { data } = await allCrecimientos(nivelesID);
-      const lista: any[] = data.data.map((item: any) => {
-        return { ...item, playing: false };
-      });
+      const crecimientosDB = new CrecimientosDB(sqlite.db);
+      await crecimientosDB.byNivel(
+        sqlite.performSQLAction,
+        (data: any) => {
+          const lista: any[] = data.map((item: any) => {
+            return { ...item, playing: false };
+          });
 
-      setCrecimientos(lista);
+          setCrecimientos(lista);
 
-      if (user.user.crecimientos_id) {
-        const idx = lista.findIndex(
-          (x: any) => x.id == user.user.crecimientos_id
-        );
-        swiper.slideTo(idx);
-      }
+          if (user.user.crecimientos_id) {
+            const idx = lista.findIndex(
+              (x: any) => x.id == user.user.crecimientos_id
+            );
+            swiper.slideTo(idx);
+          }
+        },
+        {
+          nivel: nivelesID,
+        }
+      );
     } catch (error: any) {
-      console.log( error )
-      
+      console.log(error);
+
       presentAlert({
         header: "Alerta!",
         subHeader: "Mensaje importante.",
@@ -163,7 +175,6 @@ export const Crecimiento = () => {
     } else {
       swiper.slideNext();
     }
-
   };
 
   const onGoBack = async () => {
@@ -202,24 +213,22 @@ export const Crecimiento = () => {
   };
 
   useEffect(() => {
-    dispatch(resetStore());
-    onGetNiveles();
-    return () => {
-      // BackgroundMode.disable();
-      // destroy();
-    };
-  }, []);
+    if (sqlite.initialized) {
+      onGetNiveles();
+      dispatch(resetStore());
+    }
+  }, [sqlite.initialized]);
 
   useEffect(() => {
     if (nivelID !== null && nivelID !== undefined) {
       setCrecimientos([]);
       onGetCrecimientos(nivelID);
     }
-  }, [nivelID]);
+  }, [sqlite.initialized, nivelID]);
 
   useEffect(() => {
     onSetActiveIdx();
-  }, [crecimientos]);
+  }, [sqlite.initialized, crecimientos]);
 
   return (
     <div className={`ion-no-padding ${styles["ion-content"]}`}>
@@ -273,6 +282,7 @@ export const Crecimiento = () => {
                 <Audio
                   activeIndex={swiper.activeIndex}
                   audio={item}
+                  sqlite={sqlite}
                   onGoBack={onGoBack}
                   onGoNext={onGoNext}
                   onSaveNext={(e) => onSaveNext(e)}

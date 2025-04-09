@@ -1,4 +1,4 @@
-import styles from "../Musicaterapia.module.scss";
+import { setIsGlobalPlaying } from "@/store/slices/audioSlice";
 import {
   IonAvatar,
   IonIcon,
@@ -10,42 +10,49 @@ import {
   useIonLoading,
   useIonToast,
 } from "@ionic/react";
-import React, { useEffect, useRef } from "react";
-import { useContext, useState } from "react";
-import { setIsGlobalPlaying } from "@/store/slices/audioSlice";
+import React, { useRef, useState } from "react";
+import styles from "../Musicaterapia.module.scss";
+
 import {
+  setAudioItem,
   setAudioSrc,
-  setLocalAudioSrc,
   setGlobalAudio,
   setGlobalPos,
 } from "@/store/slices/audioSlice";
+
+import { getUser } from "@/helpers/onboarding";
 import {
+  downloadOutline,
+  ellipsisVertical,
   heart,
   heartOutline,
-  shareSocial,
-  starOutline,
-  trashOutline,
-  ellipsisVertical,
+  musicalNotesOutline,
   pauseCircle,
   playCircle,
-  downloadOutline,
-  musicalNotesOutline,
+  shareSocial,
+  starOutline,
   trashBinOutline,
+  trashOutline,
 } from "ionicons/icons";
-import { useHistory } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
-import { getUser } from "@/helpers/onboarding";
+import { useHistory } from "react-router";
 
-import { add, trash } from "@/services/playlist";
-import { dislike, like } from "@/services/likes";
+import AudioNoWifi from "@/assets/images/audio_no_wifi.jpg";
+import ClipsDB from "@/database/clips";
 import { useAudio } from "@/hooks/useAudio";
-import UIContext from "@/context/Context";
+import { useNetwork } from "@/hooks/useNetwork";
+import { dislike, like } from "@/services/likes";
+import { add, trash } from "@/services/playlist";
 
-export const Item: React.FC<any> = ({ idx, item, clips, setClips }) => {
+export const Item: React.FC<any> = ({ idx, item, clips, sqlite, setClips }) => {
   const dispatch = useDispatch();
-  const { db }: any = useContext(UIContext);
+
+  const { db, performSQLAction } = sqlite;
+
   const { user } = getUser();
   const history = useHistory();
+  const network = useNetwork();
+
   const audioRef = useRef();
 
   const [presentToast] = useIonToast();
@@ -54,7 +61,6 @@ export const Item: React.FC<any> = ({ idx, item, clips, setClips }) => {
   const [presentSheet, dismissSheet] = useIonActionSheet();
 
   const [isLoading, setIsLoading] = useState(true);
-  const [localSrc, setLocalSrc] = useState<any>(null);
 
   const { onShareLink, downloadAudio, deleteAudio, getDownloadedAudio } =
     useAudio(
@@ -83,11 +89,11 @@ export const Item: React.FC<any> = ({ idx, item, clips, setClips }) => {
     console.log(audio);
 
     if (!globalAudio || audio.id != globalAudio.id) {
-      if (localSrc) {
-        const audioBlob = await getDownloadedAudio(localSrc);
-        dispatch(setLocalAudioSrc(audioBlob));
+      if (audio.audio_local) {
+        const audioBlob = await getDownloadedAudio(audio.audio_local);
+        dispatch(setAudioSrc(audioBlob));
       } else {
-        dispatch(setAudioSrc(audio.audio));
+        dispatch(setAudioSrc(baseURL + audio.audio));
       }
       dispatch(setGlobalAudio(audio));
       dispatch(setGlobalPos(idx));
@@ -100,7 +106,7 @@ export const Item: React.FC<any> = ({ idx, item, clips, setClips }) => {
     dispatch(setIsGlobalPlaying(false));
   };
 
-  const onTrash = async (idx: number, audio: any, usuarios_clips: any) => {
+  const onTrashFromPlaylist = async (idx: number, audio: any, usuarios_clips: any) => {
     try {
       present({
         message: "Cargando ...",
@@ -147,7 +153,7 @@ export const Item: React.FC<any> = ({ idx, item, clips, setClips }) => {
     }
   };
 
-  const onAdd = async (idx: number, audio: any, id: any) => {
+  const onAddToPlaylist = async (idx: number, audio: any, id: any) => {
     try {
       present({
         message: "Cargando ...",
@@ -316,42 +322,59 @@ export const Item: React.FC<any> = ({ idx, item, clips, setClips }) => {
         "Descargando " + audio.titulo + "...",
         downloadOutline
       );
-
+      
       const ruta = await downloadAudio(
         baseURL + audio.audio,
         "audio_" + audio.id,
-        async (p) => {
+        async (p: any) => {
           console.log("P es ", p);
         }
       );
-
+      /*
+      const ruta = "RUTA__RUTA";
+      */
       console.log("Ruta es ", ruta);
 
-      await db.set("audio_" + audio.id, ruta);
+      const clipsDB = new ClipsDB(db);
+      await clipsDB.download(performSQLAction, () => {}, {
+        id: audio.id,
+        imagen: audio.imagen,
+        audio: ruta,
+      });
+
+      dispatch(
+        setAudioItem({
+          index: idx,
+          newData: {
+            imagen_local: audio.imagen,
+            audio_local: ruta,
+            downloaded: 1,
+          },
+        })
+      );
+
       onPresentToast(
         "bottom",
         audio.titulo + " está listo para escucharse sin conexión.",
         musicalNotesOutline
       );
 
-      setLocalSrc(ruta);
     } catch (error) {
       console.log(" error ondownload", error);
     }
   };
 
   const onRemoveLocal = async (audio: any) => {
-    await db.remove("audio_" + audio.id);
+    const clipsDB = new ClipsDB(db);
+    await clipsDB.unload(performSQLAction, () => {}, { id: audio.id });
 
-    await deleteAudio(localSrc);
+    await deleteAudio(audio.audio_local);
 
     onPresentToast(
       "bottom",
       audio.titulo + " ha sido eliminado de tu biblioteca.",
       musicalNotesOutline
     );
-
-    setLocalSrc(null);
   };
 
   const goToClip = async () => {
@@ -373,15 +396,17 @@ export const Item: React.FC<any> = ({ idx, item, clips, setClips }) => {
   };
 
   const onPresentSheet = async (idx: number, audio: any) => {
+    console.log(audio);
     const isInMyPlaylist = hasThisUser(audio.usuarios_clips);
     const isInMyLikes = hasMyLike(audio.likes);
 
-    const action = await presentSheet({
+    await presentSheet({
       cssClass: "custom-action-sheet",
       header: audio.titulo,
       subHeader: audio.categoria?.categoria,
       buttons: [
         {
+          disabled: !network.status,
           text:
             audio.likes.length > 0
               ? audio.likes.length + " Me gusta"
@@ -393,26 +418,29 @@ export const Item: React.FC<any> = ({ idx, item, clips, setClips }) => {
               : onLike(idx, audio, audio.id),
         },
         {
+          disabled: !network.status,
           text: isInMyPlaylist
             ? "Remover de mi playlist"
             : "Agregar a mi playlist",
           icon: isInMyPlaylist ? trashOutline : starOutline,
           handler: () =>
             isInMyPlaylist
-              ? onTrash(idx, audio, audio.usuarios_clips)
-              : onAdd(idx, audio, audio.id),
+              ? onTrashFromPlaylist(idx, audio, audio.usuarios_clips)
+              : onAddToPlaylist(idx, audio, audio.id),
         },
         {
+          disabled: !network.status,
           text: "Compartir",
           icon: shareSocial,
           handler: () => onShareLink(audio.id),
         },
         {
-          text: localSrc
+          disabled: !network.status && !audio.audio_local,
+          text: audio.audio_local
             ? "Eliminar de mis descargas"
             : "Descargar esta canción",
-          icon: localSrc ? trashBinOutline : downloadOutline,
-          handler: () => (localSrc ? onRemoveLocal(audio) : onDownload(audio)),
+          icon: audio.audio_local ? trashBinOutline : downloadOutline,
+          handler: () => (audio.audio_local ? onRemoveLocal(audio) : onDownload(audio)),
         },
       ],
     });
@@ -427,7 +455,13 @@ export const Item: React.FC<any> = ({ idx, item, clips, setClips }) => {
         headerContainer.classList.add("header-container");
 
         const avatar = document.createElement("img");
-        avatar.src = baseURL + audio.imagen; // URL del avatar
+
+        if ( network.status ) {
+          avatar.src = baseURL + audio.imagen;
+        } else {
+          avatar.src = AudioNoWifi;
+        }
+        
         avatar.alt = "Avatar";
         avatar.classList.add("avatar");
 
@@ -456,20 +490,6 @@ export const Item: React.FC<any> = ({ idx, item, clips, setClips }) => {
     }, 100);
   };
 
-  const getLocalSrc = async (audioID: any) => {
-    try {
-      const ruta = await db.get("audio_" + audioID);
-      console.log(ruta);
-      setLocalSrc(ruta);
-    } catch (error) {
-      console.log("error get local src", error);
-    }
-  };
-
-  useEffect(() => {
-    getLocalSrc(item.id);
-  }, []);
-
   return (
     <IonItem button={true}>
       <IonAvatar slot="start">
@@ -486,20 +506,20 @@ export const Item: React.FC<any> = ({ idx, item, clips, setClips }) => {
 
         <img
           alt=""
-          src={baseURL + item.imagen}
+          src={network.status ? baseURL + item.imagen : AudioNoWifi}
           style={{ display: isLoading ? "none" : "block" }}
           onLoad={() => setIsLoading(false)}
         />
       </IonAvatar>
       <div style={{ display: "flex", flexDirection: "column" }}>
         <IonLabel className={`ion-text-left ${styles["titulo"]}`}>
-          {localSrc && (
+          {item.downloaded ? (
             <IonIcon
               icon={downloadOutline}
               className={`${styles["downloaded"]}`}
               slot="start"
             />
-          )}
+          ) : null}
           {item.titulo}{" "}
         </IonLabel>
         <span className={styles["categoria"]}>

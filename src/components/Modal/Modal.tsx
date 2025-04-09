@@ -1,16 +1,14 @@
 import {
   IonButton,
-  IonButtons,
   IonContent,
-  IonHeader,
   IonIcon,
   IonModal,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
+import { close, closeCircleOutline } from "ionicons/icons";
 import React, { cloneElement, memo, useRef, useState } from "react";
 import styles from "./Modal.module.scss";
-import { close, closeCircle } from "ionicons/icons";
 
 interface Props {
   showButtons: boolean;
@@ -35,6 +33,7 @@ export const Modal: React.FC<Props> = memo(
     showButtons = true,
     onConfirm,
     onWillDismiss,
+    ...props
   }) => {
     const modal = useRef<HTMLIonModalElement>(null);
     const [data, setData] = useState();
@@ -48,6 +47,11 @@ export const Modal: React.FC<Props> = memo(
       setData(params);
     };
 
+    const onClose = () => {
+      console.log('closing modal')
+      modal.current?.dismiss()
+    }
+
     return (
       <IonModal
         className={styles["example-modal"]}
@@ -55,22 +59,33 @@ export const Modal: React.FC<Props> = memo(
         trigger={trigger}
         isOpen={isOpen}
         canDismiss={canDismiss}
-        onWillDismiss={ onWillDismiss }
+        onWillDismiss={onWillDismiss}
+        {...props}
       >
         <IonContent>
+          {canDismiss && (
+            <IonIcon
+              className={styles["close-icon"]}
+              icon={closeCircleOutline}
+              onClick={() => onClose()}
+            />
+          )}
+
           <IonToolbar>
             <IonTitle> {title} </IonTitle>
           </IonToolbar>
 
-          {cloneElement(children, { doChild })}
+          {children.length
+            ? children.map((child: any, idx: number) => {
+                return cloneElement(child, { doChild });
+              })
+            : cloneElement(children, { doChild })}
 
           {showButtons ? (
             !hideButtons ? (
-              <IonButton onClick={() => dismiss()}>
-                Terminar
-              </IonButton>
+              <IonButton onClick={() => dismiss()}>Completar</IonButton>
             ) : (
-              <IonButton onClick={() => modal.current?.dismiss()}>
+              <IonButton onClick={() => dismiss()}>
                 <IonIcon icon={close} slot="start" />
                 Cerrar
               </IonButton>

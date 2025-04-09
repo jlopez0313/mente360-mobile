@@ -1,13 +1,12 @@
-import {baseApi} from './api';
-import { HttpHeaders } from '@capacitor/core';
+import { baseApi } from './api';
 
-export const all = async( ) => {
+export const all = async( fromDate: string = '' ) => {
 
     return new Promise( async (resolve, reject) => {
         const { get } = baseApi();
     
         try {
-            resolve ( await get('/likes', {"Accept": "application/json", "Content-type": "application/json" } ) )
+            resolve ( await get(`/likes?last_sync=${fromDate}`, {"Accept": "application/json", "Content-type": "application/json" } ) )
         } catch( error: any ) {
             if (error.response) {
                 reject(error.response)

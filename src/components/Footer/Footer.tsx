@@ -3,26 +3,17 @@ import {
   IonButtons,
   IonFooter,
   IonIcon,
-  IonLabel,
-  IonRouterOutlet,
-  IonTabBar,
-  IonTabButton,
-  IonTabs,
-  IonToolbar,
+  IonToolbar
 } from "@ionic/react";
 import styles from "./Footer.module.scss";
 
-import crecimiento from "/assets/icons/crecimiento.svg";
+import { useState } from "react";
+import { useSelector } from "react-redux";
+import { Link, useHistory } from "react-router-dom";
 import auriculares from "/assets/icons/auriculares.svg";
 import calendario from "/assets/icons/calendario.svg";
+import crecimiento from "/assets/icons/crecimiento.svg";
 import grupo from "/assets/icons/grupo.svg";
-import { Link, Redirect, Route, useHistory } from "react-router-dom";
-import { useContext, useEffect, useState } from "react";
-import { IonReactRouter } from "@ionic/react-router";
-import { library, playCircle, radio, search } from "ionicons/icons";
-import UIContext from "@/context/Context";
-import { Modal } from "@/components/Modal/Modal";
-import { useSelector } from "react-redux";
 
 export const Footer = (props: any) => {
   const history = useHistory();

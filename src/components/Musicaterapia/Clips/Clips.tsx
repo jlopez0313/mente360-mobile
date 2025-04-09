@@ -1,36 +1,37 @@
-import styles from "../Musicaterapia.module.scss";
 import {
   IonChip,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
   IonList,
   IonSearchbar,
-  useIonActionSheet,
   useIonAlert,
   useIonLoading,
 } from "@ionic/react";
+import styles from "../Musicaterapia.module.scss";
 
-
-import { all as allCategorias } from "@/services/categorias";
 import { all as allClips, byCategory } from "@/services/clips";
 
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
-  setGlobalAudio,
-  setListAudios,
   clearListAudios,
+  setListAudios,
   setShowGlobalAudio,
 } from "@/store/slices/audioSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { Item } from './Item';
+import { Item } from "./Item";
+
+import Categorias from "@/database/categorias";
+import ClipsDB from "@/database/clips";
+
+import { useDB } from "@/context/Context";
 
 export const Clips = () => {
   const dispatch = useDispatch();
 
-  const { globalAudio } = useSelector(
-    (state: any) => state.audio
-  );
+  const { sqlite } = useDB();
+
+  const { globalAudio, listAudios } = useSelector((state: any) => state.audio);
 
   const [present, dismiss] = useIonLoading();
   const [present2, dismiss2] = useIonLoading();
@@ -38,16 +39,11 @@ export const Clips = () => {
 
   const [categorias, setCategorias] = useState<any>([]);
   const [categoria, setCategoria] = useState("All");
-  const [todosClips, setTodosClips] = useState<any>([]);
   const [clips, setClips] = useState<any>([]);
   const [chip, setChip] = useState<any>("0");
   const [page, setPage] = useState<any>(1);
   const [search, setSearch] = useState<any>("");
   const [hasMore, setHasMore] = useState(true);
-
-  const oSetSearch = (e: any) => {
-    setSearch(e.target.value);
-  };
 
   const onSetPage = (evt: any, page: any) => {
     if (hasMore) setPage(page);
@@ -57,15 +53,16 @@ export const Clips = () => {
   const onGetCategorias = async () => {
     try {
       present({
-        message: "Cargando ...",
+        message: "Cargando...",
+        duration: 1000,
       });
 
-      const { data } = await allCategorias();
-
-      setCategorias(data.data);
-      await onGetClips(allClips);
-
-      dismiss();
+      const categoriasDB = new Categorias(sqlite.db);
+      await categoriasDB.all(sqlite.performSQLAction, (data: any) => {
+        console.log( 'data ', data)
+        setCategorias(data);
+      });
+      
     } catch (error: any) {
       console.log(error);
 
@@ -80,28 +77,59 @@ export const Clips = () => {
     }
   };
 
+  const onRefreshList = () => {
+    return chip == "0" ? onGetClips(allClips) : onGetClips(byCategory);
+  };
+
   const onGetClips = async (fn = allClips) => {
     try {
       present2({
-        message: "Cargando ...",
+        message: "Cargando...",
+        duration: 1000,
       });
 
-      const { data } = await fn(chip, page, search);
+      const clipsDB = new ClipsDB(sqlite.db);
+      const methodName =
+        fn === allClips ? "all" : fn === byCategory ? "byCategory" : null;
 
-      const clipToAdd = [
-        ...todosClips,
-        ...(data.data || []).filter(
-          (x: any) => !todosClips.some((y: any) => y.id == x.id)
-        ),
-      ];
+      await clipsDB[methodName](
+        sqlite.performSQLAction,
+        (data: any) => {
 
-      setTodosClips([...clipToAdd]);
+          console.log('first', methodName, data)
 
-      if (fn == byCategory || data.data.length === 0) {
-        setHasMore(false);
-      } else {
-        setHasMore(true);
-      }
+          const lista = data.map((item: any) => {
+            return {
+              ...item,
+              categoria: {
+                categoria: item.categoria,
+              },
+              usuarios_clips: [],
+              likes: [],
+            };
+          });
+
+          const clipToAdd = [
+            ...listAudios,
+            ...(lista || []).filter(
+              (x: any) => !listAudios.some((y: any) => y.id == x.id)
+            ),
+          ];
+
+          dispatch(setListAudios([...clipToAdd]));
+
+          if (methodName == "byCategory" || data?.length === 0) {
+            setHasMore(false);
+          } else {
+            setHasMore(true);
+          }
+        },
+        {
+          search: search,
+          categoria: chip,
+          limit: page,
+        }
+      );
     } catch (error: any) {
       console.error(error);
 
@@ -111,6 +139,8 @@ export const Clips = () => {
         message: error.data?.message || "Error Interno",
         buttons: ["OK"],
       });
+
+      dismiss2();
     } finally {
       dismiss2();
     }
@@ -124,64 +154,60 @@ export const Clips = () => {
     setClips([...tmpClips]);
   };
 
-  const onRefreshList = () => {
-    return chip == "0" ? onGetClips(allClips) : onGetClips(byCategory);
-  };
-
-
-  useEffect(() => {
-    // dispatch(resetStore());
-    onGetCategorias();
-    dispatch(setShowGlobalAudio(true));
-  }, []);
-
-  useEffect(() => {
-    setClips([...todosClips]);
-    dispatch(setListAudios([...todosClips]));
-  }, [todosClips]);
-
-  useEffect(() => {
-    globalAudio && onUpdateList();
-  }, [globalAudio]);
-
-  useEffect(() => {
-    if (chip == "0") {
-      setCategoria("All");
-    } else {
-      setCategoria(categorias.find((item: any) => item.id == chip)?.categoria);
-    }
-
-    if (search === "") {
-      setSearch("__empty__");
-      setTimeout(() => setSearch(""), 0);
-    } else {
-      setSearch("");
-    }
-  }, [chip]);
-
-  useEffect(() => {
-    setTodosClips([]);
+  const handleChipChange = (id: string) => {
     dispatch(clearListAudios());
-    setPage(0);
     setHasMore(true);
 
-    const delayDebounceFn = setTimeout(() => {
-      setPage(1);
-    }, 500);
+    if (id == "0") {
+      setCategoria("All");
+    } else {
+      setCategoria(categorias.find((item: any) => item.id == id)?.categoria);
+    }
 
-    return () => clearTimeout(delayDebounceFn);
-  }, [search]);
+    setChip(id);
+    setSearch("");
+    setPage(1);
+  };
+
+  const handleSearchChange = (value: string) => {
+    dispatch(clearListAudios());
+    setHasMore(true);
+    setSearch(value);
+
+    if (value !== "") {
+      setPage(1);
+    }
+  };
 
   useEffect(() => {
-    if (page) onRefreshList();
-  }, [page]);
+    if (sqlite.initialized) {
+      onGetCategorias();
+      dispatch(setShowGlobalAudio(true));
+    }
+  }, [sqlite.initialized]);
+
+  useEffect(() => {
+    if (sqlite.initialized) {
+      onRefreshList();
+    }
+  }, [sqlite.initialized, chip, search, page]);
+
+  useEffect(() => {
+    if (sqlite.initialized) {
+      globalAudio && onUpdateList();
+    }
+  }, [sqlite.initialized, globalAudio]);
+
+  useEffect(() => {
+    setClips([...listAudios]);
+  }, [listAudios]);
 
   return (
     <div className={styles["ion-content"]}>
       <div className={`ion-margin-bottom ${styles.chips}`}>
         <div className={styles["chip-list"]}>
           <IonChip
-            onClick={() => setChip("0")}
+            onClick={() => handleChipChange("0")}
             className={categoria == "All" ? styles.checked : ""}
           >
             {" "}
@@ -191,7 +217,7 @@ export const Clips = () => {
             return (
               <IonChip
                 key={idx}
-                onClick={() => setChip(item.id)}
+                onClick={() => handleChipChange(item.id)}
                 className={categoria == item.categoria ? styles.checked : ""}
               >
                 {" "}
@@ -205,17 +231,26 @@ export const Clips = () => {
           className={`ion-no-padding ion-margin-bottom ${styles["search"]}`}
           placeholder="Buscar..."
           color="warning"
-          onIonInput={(ev) => oSetSearch(ev)}
-          value={search == "__empty__" ? "" : search}
+          debounce={500}
+          onIonInput={(ev) => handleSearchChange(ev.detail.value!)}
+          value={search}
         ></IonSearchbar>
       </div>
 
       <IonList className="ion-no-padding ion-margin-bottom" lines="none">
-        {clips.map((item: any, idx: any) => {
-          return (
-            <Item key={idx} idx={idx} item={item} clips={clips} setClips={setClips} />            
-          );
-        })}
+        {sqlite &&
+          clips.map((item: any, idx: any) => {
+            return (
+              <Item
+                key={idx}
+                idx={idx}
+                item={item}
+                clips={clips}
+                sqlite={sqlite}
+                setClips={setClips}
+              />
+            );
+          })}
       </IonList>
 
       <IonInfiniteScroll

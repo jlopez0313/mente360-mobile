@@ -3,7 +3,7 @@
 import {baseApi} from './api';
 import { HttpHeaders } from '@capacitor/core';
 
-export const all = async( ) => {
+export const all = async( ): Promise<any> => {
 
     return new Promise( async (resolve, reject) => {
         const { get } = baseApi();

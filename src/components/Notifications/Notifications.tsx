@@ -5,18 +5,16 @@ import {
   IonItemGroup,
   IonLabel,
   IonList,
-  IonNote,
-  IonText,
+  IonText
 } from "@ionic/react";
 import styles from "./Notifications.module.scss";
 
-import UIContext from "@/context/Context";
-import { useContext, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { setGeneral } from "@/store/slices/notificationSlice";
 import Logo from "@/assets/images/logo.png";
-import dayjs from "dayjs";
 import { setShowGlobalAudio } from "@/store/slices/audioSlice";
+import { setGeneral } from "@/store/slices/notificationSlice";
+import dayjs from "dayjs";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 export const Notifications = () => {
   const dispatch = useDispatch();

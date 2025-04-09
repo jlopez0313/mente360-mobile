@@ -1,24 +1,22 @@
 import {
-  IonBackButton,
   IonButton,
   IonButtons,
   IonContent,
   IonHeader,
   IonPage,
   IonTitle,
-  IonToolbar,
+  IonToolbar
 } from "@ionic/react";
 
-import { IonIcon } from "@ionic/react";
-import { arrowBack, calendarOutline, settingsOutline, timeOutline } from "ionicons/icons";
 import { Perfil as PerfilComponent } from "@/components/Perfil/Perfil";
+import { IonIcon } from "@ionic/react";
+import { arrowBack, settingsOutline, timeOutline } from "ionicons/icons";
 
-import styles from "./Perfil.module.scss";
-import { Link, useHistory } from "react-router-dom";
-import UIContext from "@/context/Context";
-import { useContext, useEffect } from "react";
-import { useDispatch } from "react-redux";
 import { setShowGlobalAudio } from "@/store/slices/audioSlice";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { Link, useHistory } from "react-router-dom";
+import styles from "./Perfil.module.scss";
 
 const Perfil: React.FC = () => {
   const dispatch = useDispatch();

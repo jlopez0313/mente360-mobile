@@ -1,0 +1,30 @@
+@import "@/styles.scss";
+
+.cards {
+    background-repeat: no-repeat;
+    background-size: cover;
+
+    .custom-accordion {
+        border-radius: 8px;
+        overflow: hidden;
+        margin-bottom: 10px;
+    }
+    
+    ion-item {
+        --background: #fffcf9;
+        
+        ion-label {
+            color: #333 !important;
+        }
+
+        ion-icon {
+            transition: none !important;
+            transform: none !important;
+            
+            &.trofeo {
+                color: var(--bg-primary) !important;
+            }
+        }
+
+    }
+}
