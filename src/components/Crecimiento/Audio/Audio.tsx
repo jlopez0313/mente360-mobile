@@ -6,11 +6,12 @@ import {
   IonCardContent,
   IonCardHeader,
   IonCardSubtitle,
+  IonChip,
   IonIcon,
   IonRange,
   IonSkeletonText,
   IonText,
-  useIonToast
+  useIonToast,
 } from "@ionic/react";
 import {
   downloadOutline,
@@ -19,7 +20,7 @@ import {
   play,
   playSkipBack,
   playSkipForward,
-  trashBinOutline
+  trashBinOutline,
 } from "ionicons/icons";
 import { memo, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
@@ -27,24 +28,23 @@ import styles from "./Audio.module.scss";
 
 import AudioNoWifi from "@/assets/images/audio_no_wifi.jpg";
 import CrecimientosDB from "@/database/crecimientos";
-import { useNetwork } from "@/hooks/useNetwork";
 
 interface Props {
   activeIndex: any;
   audio: any;
   sqlite: any;
+  network: any;
   onGoBack: () => void;
   onGoNext: () => void;
   onSaveNext: (e: any) => void;
 }
 
 export const Audio: React.FC<Props> = memo(
-  ({ activeIndex, audio, sqlite, onGoBack, onGoNext, onSaveNext }) => {
+  ({ activeIndex, audio, sqlite, network, onGoBack, onGoNext, onSaveNext }) => {
     const { db, initialized, performSQLAction } = sqlite;
 
     const { isGlobalPlaying }: any = useSelector((state: any) => state.audio);
 
-    const network = useNetwork();
     const [presentToast] = useIonToast();
 
     const [isLoading, setIsLoading] = useState(true);
@@ -206,7 +206,7 @@ export const Audio: React.FC<Props> = memo(
     }, []);
 
     return (
-      <IonCard className={`ion-margin-top ion-text-center ${styles.card}`}>
+      <IonCard className={`ion-text-center ${styles.card}`}>
         {isLoading && (
           <IonSkeletonText
             animated
@@ -226,30 +226,24 @@ export const Audio: React.FC<Props> = memo(
           className="ion-margin-bottom"
         />
 
-        <IonCardHeader className="ion-no-padding ion-margin-bottom">
+        <IonCardHeader className="ion-no-padding">
           <IonCardSubtitle className="ion-no-padding">
-            {localSrc ? (
-              <IonIcon
-                icon={downloadOutline}
-                className={`${styles["downloaded"]}`}
-              />
-            ) : (
-              <IonText> &nbsp; </IonText>
-            )}
-
             <IonText> {audio.titulo} </IonText>
+          </IonCardSubtitle>
 
-            {network.status ? (
-              <IonIcon
-                className={`${styles["donwload-icon"]}`}
-                onClick={() =>
-                  localSrc ? onRemoveLocal(audio) : onDownload(audio)
-                }
-                icon={localSrc ? trashBinOutline : downloadOutline}
-              />
-            ) : (
-              <IonText> &nbsp; </IonText>
-            )}
+          <IonCardSubtitle className="ion-no-padding">
+            <div className={styles["chip-list"]}>
+              <IonChip disabled={!network.status}>
+                <IonIcon
+                  className={`${styles["donwload-icon"]}`}
+                  onClick={() =>
+                    localSrc ? onRemoveLocal(audio) : onDownload(audio)
+                  }
+                  icon={localSrc ? trashBinOutline : downloadOutline}
+                /> 
+                {localSrc ? 'Eliminar Descarga' : 'Descargar'}
+              </IonChip>
+            </div>
           </IonCardSubtitle>
         </IonCardHeader>
 

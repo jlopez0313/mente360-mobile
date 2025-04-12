@@ -1,4 +1,3 @@
-import { setIsGlobalPlaying } from "@/store/slices/audioSlice";
 import {
   IonAvatar,
   IonIcon,
@@ -18,6 +17,7 @@ import {
   setAudioSrc,
   setGlobalAudio,
   setGlobalPos,
+  setIsGlobalPlaying,
 } from "@/store/slices/audioSlice";
 
 import { getUser } from "@/helpers/onboarding";
@@ -27,8 +27,6 @@ import {
   heart,
   heartOutline,
   musicalNotesOutline,
-  pauseCircle,
-  playCircle,
   shareSocial,
   starOutline,
   trashBinOutline,
@@ -38,20 +36,30 @@ import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 
 import AudioNoWifi from "@/assets/images/audio_no_wifi.jpg";
+import MusicBar from "@/components/Shared/MusicBar/MusicBar";
 import ClipsDB from "@/database/clips";
+import LikesDB from "@/database/likes";
+import PlaylistDB from "@/database/playlist";
 import { useAudio } from "@/hooks/useAudio";
-import { useNetwork } from "@/hooks/useNetwork";
 import { dislike, like } from "@/services/likes";
 import { add, trash } from "@/services/playlist";
 
-export const Item: React.FC<any> = ({ idx, item, clips, sqlite, setClips }) => {
-  const dispatch = useDispatch();
-
+export const Item: React.FC<any> = ({
+  idx,
+  item,
+  sqlite,
+  network,
+  onSetClips,
+}) => {
   const { db, performSQLAction } = sqlite;
 
   const { user } = getUser();
   const history = useHistory();
-  const network = useNetwork();
+  const dispatch = useDispatch();
+
+  const { baseURL, globalAudio, isGlobalPlaying } = useSelector(
+    (state: any) => state.audio
+  );
 
   const audioRef = useRef();
 
@@ -69,33 +77,17 @@ export const Item: React.FC<any> = ({ idx, item, clips, sqlite, setClips }) => {
       () => {}
     );
 
-  const { baseURL, globalAudio, isGlobalPlaying } = useSelector(
-    (state: any) => state.audio
-  );
+  const onPlayClicked = async () => {
+    console.log(item);
 
-  const hasThisUser = (usuarios_clips: any[]) => {
-    const hasUserClip = usuarios_clips.find(
-      (item) => item.users_id == user?.id
-    );
-    return hasUserClip;
-  };
-
-  const hasMyLike = (likes: any[]) => {
-    const hasLike = likes.find((item) => item.users_id == user?.id);
-    return hasLike;
-  };
-
-  const onPlayClicked = async (idx: number, audio: any) => {
-    console.log(audio);
-
-    if (!globalAudio || audio.id != globalAudio.id) {
-      if (audio.audio_local) {
-        const audioBlob = await getDownloadedAudio(audio.audio_local);
+    if (!globalAudio || item.id != globalAudio.id) {
+      if (item.audio_local) {
+        const audioBlob = await getDownloadedAudio(item.audio_local);
         dispatch(setAudioSrc(audioBlob));
       } else {
-        dispatch(setAudioSrc(baseURL + audio.audio));
+        dispatch(setAudioSrc(baseURL + item.audio));
       }
-      dispatch(setGlobalAudio(audio));
+      dispatch(setGlobalAudio(item));
       dispatch(setGlobalPos(idx));
     }
 
@@ -106,39 +98,27 @@ export const Item: React.FC<any> = ({ idx, item, clips, sqlite, setClips }) => {
     dispatch(setIsGlobalPlaying(false));
   };
 
-  const onTrashFromPlaylist = async (idx: number, audio: any, usuarios_clips: any) => {
+  const onTrashFromPlaylist = async () => {
     try {
       present({
         message: "Cargando ...",
       });
 
-      const updatedClips = [...clips];
+      await trash(item.in_my_playlist);
 
-      const userClip = hasThisUser(usuarios_clips);
+      const playlistDB = new PlaylistDB(db);
+      await playlistDB.delete(performSQLAction, () => {}, item.in_my_playlist);
 
-      await trash(userClip?.id);
-
-      const updatedUsuariosClips = updatedClips[idx].usuarios_clips.filter(
-        (item: any) => item.id !== userClip?.id
-      );
-
-      updatedClips[idx] = {
-        ...updatedClips[idx],
-        usuarios_clips: updatedUsuariosClips,
+      const newItem = {
+        ...item,
+        in_my_playlist: null,
       };
 
-      setClips([...updatedClips]);
-
-      if (globalAudio?.id == audio.id) {
-        dispatch(
-          setGlobalAudio({
-            ...audio,
-            usuarios_clips: updatedClips[idx].usuarios_clips,
-          })
-        );
+      if (globalAudio?.id == item.id) {
+        dispatch(setGlobalAudio({ newItem }));
       }
 
-      // onGetClips();
+      onSetClips(idx, newItem);
     } catch (error: any) {
       console.log(error);
 
@@ -153,16 +133,13 @@ export const Item: React.FC<any> = ({ idx, item, clips, sqlite, setClips }) => {
     }
   };
 
-  const onAddToPlaylist = async (idx: number, audio: any, id: any) => {
+  const onAddToPlaylist = async () => {
     try {
       present({
         message: "Cargando ...",
       });
-
-      const updatedClips = [...clips];
-
       const data = {
-        clips_id: id,
+        clips_id: item.id,
         users_id: user.id,
       };
 
@@ -170,32 +147,29 @@ export const Item: React.FC<any> = ({ idx, item, clips, sqlite, setClips }) => {
         data: { data: added },
       } = await add(data);
 
-      const updatedUsuariosClips = [
-        ...updatedClips[idx].usuarios_clips,
+      const playlistDB = new PlaylistDB(db);
+      await playlistDB.create(performSQLAction, () => {}, [
         {
-          users_id: user.id,
-          clips_id: id,
           id: added.id,
+          clip: {
+            id: item.id,
+          },
+          user: {
+            id: user.id,
+          },
         },
-      ];
+      ]);
 
-      updatedClips[idx] = {
-        ...updatedClips[idx],
-        usuarios_clips: updatedUsuariosClips,
+      const newItem = {
+        ...item,
+        in_my_playlist: added.id,
       };
 
-      setClips([...updatedClips]);
-
-      if (globalAudio?.id == audio.id) {
-        dispatch(
-          setGlobalAudio({
-            ...audio,
-            usuarios_clips: updatedClips[idx].usuarios_clips,
-          })
-        );
+      if (globalAudio?.id == item.id) {
+        dispatch(setGlobalAudio(newItem));
       }
 
-      // onGetPlaylist();
+      onSetClips(idx, newItem);
     } catch (error: any) {
       console.log(error);
 
@@ -210,37 +184,28 @@ export const Item: React.FC<any> = ({ idx, item, clips, sqlite, setClips }) => {
     }
   };
 
-  const onDislike = async (idx: number, audio: any, likes: any) => {
+  const onDislike = async () => {
     try {
       present({
         message: "Cargando ...",
       });
 
-      const updatedClips = [...clips];
+      await dislike(item.my_like);
 
-      const userClip = hasMyLike(likes);
+      const likes = new LikesDB(db);
+      await likes.delete(performSQLAction, () => {}, item.my_like);
 
-      await dislike(userClip?.id);
-
-      const updatedLikes = updatedClips[idx].likes.filter(
-        (item: any) => item.id !== userClip?.id
-      );
-
-      updatedClips[idx] = {
-        ...updatedClips[idx],
-        likes: updatedLikes,
+      const newItem = {
+        ...item,
+        all_likes: item.all_likes - 1,
+        my_like: null,
       };
 
-      setClips([...updatedClips]);
-
-      if (globalAudio?.id == audio.id) {
-        dispatch(
-          setGlobalAudio({
-            ...audio,
-            likes: updatedClips[idx].likes,
-          })
-        );
+      if (globalAudio?.id == item.id) {
+        dispatch(setGlobalAudio(newItem));
       }
+
+      onSetClips(idx, newItem);
 
       // onGetClips();
     } catch (error: any) {
@@ -257,16 +222,14 @@ export const Item: React.FC<any> = ({ idx, item, clips, sqlite, setClips }) => {
     }
   };
 
-  const onLike = async (idx: number, audio: any, id: any) => {
+  const onLike = async () => {
     try {
       present({
         message: "Cargando ...",
       });
 
-      const updatedClips = [...clips];
-
       const data = {
-        clips_id: id,
+        clips_id: item.id,
         users_id: user.id,
       };
 
@@ -274,32 +237,25 @@ export const Item: React.FC<any> = ({ idx, item, clips, sqlite, setClips }) => {
         data: { data: added },
       } = await like(data);
 
-      const updateLikes = [
-        ...updatedClips[idx].likes,
+      const likesDB = new LikesDB(db);
+      await likesDB.create(performSQLAction, () => {}, [
         {
-          users_id: user.id,
-          clips_id: id,
+          ...data,
           id: added.id,
         },
-      ];
+      ]);
 
-      updatedClips[idx] = {
-        ...updatedClips[idx],
-        likes: updateLikes,
+      const newItem = {
+        ...item,
+        all_likes: item.all_likes + 1,
+        my_like: added.id,
       };
 
-      setClips([...updatedClips]);
-
-      if (globalAudio?.id == audio.id) {
-        dispatch(
-          setGlobalAudio({
-            ...audio,
-            likes: updatedClips[idx].likes,
-          })
-        );
+      if (globalAudio?.id == item.id) {
+        dispatch(setGlobalAudio(newItem));
       }
 
-      // onGetPlaylist();
+      onSetClips(idx, newItem);
     } catch (error: any) {
       console.log(error);
 
@@ -314,18 +270,18 @@ export const Item: React.FC<any> = ({ idx, item, clips, sqlite, setClips }) => {
     }
   };
 
-  const onDownload = async (audio: any) => {
+  const onDownload = async () => {
     try {
       await dismissSheet();
       onPresentToast(
         "bottom",
-        "Descargando " + audio.titulo + "...",
+        "Descargando " + item.titulo + "...",
         downloadOutline
       );
-      
+
       const ruta = await downloadAudio(
-        baseURL + audio.audio,
-        "audio_" + audio.id,
+        baseURL + item.audio,
+        "audio_" + item.id,
         async (p: any) => {
           console.log("P es ", p);
         }
@@ -337,8 +293,8 @@ export const Item: React.FC<any> = ({ idx, item, clips, sqlite, setClips }) => {
 
       const clipsDB = new ClipsDB(db);
       await clipsDB.download(performSQLAction, () => {}, {
-        id: audio.id,
-        imagen: audio.imagen,
+        id: item.id,
+        imagen: item.imagen,
         audio: ruta,
       });
 
@@ -346,7 +302,7 @@ export const Item: React.FC<any> = ({ idx, item, clips, sqlite, setClips }) => {
         setAudioItem({
           index: idx,
           newData: {
-            imagen_local: audio.imagen,
+            imagen_local: item.imagen,
             audio_local: ruta,
             downloaded: 1,
           },
@@ -355,24 +311,23 @@ export const Item: React.FC<any> = ({ idx, item, clips, sqlite, setClips }) => {
 
       onPresentToast(
         "bottom",
-        audio.titulo + " está listo para escucharse sin conexión.",
+        item.titulo + " está listo para escucharse sin conexión.",
         musicalNotesOutline
       );
-
     } catch (error) {
       console.log(" error ondownload", error);
     }
   };
 
-  const onRemoveLocal = async (audio: any) => {
+  const onRemoveLocal = async () => {
     const clipsDB = new ClipsDB(db);
-    await clipsDB.unload(performSQLAction, () => {}, { id: audio.id });
+    await clipsDB.unload(performSQLAction, () => {}, { id: item.id });
 
-    await deleteAudio(audio.audio_local);
+    await deleteAudio(item.audio_local);
 
     onPresentToast(
       "bottom",
-      audio.titulo + " ha sido eliminado de tu biblioteca.",
+      item.titulo + " ha sido eliminado de tu biblioteca.",
       musicalNotesOutline
     );
   };
@@ -395,52 +350,40 @@ export const Item: React.FC<any> = ({ idx, item, clips, sqlite, setClips }) => {
     });
   };
 
-  const onPresentSheet = async (idx: number, audio: any) => {
-    console.log(audio);
-    const isInMyPlaylist = hasThisUser(audio.usuarios_clips);
-    const isInMyLikes = hasMyLike(audio.likes);
-
+  const onPresentSheet = async () => {
     await presentSheet({
       cssClass: "custom-action-sheet",
-      header: audio.titulo,
-      subHeader: audio.categoria?.categoria,
+      header: item.titulo,
+      subHeader: item.categoria,
       buttons: [
         {
           disabled: !network.status,
-          text:
-            audio.likes.length > 0
-              ? audio.likes.length + " Me gusta"
-              : "Me gusta",
-          icon: isInMyLikes ? heart : heartOutline,
-          handler: () =>
-            isInMyLikes
-              ? onDislike(idx, audio, audio.likes)
-              : onLike(idx, audio, audio.id),
+          text: item.all_likes > 0 ? item.all_likes + " Me gusta" : "Me gusta",
+          icon: item.my_like ? heart : heartOutline,
+          handler: () => (item.my_like ? onDislike() : onLike()),
         },
         {
           disabled: !network.status,
-          text: isInMyPlaylist
+          text: item.in_my_playlist
             ? "Remover de mi playlist"
             : "Agregar a mi playlist",
-          icon: isInMyPlaylist ? trashOutline : starOutline,
+          icon: item.in_my_playlist ? trashOutline : starOutline,
           handler: () =>
-            isInMyPlaylist
-              ? onTrashFromPlaylist(idx, audio, audio.usuarios_clips)
-              : onAddToPlaylist(idx, audio, audio.id),
+            item.in_my_playlist ? onTrashFromPlaylist() : onAddToPlaylist(),
         },
         {
           disabled: !network.status,
           text: "Compartir",
           icon: shareSocial,
-          handler: () => onShareLink(audio.id),
+          handler: () => onShareLink(item.id),
         },
         {
-          disabled: !network.status && !audio.audio_local,
-          text: audio.audio_local
+          disabled: !network.status && !item.audio_local,
+          text: item.audio_local
             ? "Eliminar de mis descargas"
             : "Descargar esta canción",
-          icon: audio.audio_local ? trashBinOutline : downloadOutline,
-          handler: () => (audio.audio_local ? onRemoveLocal(audio) : onDownload(audio)),
+          icon: item.audio_local ? trashBinOutline : downloadOutline,
+          handler: () => (item.audio_local ? onRemoveLocal() : onDownload()),
         },
       ],
     });
@@ -456,12 +399,12 @@ export const Item: React.FC<any> = ({ idx, item, clips, sqlite, setClips }) => {
 
         const avatar = document.createElement("img");
 
-        if ( network.status ) {
-          avatar.src = baseURL + audio.imagen;
+        if (network.status) {
+          avatar.src = baseURL + item.imagen;
         } else {
           avatar.src = AudioNoWifi;
         }
-        
+
         avatar.alt = "Avatar";
         avatar.classList.add("avatar");
 
@@ -469,11 +412,11 @@ export const Item: React.FC<any> = ({ idx, item, clips, sqlite, setClips }) => {
         textContainer.classList.add("text-container");
 
         const title = document.createElement("span");
-        title.textContent = audio.titulo;
+        title.textContent = item.titulo;
         title.classList.add("title");
 
         const subTitle = document.createElement("span");
-        subTitle.textContent = audio.categoria?.categoria || "";
+        subTitle.textContent = item.categoria || "";
         subTitle.classList.add("sub-title");
 
         textContainer.appendChild(title);
@@ -491,8 +434,18 @@ export const Item: React.FC<any> = ({ idx, item, clips, sqlite, setClips }) => {
   };
 
   return (
-    <IonItem button={true}>
-      <IonAvatar slot="start">
+    <IonItem
+      button={true}
+      className={globalAudio?.id == item.id ? styles["current-playing"] : ""}
+    >
+      <IonAvatar
+        slot="start"
+        onClick={() =>
+          globalAudio?.id == item?.id && isGlobalPlaying
+            ? onDoPause()
+            : onPlayClicked()
+        }
+      >
         {isLoading && (
           <IonSkeletonText
             animated
@@ -510,8 +463,26 @@ export const Item: React.FC<any> = ({ idx, item, clips, sqlite, setClips }) => {
           style={{ display: isLoading ? "none" : "block" }}
           onLoad={() => setIsLoading(false)}
         />
+
+        {globalAudio?.id == item.id && (
+          <MusicBar className={styles["music-bar"]} paused={!isGlobalPlaying} />
+        )}
       </IonAvatar>
-      <div style={{ display: "flex", flexDirection: "column" }}>
+
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          width: "100%",
+          height: "100%",
+          justifyContent: "center",
+        }}
+        onClick={() =>
+          globalAudio?.id == item?.id && isGlobalPlaying
+            ? onDoPause()
+            : onPlayClicked()
+        }
+      >
         <IonLabel className={`ion-text-left ${styles["titulo"]}`}>
           {item.downloaded ? (
             <IonIcon
@@ -522,32 +493,14 @@ export const Item: React.FC<any> = ({ idx, item, clips, sqlite, setClips }) => {
           ) : null}
           {item.titulo}{" "}
         </IonLabel>
-        <span className={styles["categoria"]}>
-          {" "}
-          {item.categoria?.categoria}{" "}
-        </span>
+        <span className={styles["categoria"]}> {item.categoria} </span>
       </div>
-      {globalAudio?.id == item.id && isGlobalPlaying ? (
-        <IonIcon
-          aria-hidden="true"
-          slot="end"
-          icon={pauseCircle}
-          onClick={onDoPause}
-        />
-      ) : (
-        <IonIcon
-          aria-hidden="true"
-          slot="end"
-          icon={playCircle}
-          onClick={() => onPlayClicked(idx, item)}
-        />
-      )}
 
       <IonIcon
         aria-hidden="true"
         slot="end"
         icon={ellipsisVertical}
-        onClick={() => onPresentSheet(idx, item)}
+        onClick={() => onPresentSheet()}
       />
     </IonItem>
   );

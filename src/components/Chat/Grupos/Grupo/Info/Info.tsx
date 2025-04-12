@@ -1,18 +1,18 @@
-import React, { useEffect, useState } from "react";
-import {
-  IonFab,
-  IonFabButton,
-  IonIcon,
-  IonItemDivider,
-  IonItemGroup,
-  IonLabel,
-  IonList,
-} from "@ionic/react";
-import styles from "./Info.module.scss";
-import { addOutline } from "ionicons/icons";
-import { Modal } from "@/components/Modal/Modal";
-import { Add } from "../Add/Add";
+import { Modal } from "@/components/Shared/Modal/Modal";
 import { getData } from "@/services/realtime-db";
+import {
+    IonFab,
+    IonFabButton,
+    IonIcon,
+    IonItemDivider,
+    IonItemGroup,
+    IonLabel,
+    IonList,
+} from "@ionic/react";
+import { addOutline } from "ionicons/icons";
+import { useEffect, useState } from "react";
+import { Add } from "../Add/Add";
+import styles from "./Info.module.scss";
 
 import { Item } from "./Item";
 

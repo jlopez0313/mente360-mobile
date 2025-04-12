@@ -19,6 +19,8 @@
                     font-weight: 600;
                     padding: 5px 12px;
                     border-radius: 5px;
+                    --background: #ffedbd;
+                    border: 1px solid var(--bg-main);
             
                     &.checked {
                         --background: var(--bg-main);
@@ -56,9 +58,20 @@
             border: 1px solid var(--bg-main);
 
             margin-bottom: 5px;
+            
+
+            &.current-playing {
+                background-color: #ffedbd;
+            }
 
             ion-avatar {
                 --border-radius: 5px;
+
+                .music-bar {
+                    position: absolute;
+                    bottom: 14px;
+                    left: 38px;
+                }
             }
     
             .titulo {

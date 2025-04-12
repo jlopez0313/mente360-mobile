@@ -69,15 +69,17 @@ export default class Clips {
     }
   }
 
-  async all(
-    performSQLAction: any,
-    callback: any,
-    { search, limit }: any
-  ) {
+  async all(performSQLAction: any, callback: any, { search, limit, userID }: any) {
     try {
       performSQLAction(async () => {
         const result = await this.db?.query(
-          "SELECT clips.*, categorias.categoria FROM clips INNER JOIN categorias ON categorias.id = clips.categorias_id WHERE titulo LIKE ? ORDER BY titulo LIMIT ? OFFSET ?",
+          `SELECT clips.*, categorias.categoria,
+            (SELECT COUNT(*) FROM likes where clips.id = likes.clips_id) as all_likes,
+            (SELECT id FROM likes where clips.id = likes.clips_id AND likes.users_id = ${userID}) as my_like,
+            (SELECT id FROM playlist where clips.id = playlist.clips_id AND playlist.users_id = ${userID}) as in_my_playlist
+          FROM clips
+          INNER JOIN categorias ON categorias.id = clips.categorias_id
+          WHERE titulo LIKE ? ORDER BY titulo LIMIT ? OFFSET ?`,
           [`%${search}%`, 10, (limit - 1) * 10]
         );
 
@@ -107,12 +109,19 @@ export default class Clips {
   async byCategory(
     performSQLAction: any,
     callback: any,
-    { search, categoria }: any
+    { search, categoria, userID }: any
   ) {
     try {
       performSQLAction(async () => {
         const result = await this.db?.query(
-          "SELECT clips.*, categorias.categoria FROM clips INNER JOIN categorias ON categorias.id = clips.categorias_id WHERE categorias_id=? AND titulo LIKE ? ORDER BY titulo",
+          `SELECT clips.*, categorias.categoria, 
+            (SELECT COUNT(*) FROM likes where clips.id = likes.clips_id) as all_likes,
+            (SELECT id FROM likes where clips.id = likes.clips_id AND likes.users_id = ${userID}) as my_like,
+            (SELECT id FROM playlist where clips.id = playlist.clips_id AND playlist.users_id = ${userID}) as in_my_playlist
+          FROM clips
+          INNER JOIN categorias ON categorias.id = clips.categorias_id
+          WHERE categorias_id=? AND titulo LIKE ? ORDER BY titulo
+          `,
           [categoria, `%${search}%`]
         );
         callback(result?.values);

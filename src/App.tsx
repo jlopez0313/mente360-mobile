@@ -41,10 +41,10 @@ import "@ionic/react/css/text-alignment.css";
 import "@ionic/react/css/text-transformation.css";
 
 /* Theme variables */
+import { Toast } from "@/components/Shared/Toast/Toast";
 import { CapacitorUpdater } from '@capgo/capacitor-updater';
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { Toast } from "./components/Toast/Toast";
 import "./theme/variables.css";
 
 setupIonicReact({

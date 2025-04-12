@@ -1,11 +1,11 @@
 import {
-  IonAccordion,
-  IonButton,
-  IonIcon,
-  IonItem,
-  IonLabel,
-  IonText,
-  useIonAlert
+    IonAccordion,
+    IonButton,
+    IonIcon,
+    IonItem,
+    IonLabel,
+    IonText,
+    useIonAlert
 } from "@ionic/react";
 
 import styles from "./Acordeon.module.scss";
@@ -13,7 +13,7 @@ import styles from "./Acordeon.module.scss";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 
-import { Modal } from "@/components/Modal/Modal";
+import { Modal } from "@/components/Shared/Modal/Modal";
 import { useDB } from "@/context/Context";
 import TareasDB from "@/database/tareas";
 import { confirmTarea } from "@/services/home";
@@ -99,6 +99,7 @@ export const Tarea: React.FC<any> = () => {
       <Modal
         trigger="modal-tarea"
         title="Tarea de la semana"
+        closeText="Ir a Grupo"
         hideButtons={tarea.done || currentDay != 1 || false}
         onConfirm={() => onConfirmTarea()}
       >

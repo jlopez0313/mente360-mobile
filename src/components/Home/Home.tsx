@@ -13,7 +13,7 @@ import { update } from "@/services/user";
 import { FCM } from "@capacitor-community/fcm";
 import { useHistory } from "react-router";
 
-import { Modal } from "@/components/Modal/Modal";
+import { Modal } from "@/components/Shared/Modal/Modal";
 import { Texto } from "./Texto/Texto";
 
 import { setRoute } from "@/store/slices/routeSlice";
@@ -70,12 +70,17 @@ export const Home = () => {
 
           const { data } = await getHome({});
 
+          await audiosDB.remove(sqlite.performSQLAction, () => {});
           await audiosDB.create(sqlite.performSQLAction, () => {}, [
             data.audio,
           ]);
+
+          await mensajesDB.remove(sqlite.performSQLAction, () => {});
           await mensajesDB.create(sqlite.performSQLAction, () => {}, [
             data.mensaje,
           ]);
+
+          await tareasDB.remove(sqlite.performSQLAction, () => {});
           await tareasDB.create(sqlite.performSQLAction, () => {}, [
             data.tarea,
           ]);
@@ -87,7 +92,6 @@ export const Home = () => {
           await audiosDB.all(sqlite.performSQLAction, (data: any) => {
             if (data?.length) dispatch(setAudio(data[0]));
           });
-
           await mensajesDB.all(sqlite.performSQLAction, (data: any) => {
             if (data?.length) dispatch(setMensaje(data[0]));
           });

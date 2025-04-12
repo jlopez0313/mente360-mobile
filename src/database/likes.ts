@@ -57,7 +57,7 @@ export default class Likes {
   async all(
     performSQLAction: any,
     callback: any,
-    { search, limit, categoria }: any
+    {}: any
   ) {
     try {
       performSQLAction(async () => {
@@ -96,6 +96,18 @@ export default class Likes {
       });
     } catch (error) {
       console.log("error remove likes", error);
+      throw error;
+    }
+  }
+
+  async delete(performSQLAction: any, callback: any, id: any) {
+    try {
+      performSQLAction(async () => {
+        const query = await this.db?.query(`DELETE FROM likes WHERE id=?;`, [id]);
+        callback();
+      });
+    } catch (error) {
+      console.log("error delete likes", error);
       throw error;
     }
   }

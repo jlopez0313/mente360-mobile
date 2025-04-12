@@ -1,17 +1,16 @@
-import React, { useEffect, useState } from "react";
-import { IonButton, IonIcon, IonItemGroup, IonList } from "@ionic/react";
-import { writeData, updateData } from "@/services/realtime-db";
-import styles from "./Grupos.module.scss";
-import { add } from "ionicons/icons";
-import { Modal } from "../../Modal/Modal";
-import { Add } from "./Add/Add";
-import { create, getAll } from "@/services/grupos";
+import { Modal } from "@/components/Shared/Modal/Modal";
 import { getUser } from "@/helpers/onboarding";
+import { create } from "@/services/grupos";
+import { getData, readData, updateData, writeData } from "@/services/realtime-db";
+import { IonButton, IonIcon, IonItemGroup, IonList } from "@ionic/react";
 import { onValue } from "firebase/database";
-import { readData, getData } from "@/services/realtime-db";
+import { add } from "ionicons/icons";
+import { useEffect, useState } from "react";
+import { Add } from "./Add/Add";
+import styles from "./Grupos.module.scss";
 
-import { useDispatch } from "react-redux";
 import { setGrupo } from "@/store/slices/notificationSlice";
+import { useDispatch } from "react-redux";
 import { Item } from "./Item";
 
 export const Grupos = () => {

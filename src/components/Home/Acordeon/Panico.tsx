@@ -10,7 +10,7 @@ import {
 import { useHistory } from "react-router";
 import styles from "./Acordeon.module.scss";
 
-import { Modal } from "@/components/Modal/Modal";
+import { Modal } from "@/components/Shared/Modal/Modal";
 import { shareSocialOutline } from "ionicons/icons";
 import { useSelector } from "react-redux";
 import { Audio } from "../Audio/Audio";

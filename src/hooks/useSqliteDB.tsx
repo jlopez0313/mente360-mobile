@@ -181,6 +181,8 @@ export const useSqliteDB = () => {
       });
 
       if (dbExport?.export?.database) {
+        console.log("Contenido exportado:", JSON.stringify(dbExport.export, null, 2));
+        
         const targetPath = "Download/db_backup.json";
 
         try {

@@ -3,20 +3,27 @@ import {
   IonCardContent,
   IonCardHeader,
   IonCardSubtitle,
+  IonChip,
   IonIcon,
   IonProgressBar,
   IonSkeletonText,
   IonText,
-  useIonToast
+  useIonAlert,
+  useIonLoading,
+  useIonToast,
 } from "@ionic/react";
 import {
   downloadOutline,
+  heart,
+  heartOutline,
   musicalNotesOutline,
   pause,
   play,
   playSkipBack,
   playSkipForward,
   shareSocial,
+  star,
+  starOutline,
   trashBinOutline,
 } from "ionicons/icons";
 import { useEffect, useRef, useState } from "react";
@@ -33,20 +40,25 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 
 import { startBackground } from "@/helpers/background";
-import {
-  create,
-  updateElapsed
-} from "@/helpers/musicControls";
+import { create, updateElapsed } from "@/helpers/musicControls";
+import { getUser } from "@/helpers/onboarding";
 
 import ClipsDB from "@/database/clips";
+import LikesDB from "@/database/likes";
+import PlaylistDB from "@/database/playlist";
 import { useSqliteDB } from "@/hooks/useSqliteDB";
+import { dislike, like } from "@/services/likes";
+import { add, trash } from "@/services/playlist";
 
 export const Clip = () => {
+  const { user } = getUser();
 
   const dispatch = useDispatch();
-  const { db, initialized, performSQLAction } = useSqliteDB();
+  const { db, performSQLAction } = useSqliteDB();
 
   const [presentToast] = useIonToast();
+  const [presentAlert] = useIonAlert();
+  const [present, dismiss] = useIonLoading();
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -72,7 +84,7 @@ export const Clip = () => {
     onShareLink,
     downloadAudio,
     deleteAudio,
-    getDownloadedAudio
+    getDownloadedAudio,
   } = useAudio(
     audioRef,
     () => {},
@@ -92,17 +104,17 @@ export const Clip = () => {
     });
   };
 
-  const onDownload = async (audio: any) => {
+  const onDownload = async () => {
     try {
       onPresentToast(
         "bottom",
-        "Descargando " + audio.titulo + "...",
+        "Descargando " + globalAudio.titulo + "...",
         downloadOutline
       );
 
       const ruta = await downloadAudio(
-        baseURL + audio.audio,
-        "audio_" + audio.id,
+        baseURL + globalAudio.audio,
+        "audio_" + globalAudio.id,
         async (p: any) => {
           console.log("P es ", p);
         }
@@ -112,8 +124,8 @@ export const Clip = () => {
 
       const clipsDB = new ClipsDB(db);
       await clipsDB.download(performSQLAction, () => {}, {
-        id: audio.id,
-        imagen: audio.imagen,
+        id: globalAudio.id,
+        imagen: globalAudio.imagen,
         audio: ruta,
       });
 
@@ -121,7 +133,7 @@ export const Clip = () => {
         setAudioItem({
           index: globalPos,
           newData: {
-            imagen_local: audio.imagen,
+            imagen_local: globalAudio.imagen,
             audio_local: ruta,
             downloaded: 1,
           },
@@ -130,25 +142,183 @@ export const Clip = () => {
 
       onPresentToast(
         "bottom",
-        audio.titulo + " está listo para escucharse sin conexión.",
+        globalAudio.titulo + " está listo para escucharse sin conexión.",
         musicalNotesOutline
       );
-
     } catch (error) {
       console.log(" error ondownload", error);
     }
   };
 
-  const onRemoveLocal = async (audio: any) => {
-    await db.remove("audio_" + audio.id);
+  const onRemoveLocal = async () => {
+    const clipsDB = new ClipsDB(db);
+    await clipsDB.unload(performSQLAction, () => {}, { id: globalAudio.id });
 
-    await deleteAudio(audio.audio_local);
+    await deleteAudio(globalAudio.audio_local);
 
     onPresentToast(
       "bottom",
-      audio.titulo + " ha sido eliminado de tu biblioteca.",
+      globalAudio.titulo + " ha sido eliminado de tu biblioteca.",
       musicalNotesOutline
     );
+  };
+
+  const onTrashFromPlaylist = async () => {
+    try {
+      present({
+        message: "Cargando ...",
+      });
+
+      await trash(globalAudio.in_my_playlist);
+
+      const playlistDB = new PlaylistDB(db);
+      await playlistDB.delete(
+        performSQLAction,
+        () => {},
+        globalAudio.in_my_playlist
+      );
+
+      const newItem = {
+        ...globalAudio,
+        in_my_playlist: null,
+      };
+
+      dispatch(setGlobalAudio({ newItem }));
+    } catch (error: any) {
+      console.log(error);
+
+      presentAlert({
+        header: "Alerta!",
+        subHeader: "Mensaje importante.",
+        message: error.data?.message || "Error Interno",
+        buttons: ["OK"],
+      });
+    } finally {
+      dismiss();
+    }
+  };
+
+  const onAddToPlaylist = async () => {
+    try {
+      present({
+        message: "Cargando ...",
+      });
+      const data = {
+        clips_id: globalAudio.id,
+        users_id: user.id,
+      };
+
+      const {
+        data: { data: added },
+      } = await add(data);
+
+      const playlistDB = new PlaylistDB(db);
+      await playlistDB.create(performSQLAction, () => {}, [
+        {
+          id: added.id,
+          clip: {
+            id: globalAudio.id,
+          },
+          user: {
+            id: globalAudio.id,
+          },
+        },
+      ]);
+
+      const newItem = {
+        ...globalAudio,
+        in_my_playlist: added.id,
+      };
+
+      dispatch(setGlobalAudio(newItem));
+    } catch (error: any) {
+      console.log(error);
+
+      presentAlert({
+        header: "Alerta!",
+        subHeader: "Mensaje importante.",
+        message: error.data?.message || "Error Interno",
+        buttons: ["OK"],
+      });
+    } finally {
+      dismiss();
+    }
+  };
+
+  const onDislike = async () => {
+    try {
+      present({
+        message: "Cargando ...",
+      });
+
+      await dislike(globalAudio.my_like);
+
+      const likes = new LikesDB(db);
+      await likes.delete(performSQLAction, () => {}, globalAudio.my_like);
+
+      const newItem = {
+        ...globalAudio,
+        all_likes: globalAudio.all_likes - 1,
+        my_like: null,
+      };
+
+      dispatch(setGlobalAudio(newItem));
+    } catch (error: any) {
+      console.log(error);
+
+      presentAlert({
+        header: "Alerta!",
+        subHeader: "Mensaje importante.",
+        message: error.data?.message || "Error Interno",
+        buttons: ["OK"],
+      });
+    } finally {
+      dismiss();
+    }
+  };
+
+  const onLike = async () => {
+    try {
+      present({
+        message: "Cargando ...",
+      });
+
+      const data = {
+        clips_id: globalAudio.id,
+        users_id: user.id,
+      };
+
+      const {
+        data: { data: added },
+      } = await like(data);
+
+      const likesDB = new LikesDB(db);
+      await likesDB.create(performSQLAction, () => {}, [
+        {
+          ...data,
+          id: added.id,
+        },
+      ]);
+
+      const newItem = {
+        ...globalAudio,
+        all_likes: globalAudio.all_likes + 1,
+        my_like: added.id,
+      };
+
+      dispatch(setGlobalAudio(newItem));
+    } catch (error: any) {
+      console.log(error);
+
+      presentAlert({
+        header: "Alerta!",
+        subHeader: "Mensaje importante.",
+        message: error.data?.message || "Error Interno",
+        buttons: ["OK"],
+      });
+    } finally {
+      dismiss();
+    }
   };
 
   const onUpdateElapsed = () => {
@@ -161,7 +331,7 @@ export const Clip = () => {
     dispatch(setGlobalPos(prevIdx));
 
     const prev = listAudios[prevIdx];
-    
+
     if (prev.audio_local) {
       const audioBlob = await getDownloadedAudio(prev.audio_local);
       dispatch(setAudioSrc(audioBlob));
@@ -178,7 +348,7 @@ export const Clip = () => {
     dispatch(setGlobalPos(nextIdx));
 
     const next = listAudios[nextIdx];
-    
+
     if (next.audio_local) {
       const audioBlob = await getDownloadedAudio(next.audio_local);
       dispatch(setAudioSrc(audioBlob));
@@ -232,24 +402,64 @@ export const Clip = () => {
 
         <IonCardHeader className="ion-no-padding">
           <IonCardSubtitle className="ion-no-padding">
-            <IonIcon
-              className={`${styles["donwload-icon"]}`}
-              onClick={() =>
-                globalAudio.audio_local ? onRemoveLocal(globalAudio) : onDownload(globalAudio)
-              }
-              icon={globalAudio.audio_local ? trashBinOutline : downloadOutline}
-            />
-
             <IonText> {globalAudio.titulo} </IonText>
-            <IonIcon
-              className={`${styles["share-icon"]}`}
-              onClick={() => onShareLink(globalAudio.id)}
-              icon={shareSocial}
-            />
+            <span> {globalAudio.categoria?.categoria} </span>
+          </IonCardSubtitle>
+
+          <IonCardSubtitle className={"ion-no-padding"}>
+            <div className={styles["chip-list"]}>
+              <IonChip
+                onClick={() =>
+                  globalAudio.audio_local ? onRemoveLocal() : onDownload()
+                }
+              >
+                <IonIcon
+                  className={`${styles["share-icon"]}`}
+                  icon={
+                    globalAudio.audio_local ? trashBinOutline : downloadOutline
+                  }
+                />
+                Descargar
+              </IonChip>
+
+              <IonChip
+                onClick={() =>
+                  globalAudio.in_my_playlist
+                    ? onTrashFromPlaylist()
+                    : onAddToPlaylist()
+                }
+              >
+                <IonIcon
+                  className={`${styles["share-icon"]}`}
+                  icon={globalAudio.in_my_playlist ? star : starOutline}
+                />
+                Favoritos
+              </IonChip>
+
+              <IonChip
+                onClick={() => (globalAudio.my_like ? onDislike() : onLike())}
+              >
+                <IonIcon
+                  className={`${styles["share-icon"]}`}
+                  icon={globalAudio.my_like ? heart : heartOutline}
+                />
+                {globalAudio.all_likes > 0
+                  ? globalAudio.all_likes + " Me gusta"
+                  : "Me gusta"}
+              </IonChip>
+
+              <IonChip onClick={() => onShareLink(globalAudio.id)}>
+                <IonIcon
+                  className={`${styles["share-icon"]}`}
+                  icon={shareSocial}
+                />
+                Compartir
+              </IonChip>
+            </div>
           </IonCardSubtitle>
         </IonCardHeader>
 
-        <IonCardContent>
+        <IonCardContent className="ion-no-padding">
           <div className={`${styles["unread-indicator"]}`}>
             <IonProgressBar
               color="warning"
@@ -294,18 +504,7 @@ export const Clip = () => {
               e.stopPropagation();
               goToNext();
             }}
-            src={ audio }
-          />
-
-          <img
-            src="assets/images/logo_texto.png"
-            style={{
-              width: "90px",
-              display: "block",
-              marginTop: "50px",
-              marginLeft: "auto",
-              marginRight: "auto",
-            }}
+            src={audio}
           />
         </IonCardContent>
       </IonCard>

@@ -110,19 +110,8 @@ export const useGlobalSync = () => {
 
         await delay(500);
       } catch (err: any) {
-        if (err.response?.status === 429) {
-          const retryAfter = parseInt(
-            err.response.headers["retry-after"] || "2",
-            10
-          );
-          console.warn(
-            `Too many requests. Esperando ${retryAfter} segundos...`
-          );
-          await delay(retryAfter * 1000);
-        } else {
-          console.error("Error en syncCrecimientos:", err);
-          hasMore = false;
-        }
+        console.log( err );
+        throw new Error(`Too many requests en syncCrecimientos.`)
       }
     }
 
@@ -223,19 +212,8 @@ export const useGlobalSync = () => {
         await delay(500);
         
       } catch (err: any) {
-        if (err.response?.status === 429) {
-          const retryAfter = parseInt(
-            err.response.headers["retry-after"] || "2",
-            10
-          );
-          console.warn(
-            `Too many requests. Esperando ${retryAfter} segundos...`
-          );
-          await delay(retryAfter * 1000);
-        } else {
-          console.error("Error en syncClips:", err);
-          hasMore = false;
-        }
+        console.log( err );
+        throw new Error(`Too many requests en syncClips.`)
       }
     }
 

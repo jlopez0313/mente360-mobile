@@ -198,10 +198,12 @@ export const Toast = () => {
   };
 
   const onDoPlay = () => {
+    onPlay();
     dispatch(setIsGlobalPlaying(true));
   };
 
   const onDoPause = () => {
+    onPause();
     dispatch(setIsGlobalPlaying(false));
   };
 
@@ -209,16 +211,8 @@ export const Toast = () => {
     onTimeUpdate()
     updateElapsed( audioRef.current?.currentTime )
   }
+  
   useEffect(() => {
-
-    console.log( 'listAudios', listAudios)
-  }, [listAudios]);
-
-
-  useEffect(() => {
-
-    console.log( 'reproduciendo', globalAudio)
-
     onPause();
     onPlay();
   }, [globalAudio]);
@@ -251,8 +245,12 @@ export const Toast = () => {
         className={`${styles["custom-close"]}`}
       />
 
-      <IonItem lines="none" button={true} detail={false} onClick={goToClip}>
-        <IonLabel class={`ion-text-left ${styles.title}`}> {globalAudio.titulo} </IonLabel>
+      <IonItem lines="none" button={true} detail={false}>
+        <div style={{display: 'flex', flexDirection: 'column', flexGrow: '1'}} onClick={goToClip}>
+          <IonLabel class={`ion-text-justify ${styles.title}`}> {globalAudio.titulo} </IonLabel>
+          <span className={`${styles.categoria}`}> {globalAudio.categoria} </span>
+
+        </div>
 
         <IonIcon
           onClick={(e) => {
@@ -315,7 +313,7 @@ export const Toast = () => {
           <IonIcon
             aria-hidden="true"
             slot="end"
-            icon={starOutline}
+            icon={globalAudio.in_my_playlist ? star : starOutline}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();

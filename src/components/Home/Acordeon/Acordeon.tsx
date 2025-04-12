@@ -1,8 +1,6 @@
 import { IonAccordionGroup } from "@ionic/react";
 import styles from "./Acordeon.module.scss";
 
-
-
 import { Audio } from "./Audio";
 import { Mensaje } from "./Mensaje";
 import { Panico } from "./Panico";
@@ -12,16 +10,15 @@ import { Tarea } from "./Tarea";
 export const Acordeon = () => {
   return (
     <IonAccordionGroup expand="inset" className={styles["cards"]}>
-      <Tarea  />
+      <Tarea />
 
-      <Mensaje  />
-
+      <Mensaje />
 
       <Audio />
 
       <Podcasts />
-      
-      <Panico  />
+
+      <Panico />
     </IonAccordionGroup>
   );
 };

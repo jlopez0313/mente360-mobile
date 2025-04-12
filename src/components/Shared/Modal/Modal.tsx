@@ -16,6 +16,7 @@ interface Props {
   canDismiss: boolean;
   trigger: string;
   title?: string;
+  closeText?: string;
   children: any;
   hideButtons: boolean;
   onConfirm: (params?: any) => void;
@@ -31,6 +32,7 @@ export const Modal: React.FC<Props> = memo(
     isOpen = false,
     canDismiss = true,
     showButtons = true,
+    closeText = 'Cerrar',
     onConfirm,
     onWillDismiss,
     ...props
@@ -77,7 +79,7 @@ export const Modal: React.FC<Props> = memo(
 
           {children.length
             ? children.map((child: any, idx: number) => {
-                return cloneElement(child, { doChild });
+                return cloneElement(child, { doChild, key: child.key ?? idx });
               })
             : cloneElement(children, { doChild })}
 
@@ -87,7 +89,7 @@ export const Modal: React.FC<Props> = memo(
             ) : (
               <IonButton onClick={() => dismiss()}>
                 <IonIcon icon={close} slot="start" />
-                Cerrar
+                {closeText}
               </IonButton>
             )
           ) : null}

@@ -1,3 +1,5 @@
+import { create } from "@/services/alarmas";
+import { LocalNotifications } from "@capacitor/local-notifications";
 import {
   IonButton,
   IonChip,
@@ -13,11 +15,9 @@ import {
   IonRow,
 } from "@ionic/react";
 import { repeatOutline, timeOutline } from "ionicons/icons";
-import styles from "./Add.module.scss";
-import { Link, useHistory } from "react-router-dom";
 import { useState } from "react";
-import { LocalNotifications } from "@capacitor/local-notifications";
-import { create } from "@/services/alarmas";
+import { Link, useHistory } from "react-router-dom";
+import styles from "./Add.module.scss";
 
 export const Add = () => {
   const history = useHistory();
@@ -65,15 +65,11 @@ export const Add = () => {
       },
     }));
 
-    const savedNotifications = JSON.parse(
-      localStorage.getItem("notifications") || "[]"
-    );
-
     const save = await LocalNotifications.schedule({ notifications });
     console.log(save);
 
     const dataNotification = {
-      id: save.notifications,
+      notification_id: save.notifications,
       title: titulo,
       days: days.reduce((indices, day, index) => {
         if (day.selected) indices.push(index);

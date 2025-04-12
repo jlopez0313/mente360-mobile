@@ -3,36 +3,35 @@ import {
   IonCardContent,
   IonCardHeader,
   IonCardSubtitle,
+  IonChip,
   IonIcon,
   IonRange,
   IonSkeletonText,
   IonText,
 } from "@ionic/react";
 import {
+  downloadOutline,
   play,
   playSkipBack,
-  playSkipForward,
-  shareSocial,
+  playSkipForward
 } from "ionicons/icons";
-import styles from "./Card.module.scss";
 import { useState } from "react";
+import styles from "./Card.module.scss";
 
-import { useNetwork } from "@/hooks/useNetwork";
 import AudioNoWifi from "@/assets/images/audio_no_wifi.jpg";
 
 interface Props {
+  network: any;
   audio: any;
 }
 
-export const Card: React.FC<Props> = ({ audio }) => {
-
-  const network = useNetwork();
+export const Card: React.FC<Props> = ({ audio, network }) => {
 
   const baseURL = import.meta.env.VITE_BASE_BACK;
   const [isLoading, setIsLoading] = useState(true);
 
   return (
-    <IonCard className={`ion-margin-top ion-text-center ${styles.card}`}>
+    <IonCard className={`ion-text-center ${styles.card}`}>
       {isLoading && (
         <IonSkeletonText
           animated
@@ -52,16 +51,21 @@ export const Card: React.FC<Props> = ({ audio }) => {
         className="ion-margin-bottom"
       />
 
-      <IonCardHeader className="ion-no-padding ion-margin-bottom">
+      <IonCardHeader className="ion-no-padding">
         <IonCardSubtitle className="ion-no-padding">
-          {/*
-              <IonText> &nbsp; </IonText>
-            */}
           <IonText> {audio.titulo} </IonText>
-          {/* 
-              <IonIcon icon={shareSocial} />
-            */}
         </IonCardSubtitle>
+        <IonCardSubtitle className="ion-no-padding">
+            <div className={styles["chip-list"]}>
+              <IonChip disabled={!network.status}>
+                <IonIcon
+                  className={`${styles["donwload-icon"]}`}
+                  icon={downloadOutline}
+                /> 
+                Descargar
+              </IonChip>
+            </div>
+          </IonCardSubtitle>
       </IonCardHeader>
 
       <IonCardContent className="ion-no-padding">

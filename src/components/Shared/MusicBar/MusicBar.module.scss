@@ -1,0 +1,35 @@
+@keyframes pulse {
+    0%, 100% {
+      transform: scaleY(0.3);
+    }
+    50% {
+      transform: scaleY(1);
+    }
+}
+
+
+.animate-container {
+
+    display: flex;
+    align-items: end;
+    justify-content: center;
+    
+    .animate-pulse {
+        border-radius: 20px 20px 0 0;
+        width: 2px;
+        height: 8px;
+        margin-right: 3px;
+        animation-name: pulse;
+        background-color: #fff;
+    }
+
+    .animate-paused {
+        border-radius: 20px 20px 0 0;
+        width: 2px;
+        height: 2px;
+        margin-right: 3px;
+        background-color: #fff;
+    }
+}
+
+  

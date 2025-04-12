@@ -21,11 +21,13 @@ import { Card } from "./Card/Card";
 import { useDB } from "@/context/Context";
 import CrecimientosDB from "@/database/crecimientos";
 import NivelesDB from "@/database/niveles";
+import { useNetwork } from "@/hooks/useNetwork";
 
 export const Crecimiento = () => {
   const dispatch = useDispatch();
 
   const { sqlite } = useDB();
+  const network = useNetwork();
 
   const [swiper, setSwiper] = useState({
     activeIndex: 0,
@@ -84,12 +86,11 @@ export const Crecimiento = () => {
     try {
       present({
         message: "Cargando ...",
-        duration: 1000,
+        duration: 200,
       });
 
       const nivelesDB = new NivelesDB(sqlite.db);
       await nivelesDB.all(sqlite.performSQLAction, (data: any) => {
-        console.warn("data", data);
         setNiveles(data);
       });
     } catch (error: any) {
@@ -111,7 +112,7 @@ export const Crecimiento = () => {
     try {
       present({
         message: "Cargando ...",
-        duration: 1000,
+        duration: 200,
       });
 
       swiper.slideTo(0);
@@ -224,11 +225,11 @@ export const Crecimiento = () => {
       setCrecimientos([]);
       onGetCrecimientos(nivelID);
     }
-  }, [sqlite.initialized, nivelID]);
+  }, [nivelID]);
 
   useEffect(() => {
     onSetActiveIdx();
-  }, [sqlite.initialized, crecimientos]);
+  }, [crecimientos]);
 
   return (
     <div className={`ion-no-padding ${styles["ion-content"]}`}>
@@ -283,12 +284,13 @@ export const Crecimiento = () => {
                   activeIndex={swiper.activeIndex}
                   audio={item}
                   sqlite={sqlite}
+                  network={network}
                   onGoBack={onGoBack}
                   onGoNext={onGoNext}
                   onSaveNext={(e) => onSaveNext(e)}
                 />
               ) : (
-                <Card audio={item} />
+                <Card network={network} audio={item} />
               )}
             </SwiperSlide>
           );

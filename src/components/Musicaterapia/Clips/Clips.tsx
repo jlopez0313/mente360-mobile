@@ -25,11 +25,15 @@ import Categorias from "@/database/categorias";
 import ClipsDB from "@/database/clips";
 
 import { useDB } from "@/context/Context";
+import { getUser } from "@/helpers/onboarding";
+import { useNetwork } from "@/hooks/useNetwork";
 
 export const Clips = () => {
   const dispatch = useDispatch();
 
+  const { user } = getUser();
   const { sqlite } = useDB();
+  const network = useNetwork();
 
   const { globalAudio, listAudios } = useSelector((state: any) => state.audio);
 
@@ -54,15 +58,13 @@ export const Clips = () => {
     try {
       present({
         message: "Cargando...",
-        duration: 1000,
+        duration: 200,
       });
 
       const categoriasDB = new Categorias(sqlite.db);
       await categoriasDB.all(sqlite.performSQLAction, (data: any) => {
-        console.log( 'data ', data)
         setCategorias(data);
       });
-      
     } catch (error: any) {
       console.log(error);
 
@@ -85,7 +87,7 @@ export const Clips = () => {
     try {
       present2({
         message: "Cargando...",
-        duration: 1000,
+        duration: 200,
       });
 
       const clipsDB = new ClipsDB(sqlite.db);
@@ -94,31 +96,18 @@ export const Clips = () => {
 
       await clipsDB[methodName](
         sqlite.performSQLAction,
-        (data: any) => {
-
-          console.log('first', methodName, data)
-
-          const lista = data.map((item: any) => {
-            return {
-              ...item,
-              categoria: {
-                categoria: item.categoria,
-              },
-              usuarios_clips: [],
-              likes: [],
-            };
-          });
+        (lista: any) => {
 
           const clipToAdd = [
             ...listAudios,
             ...(lista || []).filter(
               (x: any) => !listAudios.some((y: any) => y.id == x.id)
             ),
-          ];
+          ].sort( (a, b) => a.titulo > b.titulo ? 1 : -1 );
 
           dispatch(setListAudios([...clipToAdd]));
 
-          if (methodName == "byCategory" || data?.length === 0) {
+          if (methodName == "byCategory" || lista?.length === 0) {
             setHasMore(false);
           } else {
             setHasMore(true);
@@ -128,6 +117,7 @@ export const Clips = () => {
           search: search,
           categoria: chip,
           limit: page,
+          userID: user.id
         }
       );
     } catch (error: any) {
@@ -179,6 +169,13 @@ export const Clips = () => {
     }
   };
 
+  const onSetClips = (idx: number, item: any) => {
+    const lista = [...clips];
+    lista[idx] = {...item}
+
+    dispatch(setListAudios([...lista]))
+  }
+
   useEffect(() => {
     if (sqlite.initialized) {
       onGetCategorias();
@@ -190,7 +187,7 @@ export const Clips = () => {
     if (sqlite.initialized) {
       onRefreshList();
     }
-  }, [sqlite.initialized, chip, search, page]);
+  }, [chip, search, page]);
 
   useEffect(() => {
     if (sqlite.initialized) {
@@ -245,9 +242,9 @@ export const Clips = () => {
                 key={idx}
                 idx={idx}
                 item={item}
-                clips={clips}
                 sqlite={sqlite}
-                setClips={setClips}
+                network={network}
+                onSetClips={onSetClips}
               />
             );
           })}

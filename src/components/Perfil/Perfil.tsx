@@ -65,7 +65,7 @@ export const Perfil = () => {
     try {
       present({
         message: "Cargando...",
-        duration: 1000,
+        duration: 200,
       });
 
       setPhoto(usuario.photo ? baseURL + usuario.photo : Avatar);

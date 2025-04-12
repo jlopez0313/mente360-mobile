@@ -1,4 +1,9 @@
-import { IonList, IonSearchbar, useIonAlert, useIonLoading } from "@ionic/react";
+import {
+  IonList,
+  IonSearchbar,
+  useIonAlert,
+  useIonLoading,
+} from "@ionic/react";
 import { useEffect, useState } from "react";
 import styles from "../Musicaterapia.module.scss";
 
@@ -9,11 +14,13 @@ import { Item } from "./Item";
 import { useDB } from "@/context/Context";
 import PlaylistDB from "@/database/playlist";
 import { getUser } from "@/helpers/onboarding";
+import { useNetwork } from "@/hooks/useNetwork";
 
 export const Playlist = () => {
   const dispatch = useDispatch();
-  
+
   const { sqlite } = useDB();
+  const network = useNetwork();
   const { user } = getUser();
 
   const { listAudios, globalAudio } = useSelector((state: any) => state.audio);
@@ -33,32 +40,13 @@ export const Playlist = () => {
     try {
       present({
         message: "Cargando...",
-        duration: 1000,
+        duration: 200,
       });
 
       const playlistDB = new PlaylistDB(sqlite.db);
       await playlistDB.all(
         sqlite.performSQLAction,
-        (data: any) => {
-          const lista = data.map((item: any) => {
-            return {
-              ...item,
-              clip: {
-                id: item.id,
-                titulo: item.titulo,
-                imagen: item.imagen,
-                audio: item.audio,
-                downloaded: item.downloaded,
-                categoria: {
-                  categoria: item.categoria,
-                },
-                likes: [],
-              },
-              usuarios_clips: [],
-              likes: [],
-            };
-          });
-
+        (lista: any) => {
           setPlaylist(lista);
           setFilteredPlaylist(lista);
         },
@@ -99,6 +87,22 @@ export const Playlist = () => {
     setFilteredPlaylist([...lista]);
   };
 
+  const onSetClips = (idx: number, item: any) => {
+    let lista = [...playlist];
+
+
+    if ( !item ) {
+      lista = lista.slice(idx, 1);
+    } else {
+      lista[idx] = {...item}
+    }
+
+    console.log( idx, lista )
+
+    setPlaylist(lista);
+    setFilteredPlaylist(lista);
+  }
+
   useEffect(() => {
     if (sqlite.initialized) {
       onGetPlaylist();
@@ -108,11 +112,11 @@ export const Playlist = () => {
 
   useEffect(() => {
     onFilter();
-  }, [sqlite.initialized, search]);
+  }, [search]);
 
   useEffect(() => {
     globalAudio && onUpdateList();
-  }, [sqlite.initialized, globalAudio]);
+  }, [globalAudio]);
 
   return (
     <div className={styles["ion-content"]}>
@@ -133,11 +137,9 @@ export const Playlist = () => {
               key={idx}
               item={item}
               idx={idx}
-              playlist={playlist}
               sqlite={sqlite}
-              setPlaylist={setPlaylist}
-              setFilteredPlaylist={setFilteredPlaylist}
-              onGetPlaylist={onGetPlaylist}
+              network={network}
+              onSetClips={onSetClips}
             />
           );
         })}

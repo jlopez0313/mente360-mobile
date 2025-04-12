@@ -1,29 +1,21 @@
-import React, { useEffect, useRef, useState } from "react";
-import {
-  IonAvatar,
-  IonButton,
-  IonCol,
-  IonContent,
-  IonFooter,
-  IonIcon,
-  IonInput,
-  IonItem,
-  IonItemGroup,
-  IonLabel,
-  IonList,
-  IonRow,
-  IonText,
-  IonTextarea,
-} from "@ionic/react";
-import { addData, readData, writeData } from "@/services/realtime-db";
-import styles from "./Interno.module.scss";
-import { add, send, sendOutline } from "ionicons/icons";
-import { Modal } from "../../../Modal/Modal";
-import { Add } from "../Add";
-import { sendPush } from "@/services/push";
-import { useHistory } from "react-router";
-import { onValue } from "firebase/database";
 import { getUser } from "@/helpers/onboarding";
+import { sendPush } from "@/services/push";
+import { addData, readData, writeData } from "@/services/realtime-db";
+import {
+    IonButton,
+    IonCol,
+    IonIcon,
+    IonItem,
+    IonItemGroup,
+    IonList,
+    IonRow,
+    IonText,
+    IonTextarea
+} from "@ionic/react";
+import { onValue } from "firebase/database";
+import { sendOutline } from "ionicons/icons";
+import { useEffect, useRef, useState } from "react";
+import styles from "./Interno.module.scss";
 
 export const Interno = ({ roomID }) => {
   const { user } = getUser();

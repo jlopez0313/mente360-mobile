@@ -56,12 +56,16 @@ export default class Playlist {
     try {
       performSQLAction(async () => {
         const result = await this.db?.query(
-          `SELECT * FROM playlist 
-              INNER JOIN clips ON playlist.clips_id = clips.id
-              INNER JOIN categorias ON categorias.id = clips.categorias_id
-              WHERE users_id = ? AND titulo LIKE ?`,
+          `SELECT playlist.id as in_my_playlist, clips.*, categorias.categoria,
+              (SELECT COUNT(*) FROM likes where clips.id = likes.clips_id) as all_likes,
+              (SELECT id FROM likes where clips.id = likes.clips_id) as my_like
+            FROM playlist
+            INNER JOIN clips ON playlist.clips_id = clips.id
+            INNER JOIN categorias ON categorias.id = clips.categorias_id
+            WHERE users_id = ? AND titulo LIKE ?`,
           [userID, `%${search}%`]
         );
+
         callback(result?.values);
       });
     } catch (error) {
@@ -93,6 +97,18 @@ export default class Playlist {
       });
     } catch (error) {
       console.log("error remove playlist", error);
+      throw error;
+    }
+  }
+
+  async delete(performSQLAction: any, callback: any, id: any) {
+    try {
+      performSQLAction(async () => {
+        const query = await this.db?.query(`DELETE FROM playlist WHERE id=?;`, [id]);
+        callback();
+      });
+    } catch (error) {
+      console.log("error delete playlist", error);
       throw error;
     }
   }

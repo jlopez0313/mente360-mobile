@@ -1,11 +1,11 @@
 import {
-  IonAccordion,
-  IonButton,
-  IonIcon,
-  IonItem,
-  IonLabel,
-  IonText,
-  useIonAlert
+    IonAccordion,
+    IonButton,
+    IonIcon,
+    IonItem,
+    IonLabel,
+    IonText,
+    useIonAlert
 } from "@ionic/react";
 import React from "react";
 import { useHistory } from "react-router";
@@ -14,7 +14,7 @@ import styles from "./Acordeon.module.scss";
 import { shareSocialOutline, trophy } from "ionicons/icons";
 import mensajeIcon from "/assets/icons/mensaje.svg";
 
-import { Modal } from "@/components/Modal/Modal";
+import { Modal } from "@/components/Shared/Modal/Modal";
 import { useDB } from "@/context/Context";
 import MensajesDB from "@/database/mensajes";
 import { setMensaje } from "@/store/slices/homeSlice";

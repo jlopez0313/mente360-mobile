@@ -1,6 +1,6 @@
 import { baseApi } from './api';
 
-export const all = async( fromDate: string = '' ) => {
+export const all = async( fromDate: string = '' ): Promise<any> => {
 
     return new Promise( async (resolve, reject) => {
         const { get } = baseApi();
@@ -19,7 +19,7 @@ export const all = async( fromDate: string = '' ) => {
     })
 }
 
-export const like = async( payload: {} ) => {
+export const like = async( payload: {} ): Promise<any> => {
 
     return new Promise( async (resolve, reject) => {
         const { post } = baseApi();
@@ -38,7 +38,7 @@ export const like = async( payload: {} ) => {
     })
 }
 
-export const dislike = async( id: string ) => {
+export const dislike = async( id: string ): Promise<any> => {
 
     return new Promise( async (resolve, reject) => {
         const { remove } = baseApi();

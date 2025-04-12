@@ -23,7 +23,7 @@ export const Calendar: React.FC<any> = () => {
   const daysOfWeek = ["D", "L", "M", "M", "J", "V", "S"];
 
   useEffect(() => {
-    const daysLeft = 8 - new Date().getDay()
+    const daysLeft = 7 - new Date().getDay()
     dispatch(setCurrentDay( daysLeft ));
   }, [])
 

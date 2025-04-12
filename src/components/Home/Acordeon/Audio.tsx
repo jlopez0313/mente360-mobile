@@ -1,18 +1,18 @@
 import {
-  IonAccordion,
-  IonButton,
-  IonIcon,
-  IonItem,
-  IonLabel,
-  IonText,
-  useIonAlert
+    IonAccordion,
+    IonButton,
+    IonIcon,
+    IonItem,
+    IonLabel,
+    IonText,
+    useIonAlert
 } from "@ionic/react";
 import { trophy } from "ionicons/icons";
 import React from "react";
 import styles from "./Acordeon.module.scss";
 import auriculares from "/assets/icons/auriculares.svg";
 
-import { Modal } from "@/components/Modal/Modal";
+import { Modal } from "@/components/Shared/Modal/Modal";
 import { useDB } from "@/context/Context";
 import AudiosDB from "@/database/audios";
 import { localDB } from "@/helpers/localStore";
