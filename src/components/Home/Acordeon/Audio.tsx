@@ -1,11 +1,11 @@
 import {
-    IonAccordion,
-    IonButton,
-    IonIcon,
-    IonItem,
-    IonLabel,
-    IonText,
-    useIonAlert
+  IonAccordion,
+  IonButton,
+  IonIcon,
+  IonItem,
+  IonLabel,
+  IonText,
+  useIonAlert
 } from "@ionic/react";
 import { trophy } from "ionicons/icons";
 import React from "react";
@@ -20,7 +20,7 @@ import { setAudio } from "@/store/slices/homeSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { Audio as AudioShared } from "../Audio/Audio";
 
-export const Audio: React.FC<any> = ({}) => {
+export const Audio: React.FC<any> = ({network}) => {
   const localHome = localDB("home");
 
   const dispatch = useDispatch();
@@ -91,7 +91,7 @@ export const Audio: React.FC<any> = ({}) => {
       <Modal
         trigger="modal-auricular"
         title="Audio de la noche"
-        hideButtons={audio.done || false}
+        hideButtons={!network.status || audio.done || false}
         onConfirm={() => onConfirmAudio()}
       >
         <AudioShared audio={audio} onConfirm={() => onConfirmAudio()} />

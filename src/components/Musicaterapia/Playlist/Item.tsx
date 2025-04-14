@@ -378,6 +378,7 @@ export const Item: React.FC<any> = ({
 
   return (
     <IonItem
+      disabled={!network.status && !item.audio_local}
       button={true}
       className={globalAudio?.id == item?.id ? styles["current-playing"] : ""}
     >

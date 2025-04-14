@@ -46,6 +46,7 @@ import { getUser } from "@/helpers/onboarding";
 import ClipsDB from "@/database/clips";
 import LikesDB from "@/database/likes";
 import PlaylistDB from "@/database/playlist";
+import { useNetwork } from "@/hooks/useNetwork";
 import { useSqliteDB } from "@/hooks/useSqliteDB";
 import { dislike, like } from "@/services/likes";
 import { add, trash } from "@/services/playlist";
@@ -55,6 +56,7 @@ export const Clip = () => {
 
   const dispatch = useDispatch();
   const { db, performSQLAction } = useSqliteDB();
+  const network = useNetwork();
 
   const [presentToast] = useIonToast();
   const [presentAlert] = useIonAlert();
@@ -403,12 +405,13 @@ export const Clip = () => {
         <IonCardHeader className="ion-no-padding">
           <IonCardSubtitle className="ion-no-padding">
             <IonText> {globalAudio.titulo} </IonText>
-            <span> {globalAudio.categoria?.categoria} </span>
+            <span> {globalAudio.categoria} </span>
           </IonCardSubtitle>
 
           <IonCardSubtitle className={"ion-no-padding"}>
             <div className={styles["chip-list"]}>
               <IonChip
+                disabled={!network.status && !globalAudio.audio_local}
                 onClick={() =>
                   globalAudio.audio_local ? onRemoveLocal() : onDownload()
                 }
@@ -419,10 +422,11 @@ export const Clip = () => {
                     globalAudio.audio_local ? trashBinOutline : downloadOutline
                   }
                 />
-                Descargar
+                {globalAudio.audio_local ? "Eliminar" : "Descargar"}
               </IonChip>
 
               <IonChip
+                disabled={!network.status}
                 onClick={() =>
                   globalAudio.in_my_playlist
                     ? onTrashFromPlaylist()
@@ -437,6 +441,7 @@ export const Clip = () => {
               </IonChip>
 
               <IonChip
+                disabled={!network.status}
                 onClick={() => (globalAudio.my_like ? onDislike() : onLike())}
               >
                 <IonIcon
@@ -448,7 +453,10 @@ export const Clip = () => {
                   : "Me gusta"}
               </IonChip>
 
-              <IonChip onClick={() => onShareLink(globalAudio.id)}>
+              <IonChip
+                disabled={!network.status}
+                onClick={() => onShareLink(globalAudio.id)}
+              >
                 <IonIcon
                   className={`${styles["share-icon"]}`}
                   icon={shareSocial}

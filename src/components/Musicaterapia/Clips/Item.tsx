@@ -9,7 +9,7 @@ import {
   useIonLoading,
   useIonToast,
 } from "@ionic/react";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "../Musicaterapia.module.scss";
 
 import {
@@ -433,8 +433,13 @@ export const Item: React.FC<any> = ({
     }, 100);
   };
 
+  useEffect(() => {
+    console.log( network )
+  }, [])
+
   return (
     <IonItem
+      disabled={!network.status && !item.audio_local}
       button={true}
       className={globalAudio?.id == item.id ? styles["current-playing"] : ""}
     >
@@ -504,4 +509,4 @@ export const Item: React.FC<any> = ({
       />
     </IonItem>
   );
-};
+}

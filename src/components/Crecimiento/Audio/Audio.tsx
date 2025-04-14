@@ -94,7 +94,7 @@ export const Audio: React.FC<Props> = memo(
       onPlay();
     };
 
-    const onDownload = async (audio: any) => {
+    const onDownload = async () => {
       try {
         onPresentToast(
           "bottom",
@@ -131,7 +131,9 @@ export const Audio: React.FC<Props> = memo(
       }
     };
 
-    const onRemoveLocal = async (audio: any) => {
+    const onRemoveLocal = async () => {
+      console.log("removing");
+
       const crecimientosDB = new CrecimientosDB(db);
       await crecimientosDB.unload(performSQLAction, () => {}, { id: audio.id });
 
@@ -159,7 +161,7 @@ export const Audio: React.FC<Props> = memo(
       });
     };
 
-    const getLocalSrc = async (audioID: any) => {
+    const getLocalSrc = async () => {
       try {
         const crecimientosDB = new CrecimientosDB(db);
         await crecimientosDB.find(
@@ -167,7 +169,7 @@ export const Audio: React.FC<Props> = memo(
           (clip: any) => {
             if (clip?.downloaded == "1") setLocalSrc(clip.audio_local);
           },
-          audioID
+          audio.id
         );
       } catch (error) {
         console.log("error get local src", error);
@@ -198,7 +200,7 @@ export const Audio: React.FC<Props> = memo(
     }, [isGlobalPlaying]);
 
     useEffect(() => {
-      initialized && getLocalSrc(audio.id);
+      initialized && getLocalSrc();
     }, [initialized]);
 
     useEffect(() => {
@@ -233,15 +235,15 @@ export const Audio: React.FC<Props> = memo(
 
           <IonCardSubtitle className="ion-no-padding">
             <div className={styles["chip-list"]}>
-              <IonChip disabled={!network.status}>
+              <IonChip
+                disabled={!network.status && !localSrc}
+                onClick={() => (localSrc ? onRemoveLocal() : onDownload())}
+              >
                 <IonIcon
                   className={`${styles["donwload-icon"]}`}
-                  onClick={() =>
-                    localSrc ? onRemoveLocal(audio) : onDownload(audio)
-                  }
                   icon={localSrc ? trashBinOutline : downloadOutline}
-                /> 
-                {localSrc ? 'Eliminar Descarga' : 'Descargar'}
+                />
+                {localSrc ? "Eliminar Descarga" : "Descargar"}
               </IonChip>
             </div>
           </IonCardSubtitle>
@@ -283,6 +285,11 @@ export const Audio: React.FC<Props> = memo(
                 ></IonIcon>
               ) : (
                 <IonIcon
+                  style={{
+                    opacity: !network.status && !localSrc ? 0.2 : 1,
+                    "pointer-events":
+                      !network.status && !localSrc ? "none" : "auto",
+                  }}
                   className={styles["icon-play"]}
                   onClick={onDoPlay}
                   icon={play}

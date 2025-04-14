@@ -39,5 +39,4 @@ export async function byCategory ( categoriasID: string, page = 0, search = '' )
             }
         }    
     })
-    
 }

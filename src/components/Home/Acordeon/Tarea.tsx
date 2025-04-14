@@ -1,11 +1,11 @@
 import {
-    IonAccordion,
-    IonButton,
-    IonIcon,
-    IonItem,
-    IonLabel,
-    IonText,
-    useIonAlert
+  IonAccordion,
+  IonButton,
+  IonIcon,
+  IonItem,
+  IonLabel,
+  IonText,
+  useIonAlert
 } from "@ionic/react";
 
 import styles from "./Acordeon.module.scss";
@@ -23,7 +23,7 @@ import { trophy } from "ionicons/icons";
 import { Texto } from "../Texto/Texto";
 import tareaIcon from "/assets/icons/tarea.svg";
 
-export const Tarea: React.FC<any> = () => {
+export const Tarea: React.FC<any> = ({network}) => {
   const dispatch = useDispatch();
   const history = useHistory();
 
@@ -100,7 +100,7 @@ export const Tarea: React.FC<any> = () => {
         trigger="modal-tarea"
         title="Tarea de la semana"
         closeText="Ir a Grupo"
-        hideButtons={tarea.done || currentDay != 1 || false}
+        hideButtons={!network.status || tarea.done || currentDay != 1 || false}
         onConfirm={() => onConfirmTarea()}
       >
         <Texto descripcion={tarea.tarea || ""} children={null} />

@@ -1,11 +1,11 @@
 import {
-    IonAccordion,
-    IonButton,
-    IonIcon,
-    IonItem,
-    IonLabel,
-    IonText,
-    useIonAlert
+  IonAccordion,
+  IonButton,
+  IonIcon,
+  IonItem,
+  IonLabel,
+  IonText,
+  useIonAlert
 } from "@ionic/react";
 import React from "react";
 import { useHistory } from "react-router";
@@ -17,17 +17,21 @@ import mensajeIcon from "/assets/icons/mensaje.svg";
 import { Modal } from "@/components/Shared/Modal/Modal";
 import { useDB } from "@/context/Context";
 import MensajesDB from "@/database/mensajes";
-import { setMensaje } from "@/store/slices/homeSlice";
+import { setMensaje, setMsgSource } from "@/store/slices/homeSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { Texto } from "../Texto/Texto";
 
-export const Mensaje: React.FC<any> = () => {
+export const Mensaje: React.FC<any> = ({network}) => {
   const history = useHistory();
   const { mensaje } = useSelector((state: any) => state.home);
 
   const [presentAlert] = useIonAlert();
   const dispatch = useDispatch();
   const { sqlite } = useDB();
+
+  const onSetSource = () => {
+    dispatch(setMsgSource('mensaje'));
+  }
 
   const onConfirmMensaje = async () => {
     try {
@@ -76,6 +80,7 @@ export const Mensaje: React.FC<any> = () => {
             type="button"
             className="ion-margin-top ion-padding-start ion-padding-end"
             id="modal-comentario"
+            onClick={onSetSource}
           >
             Ver
           </IonButton>
@@ -85,7 +90,7 @@ export const Mensaje: React.FC<any> = () => {
       <Modal
         trigger="modal-comentario"
         title="Mensaje del día"
-        hideButtons={mensaje.done || false}
+        hideButtons={!network.status || mensaje.done || false}
         onConfirm={() => onConfirmMensaje()}
       >
         <Texto descripcion={mensaje.mensaje || ""}>

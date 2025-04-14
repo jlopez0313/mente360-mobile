@@ -34,6 +34,7 @@ import { useDispatch } from "react-redux";
 import { useDB } from "@/context/Context";
 import EneatiposDB from "@/database/eneatipos";
 import GenerosDB from "@/database/generos";
+import { useNetwork } from "@/hooks/useNetwork";
 
 export const Perfil = () => {
   const fileRef = useRef(null);
@@ -46,6 +47,7 @@ export const Perfil = () => {
   const [presentAlert] = useIonAlert();
 
   const user = getUser();
+  const network = useNetwork();
   const homeDB = localDB("home");
 
   const [isLoading, setIsLoading] = useState(true);
@@ -370,6 +372,7 @@ export const Perfil = () => {
               expand="block"
               onClick={onUpdateUser}
               disabled={
+                !network.status ||
                 !usuario.phone ||
                 (usuario.phone && !isPossiblePhoneNumber(usuario.phone))
               }

@@ -1,5 +1,6 @@
 import { localDB } from "@/helpers/localStore";
 import { openWhatsApp } from "@/helpers/Whatsapp";
+import { useNetwork } from "@/hooks/useNetwork";
 import {
   IonContent,
   IonIcon,
@@ -20,6 +21,8 @@ import { Link } from "react-router-dom";
 export const Popover = ({ trigger = "" }) => {
   const localHome = localDB("home");
   const localData = localHome.get();
+
+  const network = useNetwork();
 
   const [data, setData] = useState<any>({});
 
@@ -46,6 +49,7 @@ export const Popover = ({ trigger = "" }) => {
           </Link>
 
           <IonItem
+            disabled={!network.status}
             button={true}
             detail={true}
             onClick={() =>
@@ -62,6 +66,7 @@ export const Popover = ({ trigger = "" }) => {
           </IonItem>
 
           <IonItem
+            disabled={!network.status}
             button={true}
             detail={true}
             onClick={() =>
@@ -79,6 +84,7 @@ export const Popover = ({ trigger = "" }) => {
 
           {data.admin && (
             <IonItem
+              disabled={!network.status}
               button={true}
               detail={true}
               onClick={() =>

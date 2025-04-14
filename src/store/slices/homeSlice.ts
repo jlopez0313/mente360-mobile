@@ -2,9 +2,11 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     mensaje: {},
+    panico: {},
     tarea: {},
     audio: {},
     currentDay: 0,
+    msgSource: ''
 }
 
 export const homeSlice = createSlice({
@@ -13,6 +15,9 @@ export const homeSlice = createSlice({
     reducers: {
         setAudio: (state, action) => {
             state.audio = {...action.payload};
+        },
+        setPanico: (state, action) => {
+            state.panico = {...action.payload};
         },
         setMensaje: (state, action) => {
             state.mensaje = {...action.payload};
@@ -23,12 +28,17 @@ export const homeSlice = createSlice({
         setCurrentDay: (state, action) => {
             state.currentDay = action.payload;
         },
+        setMsgSource: (state, action) => {
+            state.msgSource = action.payload;
+        },
     }
 });
 
 export const {
     setAudio,
-    setMensaje,
     setTarea,
+    setPanico,
+    setMensaje,
+    setMsgSource,
     setCurrentDay,
 } = homeSlice.actions

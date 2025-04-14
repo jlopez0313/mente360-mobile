@@ -13,19 +13,23 @@ import {
   useIonLoading,
 } from "@ionic/react";
 
-import styles from "../Test.module.scss";
-import { memo, useEffect, useState } from "react";
-import { test } from "@/services/test";
-import { useHistory } from "react-router";
-import { setUser, getUser } from "@/helpers/onboarding";
-import { all } from "@/services/constants";
 import { localDB } from "@/helpers/localStore";
+import { getUser, setUser } from "@/helpers/onboarding";
+import { useNetwork } from "@/hooks/useNetwork";
+import { all } from "@/services/constants";
+import { test } from "@/services/test";
+import { memo, useEffect, useState } from "react";
+import { useHistory } from "react-router";
+import styles from "../Test.module.scss";
 
 const Momento2: React.FC<any> = memo(({ momentos, onSetMomento }) => {
+  
   const [present, dismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();
+
   const history = useHistory();
   const user = getUser();
+  const network = useNetwork();
   const homeDB = localDB("home");
 
   const [constants, setConstants] = useState({ eneatipos: [], generos: [] });
@@ -176,7 +180,7 @@ const Momento2: React.FC<any> = memo(({ momentos, onSetMomento }) => {
               </IonButton>
             </IonCol>
             <IonCol class="ion-no-padding">
-              <IonButton expand="block" onClick={send}>
+              <IonButton  disabled={!network.status} expand="block" onClick={send}>
                 {" "}
                 Finalizar{" "}
               </IonButton>

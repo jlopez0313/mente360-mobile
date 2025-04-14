@@ -12,7 +12,9 @@ import { useHistory } from "react-router";
 const Sharing: React.FC = () => {
   const history = useHistory();
 
-  const { mensaje } = useSelector((state: any) => state.home);
+  const { mensaje, panico, msgSource } = useSelector(
+    (state: any) => state.home
+  );
 
   const shareScreenshot = async () => {
     try {
@@ -23,7 +25,6 @@ const Sharing: React.FC = () => {
       }
 
       console.error("modalElement.", modalElement);
-
 
       const dataUrl = await htmlToImage.toPng(modalElement, {
         cacheBust: true,
@@ -59,19 +60,21 @@ const Sharing: React.FC = () => {
   };
 
   useEffect(() => {
-    if (mensaje.mensaje) {
+    if (mensaje.mensaje || panico.texto) {
       setTimeout(() => {
         shareScreenshot();
       }, 300);
     }
-  }, [mensaje]);
+  }, [mensaje, panico]);
 
   return (
     <IonPage>
       <IonContent className={styles["ion-content"]}>
         <div id="content" className={styles["content"]}>
           <div className={styles.texto}>
-            <p style={{ whiteSpace: "pre-wrap" }}>{mensaje?.mensaje}</p>
+            <p style={{ whiteSpace: "pre-wrap" }}>
+              {msgSource == "mensaje" ? mensaje?.mensaje : panico?.texto}
+            </p>
 
             <img
               src="assets/images/logo_texto.png"
