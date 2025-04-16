@@ -4,16 +4,26 @@ export function diferenciaEnDias(fecha1: Date, fecha2: Date) {
   return Math.floor(diferencia / unDia);
 }
 
-export function parse( format: string, date: Date) {
-  switch( format ) {
-    case 'YYYY-MM-DD': 
-      const day = String(date.getDate()).padStart(2, "0");
-      const month = String(date.getMonth() + 1).padStart(2, "0");
-      const year = date.getFullYear();
-    
-      const newDate = `${year}-${month}-${day}`;
-      return newDate
-    default:
-      return date.toString()
+export const getDisplayDate = (isoDate: string) => {
+  const fecha = new Date(isoDate);
+  const ahora = new Date();
+
+  const esMismoDia = fecha.toDateString() === ahora.toDateString();
+
+  const ayer = new Date();
+  ayer.setDate(ayer.getDate() - 1);
+  const esAyer = fecha.toDateString() === ayer.toDateString();
+
+  const diffMs = ahora.getTime() - fecha.getTime();
+  const diffDias = diffMs / (1000 * 60 * 60 * 24);
+
+  if (esMismoDia) {
+    return fecha.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  } else if (esAyer) {
+    return "Ayer";
+  } else if (diffDias < 7) {
+    return fecha.toLocaleDateString("es-ES", { weekday: "long" }); // Ej: 'martes'
+  } else {
+    return fecha.toLocaleDateString(); // Ej: '10/4/2025'
   }
-}
+};

@@ -1,6 +1,4 @@
 import {
-  createGesture,
-  Gesture,
   IonAvatar,
   IonButton,
   IonButtons,
@@ -16,16 +14,17 @@ import styles from "./Interno.module.scss";
 import { IonIcon } from "@ionic/react";
 import { arrowBack } from "ionicons/icons";
 
-import { Footer } from "@/components/Footer/Footer";
 import { Interno as InternoComponent } from "@/components/Chat/Chat/Interno/Interno";
 import { Profile as ProfileModal } from "@/components/Chat/Profile/Profile";
+import { Footer } from "@/components/Footer/Footer";
 import { Link, useHistory, useParams } from "react-router-dom";
 
-import { useEffect, useRef, useState } from "react";
-import { readData, writeData } from "@/services/realtime-db";
-import { getUser } from "@/helpers/onboarding";
 import Avatar from "@/assets/images/avatar.jpg";
+import { getDisplayDate } from "@/helpers/Fechas";
+import { getUser } from "@/helpers/onboarding";
+import { getData, readData, writeData } from "@/services/realtime-db";
 import { onValue } from "firebase/database";
+import { useEffect, useState } from "react";
 
 const Interno: React.FC = () => {
   const history = useHistory();
@@ -38,22 +37,20 @@ const Interno: React.FC = () => {
     name: "",
     photo: null,
   });
-  const [isWriting, setIsWriting] = useState(false);
+  const [dataUserRoom, setDataUserRoom] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showProfileModal, setShowProfileModal] = useState(false);
 
   const onGetRoom = async () => {
-    onValue(readData(`rooms/${room}`), (snapshot) => {
+    onValue(readData(`rooms/${room}`), async (snapshot) => {
       const data = snapshot.val();
+      const userInRoom = room.split("_").find((id: any) => id != user.id) ?? 0;
 
-      const other = data
-        ? Object.keys(data.users).find((key) => key != user.id)
-        : 0;
-      const otherUser = data.users[other];
+      const dataUser = await getData(`users/${userInRoom}`);
+      const otherUser = dataUser.val();
 
-      setOtherUser(otherUser);
-
-      setIsWriting(data[otherUser.id].writing);
+      setOtherUser({ ...otherUser });
+      data.users[userInRoom] && setDataUserRoom(data.users[userInRoom]);
     });
   };
 
@@ -63,8 +60,11 @@ const Interno: React.FC = () => {
 
   const onExit = async () => {
     await Promise.all([
-      writeData(`rooms/${room}/${user.id}/writing`, false),
-      writeData(`rooms/${room}/${user.id}/exit_time`, new Date().toISOString()),
+      writeData(`rooms/${room}/users/${user.id}/writing`, false),
+      writeData(
+        `rooms/${room}/users/${user.id}/exit_time`,
+        new Date().toISOString()
+      ),
     ]);
   };
 
@@ -134,8 +134,14 @@ const Interno: React.FC = () => {
             onClick={() => setShowProfileModal(true)}
           >
             <IonTitle className={styles["title"]}>{otherUser.name}</IonTitle>
-            {isWriting && (
+            {dataUserRoom?.writing ? (
               <span className={styles["status"]}>Escribiendo...</span>
+            ) : (
+              <span className={styles["status"]}>
+                {dataUserRoom?.exit_time
+                  ? getDisplayDate(dataUserRoom.exit_time)
+                  : dataUserRoom ? "En línea" : ""}
+              </span>
             )}
           </div>
 
@@ -162,9 +168,9 @@ const Interno: React.FC = () => {
         <InternoComponent roomID={room} />
       </IonContent>
 
-      {otherUser.id && (
+      {showProfileModal && (
         <ProfileModal
-          userID={otherUser.id}
+          usuario={otherUser}
           showProfileModal={showProfileModal}
           setShowProfileModal={setShowProfileModal}
         />

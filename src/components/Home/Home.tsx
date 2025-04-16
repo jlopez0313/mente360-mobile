@@ -56,10 +56,11 @@ export const Home = () => {
 
       if (user.user.eneatipo) {
         const lastDateStr =
-          (await getPreference(keys.HOME_SYNC_KEY)) ?? "2024-01-01T05:00:00Z";
+          (await getPreference(keys.HOME_SYNC_KEY)) ?? "2024-01-01T00:00:00Z";
 
         const lastDate = new Date(lastDateStr);
         const now = new Date();
+        now.setHours(0, 0, 0, 0);
 
         if (diferenciaEnDias(now, lastDate) > 0) {
           await setPreference(keys.HOME_SYNC_KEY, now.toISOString());

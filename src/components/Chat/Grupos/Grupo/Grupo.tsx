@@ -1,4 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import { getUser } from "@/helpers/onboarding";
+import { sendPush } from "@/services/push";
+import {
+  addData,
+  readData,
+  snapshotToArray,
+  writeData,
+} from "@/services/realtime-db";
 import {
   IonButton,
   IonCol,
@@ -9,15 +16,13 @@ import {
   IonRow,
   IonTextarea,
 } from "@ionic/react";
-import { addData, readData } from "@/services/realtime-db";
-import styles from "./Grupo.module.scss";
-import { sendOutline } from "ionicons/icons";
 import { onValue } from "firebase/database";
-import { getUser } from "@/helpers/onboarding";
-import { sendPush } from "@/services/push";
+import { sendOutline } from "ionicons/icons";
+import React, { useEffect, useRef, useState } from "react";
+import styles from "./Grupo.module.scss";
 import { Item } from "./Item";
 
-export const Grupo = ({ grupoID, grupo, removed }) => {
+export const Grupo: React.FC<any> = ({ grupoID, grupo, removed }) => {
   const { user } = getUser();
   const [mensaje, setMensaje] = useState("");
 
@@ -25,24 +30,26 @@ export const Grupo = ({ grupoID, grupo, removed }) => {
 
   const [isScrolledUp, setIsScrolledUp] = useState(false);
   const [messagesList, setMessagesList] = useState<any>([]);
+  const [usuarios, setUsuarios] = useState<any>([]);
 
   const onGetChat = async () => {
+    onValue(readData("users"), (snapshot) => {
+      const lista = snapshotToArray(snapshot.val());
+      setUsuarios(lista);
+    });
+    
     onValue(readData("grupos/" + grupoID + "/messages"), (snapshot) => {
-      const data = snapshot.val();
-      const messagesList = data
-        ? Object.keys(data).map((key) => ({ id: key, ...data[key] }))
-        : [];
+      const messagesList = snapshotToArray(snapshot.val());
       setMessagesList(messagesList);
     });
   };
 
   const onSendMessage = async () => {
     try {
-      setMensaje("");
       const fecha = new Date();
 
       const message = {
-        user: { id: user.id, photo: user.photo, name: user.name },
+        user: user.id,
         fecha: fecha.toLocaleDateString(),
         hora: fecha.toLocaleTimeString([], {
           hour: "2-digit",
@@ -52,7 +59,7 @@ export const Grupo = ({ grupoID, grupo, removed }) => {
         mensaje,
       };
 
-      const addMessagePromise = addData(`grupos/${grupoID}/messages`, message);
+      setMensaje("");
 
       const otherUsers = grupo.users.filter((x: any) => x.id != user.id) || [];
 
@@ -69,10 +76,24 @@ export const Grupo = ({ grupoID, grupo, removed }) => {
             })
           : Promise.resolve();
 
-      await Promise.all([addMessagePromise, sendPushPromise]);
+      await Promise.all([
+        addData(`grupos/${grupoID}/messages`, message),
+        writeData(`grupos/${grupoID}/users/${user.id}/writing`, false),
+        sendPushPromise,
+      ]);
     } catch (error) {
       console.error("Error enviando mensaje al grupo:", error);
     }
+  };
+
+  const onCheckInput = async (e: any) => {
+    setMensaje(e.target.value);
+
+    const writingStatus = e.target.value ? true : false;
+    await writeData(
+      `grupos/${grupoID}/users/${user.id}/writing`,
+      writingStatus
+    );
   };
 
   const scrollToBottom = () => {
@@ -91,14 +112,14 @@ export const Grupo = ({ grupoID, grupo, removed }) => {
       element.scrollHeight - element.scrollTop === element.clientHeight;
     setIsScrolledUp(!isAtBottom);
   };
-  
+
   useEffect(() => {
     if (!isScrolledUp) {
-      setTimeout( () => {
+      requestAnimationFrame(() => {
         scrollToBottom();
-      }, 100)
+      });
     }
-  }, [messagesList])
+  }, [messagesList, isScrolledUp]);
 
   useEffect(() => {
     onGetChat();
@@ -114,9 +135,7 @@ export const Grupo = ({ grupoID, grupo, removed }) => {
       >
         <IonItemGroup>
           {messagesList.map((msg: any, idx: number) => {
-            return (
-              <Item key={idx} msg={msg} />
-            );
+            return <Item key={idx} msg={msg} usuarios={usuarios} />;
           })}
         </IonItemGroup>
       </IonList>
@@ -134,7 +153,7 @@ export const Grupo = ({ grupoID, grupo, removed }) => {
               <IonTextarea
                 rows={1}
                 placeholder="Mensaje..."
-                onIonInput={(e) => setMensaje(e.target.value)}
+                onIonInput={onCheckInput}
                 value={mensaje}
                 autoGrow={true}
               />

@@ -4,7 +4,6 @@ import {
   IonIcon,
   IonItem,
   IonLabel,
-  IonText,
   useIonAlert
 } from "@ionic/react";
 import React from "react";
@@ -69,9 +68,9 @@ export const Mensaje: React.FC<any> = ({network}) => {
         <IonItem slot="header">
           <IonLabel>Mensaje del día</IonLabel>
           {mensaje?.done ? (
-            <IonIcon icon={trophy} slot="end" className={styles.trofeo} />
+            <IonIcon icon={trophy} slot="end" className={styles['trofeo']} />
           ) : (
-            <IonText style={{ width: "20px" }}></IonText>
+            <IonIcon icon={trophy} slot="end" className={styles['trofeo-gris']} />
           )}
         </IonItem>
         <div className="ion-padding" slot="content">

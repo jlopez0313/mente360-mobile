@@ -1,36 +1,44 @@
 import { Modal } from "@/components/Shared/Modal/Modal";
-import { getData } from "@/services/realtime-db";
+import { getData, readData, snapshotToArray } from "@/services/realtime-db";
 import {
-    IonFab,
-    IonFabButton,
-    IonIcon,
-    IonItemDivider,
-    IonItemGroup,
-    IonLabel,
-    IonList,
+  IonFab,
+  IonFabButton,
+  IonIcon,
+  IonItemDivider,
+  IonItemGroup,
+  IonLabel,
+  IonList,
 } from "@ionic/react";
 import { addOutline } from "ionicons/icons";
 import { useEffect, useState } from "react";
 import { Add } from "../Add/Add";
 import styles from "./Info.module.scss";
 
+import { onValue } from "firebase/database";
 import { Item } from "./Item";
 
 export const Info = ({ grupoID }) => {
-  const [grupo, setGrupo] = useState({ grupo: "", photo: "", users: [] });
+  const [users, setUsers] = useState<any>([]);
 
   const onGetGrupo = async (id: number) => {
-    const data = await getData(`grupos/${id}`);
-    const grupo = data.val();
+    onValue(readData(`grupos/${id}/users/`), async (snapshot) => {
+      const users = snapshotToArray(snapshot.val());
 
-    const users: any = grupo.users
-      ? Object.keys(grupo.users).map((key) => ({
-          id: key,
-          ...grupo.users[key],
-        }))
-      : [];
+      const listaUsuarios: any = [];
 
-    setGrupo({ grupo: grupo.grupo, photo: grupo.photo, users: users });
+      setUsers([]);
+
+      await Promise.all(
+        users.map(async (user: any, idx: number) => {
+          const data = await getData(`users/${user.id}`);
+          const userData = data.val();
+
+          listaUsuarios.push(userData);
+        })
+      );
+
+      setUsers([...listaUsuarios]);
+    });
   };
 
   useEffect(() => {
@@ -42,10 +50,10 @@ export const Info = ({ grupoID }) => {
       <IonList className={`ion-padding ${styles["chat"]}`} lines="none">
         <IonItemGroup>
           <IonItemDivider>
-            <IonLabel>{grupo.users.length} Miembros</IonLabel>
+            <IonLabel>{users.length} Miembros</IonLabel>
           </IonItemDivider>
 
-          {grupo.users.map((user: any, idx: number) => {
+          {users.map((user: any, idx: number) => {
             return <Item key={idx} user={user} />;
           })}
         </IonItemGroup>
@@ -61,11 +69,10 @@ export const Info = ({ grupoID }) => {
         trigger="modal-add"
         title="Agregar Miembro"
         hideButtons={true}
-        onWillDismiss={() => {
-          onGetGrupo(grupoID);
-        }}
+        onWillDismiss={() => {}}
+        onConfirm={() => {}}
       >
-        <Add grupoID={grupoID} users={grupo.users} />
+        <Add grupoID={grupoID} users={users} />
       </Modal>
     </div>
   );

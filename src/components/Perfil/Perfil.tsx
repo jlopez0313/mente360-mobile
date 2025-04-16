@@ -25,7 +25,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import styles from "./Perfil.module.scss";
 
-import { getData, updateData } from "@/services/realtime-db";
+import { updateData } from "@/services/realtime-db";
 import { setRoute } from "@/store/slices/routeSlice";
 import PhoneInput, { isPossiblePhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
@@ -156,24 +156,13 @@ export const Perfil = () => {
         name: data.data.name,
         phone: data.data.phone,
         photo: data.data.photo,
+        edad: edad,
+        eneatipo: usuario.eneatipo,
+        genero: usuario.genero,
       };
 
-      const [roomsResponse, gruposResponse] = await Promise.all([
-        getData(`user_rooms/${user.user.id}/rooms`),
-        getData(`user_rooms/${user.user.id}/grupos`),
-      ]);
-
-      const rt_data = roomsResponse.val();
-      const roomUpdatePromises = Object.keys(rt_data ?? {}).map((room) => {
-        updateData(`rooms/${room}/users/${user.user.id}`, obj);
-      });
-
-      const rt_grupos = gruposResponse.val();
-      const grupoUpdatePromises = Object.keys(rt_grupos ?? {}).map((grupo) => {
-        updateData(`grupos/${grupo}/users/${user.user.id}`, obj);
-      });
-
-      await Promise.all([...roomUpdatePromises, ...grupoUpdatePromises]);
+      await updateData(`users/${user.user.id}`, obj);
+      
     } catch (error: any) {
       console.log(error);
 

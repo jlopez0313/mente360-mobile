@@ -44,14 +44,6 @@
         background: none;
         border: 1px solid var(--bg-main);
         border-radius: 3px;
-        
-        ion-note {
-            font-size: 15px;
-            font-weight: bold;
-            align-self: center;
-            padding-top: 14px;
-            padding-bottom: 14px;
-        }
 
         &.contact {
             margin-bottom: 5px;
@@ -62,10 +54,13 @@
                 justify-content: space-between;
                 flex-grow: 1;
 
-                ion-label {
+                .item-user {
                     margin: 5px 0;
                     flex-grow: 1;
-                    
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+
                     span {
                         display: block;
                         text-align: justify;
@@ -85,20 +80,19 @@
                     }
                 }
     
-                ion-note {
+                .note {
                     display: flex;
                     flex-direction: column;
-                    font-weight: normal;
+                    justify-content: center;
     
                     span {
-                        font-size: 11px;
+                        font-size: 10px;
                     }
     
                     .unreads {
                         text-align: center;
                         border-radius: 3px;
-                        background: #777;
-                        color: #fff;
+                        background: var(--bg-main);
                     }
                 }
             }

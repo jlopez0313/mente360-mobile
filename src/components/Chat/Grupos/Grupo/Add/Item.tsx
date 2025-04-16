@@ -1,4 +1,6 @@
-import styles from "./Add.module.scss";
+import Avatar from "@/assets/images/avatar.jpg";
+import { Profile } from "@/components/Chat/Profile/Profile";
+import { updateData, writeData } from "@/services/realtime-db";
 import {
   IonAvatar,
   IonItem,
@@ -7,9 +9,7 @@ import {
   useIonAlert,
 } from "@ionic/react";
 import React, { useState } from "react";
-import Avatar from "@/assets/images/avatar.jpg";
-import { updateData, writeData } from "@/services/realtime-db";
-import { Profile } from "@/components/Chat/Profile/Profile";
+import styles from "./Add.module.scss";
 
 export const Item: React.FC<any> = ({ grupoID, contact, doChild }) => {
   const baseURL = import.meta.env.VITE_BASE_BACK;
@@ -25,13 +25,11 @@ export const Item: React.FC<any> = ({ grupoID, contact, doChild }) => {
       const updates = { [grupoID]: true };
 
       await Promise.all([
+        writeData(`users/${contact.id}`, contact),
+        updateData(`users/${contact.id}/grupos`, updates),
         writeData(`grupos/${grupoID}/users/${contact.id}`, {
-          name: contact.name,
-          id: contact.id,
-          phone: contact.phone || "",
-          photo: contact.photo || "",
+          writing: false,
         }),
-        updateData(`user_rooms/${contact.id}/grupos`, updates),
       ]);
 
       setContactosAgregados((prev: any) => [...prev, contact.phone]);
@@ -92,11 +90,10 @@ export const Item: React.FC<any> = ({ grupoID, contact, doChild }) => {
       </IonLabel>
 
       <Profile
-        userID={contact.id}
+        usuario={contact}
         showProfileModal={showProfileModal}
         setShowProfileModal={setShowProfileModal}
       />
-      
     </IonItem>
   );
 };

@@ -7,6 +7,25 @@
         width: 35px;
         height: 35px;
     }
+
+    .title-container {
+        display: flex;
+        flex-direction: column; /* Coloca el título encima del status */
+        justify-content: center;
+        
+        .title {
+          line-height: 20px;
+          margin: 0; /* Elimina el espacio adicional si existe */
+        }
+        
+        .status {
+          font-size: 11px;
+          color: #999999; /* Color gris claro */
+          margin-left: 20px; /* Pequeño espacio debajo del título */          
+          margin-top: 2px; /* Pequeño espacio debajo del título */          
+          line-height: 15px;
+        }
+    }
 }
 
 .ion-content {

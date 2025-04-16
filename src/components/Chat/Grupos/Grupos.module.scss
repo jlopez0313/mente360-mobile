@@ -55,8 +55,8 @@
                 .unreads {
                     text-align: center;
                     border-radius: 3px;
-                    background: #777;
-                    color: #fff;
+                    background: var(--bg-main);
+                    color: #fff !important;
                 }
             }
         }

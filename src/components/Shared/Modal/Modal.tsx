@@ -11,16 +11,16 @@ import React, { cloneElement, memo, useRef, useState } from "react";
 import styles from "./Modal.module.scss";
 
 interface Props {
-  showButtons: boolean;
-  isOpen: boolean;
-  canDismiss: boolean;
-  trigger: string;
+  showButtons?: boolean;
+  isOpen?: boolean;
+  canDismiss?: boolean;
+  trigger?: string;
   title?: string;
   closeText?: string;
   children: any;
   hideButtons: boolean;
   onConfirm: (params?: any) => void;
-  onWillDismiss: (params?: any) => void;
+  onWillDismiss?: (params?: any) => void;
 }
 
 export const Modal: React.FC<Props> = memo(

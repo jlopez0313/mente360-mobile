@@ -18,13 +18,15 @@ import { IonIcon } from "@ionic/react";
 import { arrowBack, ellipsisVerticalOutline } from "ionicons/icons";
 
 import { Footer } from "@/components/Footer/Footer";
-import { Grupo as GrupoComponent } from "@/components/Chat/Grupos/Grupo/Grupo";
 import { Link, useHistory, useParams } from "react-router-dom";
 
-import { useEffect, useRef, useState } from "react";
-import { getData, writeData, removeData } from "@/services/realtime-db";
-import { getUser } from "@/helpers/onboarding";
 import Avatar from "@/assets/images/avatar.jpg";
+import { getUser } from "@/helpers/onboarding";
+import { readData, removeData, snapshotToArray, writeData } from "@/services/realtime-db";
+import { onValue } from "firebase/database";
+import { useEffect, useState } from "react";
+
+import { Grupo as GrupoComponent } from "@/components/Chat/Grupos/Grupo/Grupo";
 
 const Grupo: React.FC = () => {
   const { id } = useParams();
@@ -32,31 +34,31 @@ const Grupo: React.FC = () => {
   const baseURL = import.meta.env.VITE_BASE_BACK;
 
   const history = useHistory();
-  const modal = useRef<HTMLIonModalElement>(null);
 
   const [removed, setRemoved] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isWriting, setIsWriting] = useState(false);
 
-  const [grupo, setGrupo] = useState({ grupo: "", photo: "", users: [] });
-  const [presentingElement, setPresentingElement] =
-    useState<HTMLElement | null>(null);
+  const [grupo, setGrupo] = useState({ grupo: "", photo: "" });
 
   const onGetGrupo = async (id: number) => {
-    const data = await getData(`grupos/${id}`);
-    const grupo = data.val();
+    onValue(readData(`grupos/${id}`), async (snapshot) => {
+      const data = snapshot.val();
 
-    const users: any = grupo.users
-      ? Object.keys(grupo.users).map((key) => ({
-          id: key,
-          ...grupo.users[key],
-        }))
-      : [];
+      setGrupo({
+        ...data,
+        users: snapshotToArray(data.users),
+        messages: snapshotToArray(data.messages)
+      });
 
-    setGrupo({ grupo: grupo.grupo, photo: grupo.photo, users: users });
-  };
+      const users: any = data ? snapshotToArray(data.users) : [];
 
-  const dismiss = () => {
-    modal.current?.dismiss();
+      const isWriting = users.find(
+        (usario: any) => usario.writing && usario.id != user.id
+      );
+      setIsWriting(isWriting ?? false);
+
+    });
   };
 
   const goToDetalle = () => {
@@ -78,7 +80,7 @@ const Grupo: React.FC = () => {
   };
 
   const onExitGroup = async () => {
-    await removeData(`user_rooms/${user.id}/grupos/${id}`);
+    await removeData(`users/${user.id}/grupos/${id}`);
     setRemoved(true);
   };
 
@@ -143,10 +145,12 @@ const Grupo: React.FC = () => {
             />
           </IonAvatar>
 
-          <IonTitle className="ion-no-padding ion-padding-end ion-text-justify ion-padding-start">
-            {" "}
-            {grupo.grupo}{" "}
-          </IonTitle>
+          <div className={styles["title-container"]}>
+            <IonTitle className="title">{grupo.grupo}</IonTitle>{" "}
+            {isWriting ? (
+              <span className={styles["status"]}>Escribiendo...</span>
+            ) : null}{" "}
+          </div>
 
           <IonButtons slot="end">
             <IonButton id="popover-button">

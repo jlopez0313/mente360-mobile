@@ -1,27 +1,95 @@
-import {
-  IonAvatar,
-  IonItem,
-  IonLabel,
-  IonNote,
-  IonSkeletonText,
-} from "@ionic/react";
-import React, { useState } from "react";
 import Avatar from "@/assets/images/avatar.jpg";
-import styles from "./Chat.module.scss";
 import { Profile } from "@/components/Chat/Profile/Profile";
+import { getDisplayDate } from "@/helpers/Fechas";
+import { getUser } from "@/helpers/onboarding";
+import { getArrayData, readData, snapshotToArray, writeData } from "@/services/realtime-db";
+import { IonAvatar, IonItem, IonNote, IonSkeletonText } from "@ionic/react";
+import { onValue } from "firebase/database";
+import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { useHistory } from "react-router";
+import styles from "./Chat.module.scss";
 
-export const Item: React.FC<any> = ({
-  idx,
-  usuario,
-  messages,
-  isWriting,
-  unreadList,
-  goToInterno,
-}) => {
+export const Item: React.FC<any> = ({ usuario }) => {
   const baseURL = import.meta.env.VITE_BASE_BACK;
+  const { user } = getUser();
+
+  const history = useHistory();
+  const dispatch = useDispatch();
 
   const [isLoading, setIsLoading] = useState(true);
+  const [lastMsg, setLastMsg] = useState<any>({ mensaje: "" });
+  const [isWriting, setIsWriting] = useState<any>(false);
+  const [unreads, setUnreads] = useState<any>(0);
   const [showProfileModal, setShowProfileModal] = useState(false);
+
+  const goToInterno = async () => {
+    try {
+      const roomArray = [Number(user.id), Number(usuario.id)];
+      const roomID = roomArray.sort((a, b) => a - b).join("_");
+
+      // await writeData(`users/${user.id}/rooms/${roomID}`, true);
+      // await writeData(`users/${usuario.id}/rooms/${roomID}`, true);
+      await writeData(`rooms/${roomID}/users/${user.id}/exit_time`, null);
+
+      history.replace(`/chat/${roomID}`);
+    } catch (error) {
+      console.error("Error creando la sala de chat:", error);
+    }
+  };
+
+  const onCheckStatus = async () => {
+    const roomID = [Number(user.id), Number(usuario.id)]
+      .sort((a, b) => a - b)
+      .join("_");
+
+    const listaMensajes = await getArrayData(`rooms/${roomID}/messages`);
+    const lastMsg = listaMensajes.pop();
+
+    if (lastMsg) {
+      setLastMsg(lastMsg);
+    }
+
+    onValue(readData(`rooms/${roomID}`), (snapshot) => {
+      const data2 = snapshot.val();
+
+      const escribiendo = data2.users[usuario.id]?.writing;
+      setIsWriting(escribiendo);
+
+      const listaMensajes: any = data2 ? snapshotToArray(data2.messages) : [];
+
+      if (data2.users[user.id]?.exit_time) {
+        const targetDate = new Date(data2.users[user.id]?.exit_time);
+
+        const unreads: any = listaMensajes.filter((message: any) => {
+          const messageDate = new Date(`${message.date}`);
+          return messageDate > targetDate && message.user != user.id;
+        });
+
+        setUnreads(unreads.length ?? 0);
+      }
+
+      const lastMsg = listaMensajes.pop();
+
+      if (lastMsg) {
+        setLastMsg({ ...lastMsg });
+      }
+    });
+  };
+
+  const onCheckUnreads = () => {
+    if (unreads == 0) {
+      // dispatch(setRoom(false));
+    }
+  };
+
+  useEffect(() => {
+    onCheckStatus();
+  }, []);
+
+  useEffect(() => {
+    onCheckUnreads();
+  }, [unreads]);
 
   return (
     <IonItem button={true} className={`${styles["contact"]}`}>
@@ -50,32 +118,34 @@ export const Item: React.FC<any> = ({
 
       <div
         className={styles["item-content"]}
-        onClick={() => goToInterno(usuario)}
+        onClick={() => goToInterno()}
       >
-        <IonLabel className="ion-no-margin">
+        <div className={styles["item-user"]}>
           <span className={styles["name"]}> {usuario?.name} </span>
           <span className={styles["phone"]}>
             {" "}
-            {isWriting[idx]
+            {isWriting
               ? "Escribiendo..."
-              : messages[idx]?.mensaje.length > 35
-              ? messages[idx]?.mensaje.substring(0, 32) + "..."
-              : messages[idx]?.mensaje}{" "}
+              : lastMsg.mensaje.length > 35
+              ? lastMsg.mensaje.substring(0, 32) + "..."
+              : lastMsg.mensaje}{" "}
           </span>
-        </IonLabel>
+        </div>
         <IonNote className={styles["note"]}>
-          <span className={styles["time"]}> {messages[idx]?.hora} </span>
-          {unreadList[idx] ? (
-            <span className={styles["unreads"]}> {unreadList[idx]} </span>
+          <span className={styles["time"]}> {lastMsg.date ? getDisplayDate(lastMsg.date) : null} </span>
+          {unreads ? (
+            <span className={styles["unreads"]}> {unreads} </span>
           ) : null}
         </IonNote>
       </div>
 
-      <Profile
-        userID={usuario.id}
-        showProfileModal={showProfileModal}
-        setShowProfileModal={setShowProfileModal}
-      />
+      {showProfileModal && (
+        <Profile
+          usuario={usuario}
+          showProfileModal={showProfileModal}
+          setShowProfileModal={setShowProfileModal}
+        />
+      )}
     </IonItem>
   );
 };

@@ -1,3 +1,4 @@
+import Avatar from "@/assets/images/avatar.jpg";
 import { createGesture, Gesture } from "@ionic/core";
 import {
   IonButton,
@@ -14,15 +15,13 @@ import {
 } from "@ionic/react";
 import { close } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
-import styles from "./Profile.module.scss";
-import Avatar from "@/assets/images/avatar.jpg";
-import { find } from "@/services/user";
 import { Photo } from "./Photo/Photo";
+import styles from "./Profile.module.scss";
 
 // import PinchZoomPan from "react-pinch-zoom-pan";
 
 export const Profile: React.FC<any> = ({
-  userID,
+  usuario,
   showProfileModal,
   setShowProfileModal,
 }) => {
@@ -31,55 +30,8 @@ export const Profile: React.FC<any> = ({
   
   const [showImageModal, setShowImageModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [edad, setEdad] = useState(0);
-  const [otherUser, setOtherUser] = useState({
-    id: null,
-    name: "",
-    photo: null,
-    email: "",
-    edad: "",
-    eneatipo: "",
-    genero: "",
-    fecha_nacimiento: "",
-  });
 
   const modalRef = useRef<HTMLIonModalElement>(null);
-
-  const onGetEdad = () => {
-    if (!otherUser.fecha_nacimiento) {
-      setEdad(0);
-      return;
-    }
-
-    const date = new Date(otherUser.fecha_nacimiento);
-    const today = new Date();
-
-    const diffInMs = today - date;
-
-    const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
-    setEdad(Math.floor(diffInDays / 365.25));
-  };
-
-  const onFindUser = async () => {
-    try {
-      const {
-        data: { data },
-      } = await find(userID);
-      console.log(data);
-
-      setOtherUser(data);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  useEffect(() => {
-    onFindUser();
-  }, []);
-
-  useEffect(() => {
-    onGetEdad();
-  }, [otherUser]);
 
   useEffect(() => {
     if (showImageModal) {
@@ -138,7 +90,7 @@ export const Profile: React.FC<any> = ({
           )}
 
           <img
-            src={otherUser.photo ? baseURL + otherUser.photo : Avatar}
+            src={usuario.photo ? baseURL + usuario.photo : Avatar}
             style={{ display: "none" }}
             onLoad={() => setIsLoading(false)}
           />
@@ -148,17 +100,17 @@ export const Profile: React.FC<any> = ({
             style={{
               display: isLoading ? "none" : "block",
               background: `url(
-                ${otherUser.photo ? baseURL + otherUser.photo : Avatar}
+                ${usuario.photo ? baseURL + usuario.photo : Avatar}
               )  50% 50% / cover`,
             }}
             onClick={() => setShowImageModal(true)}
           ></div>
 
-          <IonLabel>{otherUser.name}</IonLabel>
+          <IonLabel>{usuario.name}</IonLabel>
 
           <div className={`ion-margin-top ion-margin-bottom ${styles.profile}`}>
             <div className={styles.info}>
-              <IonChip outline={true}>{edad || "00"}</IonChip>
+              <IonChip outline={true}>{usuario.edad || "00"}</IonChip>
               <IonNote>
                 {" "}
                 <strong> Edad </strong>{" "}
@@ -169,7 +121,7 @@ export const Profile: React.FC<any> = ({
                 outline={true}
                 className="ion-padding-start ion-padding-end"
               >
-                {otherUser.eneatipo || "-"}
+                {usuario.eneatipo || "-"}
               </IonChip>
               <IonNote>
                 {" "}
@@ -177,7 +129,7 @@ export const Profile: React.FC<any> = ({
               </IonNote>
             </div>
             <div className={styles.info}>
-              <IonChip outline={true}>{otherUser.genero || "--"}</IonChip>
+              <IonChip outline={true}>{usuario.genero || "--"}</IonChip>
               <IonNote>
                 {" "}
                 <strong> Género </strong>{" "}
@@ -187,7 +139,7 @@ export const Profile: React.FC<any> = ({
         </IonContent>
       </IonModal>
 
-      <Photo otherUser={otherUser} showImageModal={showImageModal} setShowImageModal={setShowImageModal} />
+      <Photo photo={usuario.photo} showImageModal={showImageModal} setShowImageModal={setShowImageModal} />
 
     </>
   );

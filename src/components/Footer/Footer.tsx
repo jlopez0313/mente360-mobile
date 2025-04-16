@@ -3,10 +3,11 @@ import {
   IonButtons,
   IonFooter,
   IonIcon,
-  IonToolbar
+  IonToolbar,
 } from "@ionic/react";
 import styles from "./Footer.module.scss";
 
+import { useNetwork } from "@/hooks/useNetwork";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useHistory } from "react-router-dom";
@@ -17,9 +18,11 @@ import grupo from "/assets/icons/grupo.svg";
 
 export const Footer = (props: any) => {
   const history = useHistory();
+  const network = useNetwork();
+
   const [tab, setTab] = useState(history.location.pathname);
 
-  const { isRoom, isGrupo } = useSelector( (state: any) => state.notifications)
+  const { isRoom, isGrupo } = useSelector((state: any) => state.notifications);
 
   return (
     <IonFooter {...props}>
@@ -60,6 +63,10 @@ export const Footer = (props: any) => {
           </Link>
 
           <Link
+            style={{
+              opacity: !network.status ? 0.5 : 1,
+              pointerEvents: !network.status ? "none" : "auto",
+            }}
             to="/chat"
             replace={true}
             onClick={() => setTab(history.location.pathname)}
@@ -71,8 +78,9 @@ export const Footer = (props: any) => {
                   : ""
               }
             >
-              { (isRoom || isGrupo) &&
-                <div className={styles["has-notification"]}></div>}
+              {(isRoom || isGrupo) && (
+                <div className={styles["has-notification"]}></div>
+              )}
               <IonIcon slot="icon-only" src={grupo}></IonIcon>
             </IonButton>
           </Link>

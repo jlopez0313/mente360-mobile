@@ -1,21 +1,17 @@
 import { IonIcon, IonInput } from "@ionic/react";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import styles from "./Add.module.scss";
-import { camera, cameraOutline } from "ionicons/icons";
 import { getUser } from "@/helpers/onboarding";
+import { camera } from "ionicons/icons";
+import styles from "./Add.module.scss";
 
-interface Props {
-  doChild?: (params?: any) => {};
-}
-
-export const Add = ({ doChild }: Props) => {
-  const {user} = getUser();
+export const Add: React.FC<any> = ({ doChild }) => {
+  const { user } = getUser();
   const fileRef = useRef(null);
   const [photo, setPhoto] = useState(null);
-  const [grupo, setGrupo] = useState({ photo: "", grupo: "", users_id: "" });
+  const [grupo, setGrupo] = useState<any>({ photo: "", grupo: "", users_id: "" });
 
-  const onSetGrupo = (idx: string, value: string) => {
+  const onSetGrupo = (idx: string, value: any) => {
     grupo[idx] = value;
 
     setGrupo({
@@ -76,7 +72,6 @@ export const Add = ({ doChild }: Props) => {
         value={grupo.grupo}
         onIonInput={(e) => onSetGrupo("grupo", e.target.value)}
       ></IonInput>
-
     </div>
   );
 };

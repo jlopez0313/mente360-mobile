@@ -1,15 +1,21 @@
 import { Modal } from "@/components/Shared/Modal/Modal";
 import { getUser } from "@/helpers/onboarding";
 import { create } from "@/services/grupos";
-import { getData, readData, updateData, writeData } from "@/services/realtime-db";
+import {
+  getArrayData,
+  getData,
+  readData,
+  updateData,
+  writeData,
+} from "@/services/realtime-db";
 import { IonButton, IonIcon, IonItemGroup, IonList } from "@ionic/react";
-import { onValue } from "firebase/database";
 import { add } from "ionicons/icons";
 import { useEffect, useState } from "react";
 import { Add } from "./Add/Add";
 import styles from "./Grupos.module.scss";
 
 import { setGrupo } from "@/store/slices/notificationSlice";
+import { onValue } from "firebase/database";
 import { useDispatch } from "react-redux";
 import { Item } from "./Item";
 
@@ -28,28 +34,14 @@ export const Grupos = () => {
         [grupo.id]: true,
       };
 
+      delete grupo.usuario;
+
       await Promise.all([
+        writeData("grupos/" + grupo.id, grupo),
         writeData("grupos/" + grupo.id + "/users/" + user.id, {
-          name: user.name,
-          id: user.id,
-          phone: user.phone || "",
-          photo: user.photo || "",
+          writing: false,
         }),
-
-        writeData("grupos/" + grupo.id, {
-          grupo: grupo.grupo,
-          photo: grupo.photo,
-          users: {
-            [user.id]: {
-              name: user.name,
-              id: user.id,
-              phone: user.phone || "",
-              photo: user.photo || "",
-            },
-          },
-        }),
-
-        updateData(`user_rooms/${user.id}/grupos/`, updates),
+        updateData(`users/${user.id}/grupos/`, updates),
       ]);
     } catch (error) {
       console.error("Error al añadir el grupo:", error);
@@ -68,69 +60,27 @@ export const Grupos = () => {
     }
   };
 
-  const onGetAll = async () => {
-    // Escucha los datos de los grupos en tiempo real.
-    onValue(readData(`user_rooms/${user.id}/grupos`), async (snapshot) => {
-      const data = snapshot.val();
-
-      const rooms = data
-        ? Object.keys(data).map((key) => ({
-            id: key,
-            ...data[key],
-          }))
-        : [];
-
-      const tmpGrupos: any[] = [];
-      const noLeidos: Record<string, number> = {};
-      const mensajes: Record<string, any> = {};
-
-      await Promise.all(
-        rooms.map(async (room) => {
-          const grupoData = await getData(`grupos/${room.id}`);
-          const grupoVal = grupoData.val();
-
-          if (grupoVal) {
-            tmpGrupos.push({
-              photo: grupoVal?.photo,
-              grupo: grupoVal?.grupo,
-              id: room.id,
-            });
-
-            onValue(readData(`grupos/${room.id}`), (snapshot) => {
-              const data2 = snapshot.val();
-
-              const listaMensajes = data2
-                ? Object.keys(data2.messages || {}).map((key) => ({
-                    id: key,
-                    ...data2.messages[key],
-                  }))
-                : [];
-
-              if (data2?.users?.[user.id]?.exit_time) {
-                const targetDate = new Date(data2.users[user.id]?.exit_time);
-
-                const unreads = listaMensajes.filter((message) => {
-                  const messageDate = new Date(`${message.date}`);
-                  return messageDate > targetDate && message.user.id != user.id;
-                });
-
-                noLeidos[room.id] = unreads.length || 0;
-              }
-
-              const lastMsg = listaMensajes.pop();
-              if (lastMsg) {
-                mensajes[room.id] = { ...lastMsg };
-              }
-
-              setUnreadList(Object.values(noLeidos));
-              setMessages(Object.values(mensajes));
-            });
-          }
-        })
-      );
-
-      setGrupos(tmpGrupos);
+  const onCheckStatus = () => {
+    onValue(readData(`users/${user.id}/grupos`), async (snapshot) => {
+      onGetAll();
     });
+  };
+
+  const onGetAll = async () => {
+    const grupos = await getArrayData(`users/${user.id}/grupos`);
+
+    const lista: any = [];
+
+    await Promise.all(
+      grupos.map(async (grupo: any, idx: number) => {
+        const data = await getData(`grupos/${grupo.id}`);
+        const grupoData = data.val();
+
+        lista[idx] = grupoData;
+      })
+    );
+
+    setGrupos(lista);
   };
 
   const onCheckUnreads = () => {
@@ -141,7 +91,7 @@ export const Grupos = () => {
   };
 
   useEffect(() => {
-    onGetAll();
+    onCheckStatus();
   }, []);
 
   useEffect(() => {
@@ -158,15 +108,7 @@ export const Grupos = () => {
       <IonList className="ion-no-padding" lines="none">
         <IonItemGroup>
           {grupos.map((grupo: any, idx: number) => {
-            return (
-              <Item
-                key={idx}
-                idx={idx}
-                grupo={grupo}
-                messages={messages}
-                unreadList={unreadList}
-              />
-            );
+            return <Item key={idx} grupo={grupo} />;
           })}
         </IonItemGroup>
       </IonList>

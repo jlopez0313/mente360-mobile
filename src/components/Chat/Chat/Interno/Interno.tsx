@@ -1,23 +1,28 @@
 import { getUser } from "@/helpers/onboarding";
 import { sendPush } from "@/services/push";
-import { addData, readData, writeData } from "@/services/realtime-db";
 import {
-    IonButton,
-    IonCol,
-    IonIcon,
-    IonItem,
-    IonItemGroup,
-    IonList,
-    IonRow,
-    IonText,
-    IonTextarea
+  addData,
+  readData,
+  snapshotToArray,
+  writeData,
+} from "@/services/realtime-db";
+import {
+  IonButton,
+  IonCol,
+  IonIcon,
+  IonItem,
+  IonItemGroup,
+  IonList,
+  IonRow,
+  IonText,
+  IonTextarea,
 } from "@ionic/react";
 import { onValue } from "firebase/database";
 import { sendOutline } from "ionicons/icons";
 import { useEffect, useRef, useState } from "react";
 import styles from "./Interno.module.scss";
 
-export const Interno = ({ roomID }) => {
+export const Interno: React.FC<any> = ({ roomID }) => {
   const { user } = getUser();
   const [mensaje, setMensaje] = useState("");
 
@@ -28,22 +33,17 @@ export const Interno = ({ roomID }) => {
 
   const onGetChat = async () => {
     onValue(readData("rooms/" + roomID + "/messages"), (snapshot) => {
-      const data = snapshot.val();
-
-      const messagesList = data
-        ? Object.keys(data).map((key) => ({ id: key, ...data[key] }))
-        : [];
+      const messagesList = snapshotToArray(snapshot.val());
       setMessagesList(messagesList);
     });
   };
 
   const onSendMessage = async () => {
     try {
-      setMensaje("");
       const fecha = new Date();
 
       const message = {
-        user: { id: user.id, photo: user.photo, name: user.name },
+        user: user.id,
         fecha: fecha.toLocaleDateString(),
         hora: fecha.toLocaleTimeString([], {
           hour: "2-digit",
@@ -52,6 +52,8 @@ export const Interno = ({ roomID }) => {
         date: fecha.toISOString(),
         mensaje,
       };
+
+      setMensaje("");
 
       const otherUsers =
         roomID.split("_").filter((x: any) => x != String(user.id)) || [];
@@ -71,7 +73,7 @@ export const Interno = ({ roomID }) => {
 
       await Promise.all([
         addData(`rooms/${roomID}/messages`, message),
-        writeData(`rooms/${roomID}/${user.id}/writing`, false),
+        writeData(`rooms/${roomID}/users/${user.id}/writing`, false),
         sendPushPromise,
       ]);
     } catch (error) {
@@ -79,12 +81,11 @@ export const Interno = ({ roomID }) => {
     }
   };
 
-  const onCheckInput = async (e) => {
+  const onCheckInput = async (e: any) => {
     setMensaje(e.target.value);
 
     const writingStatus = e.target.value ? true : false;
-
-    await writeData(`rooms/${roomID}/${user.id}/writing`, writingStatus);
+    await writeData(`rooms/${roomID}/users/${user.id}/writing`, writingStatus);
   };
 
   const scrollToBottom = () => {
@@ -106,11 +107,11 @@ export const Interno = ({ roomID }) => {
 
   useEffect(() => {
     if (!isScrolledUp) {
-      setTimeout( () => {
+      requestAnimationFrame(() => {
         scrollToBottom();
-      }, 100)
+      });
     }
-  }, [messagesList])
+  }, [messagesList, isScrolledUp]);
 
   useEffect(() => {
     onGetChat();
@@ -120,7 +121,7 @@ export const Interno = ({ roomID }) => {
     <div className={`${styles["ion-content"]}`}>
       <IonList
         ref={chatListRef}
-        className={`ion-padding ${styles["chat"]}`}
+        className={`ion-padding`}
         lines="none"
         onScroll={handleScroll}
       >
@@ -131,9 +132,7 @@ export const Interno = ({ roomID }) => {
                 key={idx}
                 button={true}
                 className={`${styles["message"]} ${
-                  msg.user.id === user.id
-                    ? styles["sender"]
-                    : styles["receiver"]
+                  msg.user === user.id ? styles["sender"] : styles["receiver"]
                 } `}
               >
                 <div>

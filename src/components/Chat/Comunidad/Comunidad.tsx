@@ -1,26 +1,22 @@
+import { getUser } from "@/helpers/onboarding";
+import { invitar, misContactos } from "@/services/user";
+import { Contacts } from "@capacitor-community/contacts";
+import { Share } from "@capacitor/share";
 import {
-  IonAvatar,
   IonIcon,
   IonItem,
   IonItemDivider,
   IonItemGroup,
   IonLabel,
   IonList,
-  IonNote,
   IonSearchbar,
   useIonAlert,
   useIonLoading,
 } from "@ionic/react";
 import { shareSocialOutline } from "ionicons/icons";
-import React, { useEffect, useState } from "react";
-import styles from "./Comunidad.module.scss";
-import { Contacts } from "@capacitor-community/contacts";
-import { invitar } from "@/services/user";
-import { getUser } from "@/helpers/onboarding";
-import { Share } from "@capacitor/share";
+import { useEffect, useState } from "react";
 import { parsePhoneNumber } from "react-phone-number-input";
-import { misContactos } from "@/services/user";
-
+import styles from "./Comunidad.module.scss";
 
 import { Item } from "./Item";
 
@@ -30,8 +26,8 @@ export const Comunidad = () => {
   const [present, dismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();
 
-  const [allContacts, setAllContacts] = useState<any>([]);
-  const [contacts, setContacts] = useState<any>([]);
+  // const [allContacts, setAllContacts] = useState<any>([]);
+  // const [contacts, setContacts] = useState<any>([]);
   const [userContacts, setUserContacts] = useState<any>([]);
   const [filteredUserContacts, setFilteredUserContacts] = useState<any>([]);
 
@@ -93,7 +89,7 @@ export const Comunidad = () => {
             a.name?.display.toLowerCase() > b.name?.display.toLowerCase()
               ? 1
               : -1
-          ) || [];
+          ) ?? [];
 
       const body = {
         user_id: user.id,
@@ -109,8 +105,9 @@ export const Comunidad = () => {
       setFilteredUserContacts(data);
 
       // Contactos de mi teléfono
-      setAllContacts(lista);
-      setContacts(lista);
+      // setAllContacts(lista);
+      // setContacts(lista);
+
     } catch (error: any) {
       console.error(error);
 
@@ -160,8 +157,6 @@ export const Comunidad = () => {
       dialogTitle: "Comparte Mente360 con tus amigos",
     });
   };
-
-  
 
   useEffect(() => {
     getContacts();

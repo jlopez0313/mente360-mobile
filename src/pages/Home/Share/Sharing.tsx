@@ -24,8 +24,6 @@ const Sharing: React.FC = () => {
         return;
       }
 
-      console.error("modalElement.", modalElement);
-
       const dataUrl = await htmlToImage.toPng(modalElement, {
         cacheBust: true,
       });
@@ -61,9 +59,9 @@ const Sharing: React.FC = () => {
 
   useEffect(() => {
     if (mensaje.mensaje || panico.texto) {
-      setTimeout(() => {
+      requestAnimationFrame(() => {
         shareScreenshot();
-      }, 300);
+      });
     }
   }, [mensaje, panico]);
 

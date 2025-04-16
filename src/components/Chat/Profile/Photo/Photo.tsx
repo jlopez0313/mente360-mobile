@@ -1,9 +1,9 @@
+import Avatar from "@/assets/images/avatar.jpg";
 import { IonButton, IonContent, IonIcon, IonModal } from "@ionic/react";
 import { close } from "ionicons/icons";
 import React, { useRef } from "react";
-import Avatar from "@/assets/images/avatar.jpg";
 
-export const Photo: React.FC<any> = ({otherUser, showImageModal, setShowImageModal}) => {
+export const Photo: React.FC<any> = ({photo, showImageModal, setShowImageModal}) => {
 
   const baseURL = import.meta.env.VITE_BASE_BACK;
 
@@ -37,7 +37,7 @@ export const Photo: React.FC<any> = ({otherUser, showImageModal, setShowImageMod
         */}
 
         <img
-          src={otherUser.photo ? baseURL + otherUser.photo : Avatar}
+          src={photo ? baseURL + photo : Avatar}
           alt="Foto de ¨Perfil"
           style={{
             width: "100%",

@@ -17,17 +17,6 @@
         --background: var(--bg-secondary);
         --border-radius: 5px;
         
-        .triangle {
-            position: absolute;
-            left: -16px;
-            z-index: 999;
-            width: 0;
-            height: 0;
-            border-right: 20px solid #787878;
-            border-top: 0px solid transparent;
-            border-bottom: 20px solid transparent; /* Color del triángulo */
-        }
-
         &.message{
 
             width: 90%;

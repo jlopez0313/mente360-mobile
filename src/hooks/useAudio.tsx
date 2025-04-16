@@ -130,7 +130,7 @@ export const useAudio: any = (audio: any, onConfirm: any = () => {}) => {
   const onShareLink = async (id: any) => {
     await Share.share({
       title: "¡Tienes que escuchar esto en Mente360!",
-      text: "Esta canción en Mente360 está transformando mi día. Escuchalo también. ¡Se que te va a encantar!",
+      text: "Esta canción en Mente360 está transformando mi día. Escúchalo también. ¡Se que te va a encantar!",
       url: baseURL + "audios/" + btoa(id),
       dialogTitle:
         "Invita a tus amigos a escuchar esta canción y descubrir Mente360.",

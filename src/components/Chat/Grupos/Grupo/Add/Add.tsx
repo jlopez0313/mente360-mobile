@@ -1,40 +1,26 @@
 import {
-  IonAvatar,
-  IonIcon,
-  IonInput,
-  IonItem,
-  IonItemDivider,
-  IonItemGroup,
-  IonLabel,
   IonList,
   IonSearchbar,
   useIonAlert,
   useIonLoading,
 } from "@ionic/react";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
-import styles from "./Add.module.scss";
-import { camera, cameraOutline } from "ionicons/icons";
 import { getUser } from "@/helpers/onboarding";
-import { parsePhoneNumber } from "react-phone-number-input";
-import { Contacts } from "@capacitor-community/contacts";
 import { misContactos } from "@/services/user";
+import { Contacts } from "@capacitor-community/contacts";
+import { parsePhoneNumber } from "react-phone-number-input";
+import styles from "./Add.module.scss";
 import { Item } from "./Item";
 
-interface Props {
-  grupoID: any;
-  users: any;
-  doChild?: any;
-}
-
-export const Add = ({ grupoID, users, doChild }: Props) => {
+export const Add: React.FC<any> = ({ grupoID, users, doChild }) => {
   const { user } = getUser();
 
   const [present, onDismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();
 
   const [allContacts, setAllContacts] = useState<any>([]); // todos los contactos con usuario registrado
-  const [userContacts, setUserContacts] = useState<any>([]); // AllContacts filtrados
+  const [filteredContacts, setFilteredContacts] = useState<any>([]); // AllContacts filtrados
 
   const getContacts = async () => {
     try {
@@ -88,8 +74,9 @@ export const Add = ({ grupoID, users, doChild }: Props) => {
         (contact: any) =>
           !users.find((user: any) => user.phone == contact.phone)
       );
-      setUserContacts(filteredContacts);
+
       setAllContacts(filteredContacts);
+      setFilteredContacts(filteredContacts);
     } catch (error: any) {
       console.error(error);
 
@@ -107,7 +94,7 @@ export const Add = ({ grupoID, users, doChild }: Props) => {
   const onSearchContacts = (evt: any) => {
     console.log(allContacts, evt, evt.target);
 
-    setUserContacts(
+    setFilteredContacts(
       allContacts.filter(
         (item: any) =>
           item.name.toLowerCase().includes(evt.target.value.toLowerCase()) ||
@@ -115,7 +102,6 @@ export const Add = ({ grupoID, users, doChild }: Props) => {
       )
     );
   };
-
 
   useEffect(() => {
     getContacts();
@@ -131,10 +117,15 @@ export const Add = ({ grupoID, users, doChild }: Props) => {
           onIonInput={(ev) => onSearchContacts(ev)}
         ></IonSearchbar>
 
-        {userContacts.map((contact: any, idx: number) => {
+        {filteredContacts.map((contact: any, idx: number) => {
           return (
             contact && (
-              <Item key={idx} contact={contact} grupoID={grupoID} doChild={doChild} />
+              <Item
+                key={idx}
+                contact={contact}
+                grupoID={grupoID}
+                doChild={doChild}
+              />
             )
           );
         })}

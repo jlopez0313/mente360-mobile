@@ -1,6 +1,6 @@
 import { baseApi } from './api';
 
-export const create = async( formData: {} ) => {
+export const create = async( formData: {} ): Promise<any> => {
 
     console.log(formData)
 
@@ -22,7 +22,7 @@ export const create = async( formData: {} ) => {
     
 }
 
-export const getAll = async( fromDate: string = '') => {
+export const getAll = async( fromDate: string = ''): Promise<any> => {
 
     return new Promise( async (resolve, reject) => {
         const { get } = baseApi();
@@ -42,7 +42,7 @@ export const getAll = async( fromDate: string = '') => {
 }
 
 
-export const find = async(id: number) => {
+export const find = async(id: number): Promise<any> => {
 
     return new Promise( async (resolve, reject) => {
         const { get } = baseApi();

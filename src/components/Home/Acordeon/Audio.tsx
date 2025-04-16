@@ -4,7 +4,6 @@ import {
   IonIcon,
   IonItem,
   IonLabel,
-  IonText,
   useIonAlert
 } from "@ionic/react";
 import { trophy } from "ionicons/icons";
@@ -15,19 +14,17 @@ import auriculares from "/assets/icons/auriculares.svg";
 import { Modal } from "@/components/Shared/Modal/Modal";
 import { useDB } from "@/context/Context";
 import AudiosDB from "@/database/audios";
-import { localDB } from "@/helpers/localStore";
 import { setAudio } from "@/store/slices/homeSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { Audio as AudioShared } from "../Audio/Audio";
 
 export const Audio: React.FC<any> = ({network}) => {
-  const localHome = localDB("home");
 
   const dispatch = useDispatch();
   const [presentAlert] = useIonAlert();
   const { sqlite } = useDB();
 
-  const { audio, currentDate } = useSelector((state: any) => state.home);
+  const { audio } = useSelector((state: any) => state.home);
 
   const onConfirmAudio = async () => {
     try {
@@ -43,9 +40,6 @@ export const Audio: React.FC<any> = ({network}) => {
       };
 
       dispatch(setAudio({ ...newData }));
-
-      const localData = localHome.get();
-      localHome.set({ ...localData, data: { ...newData } });
     } catch (error: any) {
       console.error(error);
 
@@ -71,9 +65,9 @@ export const Audio: React.FC<any> = ({network}) => {
         <IonItem slot="header">
           <IonLabel>Audio de la noche</IonLabel>
           {audio.done ? (
-            <IonIcon icon={trophy} slot="end" className={styles.trofeo} />
+            <IonIcon icon={trophy} slot="end" className={styles['trofeo']} />
           ) : (
-            <IonText style={{ width: "20px" }}></IonText>
+            <IonIcon icon={trophy} slot="end" className={styles['trofeo-gris']} />
           )}
         </IonItem>
         <div className="ion-padding" slot="content">
