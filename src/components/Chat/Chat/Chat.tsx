@@ -14,7 +14,7 @@ export const Chat = () => {
 
   const onGetRooms = async () => {
     const rooms = await getArrayData(`users/${user.id}/rooms`);
-    
+
     const usuarios: any = [];
 
     await Promise.all(

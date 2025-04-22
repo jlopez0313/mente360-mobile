@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
     tab: 'clips',
     baseURL: import.meta.env.VITE_BASE_BACK,
-    audio: '', // El src del Audio
+    audioSrc: '', // El src del Audio
     isGlobalPlaying: false,
     globalAudio: '',
     listAudios: [] as any[],
@@ -23,7 +23,7 @@ export const audioSlice = createSlice({
             state.tab = action.payload;
         },
         setAudioSrc: (state, action) => {
-            state.audio = action.payload;
+            state.audioSrc = action.payload;
         },
         updateCurrentTime: (state, action) => {
             state.myCurrentTime = action.payload;

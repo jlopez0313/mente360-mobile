@@ -17,23 +17,38 @@ import { Modal } from "@/components/Shared/Modal/Modal";
 import { Texto } from "./Texto/Texto";
 
 import { setRoute } from "@/store/slices/routeSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Acordeon } from "./Acordeon/Acordeon";
 import { Calendar } from "./Calendar/Calendar";
 
 import { useNetwork } from "@/hooks/useNetwork";
 import { usePreferences } from "@/hooks/usePreferences";
-import { getHome } from "@/services/home";
-import { setAudio, setMensaje, setTarea } from "@/store/slices/homeSlice";
+import {
+  setAdmin,
+  setAudio,
+  setMensaje,
+  setPodcast,
+  setTarea,
+} from "@/store/slices/homeSlice";
 
+import { SuccessOverlay } from "@/components/Shared/Animations/Success/SuccessOverlay";
 import { useDB } from "@/context/Context";
 import AudiosDB from "@/database/audios";
 import MensajesDB from "@/database/mensajes";
 import TareasDB from "@/database/tareas";
 import { diferenciaEnDias } from "@/helpers/Fechas";
+import { DB, localDB } from "@/helpers/localStore";
+import { getHomeThunk } from "@/store/thunks/home";
 
 export const Home = () => {
   const { getPreference, setPreference, keys } = usePreferences();
+
+  const { audio, mensaje, tarea, podcast } = useSelector(
+    (state: any) => state.home
+  );
+
+  const localHome = localDB(DB.HOME);
+  const localData = localHome.get();
 
   const { sqlite } = useDB();
   const network = useNetwork();
@@ -44,6 +59,7 @@ export const Home = () => {
 
   const dispatch = useDispatch();
 
+  const [showSuccess, setShowSuccess] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [present, dismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();
@@ -69,26 +85,7 @@ export const Home = () => {
             message: "Cargando ...",
           });
 
-          const { data } = await getHome({});
-
-          await audiosDB.remove(sqlite.performSQLAction, () => {});
-          await audiosDB.create(sqlite.performSQLAction, () => {}, [
-            data.audio,
-          ]);
-
-          await mensajesDB.remove(sqlite.performSQLAction, () => {});
-          await mensajesDB.create(sqlite.performSQLAction, () => {}, [
-            data.mensaje,
-          ]);
-
-          await tareasDB.remove(sqlite.performSQLAction, () => {});
-          await tareasDB.create(sqlite.performSQLAction, () => {}, [
-            data.tarea,
-          ]);
-
-          dispatch(setAudio(data.audio));
-          dispatch(setMensaje(data.mensaje));
-          dispatch(setTarea(data.tarea));
+          await dispatch(getHomeThunk(sqlite, audiosDB, mensajesDB, tareasDB));
         } else {
           await audiosDB.all(sqlite.performSQLAction, (data: any) => {
             if (data?.length) dispatch(setAudio(data[0]));
@@ -99,6 +96,9 @@ export const Home = () => {
           await tareasDB.all(sqlite.performSQLAction, (data: any) => {
             if (data?.length) dispatch(setTarea(data[0]));
           });
+
+          dispatch(setPodcast(localData.podcast));
+          dispatch(setAdmin(localData.admin));
         }
       }
     } catch (error: any) {
@@ -139,6 +139,16 @@ export const Home = () => {
     }
   };
 
+  const onCompleteAll = () => {
+    setShowSuccess(true);
+
+    localHome.set({ ...localData, showSuccess: true });
+
+    setTimeout(() => {
+      setShowSuccess(false);
+    }, 2500);
+  };
+
   useEffect(() => {
     dispatch(setRoute("/home"));
 
@@ -150,8 +160,22 @@ export const Home = () => {
     }
   }, [sqlite.initialized]);
 
+  useEffect(() => {
+    if (
+      audio.done &&
+      mensaje.done &&
+      tarea.done &&
+      podcast.done &&
+      !localData.showSuccess
+    ) {
+      onCompleteAll();
+    }
+  }, [audio, mensaje, tarea, podcast]);
+
   return (
     <>
+      <SuccessOverlay show={showSuccess} />
+
       <Calendar />
       <Acordeon />
 

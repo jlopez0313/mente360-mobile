@@ -50,7 +50,7 @@ export const Audio: React.FC<Props> = memo(
     const [isLoading, setIsLoading] = useState(true);
     const [localSrc, setLocalSrc] = useState<any>(null);
 
-    const audioRef = useRef({
+    const audioRef: any = useRef({
       currentTime: 0,
       duration: 0,
       pause: () => {},
@@ -76,6 +76,7 @@ export const Audio: React.FC<Props> = memo(
       onLoad,
       downloadAudio,
       deleteAudio,
+      getDownloadedAudio,
     } = useAudio(audioRef, () => {});
 
     const onDoPlay = () => {
@@ -125,7 +126,8 @@ export const Audio: React.FC<Props> = memo(
           musicalNotesOutline
         );
 
-        setLocalSrc(ruta);
+        const audioBlob = await getDownloadedAudio(ruta);
+        setLocalSrc(audioBlob);
       } catch (error) {
         console.log(" error ondownload", error);
       }
@@ -166,8 +168,11 @@ export const Audio: React.FC<Props> = memo(
         const crecimientosDB = new CrecimientosDB(db);
         await crecimientosDB.find(
           performSQLAction,
-          (clip: any) => {
-            if (clip?.downloaded == "1") setLocalSrc(clip.audio_local);
+          async (clip: any) => {
+            if (clip?.downloaded == "1") {
+              const audioBlob = await getDownloadedAudio(clip.audio_local);
+              setLocalSrc(audioBlob);
+            }
           },
           audio.id
         );
@@ -305,7 +310,7 @@ export const Audio: React.FC<Props> = memo(
 
           <audio
             ref={audioRef}
-            src={baseURL + audio.audio}
+            src={localSrc ? localSrc : baseURL + audio.audio}
             onLoadedMetadata={onLoadedMetadata}
             onTimeUpdate={onTimeUpdate}
             onProgress={onUpdateBuffer}

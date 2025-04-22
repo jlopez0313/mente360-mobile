@@ -29,7 +29,7 @@ import { useEffect, useState } from "react";
 import { Grupo as GrupoComponent } from "@/components/Chat/Grupos/Grupo/Grupo";
 
 const Grupo: React.FC = () => {
-  const { id } = useParams();
+  const { id } = useParams<any>();
   const { user } = getUser();
   const baseURL = import.meta.env.VITE_BASE_BACK;
 

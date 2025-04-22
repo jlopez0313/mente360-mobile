@@ -1,4 +1,3 @@
-import { localDB } from "@/helpers/localStore";
 import { openWhatsApp } from "@/helpers/Whatsapp";
 import { useNetwork } from "@/hooks/useNetwork";
 import {
@@ -13,22 +12,15 @@ import {
   logoWhatsapp,
   peopleOutline,
   readerOutline,
-  timeOutline
+  timeOutline,
 } from "ionicons/icons";
-import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 export const Popover = ({ trigger = "" }) => {
-  const localHome = localDB("home");
-  const localData = localHome.get();
-
+  
   const network = useNetwork();
-
-  const [data, setData] = useState<any>({});
-
-  useEffect(() => {
-    setData({ ...localData.data });
-  }, []);
+  const { admin } = useSelector( (state: any) => state.home);
 
   return (
     <IonPopover trigger={trigger} dismissOnSelect={true}>
@@ -82,16 +74,16 @@ export const Popover = ({ trigger = "" }) => {
             Ayuda
           </IonItem>
 
-          {data.admin && (
+          {admin.name ? (
             <IonItem
               disabled={!network.status}
               button={true}
               detail={true}
               onClick={() =>
                 openWhatsApp(
-                  data.admin.phone,
+                  admin.phone,
                   `Hola, me gustaría contactar con ${
-                    data.admin.name
+                    admin.name
                   } para recibir orientación desde ${
                     import.meta.env.VITE_NAME
                   }. ¿Podrían ayudarme?`
@@ -99,9 +91,9 @@ export const Popover = ({ trigger = "" }) => {
               }
             >
               <IonIcon slot="start" icon={peopleOutline}></IonIcon>
-              Contacta con {data.admin.name}
+              Contacta con {admin.name}
             </IonItem>
-          )}
+          ): null }
         </IonList>
       </IonContent>
     </IonPopover>

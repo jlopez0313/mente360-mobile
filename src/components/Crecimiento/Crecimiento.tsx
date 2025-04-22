@@ -22,6 +22,7 @@ import { useDB } from "@/context/Context";
 import CrecimientosDB from "@/database/crecimientos";
 import NivelesDB from "@/database/niveles";
 import { useNetwork } from "@/hooks/useNetwork";
+import { setPodcast } from "@/store/slices/homeSlice";
 
 export const Crecimiento = () => {
   const dispatch = useDispatch();
@@ -207,6 +208,8 @@ export const Crecimiento = () => {
       await Promise.all([updatePromise, setUserPromise]);
     }
     onGoNext();
+
+    await dispatch(setPodcast({ done: 1 }));
   };
 
   const compareWithFn = (o1: any, o2: any) => {

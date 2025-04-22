@@ -1,5 +1,4 @@
 import Avatar from "@/assets/images/avatar.jpg";
-import { localDB } from "@/helpers/localStore";
 import { getUser, setUser } from "@/helpers/onboarding";
 import { update } from "@/services/user";
 import {
@@ -34,6 +33,7 @@ import { useDispatch } from "react-redux";
 import { useDB } from "@/context/Context";
 import EneatiposDB from "@/database/eneatipos";
 import GenerosDB from "@/database/generos";
+import { diferenciaEnDias } from "@/helpers/Fechas";
 import { useNetwork } from "@/hooks/useNetwork";
 
 export const Perfil = () => {
@@ -48,7 +48,6 @@ export const Perfil = () => {
 
   const user = getUser();
   const network = useNetwork();
-  const homeDB = localDB("home");
 
   const [isLoading, setIsLoading] = useState(true);
   const [photo, setPhoto] = useState("");
@@ -130,10 +129,7 @@ export const Perfil = () => {
 
     const date = new Date(usuario.fecha_nacimiento);
     const today = new Date();
-
-    const diffInMs = today - date;
-
-    const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+    const diffInDays = diferenciaEnDias(date, today);
     setEdad(Math.floor(diffInDays / 365.25));
   };
 
@@ -142,10 +138,6 @@ export const Perfil = () => {
       present({
         message: "Cargando ...",
       });
-
-      if (usuario.eneatipo != user.user.eneatipo) {
-        homeDB.clear();
-      }
 
       const { data } = await update(usuario, user.user.id);
 

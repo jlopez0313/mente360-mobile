@@ -13,7 +13,6 @@ import {
   useIonLoading,
 } from "@ionic/react";
 
-import { localDB } from "@/helpers/localStore";
 import { getUser, setUser } from "@/helpers/onboarding";
 import { useNetwork } from "@/hooks/useNetwork";
 import { all } from "@/services/constants";
@@ -30,8 +29,7 @@ const Momento2: React.FC<any> = memo(({ momentos, onSetMomento }) => {
   const history = useHistory();
   const user = getUser();
   const network = useNetwork();
-  const homeDB = localDB("home");
-
+  
   const [constants, setConstants] = useState({ eneatipos: [], generos: [] });
 
   const onClearMomentos = () => {
@@ -89,8 +87,6 @@ const Momento2: React.FC<any> = memo(({ momentos, onSetMomento }) => {
       });
 
       await Promise.all([testPromise, setUserPromise]);
-
-      homeDB.clear();
 
       setTimeout(() => {
         history.replace("/home");

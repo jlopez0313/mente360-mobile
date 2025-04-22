@@ -60,7 +60,6 @@ export default class Tareas {
     try {
       performSQLAction(async () => {
         const result = await this.db?.query("SELECT * FROM tareas", []);
-        console.log( 'result?.values', result?.values )
         callback(result?.values);
       });
     } catch (error) {

@@ -10,9 +10,8 @@ import {
 import {
   IonAvatar,
   IonItem,
-  IonLabel,
   IonNote,
-  IonSkeletonText,
+  IonSkeletonText
 } from "@ionic/react";
 import { onValue } from "firebase/database";
 import React, { useEffect, useState } from "react";
@@ -28,6 +27,7 @@ export const Item: React.FC<any> = ({ grupo }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [lastMsg, setLastMsg] = useState<any>(null);
   const [unreads, setUnreads] = useState<any>(0);
+  const [isWriting, setIsWriting] = useState<any>(null);
 
   const goToGrupo = async () => {
     try {
@@ -52,6 +52,14 @@ export const Item: React.FC<any> = ({ grupo }) => {
       const data = snapshot.val();
 
       const listaMensajes = data ? snapshotToArray(data.messages) : [];
+
+      const users: any = data ? snapshotToArray(data.users) : [];
+
+      const isWriting = users.find(
+        (usario: any) => usario.writing && usario.id != user.id
+      );
+
+      setIsWriting(isWriting ?? false);
 
       if (data.users[user.id]?.exit_time) {
         const targetDate = new Date(data.users[user.id]?.exit_time);
@@ -101,35 +109,40 @@ export const Item: React.FC<any> = ({ grupo }) => {
           onLoad={() => setIsLoading(false)}
         />
       </IonAvatar>
-      <IonLabel className="ion-no-margin">
-        <span className={styles["name"]}> {grupo.grupo} </span>
-        <span className={styles["phone"]}>
-          {lastMsg && (
-            <>
-              {lastMsg.user == user.id ? "tu" : lastMsg.from.name}:{" "}
-              {lastMsg.user == user.id
-                ? ("tu: " + lastMsg.mensaje).length > 30 // Mensaje Mio
-                  ? lastMsg?.mensaje.substring(0, 27) + "..."
-                  : lastMsg?.mensaje
-                : (lastMsg.from.name + ": " + lastMsg.mensaje).length > 30 // Mensaje de otra persona
-                ? lastMsg.mensaje.substring(
-                    0,
-                    Math.abs(27 - (lastMsg.from.name + ": ").length)
-                  ) + "..."
-                : lastMsg.mensaje}{" "}
-            </>
-          )}{" "}
-        </span>
-      </IonLabel>
-      <IonNote className={styles["note"]}>
-        <span className={styles["time"]}>
-          {" "}
-          {lastMsg ? getDisplayDate(lastMsg.date) : null}{" "}
-        </span>
-        {unreads ? (
-          <span className={styles["unreads"]}> {unreads} </span>
-        ) : null}
-      </IonNote>
+
+      <div className={styles["item-content"]}>
+        <div className={styles["item-user"]}>
+          <span className={styles["name"]}> {grupo.grupo} </span>
+          <span className={styles["phone"]}>
+            {isWriting
+              ? " Escribiendo..."
+              : lastMsg && (
+                  <>
+                    {lastMsg.user == user.id ? "tu" : lastMsg.from.name}:{" "}
+                    {lastMsg.user == user.id
+                      ? ("tu: " + lastMsg.mensaje).length > 30 // Mensaje Mio
+                        ? lastMsg?.mensaje.substring(0, 27) + "..."
+                        : lastMsg?.mensaje
+                      : (lastMsg.from.name + ": " + lastMsg.mensaje).length > 30 // Mensaje de otra persona
+                      ? lastMsg.mensaje.substring(
+                          0,
+                          Math.abs(27 - (lastMsg.from.name + ": ").length)
+                        ) + "..."
+                      : lastMsg.mensaje}{" "}
+                  </>
+                )}{" "}
+          </span>
+        </div>
+        <IonNote className={styles["note"]}>
+          <span className={styles["time"]}>
+            {" "}
+            {lastMsg ? getDisplayDate(lastMsg.date) : null}{" "}
+          </span>
+          {unreads ? (
+            <span className={styles["unreads"]}> {unreads} </span>
+          ) : null}
+        </IonNote>
+      </div>
     </IonItem>
   );
 };

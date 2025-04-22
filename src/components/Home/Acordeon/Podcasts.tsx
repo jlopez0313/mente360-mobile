@@ -1,17 +1,20 @@
 import {
   IonAccordion,
   IonButton,
+  IonIcon,
   IonItem,
-  IonLabel,
-  IonText,
+  IonLabel
 } from "@ionic/react";
-import React from "react";
+import { trophy } from "ionicons/icons";
+import { useSelector } from "react-redux";
 import { useHistory } from "react-router";
-import crecimiento from "/assets/icons/crecimiento.svg";
 import styles from "./Acordeon.module.scss";
+import crecimiento from "/assets/icons/crecimiento.svg";
 
 export const Podcasts = () => {
   const history = useHistory();
+
+  const { podcast } = useSelector((state: any) => state.home);
 
   const goToPodcast = () => {
     history.replace("/crecimiento");
@@ -27,7 +30,11 @@ export const Podcasts = () => {
       >
         <IonItem slot="header">
           <IonLabel>Audio del día</IonLabel>
-          <IonText style={{ width: "20px" }}></IonText>
+          {podcast.done ? (
+            <IonIcon icon={trophy} slot="end" className={styles['trofeo']} />
+          ) : (
+            <IonIcon icon={trophy} slot="end" className={styles['trofeo-gris']} />
+          )}
         </IonItem>
         <div className="ion-padding" slot="content">
           <IonButton

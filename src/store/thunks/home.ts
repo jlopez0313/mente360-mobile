@@ -1,9 +1,41 @@
-import { semana } from "@/services/notificaciones";
-import { update } from "../slices/notificationSlice";
+import { DB, localDB } from "@/helpers/localStore";
+import { getHome } from "@/services/home";
+import {
+  setAdmin,
+  setAudio,
+  setMensaje,
+  setPodcast,
+  setTarea,
+} from "@/store/slices/homeSlice";
 
-export const getHome = () => {
+export const getHomeThunk = (
+  sqlite: any,
+  audiosDB: any,
+  mensajesDB: any,
+  tareasDB: any
+) => {
   return async (dispatch: any) => {
-    const {data: resp} = await semana();
-    dispatch(update({ notificaciones: resp.data }));
+    const { data } = await getHome({});
+
+    await audiosDB.remove(sqlite.performSQLAction, () => {});
+    await audiosDB.create(sqlite.performSQLAction, () => {}, [data.audio]);
+
+    await mensajesDB.remove(sqlite.performSQLAction, () => {});
+    await mensajesDB.create(sqlite.performSQLAction, () => {}, [data.mensaje]);
+
+    await tareasDB.remove(sqlite.performSQLAction, () => {});
+    await tareasDB.create(sqlite.performSQLAction, () => {}, [data.tarea]);
+
+    dispatch(setAudio(data.audio));
+    dispatch(setMensaje(data.mensaje));
+    dispatch(setTarea(data.tarea));
+
+    const podcast = { done: false };
+
+    const localHome = localDB(DB.HOME);
+    localHome.set({ admin: { ...data.admin }, podcast, showSuccess: false });
+
+    dispatch(setPodcast(podcast));
+    dispatch(setAdmin(data.admin));
   };
 };

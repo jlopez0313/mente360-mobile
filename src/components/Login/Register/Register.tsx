@@ -32,6 +32,7 @@ export const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [politicas, setPoliticas] = useState(false);
+  const [terminos, setTerminos] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const togglePasswordVisibility = () => {
@@ -156,7 +157,7 @@ export const Register = () => {
   }, []);
 
   return (
-    <IonGrid class="ion-text-center">
+    <IonGrid class="ion-text-justify">
       <IonRow>
         <IonCol size="12" class="ion-no-padding">
           <IonCard className={`ion-no-padding`}>
@@ -202,11 +203,28 @@ export const Register = () => {
                 </a>
               </IonCheckbox>
 
+
+              <IonCheckbox
+                className={`ion-margin-bottom ${styles.login}`}
+                onIonChange={(evt: any) => setTerminos(!terminos)}
+                labelPlacement="end"
+              >
+                He leído los &nbsp;
+                < a
+                  href="#"
+                  onClick={() => {
+                    window.open("https://soymente360.com/privacy-policy/", "_blank");
+                  }}
+                >
+                  términos y condiciones
+                </a>
+              </IonCheckbox>
+
               <IonButton
                 type="button"
                 className="ion-margin-top ion-margin-bottom"
                 expand="block"
-                disabled={!email || !password || !politicas}
+                disabled={!email || !password || !politicas || !terminos}
                 onClick={(evt) => doRegister(evt)}
               >
                 {" "}

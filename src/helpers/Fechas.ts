@@ -22,8 +22,8 @@ export const getDisplayDate = (isoDate: string) => {
   } else if (esAyer) {
     return "Ayer";
   } else if (diffDias < 7) {
-    return fecha.toLocaleDateString("es-ES", { weekday: "long" }); // Ej: 'martes'
+    return fecha.toLocaleDateString("es-ES", { weekday: "long" });
   } else {
-    return fecha.toLocaleDateString(); // Ej: '10/4/2025'
+    return fecha.toLocaleDateString();
   }
 };

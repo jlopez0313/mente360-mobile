@@ -64,7 +64,7 @@ export const Clip = () => {
 
   const [isLoading, setIsLoading] = useState(true);
 
-  const { audio, globalAudio, globalPos, listAudios } = useSelector(
+  const { audioSrc, globalAudio, globalPos, listAudios } = useSelector(
     (state: any) => state.audio
   );
 
@@ -512,7 +512,7 @@ export const Clip = () => {
               e.stopPropagation();
               goToNext();
             }}
-            src={audio}
+            src={audioSrc}
           />
         </IonCardContent>
       </IonCard>

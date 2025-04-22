@@ -40,11 +40,11 @@ export const Toast = () => {
 
   const dispatch = useDispatch();
 
-  const { baseURL, audio, globalAudio, listAudios, globalPos, isGlobalPlaying } = useSelector(
+  const { baseURL, audioSrc, globalAudio, listAudios, globalPos, isGlobalPlaying } = useSelector(
     (state: any) => state.audio
   );
 
-  const audioRef = useRef();
+  const audioRef: any = useRef();
 
   const {
     duration,
@@ -67,7 +67,7 @@ export const Toast = () => {
   const [present, dismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();
 
-  const [hasClip, setHasClip] = useState<boolean>(false);
+  const [hasClip, setHasClip] = useState<any>(null);
 
   const hasThisUser = (usuarios_clips: any[]) => {
     const hasUserClip = usuarios_clips?.find(
@@ -337,7 +337,7 @@ export const Toast = () => {
           e.stopPropagation();
           goToNext();
         }}
-        src={audio}
+        src={audioSrc}
       />
     </div>
   );

@@ -17,7 +17,7 @@ import styles from "./Info.module.scss";
 import { onValue } from "firebase/database";
 import { Item } from "./Item";
 
-export const Info = ({ grupoID }) => {
+export const Info: React.FC<any> = ({ grupoID }) => {
   const [users, setUsers] = useState<any>([]);
 
   const onGetGrupo = async (id: number) => {

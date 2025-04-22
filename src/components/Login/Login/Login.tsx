@@ -6,27 +6,21 @@ import {
   IonGrid,
   IonIcon,
   IonInput,
-  IonItem,
-  IonLabel,
-  IonList,
   IonLoading,
   IonNote,
   IonRow,
   useIonAlert,
-  useIonLoading,
+  useIonLoading
 } from "@ionic/react";
 import styles from "../Login.module.scss";
 
-import { setUser } from "@/helpers/onboarding";
-import { login } from "@/services/auth";
 import { GmailLogin } from "@/firebase/auth";
-import { register } from "@/services/auth";
+import { setUser } from "@/helpers/onboarding";
+import { login, register } from "@/services/auth";
 
+import { eye, eyeOff } from "ionicons/icons";
 import { useState } from "react";
 import { useHistory } from "react-router";
-import { FCM } from "@capacitor-community/fcm";
-import { eye, eyeOff } from "ionicons/icons";
-import { useSqliteDB } from "@/hooks/useSqliteDB";
 
 export const Login = () => {
 

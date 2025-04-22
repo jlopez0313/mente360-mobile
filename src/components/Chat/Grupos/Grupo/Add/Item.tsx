@@ -25,7 +25,7 @@ export const Item: React.FC<any> = ({ grupoID, contact, doChild }) => {
       const updates = { [grupoID]: true };
 
       await Promise.all([
-        writeData(`users/${contact.id}`, contact),
+        updateData(`users/${contact.id}`, contact),
         updateData(`users/${contact.id}/grupos`, updates),
         writeData(`grupos/${grupoID}/users/${contact.id}`, {
           writing: false,
