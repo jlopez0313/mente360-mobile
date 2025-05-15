@@ -53,7 +53,7 @@ export const useAudio: any = (audio: any, onConfirm: any = () => {}) => {
       });
       console.log("Archivo eliminado correctamente");
     } catch (error) {
-      console.error("Error eliminando archivo:", error);
+      console.error("Error eliminando archivo:", filePath, ': ', error);
     }
   };
 
@@ -78,6 +78,8 @@ export const useAudio: any = (audio: any, onConfirm: any = () => {}) => {
         if (done) break;
         chunks.push(value);
         receivedLength += value.length;
+
+        console.log( response, response.body, reader, await reader.read(), receivedLength, contentLength, receivedLength / contentLength, ((receivedLength / contentLength) * 100) )
 
         if (onProgress) {
           onProgress(Math.floor((receivedLength / contentLength) * 100));

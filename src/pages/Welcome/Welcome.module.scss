@@ -1,0 +1,26 @@
+@import "@/styles.scss";
+.ion-content {    
+  /*  
+  --background: url('/images/modal.png') no-repeat cover fixed center;
+
+  background: url('/assets/images/modal.png') no-repeat fixed center; 
+  background-size: cover;
+  */
+  --background: var(--bg-content);
+  background: var(--bg-content);
+
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .logo {
+    width: 100px;
+  }
+}
+
+ion-backdrop {
+  background: var(--ion-color-dark);
+  opacity: 0.3;
+}

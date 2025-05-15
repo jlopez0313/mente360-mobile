@@ -1,0 +1,29 @@
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .logo {
+        width: 70px;
+    }
+
+    .embarcate {
+        font-size: 20px;
+        text-align: center;
+        color: var(--bg-main) !important;
+        font-weight: bold;
+    }
+
+    .planes {
+        margin-bottom: 20px;
+        width: 100%;
+
+        ion-card {
+            
+        }
+    }
+
+    .all-planes {
+        margin-bottom: 50px;
+    }
+}

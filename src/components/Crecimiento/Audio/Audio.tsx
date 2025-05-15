@@ -11,7 +11,7 @@ import {
   IonRange,
   IonSkeletonText,
   IonText,
-  useIonToast,
+  useIonToast
 } from "@ionic/react";
 import {
   downloadOutline,
@@ -27,6 +27,7 @@ import { useSelector } from "react-redux";
 import styles from "./Audio.module.scss";
 
 import AudioNoWifi from "@/assets/images/audio_no_wifi.jpg";
+import AudioProgressCircle from "@/components/Shared/Animations/ProgressCircle/ProgressCircle";
 import CrecimientosDB from "@/database/crecimientos";
 
 interface Props {
@@ -47,15 +48,16 @@ export const Audio: React.FC<Props> = memo(
 
     const [presentToast] = useIonToast();
 
+    const [percent, setPercent] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const [localSrc, setLocalSrc] = useState<any>(null);
 
     const audioRef: any = useRef({
       currentTime: 0,
       duration: 0,
-      pause: () => {},
-      play: () => {},
-      fastSeek: (time: number) => {},
+      pause: () => { },
+      play: () => { },
+      fastSeek: (time: number) => { },
     });
 
     const {
@@ -77,7 +79,7 @@ export const Audio: React.FC<Props> = memo(
       downloadAudio,
       deleteAudio,
       getDownloadedAudio,
-    } = useAudio(audioRef, () => {});
+    } = useAudio(audioRef, () => { });
 
     const onDoPlay = () => {
       // toggle(true)
@@ -107,14 +109,16 @@ export const Audio: React.FC<Props> = memo(
           baseURL + audio.audio,
           "podcast_" + audio.id,
           async (p: any) => {
+            setPercent(p)
             console.log("P es ", p);
           }
         );
 
         console.log("Ruta es ", ruta);
+        setPercent(0)
 
         const crecimientosDB = new CrecimientosDB(db);
-        await crecimientosDB.download(performSQLAction, () => {}, {
+        await crecimientosDB.download(performSQLAction, () => { }, {
           id: audio.id,
           imagen: audio.imagen,
           audio: ruta,
@@ -137,7 +141,7 @@ export const Audio: React.FC<Props> = memo(
       console.log("removing");
 
       const crecimientosDB = new CrecimientosDB(db);
-      await crecimientosDB.unload(performSQLAction, () => {}, { id: audio.id });
+      await crecimientosDB.unload(performSQLAction, () => { }, { id: audio.id });
 
       await deleteAudio(localSrc);
 
@@ -213,111 +217,130 @@ export const Audio: React.FC<Props> = memo(
     }, []);
 
     return (
-      <IonCard className={`ion-text-center ${styles.card}`}>
-        {isLoading && (
-          <IonSkeletonText
-            animated
-            style={{
-              width: "100%",
-              height: "200px",
-              borderRadius: "5px",
-            }}
+      <>
+        <IonCard className={`ion-text-center ${styles.card}`}>
+          {isLoading && (
+            <IonSkeletonText
+              animated
+              style={{
+                width: "100%",
+                height: "200px",
+                borderRadius: "5px",
+              }}
+            />
+          )}
+
+          <img
+            alt=""
+            src={network.status ? baseURL + audio.imagen : AudioNoWifi}
+            style={{ display: isLoading ? "none" : "block" }}
+            onLoad={() => setIsLoading(false)}
+            className="ion-margin-bottom"
           />
-        )}
 
-        <img
-          alt=""
-          src={network.status ? baseURL + audio.imagen : AudioNoWifi}
-          style={{ display: isLoading ? "none" : "block" }}
-          onLoad={() => setIsLoading(false)}
-          className="ion-margin-bottom"
-        />
+          <IonCardHeader className="ion-no-padding">
+            <IonCardSubtitle className="ion-no-padding">
+              <IonText> {audio.titulo} </IonText>
+            </IonCardSubtitle>
 
-        <IonCardHeader className="ion-no-padding">
-          <IonCardSubtitle className="ion-no-padding">
-            <IonText> {audio.titulo} </IonText>
-          </IonCardSubtitle>
+            <IonCardSubtitle className="ion-no-padding"
+              style={{
+                display: 'flex',
+                justifyContent: 'space-around',
+                alignItems: 'center',
+              }}
+            >
+              {
+                percent > 0 &&
+                <span style={{ width: '30px' }}></span>
+              }
+              <div className={styles["chip-list"]}>
+                <IonChip
+                  disabled={!network.status && !localSrc}
+                  onClick={() => (localSrc ? onRemoveLocal() : onDownload())}
+                >
+                  <IonIcon
+                    className={`${styles["donwload-icon"]}`}
+                    icon={localSrc ? trashBinOutline : downloadOutline}
+                  />
+                  {localSrc ? "Eliminar Descarga" : "Descargar"}
+                </IonChip>
+              </div>
 
-          <IonCardSubtitle className="ion-no-padding">
-            <div className={styles["chip-list"]}>
-              <IonChip
-                disabled={!network.status && !localSrc}
-                onClick={() => (localSrc ? onRemoveLocal() : onDownload())}
-              >
-                <IonIcon
-                  className={`${styles["donwload-icon"]}`}
-                  icon={localSrc ? trashBinOutline : downloadOutline}
-                />
-                {localSrc ? "Eliminar Descarga" : "Descargar"}
-              </IonChip>
+              {
+                percent > 0 &&
+                <AudioProgressCircle />
+              }
+
+
+            </IonCardSubtitle>
+          </IonCardHeader>
+
+          <IonCardContent className="ion-no-padding">
+            <IonRange
+              disabled={false}
+              value={progress}
+              onIonKnobMoveStart={onPause}
+              onIonKnobMoveEnd={(e) => onLoad(e.detail.value)}
+              style={{
+                "--bar-background":
+                  "linear-gradient(to right, #787878 " +
+                  (buffer * 100).toFixed(2) +
+                  "%, #dddddd " +
+                  (buffer * 100).toFixed(2) +
+                  "%)",
+              }}
+            ></IonRange>
+
+            <div className={`ion-margin-top ${styles.time}`}>
+              <span> {currentTime} </span>
+              <span> {duration} </span>
             </div>
-          </IonCardSubtitle>
-        </IonCardHeader>
 
-        <IonCardContent className="ion-no-padding">
-          <IonRange
-            disabled={false}
-            value={progress}
-            onIonKnobMoveStart={onPause}
-            onIonKnobMoveEnd={(e) => onLoad(e.detail.value)}
-            style={{
-              "--bar-background":
-                "linear-gradient(to right, #787878 " +
-                (buffer * 100).toFixed(2) +
-                "%, #dddddd " +
-                (buffer * 100).toFixed(2) +
-                "%)",
-            }}
-          ></IonRange>
-
-          <div className={`ion-margin-top ${styles.time}`}>
-            <span> {currentTime} </span>
-            <span> {duration} </span>
-          </div>
-
-          <div className={`${styles.controls}`}>
-            <IonIcon
-              onClick={onGoBack}
-              className={styles.previous}
-              icon={playSkipBack}
-            ></IonIcon>
-            <div className={`${styles.play}`}>
-              {isPlaying ? (
-                <IonIcon
-                  className={styles["icon-play"]}
-                  onClick={onDoPause}
-                  icon={pause}
-                ></IonIcon>
-              ) : (
-                <IonIcon
-                  style={{
-                    opacity: !network.status && !localSrc ? 0.2 : 1,
-                    "pointer-events":
-                      !network.status && !localSrc ? "none" : "auto",
-                  }}
-                  className={styles["icon-play"]}
-                  onClick={onDoPlay}
-                  icon={play}
-                ></IonIcon>
-              )}
+            <div className={`${styles.controls}`}>
+              <IonIcon
+                onClick={onGoBack}
+                className={styles.previous}
+                icon={playSkipBack}
+              ></IonIcon>
+              <div className={`${styles.play}`}>
+                {isPlaying ? (
+                  <IonIcon
+                    className={styles["icon-play"]}
+                    onClick={onDoPause}
+                    icon={pause}
+                  ></IonIcon>
+                ) : (
+                  <IonIcon
+                    style={{
+                      opacity: !network.status && !localSrc ? 0.2 : 1,
+                      "pointer-events":
+                        !network.status && !localSrc ? "none" : "auto",
+                    }}
+                    className={styles["icon-play"]}
+                    onClick={onDoPlay}
+                    icon={play}
+                  ></IonIcon>
+                )}
+              </div>
+              <IonIcon
+                onClick={onGoNext}
+                className={styles.next}
+                icon={playSkipForward}
+              ></IonIcon>
             </div>
-            <IonIcon
-              onClick={onGoNext}
-              className={styles.next}
-              icon={playSkipForward}
-            ></IonIcon>
-          </div>
 
-          <audio
-            ref={audioRef}
-            src={localSrc ? localSrc : baseURL + audio.audio}
-            onLoadedMetadata={onLoadedMetadata}
-            onTimeUpdate={onTimeUpdate}
-            onProgress={onUpdateBuffer}
-            onEnded={() => onSaveNext(activeIndex)}
-          />
-        </IonCardContent>
-      </IonCard>
+            <audio
+              ref={audioRef}
+              src={localSrc ? localSrc : baseURL + audio.audio}
+              onLoadedMetadata={onLoadedMetadata}
+              onTimeUpdate={onTimeUpdate}
+              onProgress={onUpdateBuffer}
+              onEnded={() => onSaveNext(activeIndex)}
+            />
+          </IonCardContent>
+        </IonCard>
+      </>
     );
   }
 );

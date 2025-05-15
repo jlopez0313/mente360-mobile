@@ -13,6 +13,7 @@ import styles from "./Modal.module.scss";
 interface Props {
   showButtons?: boolean;
   isOpen?: boolean;
+  isBtnDisabled?: boolean;
   canDismiss?: boolean;
   trigger?: string;
   title?: string;
@@ -32,6 +33,7 @@ export const Modal: React.FC<Props> = memo(
     isOpen = false,
     canDismiss = true,
     showButtons = true,
+    isBtnDisabled = false,
     closeText = 'Cerrar',
     onConfirm,
     onWillDismiss,
@@ -87,7 +89,7 @@ export const Modal: React.FC<Props> = memo(
             !hideButtons ? (
               <IonButton onClick={() => dismiss()}>Completar</IonButton>
             ) : (
-              <IonButton onClick={() => dismiss()}>
+              <IonButton disabled={isBtnDisabled} onClick={() => dismiss()}>
                 <IonIcon icon={close} slot="start" />
                 {closeText}
               </IonButton>

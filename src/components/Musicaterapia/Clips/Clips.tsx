@@ -200,67 +200,68 @@ export const Clips = () => {
   }, [listAudios]);
 
   return (
-    <div className={styles["ion-content"]}>
-      <div className={`ion-margin-bottom ${styles.chips}`}>
-        <div className={styles["chip-list"]}>
-          <IonChip
-            onClick={() => handleChipChange("0")}
-            className={categoria == "All" ? styles.checked : ""}
-          >
-            {" "}
-            All{" "}
-          </IonChip>
-          {categorias.map((item: any, idx: any) => {
-            return (
-              <IonChip
-                key={idx}
-                onClick={() => handleChipChange(item.id)}
-                className={categoria == item.categoria ? styles.checked : ""}
-              >
-                {" "}
-                {item.categoria}{" "}
-              </IonChip>
-            );
-          })}
+    <>
+      <div className={styles["ion-content"]}>
+        <div className={`ion-margin-bottom ${styles.chips}`}>
+          <div className={styles["chip-list"]}>
+            <IonChip
+              onClick={() => handleChipChange("0")}
+              className={categoria == "All" ? styles.checked : ""}
+            >
+              {" "}
+              All{" "}
+            </IonChip>
+            {categorias.map((item: any, idx: any) => {
+              return (
+                <IonChip
+                  key={idx}
+                  onClick={() => handleChipChange(item.id)}
+                  className={categoria == item.categoria ? styles.checked : ""}
+                >
+                  {" "}
+                  {item.categoria}{" "}
+                </IonChip>
+              );
+            })}
+          </div>
+
+          <IonSearchbar
+            className={`ion-no-padding ion-margin-bottom ${styles["search"]}`}
+            placeholder="Buscar..."
+            color="warning"
+            debounce={1000}
+            onIonInput={(ev) => handleSearchChange(ev.detail.value!)}
+          ></IonSearchbar>
         </div>
 
-        <IonSearchbar
-          className={`ion-no-padding ion-margin-bottom ${styles["search"]}`}
-          placeholder="Buscar..."
-          color="warning"
-          debounce={500}
-          onIonInput={(ev) => handleSearchChange(ev.detail.value!)}
-          value={search}
-        ></IonSearchbar>
+        <IonList className="ion-no-padding ion-margin-bottom" lines="none">
+          {sqlite &&
+            clips.map((item: any, idx: any) => {
+              return (
+                <Item
+                  key={idx}
+                  idx={idx}
+                  item={item}
+                  sqlite={sqlite}
+                  network={network}
+                  onSetClips={onSetClips}
+                />
+              );
+            })}
+        </IonList>
+
+        <IonInfiniteScroll
+          onIonInfinite={(ev) => {
+            onSetPage(ev, page + 1);
+            setTimeout(() => ev.target.complete(), 1000);
+          }}
+        >
+          <IonInfiniteScrollContent
+            loadingText="Cargando..."
+            loadingSpinner="bubbles"
+          ></IonInfiniteScrollContent>
+        </IonInfiniteScroll>
       </div>
-
-      <IonList className="ion-no-padding ion-margin-bottom" lines="none">
-        {sqlite &&
-          clips.map((item: any, idx: any) => {
-            return (
-              <Item
-                key={idx}
-                idx={idx}
-                item={item}
-                sqlite={sqlite}
-                network={network}
-                onSetClips={onSetClips}
-              />
-            );
-          })}
-      </IonList>
-
-      <IonInfiniteScroll
-        onIonInfinite={(ev) => {
-          onSetPage(ev, page + 1);
-          setTimeout(() => ev.target.complete(), 1000);
-        }}
-      >
-        <IonInfiniteScrollContent
-          loadingText="Cargando..."
-          loadingSpinner="bubbles"
-        ></IonInfiniteScrollContent>
-      </IonInfiniteScroll>
-    </div>
+    </>
   );
 };

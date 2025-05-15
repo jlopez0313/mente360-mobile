@@ -35,6 +35,9 @@ export const audioSlice = createSlice({
             state.myCurrentTime = 0;
             state.globalAudio = action.payload;
         },
+        putGlobalAudio: (state, action) => {
+            state.globalAudio = action.payload;
+        },
         clearListAudios: (state) => {
             state.listAudios = [];
         },
@@ -65,6 +68,7 @@ export const {
     updateCurrentTime,
     setIsGlobalPlaying,
     setGlobalAudio,
+    putGlobalAudio,
     clearListAudios,
     setListAudios,
     setGlobalPos,

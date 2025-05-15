@@ -9,7 +9,7 @@ import {
   useIonLoading,
   useIonToast,
 } from "@ionic/react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import styles from "../Musicaterapia.module.scss";
 
 import {
@@ -36,6 +36,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 
 import AudioNoWifi from "@/assets/images/audio_no_wifi.jpg";
+import AudioProgressCircle from "@/components/Shared/Animations/ProgressCircle/ProgressCircle";
 import MusicBar from "@/components/Shared/MusicBar/MusicBar";
 import ClipsDB from "@/database/clips";
 import LikesDB from "@/database/likes";
@@ -69,12 +70,13 @@ export const Item: React.FC<any> = ({
   const [presentSheet, dismissSheet] = useIonActionSheet();
 
   const [isLoading, setIsLoading] = useState(true);
+  const [percent, setPercent] = useState(0);
 
   const { onShareLink, downloadAudio, deleteAudio, getDownloadedAudio } =
     useAudio(
       audioRef,
-      () => {},
-      () => {}
+      () => { },
+      () => { }
     );
 
   const onPlayClicked = async () => {
@@ -107,7 +109,7 @@ export const Item: React.FC<any> = ({
       await trash(item.in_my_playlist);
 
       const playlistDB = new PlaylistDB(db);
-      await playlistDB.delete(performSQLAction, () => {}, item.in_my_playlist);
+      await playlistDB.delete(performSQLAction, () => { }, item.in_my_playlist);
 
       const newItem = {
         ...item,
@@ -148,7 +150,7 @@ export const Item: React.FC<any> = ({
       } = await add(data);
 
       const playlistDB = new PlaylistDB(db);
-      await playlistDB.create(performSQLAction, () => {}, [
+      await playlistDB.create(performSQLAction, () => { }, [
         {
           id: added.id,
           clip: {
@@ -193,7 +195,7 @@ export const Item: React.FC<any> = ({
       await dislike(item.my_like);
 
       const likes = new LikesDB(db);
-      await likes.delete(performSQLAction, () => {}, item.my_like);
+      await likes.delete(performSQLAction, () => { }, item.my_like);
 
       const newItem = {
         ...item,
@@ -238,7 +240,7 @@ export const Item: React.FC<any> = ({
       } = await like(data);
 
       const likesDB = new LikesDB(db);
-      await likesDB.create(performSQLAction, () => {}, [
+      await likesDB.create(performSQLAction, () => { }, [
         {
           ...data,
           id: added.id,
@@ -283,6 +285,7 @@ export const Item: React.FC<any> = ({
         baseURL + item.audio,
         "audio_" + item.id,
         async (p: any) => {
+          setPercent(p)
           console.log("P es ", p);
         }
       );
@@ -290,9 +293,10 @@ export const Item: React.FC<any> = ({
       const ruta = "RUTA__RUTA";
       */
       console.log("Ruta es ", ruta);
+      setPercent(0)
 
       const clipsDB = new ClipsDB(db);
-      await clipsDB.download(performSQLAction, () => {}, {
+      await clipsDB.download(performSQLAction, () => { }, {
         id: item.id,
         imagen: item.imagen,
         audio: ruta,
@@ -321,9 +325,20 @@ export const Item: React.FC<any> = ({
 
   const onRemoveLocal = async () => {
     const clipsDB = new ClipsDB(db);
-    await clipsDB.unload(performSQLAction, () => {}, { id: item.id });
+    await clipsDB.unload(performSQLAction, () => { }, { id: item.id });
 
     await deleteAudio(item.audio_local);
+
+    dispatch(
+      setAudioItem({
+        index: idx,
+        newData: {
+          imagen_local: null,
+          audio_local: null,
+          downloaded: 0,
+        },
+      })
+    );
 
     onPresentToast(
       "bottom",
@@ -433,10 +448,6 @@ export const Item: React.FC<any> = ({
     }, 100);
   };
 
-  useEffect(() => {
-    console.log( network )
-  }, [])
-
   return (
     <IonItem
       disabled={!network.status && !item.audio_local}
@@ -500,6 +511,12 @@ export const Item: React.FC<any> = ({
         </IonLabel>
         <span className={styles["categoria"]}> {item.categoria} </span>
       </div>
+
+      {
+        percent > 0 &&
+        <AudioProgressCircle />
+      }
+
 
       <IonIcon
         aria-hidden="true"

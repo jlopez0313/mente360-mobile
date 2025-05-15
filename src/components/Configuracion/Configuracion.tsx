@@ -189,8 +189,7 @@ export const Configuracion = () => {
           onClick={() =>
             openWhatsApp(
               import.meta.env.VITE_SUPPORT_PHONE,
-              `Hola, tengo un problema con la aplicación ${
-                import.meta.env.VITE_NAME
+              `Hola, tengo un problema con la aplicación ${import.meta.env.VITE_NAME
               } y necesito ayuda. Esto es lo que me sucede: `
             )
           }
@@ -230,8 +229,7 @@ export const Configuracion = () => {
           onClick={() =>
             openWhatsApp(
               import.meta.env.VITE_CONTACT_PHONE,
-              `¡Hola! Me gustaría obtener más información sobre su servicio en ${
-                import.meta.env.VITE_NAME
+              `¡Hola! Me gustaría obtener más información sobre su servicio en ${import.meta.env.VITE_NAME
               }. ¿Podrían ayudarme?`
             )
           }

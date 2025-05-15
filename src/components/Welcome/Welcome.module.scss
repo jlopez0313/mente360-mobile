@@ -1,0 +1,26 @@
+@import "@/styles.scss";
+
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .logo {
+        width: 70px;
+    }
+
+    .disfruta {        
+        font-size: 16px;
+        text-align: center;
+        color: var(--bg-main) !important;
+        font-weight: bold;
+    }
+
+    .ready {
+        font-size: 20px;
+    }
+
+    .futuro {
+        font-style: italic;
+    }
+}

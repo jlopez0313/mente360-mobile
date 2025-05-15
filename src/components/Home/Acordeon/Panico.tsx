@@ -22,10 +22,10 @@ import { Audio } from "../Audio/Audio";
 import { Texto } from "../Texto/Texto";
 import panico from "/assets/icons/panico.svg";
 
-export const Panico: React.FC<any> = ({network}) => {
+export const Panico: React.FC<any> = ({ network }) => {
   const { audio, currentDate } = useSelector((state: any) => state.home);
-  
-  const {user} = getUser();
+
+  const { user } = getUser();
   const history = useHistory();
   const dispatch = useDispatch()
   const [present, dismiss] = useIonLoading();
@@ -39,18 +39,19 @@ export const Panico: React.FC<any> = ({network}) => {
       present({
         message: 'Activando...'
       })
-      
-      const {data} = await activar( user.eneatipo );
-      
+
+      const { data } = await activar(user.eneatipo);
+
       setSOS({
         ...data,
-        audio: {...data.clip,
+        audio: {
+          ...data.clip,
           imagen: data.imagen?.imagen,
           audio: data.clip?.clip,
         }
       });
-      
-      setIsOpen( true );
+
+      setIsOpen(true);
 
       dispatch(setPanico(data.texto));
       dispatch(setMsgSource('panico'));
@@ -63,7 +64,7 @@ export const Panico: React.FC<any> = ({network}) => {
   }
 
   const onCloseModal = () => {
-    setIsOpen( false );
+    setIsOpen(false);
   }
 
   return (
@@ -79,16 +80,28 @@ export const Panico: React.FC<any> = ({network}) => {
           <IonText style={{ width: "20px" }}></IonText>
         </IonItem>
         <div className="ion-padding" slot="content">
-          <IonButton
-            disabled={!network.status}        
-            expand="block"
-            type="button"
-            className="ion-margin-top ion-padding-start ion-padding-end"
-            id="modal-panico"
-            onClick={onGetSos}
-          >
-            Activar
-          </IonButton>
+          {
+            !user.has_paid ?
+              <IonButton
+                disabled={true}
+                expand="block"
+                type="button"
+                className="ion-margin-top ion-padding-start ion-padding-end"
+              >
+                Premium
+              </IonButton> :
+              <IonButton
+                disabled={!network.status}
+                expand="block"
+                type="button"
+                className="ion-margin-top ion-padding-start ion-padding-end"
+                id="modal-panico"
+                onClick={onGetSos}
+              >
+                Activar
+              </IonButton>
+
+          }
         </div>
       </IonAccordion>
 
@@ -119,7 +132,7 @@ export const Panico: React.FC<any> = ({network}) => {
           />
         </Texto>
 
-        <Audio audio={sos.audio} onConfirm={() => {}} />
+        <Audio audio={sos.audio} onConfirm={() => { }} />
       </Modal>
     </>
   );

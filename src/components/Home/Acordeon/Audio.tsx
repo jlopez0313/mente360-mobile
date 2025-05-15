@@ -14,22 +14,24 @@ import auriculares from "/assets/icons/auriculares.svg";
 import { Modal } from "@/components/Shared/Modal/Modal";
 import { useDB } from "@/context/Context";
 import AudiosDB from "@/database/audios";
+import { getUser } from "@/helpers/onboarding";
 import { setAudio } from "@/store/slices/homeSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { Audio as AudioShared } from "../Audio/Audio";
 
-export const Audio: React.FC<any> = ({network}) => {
+export const Audio: React.FC<any> = ({ network }) => {
 
   const dispatch = useDispatch();
   const [presentAlert] = useIonAlert();
   const { sqlite } = useDB();
+  const { user } = getUser();
 
   const { audio } = useSelector((state: any) => state.home);
 
   const onConfirmAudio = async () => {
     try {
       const audiosDB = new AudiosDB(sqlite.db);
-      await audiosDB.markAsDone(sqlite.performSQLAction, () => {}, {
+      await audiosDB.markAsDone(sqlite.performSQLAction, () => { }, {
         id: audio.id,
         done: 1,
       });
@@ -71,14 +73,26 @@ export const Audio: React.FC<any> = ({network}) => {
           )}
         </IonItem>
         <div className="ion-padding" slot="content">
-          <IonButton
-            expand="block"
-            type="button"
-            className="ion-margin-top ion-padding-start ion-padding-end"
-            id="modal-auricular"
-          >
-            Escuchar
-          </IonButton>
+          {
+            !user.has_paid ?
+              <IonButton
+                disabled={true}
+                expand="block"
+                type="button"
+                className="ion-margin-top ion-padding-start ion-padding-end"
+              >
+                Premium
+              </IonButton> :
+              <IonButton
+                expand="block"
+                type="button"
+                className="ion-margin-top ion-padding-start ion-padding-end"
+                id="modal-auricular"
+              >
+                Escuchar
+              </IonButton>
+
+          }
         </div>
       </IonAccordion>
 

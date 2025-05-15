@@ -22,7 +22,8 @@ export default class Niveles {
             CREATE TABLE IF NOT EXISTS niveles (
               id INTEGER PRIMARY KEY AUTOINCREMENT,
               nivel TEXT,
-              gratis INTEGER
+              gratis INTEGER,
+              orden INTEGER
             );
         `);
 
@@ -36,14 +37,15 @@ export default class Niveles {
   async create(performSQLAction: any, callback: any, niveles: any) {
     try {
       performSQLAction(async () => {
-        const placeholders = niveles.map(() => "(?, ?, ?)").join(", ");
+        const placeholders = niveles.map(() => "(?, ?, ?, ?)").join(", ");
         const values = niveles.flatMap((nivel: any) => [
           nivel.id,
           nivel.nivel,
           nivel.gratis,
+          nivel.orden,
         ]);
 
-        const query2 = `INSERT OR REPLACE INTO niveles (id, nivel, gratis) VALUES ${placeholders};`;
+        const query2 = `INSERT OR REPLACE INTO niveles (id, nivel, gratis, orden) VALUES ${placeholders};`;
 
         await this.db?.query(query2, values);
         callback();
@@ -57,7 +59,7 @@ export default class Niveles {
   async all(performSQLAction: any, callback: any) {
     try {
       performSQLAction(async () => {
-        const result = await this.db?.query("SELECT * FROM niveles", []);
+        const result = await this.db?.query("SELECT * FROM niveles ORDER BY orden", []);
         callback(result?.values);
       });
     } catch (error) {

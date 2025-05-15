@@ -45,6 +45,9 @@ import { Toast } from "@/components/Shared/Toast/Toast";
 import { CapacitorUpdater } from '@capgo/capacitor-updater';
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
+import Detalle from "./pages/Planes/Detalle/Detalle";
+import Planes from "./pages/Planes/Planes/Planes";
+import Welcome from "./pages/Welcome/Wecome";
 import "./theme/variables.css";
 
 setupIonicReact({
@@ -92,6 +95,12 @@ const App: React.FC = () => {
         <DBProvider>
           <IonRouterOutlet>
             <Route exact path="/" render={() => <Redirect to="/login" />} />
+
+
+            <Route exact={true} path="/welcome" component={Welcome} />
+
+            <Route exact={true} path="/planes" component={Planes} />
+            <Route exact={true} path="/planes/detalle" component={Detalle} />
 
             <Route exact={true} path="/chat" component={Chat} />
             <Route exact={true} path="/chat/:room" component={Interno} />

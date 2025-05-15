@@ -77,8 +77,6 @@ export const Item: React.FC<any> = ({
     );
 
   const onPlay = async () => {
-    dispatch(setListAudios(playlist.map((clip: any) => clip)));
-
     if (item.audio_local) {
       const audioBlob = await getDownloadedAudio(item.audio_local);
       dispatch(setAudioSrc(audioBlob));

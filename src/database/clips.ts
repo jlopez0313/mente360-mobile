@@ -144,6 +144,18 @@ export default class Clips {
     }
   }
 
+  async delete(performSQLAction: any, callback: any, id: any) {
+    try {
+      performSQLAction(async () => {
+        const query = await this.db?.query(`DELETE FROM clips WHERE id=?;`, [id]);
+        callback();
+      });
+    } catch (error) {
+      console.log("error delete likes", error);
+      throw error;
+    }
+  }
+
   async download(
     performSQLAction: any,
     callback: any,

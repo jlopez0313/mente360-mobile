@@ -47,6 +47,7 @@ export const Playlist = () => {
       await playlistDB.all(
         sqlite.performSQLAction,
         (lista: any) => {
+          dispatch(setListAudios(lista));
           setPlaylist(lista);
           setFilteredPlaylist(lista);
         },

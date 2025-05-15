@@ -1,11 +1,11 @@
 import { all as getAllCategorias } from "@/services/categorias";
-import { all as getAllClips } from "@/services/clips";
+import { all as getAllClips, trashed as getTrashedClips } from "@/services/clips";
 import { all as getAllConstants } from "@/services/constants";
 import { all as getAllCrecimientos } from "@/services/crecimientos";
 import { all as getAllNiveles } from "@/services/niveles";
 import { all as getAllPlaylist } from "@/services/playlist";
 
-import { useEffect } from "react";
+import { useState } from "react";
 import { useNetwork } from "./useNetwork";
 
 import CategoriasDB from "@/database/categorias";
@@ -31,6 +31,10 @@ export const useGlobalSync = () => {
 
   const network = useNetwork();
   const { sqlite } = useDB();
+  
+  const [ loading, setLoading ] = useState( false );
+  const [ success, setSuccess ] = useState( false );
+  const [ mensaje, setMensaje ] = useState( '' );
 
   const syncConstants = async () => {
     try {
@@ -220,37 +224,93 @@ export const useGlobalSync = () => {
     console.log("syncClips completa.");
   };
 
+  const syncClipsTrashed = async () => {
+    console.log("start syncClipsTrashed");
+
+    const lastSync = await getPreference(keys.SYNC_KEY);
+    const fromDate = lastSync ?? initSync;
+
+    const clipsDB = new ClipsDB(sqlite.db);
+
+    try {
+      const {
+        data: { data },
+      } = await getTrashedClips(fromDate);
+
+      if (!data.length) {
+        return;
+      }
+
+      for (const clip of data) {
+        await clipsDB.delete(sqlite.performSQLAction, () => {}, clip.id);
+      }
+      
+    } catch (err: any) {
+      console.log( err );
+      throw new Error(`Too many requests en syncClipsTrashed.`)
+    }
+
+    console.log("syncClipsTrashed completa.");
+  };
+
   const syncAll = async () => {
     if (network.status) {
       try {
+
+        setLoading( true );
+        setMensaje('Descargando información...')
+
         console.log("start syncAll");
 
-        await syncConstants();
+        await Promise.all([
+          syncConstants(),
+          syncNiveles(),
+          syncCategorias(),
+          syncPlaylist(),
+        ]);
 
-        await syncNiveles();
+        await delay(2000);
+        
+        setMensaje('Descargando Podcasts...')
         await syncCrecimientos();
 
-        await syncCategorias();
-        await syncPlaylist();
+        setMensaje('Descargando Clips...')
         await syncClips();
+        await syncClipsTrashed();
 
-        await setPreference(keys.SYNC_KEY, new Date().toISOString());
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+
+        await setPreference(keys.SYNC_KEY, now.toISOString());
         await setPreference(keys.CRECIMIENTOS_PAGE_KEY, "1");
         await setPreference(keys.CLIP_PAGE_KEY, "1");
 
         console.log("Sincronización completa.");
+        
+        setSuccess( true );
+        setLoading( false );
+        setMensaje('¡Información actualizada!')
+        
       } catch (error) {
         console.error(error);
+        
+        setLoading( false );
+        setSuccess( false );
+        setMensaje('¡Vaya! Intenta luego.')
       }
+
+
     } else {
       console.warn("Sin conexión a internet. No se puede sincronizar.");
       return;
     }
   };
 
-  useEffect(() => {
-    sqlite.initialized && syncAll();
+  return {
+    loading,
+    success,
+    mensaje,
+    syncAll
+  }
 
-    console.log("sqlite.initialized", sqlite.initialized);
-  }, [sqlite.initialized]);
 };

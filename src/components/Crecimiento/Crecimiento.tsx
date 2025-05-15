@@ -157,7 +157,13 @@ export const Crecimiento = () => {
   const onGoNext = async () => {
     if (swiper.activeIndex + 1 == crecimientos.length) {
       const nextNivelIdx = niveles.map((i) => i.id).indexOf(nivelID) + 1;
+
       if (niveles[nextNivelIdx]) {
+        
+        if ( niveles[nextNivelIdx].gratis == '0' && !user.user.has_paid ) {
+          return ;
+        }
+
         const _nivelID = niveles[nextNivelIdx].id;
         setNivelID(_nivelID);
 
@@ -247,7 +253,7 @@ export const Crecimiento = () => {
       >
         {niveles.map((item: any, idx: number) => {
           return (
-            <IonSelectOption key={idx} value={item.id}>
+            <IonSelectOption disabled={!user.has_paid && item.gratis == 0} key={idx} value={item.id}>
               {" "}
               {item.nivel}{" "}
             </IonSelectOption>

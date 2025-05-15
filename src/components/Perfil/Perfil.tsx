@@ -21,7 +21,7 @@ import {
   useIonLoading,
 } from "@ionic/react";
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import styles from "./Perfil.module.scss";
 
 import { updateData } from "@/services/realtime-db";
@@ -47,6 +47,7 @@ export const Perfil = () => {
   const [presentAlert] = useIonAlert();
 
   const user = getUser();
+  const history = useHistory();
   const network = useNetwork();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -154,7 +155,7 @@ export const Perfil = () => {
       };
 
       await updateData(`users/${user.user.id}`, obj);
-      
+
     } catch (error: any) {
       console.log(error);
 
@@ -168,6 +169,22 @@ export const Perfil = () => {
       dismiss();
     }
   };
+
+  const goToPlanes = async () => {
+    history.replace('/planes');
+  }
+
+  const goToDetalle = async () => {
+    history.replace('/planes/detalle');
+  }
+
+  const getFechaVencimiento = ()=> {
+    return new Date(user.user.fecha_vencimiento).toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).replaceAll('/', '-')
+  }
 
   useEffect(() => {
     dispatch(setRoute("/perfil"));
@@ -217,6 +234,27 @@ export const Perfil = () => {
           <span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span>
         </IonItem>
       </div>
+
+      {
+        user.user.has_paid ?
+          <div 
+            className={`ion-margin-top ion-margin-bottom ion-text-center ${styles['premium']}`}
+            onClick={goToDetalle}
+          >
+            <div style={{display: 'flex', flexDirection: 'column', alignItems: 'baseline'}}>
+              <span style={{fontWeight: 'bold'}}>{import.meta.env.VITE_NAME} PREMIUM</span>
+              <span>Vence el: { getFechaVencimiento() }</span>
+            </div>
+            <div>
+              <span className={styles['detalle']}>Ver Detalles</span>
+            </div>
+          </div>
+          :
+
+          <div className={`ion-margin-top ion-margin-bottom ion-text-center`}>
+            <IonButton onClick={goToPlanes}> Unete a {import.meta.env.VITE_NAME} PREMIUM </IonButton>
+          </div>
+      }
 
       <div className={`ion-margin-top ion-margin-bottom ${styles.profile}`}>
         <div className={styles.info}>

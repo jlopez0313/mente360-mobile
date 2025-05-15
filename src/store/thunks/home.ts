@@ -13,7 +13,7 @@ export const getHomeThunk = (
   audiosDB: any,
   mensajesDB: any,
   tareasDB: any
-) => {
+): any => {
   return async (dispatch: any) => {
     const { data } = await getHome({});
 

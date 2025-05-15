@@ -1,0 +1,24 @@
+.clip-sync-toast {
+  position: fixed;
+  bottom: 70px;
+  right: 16px;
+  background-color: rgba(33, 33, 33, 0.9);
+  border-radius: 12px;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  z-index: 9999;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.clip-sync-content {
+  display: flex;
+  align-items: center;
+}
+
+.clip-sync-text {
+  margin-left: 12px;
+  font-size: 0.85rem;
+  color: white;
+  font-weight: 500;
+}

@@ -1,3 +1,9 @@
+export function diferenciaRealEnDias(fecha1: Date, fecha2: Date) {
+  const unDia = 1000 * 60 * 60 * 24;
+  const diferencia = fecha2.getTime() - fecha1.getTime();
+  return Math.floor(diferencia / unDia);
+}
+
 export function diferenciaEnDias(fecha1: Date, fecha2: Date) {
   const unDia = 1000 * 60 * 60 * 24;
   const diferencia = Math.abs(fecha2.getTime() - fecha1.getTime());

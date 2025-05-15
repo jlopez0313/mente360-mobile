@@ -7,6 +7,7 @@ import {
 } from "@ionic/react";
 import styles from "./Footer.module.scss";
 
+import { getUser } from "@/helpers/onboarding";
 import { useNetwork } from "@/hooks/useNetwork";
 import { useState } from "react";
 import { useSelector } from "react-redux";
@@ -19,6 +20,8 @@ import grupo from "/assets/icons/grupo.svg";
 export const Footer = (props: any) => {
   const history = useHistory();
   const network = useNetwork();
+
+  const { user } = getUser();
 
   const [tab, setTab] = useState(history.location.pathname);
 
@@ -50,40 +53,56 @@ export const Footer = (props: any) => {
             </IonButton>
           </Link>
 
-          <Link
-            to="/musicaterapia"
-            replace={true}
-            onClick={() => setTab(history.location.pathname)}
-          >
-            <IonButton
-              className={tab.includes("/musicaterapia") ? styles.active : ""}
-            >
-              <IonIcon slot="icon-only" src={auriculares}></IonIcon>
-            </IonButton>
-          </Link>
+          {
+            !user.has_paid ?
+              <IonButton>
+                <IonIcon slot="icon-only" src={auriculares}></IonIcon>
+              </IonButton>
+              :
+              <Link
+                to="/musicaterapia"
+                replace={true}
+                onClick={() => setTab(history.location.pathname)}
+              >
+                <IonButton
+                  className={tab.includes("/musicaterapia") ? styles.active : ""}
+                >
+                  <IonIcon slot="icon-only" src={auriculares}></IonIcon>
+                </IonButton>
+              </Link>
+          }
 
-          <Link
-            style={{
-              opacity: !network.status ? 0.5 : 1,
-              pointerEvents: !network.status ? "none" : "auto",
-            }}
-            to="/chat"
-            replace={true}
-            onClick={() => setTab(history.location.pathname)}
-          >
-            <IonButton
-              className={
-                tab.includes("/chat") || tab.includes("/grupo")
-                  ? styles.active
-                  : ""
-              }
-            >
-              {(isRoom || isGrupo) && (
-                <div className={styles["has-notification"]}></div>
-              )}
-              <IonIcon slot="icon-only" src={grupo}></IonIcon>
-            </IonButton>
-          </Link>
+          {
+            !user.has_paid ?
+              <IonButton>
+                <IonIcon slot="icon-only" src={grupo}></IonIcon>
+              </IonButton>
+              :
+              <Link
+                style={{
+                  opacity: !network.status ? 0.5 : 1,
+                  pointerEvents: !network.status ? "none" : "auto",
+                }}
+                to="/chat"
+                replace={true}
+                onClick={() => setTab(history.location.pathname)}
+              >
+                <IonButton
+                  className={
+                    tab.includes("/chat") || tab.includes("/grupo")
+                      ? styles.active
+                      : ""
+                  }
+                >
+                  {(isRoom || isGrupo) && (
+                    <div className={styles["has-notification"]}></div>
+                  )}
+                  <IonIcon slot="icon-only" src={grupo}></IonIcon>
+                </IonButton>
+              </Link>
+          }
+
+
         </IonButtons>
       </IonToolbar>
     </IonFooter>

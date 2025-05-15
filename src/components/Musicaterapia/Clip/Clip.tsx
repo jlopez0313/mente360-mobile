@@ -1,3 +1,4 @@
+import AudioNoWifi from "@/assets/images/audio_no_wifi.jpg";
 import {
   IonCard,
   IonCardContent,
@@ -31,6 +32,7 @@ import styles from "./Clip.module.scss";
 
 import { useAudio } from "@/hooks/useAudio";
 import {
+  putGlobalAudio,
   setAudioItem,
   setAudioSrc,
   setGlobalAudio,
@@ -43,6 +45,7 @@ import { startBackground } from "@/helpers/background";
 import { create, updateElapsed } from "@/helpers/musicControls";
 import { getUser } from "@/helpers/onboarding";
 
+import AudioProgressCircle from "@/components/Shared/Animations/ProgressCircle/ProgressCircle";
 import ClipsDB from "@/database/clips";
 import LikesDB from "@/database/likes";
 import PlaylistDB from "@/database/playlist";
@@ -63,6 +66,7 @@ export const Clip = () => {
   const [present, dismiss] = useIonLoading();
 
   const [isLoading, setIsLoading] = useState(true);
+  const [percent, setPercent] = useState(0);
 
   const { audioSrc, globalAudio, globalPos, listAudios } = useSelector(
     (state: any) => state.audio
@@ -89,8 +93,8 @@ export const Clip = () => {
     getDownloadedAudio,
   } = useAudio(
     audioRef,
-    () => {},
-    () => {}
+    () => { },
+    () => { }
   );
 
   const onPresentToast = (
@@ -118,14 +122,16 @@ export const Clip = () => {
         baseURL + globalAudio.audio,
         "audio_" + globalAudio.id,
         async (p: any) => {
+          setPercent(p)
           console.log("P es ", p);
         }
       );
 
       console.log("Ruta es ", ruta);
+      setPercent(0)
 
       const clipsDB = new ClipsDB(db);
-      await clipsDB.download(performSQLAction, () => {}, {
+      await clipsDB.download(performSQLAction, () => { }, {
         id: globalAudio.id,
         imagen: globalAudio.imagen,
         audio: ruta,
@@ -154,9 +160,24 @@ export const Clip = () => {
 
   const onRemoveLocal = async () => {
     const clipsDB = new ClipsDB(db);
-    await clipsDB.unload(performSQLAction, () => {}, { id: globalAudio.id });
+    await clipsDB.unload(performSQLAction, () => { }, { id: globalAudio.id });
 
     await deleteAudio(globalAudio.audio_local);
+
+    dispatch(
+      setAudioItem({
+        index: globalPos,
+        newData: {
+          imagen_local: null,
+          audio_local: null,
+          downloaded: 0,
+        },
+      })
+    );
+
+    dispatch(
+      putGlobalAudio({ ...globalAudio, audio_local: null })
+    );
 
     onPresentToast(
       "bottom",
@@ -176,7 +197,7 @@ export const Clip = () => {
       const playlistDB = new PlaylistDB(db);
       await playlistDB.delete(
         performSQLAction,
-        () => {},
+        () => { },
         globalAudio.in_my_playlist
       );
 
@@ -215,7 +236,7 @@ export const Clip = () => {
       } = await add(data);
 
       const playlistDB = new PlaylistDB(db);
-      await playlistDB.create(performSQLAction, () => {}, [
+      await playlistDB.create(performSQLAction, () => { }, [
         {
           id: added.id,
           clip: {
@@ -256,7 +277,7 @@ export const Clip = () => {
       await dislike(globalAudio.my_like);
 
       const likes = new LikesDB(db);
-      await likes.delete(performSQLAction, () => {}, globalAudio.my_like);
+      await likes.delete(performSQLAction, () => { }, globalAudio.my_like);
 
       const newItem = {
         ...globalAudio,
@@ -295,7 +316,7 @@ export const Clip = () => {
       } = await like(data);
 
       const likesDB = new LikesDB(db);
-      await likesDB.create(performSQLAction, () => {}, [
+      await likesDB.create(performSQLAction, () => { }, [
         {
           ...data,
           id: added.id,
@@ -396,7 +417,7 @@ export const Clip = () => {
         )}
         <img
           alt=""
-          src={baseURL + globalAudio.imagen}
+          src={!network.status ? AudioNoWifi : baseURL + globalAudio.imagen}
           style={{ display: isLoading ? "none" : "block" }}
           onLoad={() => setIsLoading(false)}
           className="ion-margin-bottom"
@@ -514,6 +535,14 @@ export const Clip = () => {
             }}
             src={audioSrc}
           />
+
+
+          {
+            percent > 0 &&
+            <div style={{ width: '100%', display: 'flex', justifyContent: 'end' }}>
+              <AudioProgressCircle />
+            </div>
+          }
         </IonCardContent>
       </IonCard>
     </div>

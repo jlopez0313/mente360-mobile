@@ -36,8 +36,9 @@ import { useDB } from "@/context/Context";
 import AudiosDB from "@/database/audios";
 import MensajesDB from "@/database/mensajes";
 import TareasDB from "@/database/tareas";
-import { diferenciaEnDias } from "@/helpers/Fechas";
+import { diferenciaEnDias, diferenciaRealEnDias } from "@/helpers/Fechas";
 import { DB, localDB } from "@/helpers/localStore";
+import { writeData } from "@/services/realtime-db";
 import { getHomeThunk } from "@/store/thunks/home";
 
 export const Home = () => {
@@ -64,6 +65,27 @@ export const Home = () => {
   const [present, dismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();
 
+  const checkEndingDate = async () => {
+    if ( user.user.fecha_vencimiento ) {
+      const lastDate = new Date(user.user.fecha_vencimiento);
+      lastDate.setHours(0, 0, 0, 0);
+
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+  
+      if (diferenciaRealEnDias(now, lastDate) < 0) {
+        try {
+          await update({ref_payco: null}, user.user.id);
+          await writeData(`payments/${user.user.id}/ref_payco`, null)
+        } catch (error) {
+          console.log('Error Cancelando en Home', error)
+        }
+      } else {
+        console.log('quedan ', diferenciaRealEnDias(now, lastDate))
+      }
+    }
+  }
+
   const onGetHome = async () => {
     try {
       const audiosDB = new AudiosDB(sqlite.db);
@@ -79,6 +101,9 @@ export const Home = () => {
         now.setHours(0, 0, 0, 0);
 
         if (diferenciaEnDias(now, lastDate) > 0) {
+
+          checkEndingDate()
+
           await setPreference(keys.HOME_SYNC_KEY, now.toISOString());
 
           present({
@@ -174,6 +199,7 @@ export const Home = () => {
 
   return (
     <>
+
       <SuccessOverlay show={showSuccess} />
 
       <Calendar />
@@ -185,7 +211,7 @@ export const Home = () => {
         canDismiss={false}
         title="¿Aún no conoces tu eneatipo?"
         hideButtons={false}
-        onConfirm={() => {}}
+        onConfirm={() => { }}
       >
         <Texto descripcion="Completa nuestro test y descúbrelo. ¡Es el primer paso para entenderte mejor!">
           <IonRow>

@@ -1,18 +1,18 @@
 import { Preferences } from "@capacitor/preferences";
 
 export interface IKeys {
-    SYNC_KEY: string;
-    CLIP_PAGE_KEY: string;
-    CRECIMIENTOS_PAGE_KEY: string;
-    HOME_SYNC_KEY: string;
-    DARK_MODE: string;
+  SYNC_KEY: string;
+  CLIP_PAGE_KEY: string;
+  CRECIMIENTOS_PAGE_KEY: string;
+  HOME_SYNC_KEY: string;
+  DARK_MODE: string;
 }
 
 interface IPreferences {
-    keys: IKeys,
-    getPreference: (key: string) => Promise<string | null>
-    setPreference: (key: string, value: string) => Promise<void>;
-    removePreference: (key: string) => Promise<void>
+  keys: IKeys;
+  getPreference: (key: string) => Promise<string | null>;
+  setPreference: (key: string, value: string) => Promise<void>;
+  removePreference: (key: string) => Promise<void>;
 }
 
 export const usePreferences = (): IPreferences => {
