@@ -2,7 +2,7 @@
 import { getUser } from "@/helpers/onboarding";
 import { useNetwork } from "@/hooks/useNetwork";
 import { writeData } from "@/services/realtime-db";
-import { IonButton, IonText } from "@ionic/react";
+import { IonButton, IonText, useIonLoading } from "@ionic/react";
 import { useHistory } from "react-router";
 import styles from './Welcome.module.scss';
 
@@ -12,6 +12,7 @@ export const Welcome = () => {
 
     const history = useHistory();
     const network = useNetwork();
+    const [present, dismiss] = useIonLoading();
 
     const goToPlanes = () => {
         history.replace('/planes')
@@ -19,6 +20,11 @@ export const Welcome = () => {
 
     const onStartFreeTrial = async () => {
         try {
+            await present({
+                message: 'Cargando...',
+                duration: 3000
+            })
+            
             const hora = new Date();
             const vence = hora;
             vence.setDate(vence.getDate() + 14);
@@ -27,11 +33,13 @@ export const Welcome = () => {
             const data = {
                 estado: "completado",
                 hora: hora.toISOString(),
-                ref_payco: 'FREE_TRYAL',
+                ref_payco: 'FREE_TRIAL',
                 vence: vence.toISOString()
             }
     
             await writeData(`payments/${user.id}`, data)
+            dismiss();
+
             history.replace('/home')
         } catch (error) {
             console.log('Error onStartFreeTrial', error)

@@ -1,6 +1,6 @@
 
 import { find } from "@/services/subscribe";
-import { IonButton, IonCard, IonCardContent, IonCardTitle, IonCol, IonRow, IonText } from "@ionic/react";
+import { IonButton, IonCard, IonCardContent, IonCardTitle, IonCol, IonRow, IonText, useIonLoading } from "@ionic/react";
 import { useHistory } from "react-router";
 
 import { getUser } from "@/helpers/onboarding";
@@ -12,6 +12,7 @@ export const Planes = () => {
 
     const history = useHistory();
     const network = useNetwork();
+    const [present, dismiss] = useIonLoading();
 
     const { user } = getUser();
 
@@ -32,6 +33,11 @@ export const Planes = () => {
 
     const onStartFreeTrial = async () => {
         try {
+            await present({
+                message: 'Cargando...',
+                duration: 3000
+            })
+
             const hora = new Date();
             const vence = hora;
             vence.setDate(vence.getDate() + 14);
@@ -40,11 +46,15 @@ export const Planes = () => {
             const data = {
                 estado: "completado",
                 hora: hora.toISOString(),
-                ref_payco: 'FREE_TRYAL',
+                ref_payco: 'FREE_TRIAL',
                 vence: vence.toISOString()
             }
     
             await writeData(`payments/${user.id}`, data)
+            dismiss();
+
+            history.replace('/perfil')
+
         } catch (error) {
             console.log('Error onStartFreeTrial', error)
         }

@@ -13,7 +13,7 @@ export const Detalle = () => {
 
     const history = useHistory();
     const network = useNetwork();
-    const [present, dismiss] = useIonLoading();
+    const [present, dismiss] = useIonLoading(); 
 
     const { user } = getUser();
 
