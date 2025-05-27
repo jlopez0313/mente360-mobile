@@ -1,13 +1,13 @@
 import Avatar from "@/assets/images/avatar.jpg";
-import { getUser } from "@/helpers/onboarding";
 import { IonAvatar, IonItem, IonSkeletonText, IonText } from "@ionic/react";
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import styles from "./Grupo.module.scss";
 
 export const Item: React.FC<any> = ({ msg, usuarios }) => {
 
   const baseURL = import.meta.env.VITE_BASE_BACK;
-  const { user } = getUser();
+  const { user } = useSelector( (state: any) => state.user);
 
   const [isLoading, setIsLoading] = useState(true);
   const [usuario, setUsuario] = useState<any>({});

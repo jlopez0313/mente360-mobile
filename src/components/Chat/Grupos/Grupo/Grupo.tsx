@@ -1,4 +1,3 @@
-import { getUser } from "@/helpers/onboarding";
 import { sendPush } from "@/services/push";
 import {
   addData,
@@ -19,11 +18,12 @@ import {
 import { onValue } from "firebase/database";
 import { sendOutline } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
 import styles from "./Grupo.module.scss";
 import { Item } from "./Item";
 
 export const Grupo: React.FC<any> = ({ grupoID, grupo, removed }) => {
-  const { user } = getUser();
+  const { user } = useSelector( (state: any) => state.user);
   const [mensaje, setMensaje] = useState("");
 
   const chatListRef = useRef<HTMLIonListElement>(null);

@@ -21,6 +21,8 @@ import { getNotifications } from "@/store/thunks/notifications";
 import { PushNotifications } from "@capacitor/push-notifications";
 import { useDispatch } from "react-redux";
 
+import { getUser } from "@/helpers/onboarding";
+import { usePreferences } from "@/hooks/usePreferences";
 import { useSqliteDB } from "@/hooks/useSqliteDB";
 import { setGlobalAudio } from "@/store/slices/audioSlice";
 import { LocalNotifications } from "@capacitor/local-notifications";
@@ -28,9 +30,11 @@ import { LocalNotifications } from "@capacitor/local-notifications";
 const Login: React.FC = () => {
 
   const { db, initialized, performSQLAction } = useSqliteDB();
+  const { keys, getPreference } = usePreferences();
 
   const [tab, setTab] = useState("login");
   const history = useHistory();
+  const user = getUser();
 
   const dispatch = useDispatch();
   
@@ -43,7 +47,8 @@ const Login: React.FC = () => {
   }, []);
 
   const runGet = async () => {
-    localStorage.getItem("onboarding") && history.replace("/home");
+    const token = await getPreference( keys.TOKEN );
+    token && history.replace("/home");
   };
 
   const initializeFCM = async () => {

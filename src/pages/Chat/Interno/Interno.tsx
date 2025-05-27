@@ -21,14 +21,14 @@ import { Link, useHistory, useParams } from "react-router-dom";
 
 import Avatar from "@/assets/images/avatar.jpg";
 import { getDisplayDate } from "@/helpers/Fechas";
-import { getUser } from "@/helpers/onboarding";
 import { getData, readData, writeData } from "@/services/realtime-db";
 import { onValue } from "firebase/database";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 const Interno: React.FC = () => {
   const history = useHistory();
-  const { user } = getUser();
+  const { user } = useSelector( (state: any) => state.user);
   const { room } = useParams<{ room: string }>();
   const baseURL = import.meta.env.VITE_BASE_BACK;
 

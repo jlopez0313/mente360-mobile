@@ -13,7 +13,6 @@ import { Item } from "./Item";
 
 import { useDB } from "@/context/Context";
 import PlaylistDB from "@/database/playlist";
-import { getUser } from "@/helpers/onboarding";
 import { useNetwork } from "@/hooks/useNetwork";
 
 export const Playlist = () => {
@@ -21,7 +20,7 @@ export const Playlist = () => {
 
   const { sqlite } = useDB();
   const network = useNetwork();
-  const { user } = getUser();
+  const { user } = useSelector( (state: any) => state.user);
 
   const { listAudios, globalAudio } = useSelector((state: any) => state.audio);
 

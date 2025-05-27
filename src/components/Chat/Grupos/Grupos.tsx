@@ -1,5 +1,4 @@
 import { Modal } from "@/components/Shared/Modal/Modal";
-import { getUser } from "@/helpers/onboarding";
 import { create } from "@/services/grupos";
 import {
   getArrayData,
@@ -16,11 +15,11 @@ import styles from "./Grupos.module.scss";
 
 import { setGrupo } from "@/store/slices/notificationSlice";
 import { onValue } from "firebase/database";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Item } from "./Item";
 
 export const Grupos = () => {
-  const { user } = getUser();
+  const { user } = useSelector( (state: any) => state.user);
 
   const dispatch = useDispatch();
 

@@ -43,7 +43,6 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { startBackground } from "@/helpers/background";
 import { create, updateElapsed } from "@/helpers/musicControls";
-import { getUser } from "@/helpers/onboarding";
 
 import AudioProgressCircle from "@/components/Shared/Animations/ProgressCircle/ProgressCircle";
 import ClipsDB from "@/database/clips";
@@ -55,7 +54,7 @@ import { dislike, like } from "@/services/likes";
 import { add, trash } from "@/services/playlist";
 
 export const Clip = () => {
-  const { user } = getUser();
+  const { user } = useSelector( (state: any) => state.user);
 
   const dispatch = useDispatch();
   const { db, performSQLAction } = useSqliteDB();

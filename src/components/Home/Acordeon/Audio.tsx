@@ -14,7 +14,7 @@ import auriculares from "/assets/icons/auriculares.svg";
 import { Modal } from "@/components/Shared/Modal/Modal";
 import { useDB } from "@/context/Context";
 import AudiosDB from "@/database/audios";
-import { getUser } from "@/helpers/onboarding";
+import { usePayment } from "@/hooks/usePayment";
 import { setAudio } from "@/store/slices/homeSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { Audio as AudioShared } from "../Audio/Audio";
@@ -24,8 +24,8 @@ export const Audio: React.FC<any> = ({ network }) => {
   const dispatch = useDispatch();
   const [presentAlert] = useIonAlert();
   const { sqlite } = useDB();
-  const { user } = getUser();
 
+  const { userEnabled } = usePayment();
   const { audio } = useSelector((state: any) => state.home);
 
   const onConfirmAudio = async () => {
@@ -74,7 +74,7 @@ export const Audio: React.FC<any> = ({ network }) => {
         </IonItem>
         <div className="ion-padding" slot="content">
           {
-            !user.has_paid ?
+            !userEnabled ?
               <IonButton
                 disabled={true}
                 expand="block"

@@ -20,7 +20,6 @@ import {
   setIsGlobalPlaying,
 } from "@/store/slices/audioSlice";
 
-import { getUser } from "@/helpers/onboarding";
 import {
   downloadOutline,
   ellipsisVertical,
@@ -54,7 +53,7 @@ export const Item: React.FC<any> = ({
 }) => {
   const { db, performSQLAction } = sqlite;
 
-  const { user } = getUser();
+  const { user } = useSelector( (state: any) => state.user);
   const history = useHistory();
   const dispatch = useDispatch();
 

@@ -13,11 +13,12 @@ import {
   useIonLoading,
 } from "@ionic/react";
 
-import { getUser, setUser } from "@/helpers/onboarding";
 import { useNetwork } from "@/hooks/useNetwork";
 import { all } from "@/services/constants";
 import { test } from "@/services/test";
+import { setUser } from "@/store/slices/userSlice";
 import { memo, useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { useHistory } from "react-router";
 import styles from "../Test.module.scss";
 
@@ -27,7 +28,7 @@ const Momento2: React.FC<any> = memo(({ momentos, onSetMomento }) => {
   const [presentAlert] = useIonAlert();
 
   const history = useHistory();
-  const user = getUser();
+  const dispatch = useDispatch();
   const network = useNetwork();
   
   const [constants, setConstants] = useState({ eneatipos: [], generos: [] });
@@ -69,7 +70,7 @@ const Momento2: React.FC<any> = memo(({ momentos, onSetMomento }) => {
 
       const testPromise = test(momentos);
 
-      const setUserPromise = testPromise.then(({ data }) => {
+      const setUserPromise = testPromise.then(({ data }: any) => {
 
         const eneatipo: any = constants.eneatipos.find(
           (item: any) => item.key == data.data.eneatipo
@@ -83,7 +84,7 @@ const Momento2: React.FC<any> = memo(({ momentos, onSetMomento }) => {
           buttons: ["OK"],
         });
 
-        return setUser({ ...user, user: data.data });
+        return dispatch(setUser(data.data));
       });
 
       await Promise.all([testPromise, setUserPromise]);

@@ -28,7 +28,6 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Sync } from "@/components/Shared/Animations/Sync/Sync";
-import User from "@/database/user";
 import { diferenciaEnDias } from "@/helpers/Fechas";
 import { useGlobalSync } from "@/hooks/useGlobalSync";
 import { usePreferences } from "@/hooks/usePreferences";
@@ -38,7 +37,7 @@ const Home: React.FC = () => {
   const { getPreference, setPreference, keys } = usePreferences();
 
   const dispatch = useDispatch();
-  const { loading, success, mensaje, syncAll } = useGlobalSync();
+  const { loading, error, success, mensaje, syncAll } = useGlobalSync();
 
   const { isGeneral } = useSelector((state: any) => state.notifications);
   const { db, initialized, performSQLAction } = useSqliteDB();
@@ -55,8 +54,6 @@ const Home: React.FC = () => {
     now.setHours(0, 0, 0, 0);
     if (diferenciaEnDias(now, lastDate) > 0) {
       syncAll();
-    } else {
-      console.log(diferenciaEnDias(now, lastDate))
     }
   }
 
@@ -67,14 +64,18 @@ const Home: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const onGetUser = async () => {
-      const userDB = new User(db);
-      await userDB.find(performSQLAction, (data: any) => {
-        console.log(data);
-      });
-    };
+    /*
+      const onGetUser = async () => {
+        const userDB = new User(db);
+        await userDB.find(performSQLAction, (data: any) => {
+          console.log( data )
+          // dispatch( setUser( data[0] ) )
+        });
+      };
+    */
 
-    initialized && onGlobalSync()
+    initialized && onGlobalSync();
+    
   }, [initialized]);
 
   return (
@@ -113,7 +114,7 @@ const Home: React.FC = () => {
       </IonHeader>
 
       <IonContent fullscreen className={styles["ion-content"]}>
-        <Sync loading={loading} success={success} mensaje={mensaje} />
+        <Sync loading={loading} success={success} error={error} mensaje={mensaje} />
         <HomeComponent />
       </IonContent>
 

@@ -32,16 +32,17 @@ import styles from "./Configuracion.module.scss";
 
 export const Configuracion = () => {
   const history = useHistory();
-
+  const dispatch = useDispatch();
   const { makeBackup, exportJson } = useSqliteDB();
   const { removePreference, keys } = usePreferences();
 
-  const dispatch = useDispatch();
   const [presentToast] = useIonToast();
 
   const onLogout = async () => {
     localStorage.removeItem("home");
     localStorage.removeItem("onboarding");
+    await removePreference(keys.TOKEN);
+
     history.replace("/login");
   };
 
@@ -70,7 +71,8 @@ export const Configuracion = () => {
 
   const onClearPreferences = () => {
     Object.keys(keys).forEach((key: string) => {
-      removePreference(keys[key]);
+      if (key !== keys.TOKEN)
+        removePreference(keys[key]);
     });
 
     onPresentToast("bottom", "Preferencias Eliminadas.", "");

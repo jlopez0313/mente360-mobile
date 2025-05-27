@@ -15,16 +15,20 @@ import {
 import styles from "../Login.module.scss";
 
 import { GmailLogin } from "@/firebase/auth";
-import { setUser } from "@/helpers/onboarding";
 import { login, register } from "@/services/auth";
 
+import { usePreferences } from "@/hooks/usePreferences";
+import { setUser } from "@/store/slices/userSlice";
 import { eye, eyeOff } from "ionicons/icons";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 import { useHistory } from "react-router";
 
 export const Login = () => {
 
   const history = useHistory();
+  const dispatch = useDispatch();
+  const { keys, setPreference } = usePreferences();
 
   const [present, dismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();
@@ -60,7 +64,8 @@ export const Login = () => {
 
       data.fcm_token = token.token;
 */
-      await setUser(data);
+      await setPreference(keys.TOKEN, data.token);
+      dispatch(setUser(data.user));
 
       setTimeout(() => {
         history.replace("/home");
@@ -94,8 +99,8 @@ export const Login = () => {
               device: "gmail",
             });
 
-            const setUserPromise = loginPromise.then(({ data }) => {
-              return setUser(data);
+            const setUserPromise = loginPromise.then(({ data }: any) => {
+              return dispatch(setUser(data));
             });
 
             await Promise.all([
@@ -119,8 +124,8 @@ export const Login = () => {
                 device: "gmail",
               });
 
-              const setUserPromise = registerPromise.then(({ data }) => {
-                return setUser(data);
+              const setUserPromise = registerPromise.then(({ data }: any) => {
+                return dispatch(setUser(data));
               });
 
               await Promise.all([

@@ -1,12 +1,12 @@
 import { IonIcon, IonInput } from "@ionic/react";
 import { useEffect, useRef, useState } from "react";
 
-import { getUser } from "@/helpers/onboarding";
 import { camera } from "ionicons/icons";
+import { useSelector } from "react-redux";
 import styles from "./Add.module.scss";
 
 export const Add: React.FC<any> = ({ doChild }) => {
-  const { user } = getUser();
+  const { user } = useSelector( (state: any) => state.user);
   const fileRef = useRef(null);
   const [photo, setPhoto] = useState(null);
   const [grupo, setGrupo] = useState<any>({ photo: "", grupo: "", users_id: "" });

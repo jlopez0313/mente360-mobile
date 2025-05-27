@@ -1,4 +1,3 @@
-import { getUser } from "@/helpers/onboarding";
 import { add, trash } from "@/services/playlist";
 import {
   IonIcon,
@@ -63,7 +62,7 @@ export const Toast = () => {
     () => {}
   );
 
-  const { user } = getUser();
+  const { user } = useSelector( (state: any) => state.user);
   const [present, dismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();
 

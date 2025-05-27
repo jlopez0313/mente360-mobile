@@ -6,15 +6,15 @@ import {
 } from "@ionic/react";
 import { useEffect, useState } from "react";
 
-import { getUser } from "@/helpers/onboarding";
 import { misContactos } from "@/services/user";
 import { Contacts } from "@capacitor-community/contacts";
 import { parsePhoneNumber } from "react-phone-number-input";
+import { useSelector } from "react-redux";
 import styles from "./Add.module.scss";
 import { Item } from "./Item";
 
 export const Add: React.FC<any> = ({ grupoID, users, doChild }) => {
-  const { user } = getUser();
+  const { user } = useSelector( (state: any) => state.user);
 
   const [present, onDismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();

@@ -1,13 +1,13 @@
-import { getUser } from "@/helpers/onboarding";
 import { getArrayData, getData } from "@/services/realtime-db";
 import { IonItemGroup, IonList, IonSearchbar } from "@ionic/react";
 import { useEffect, useState } from "react";
 
+import { useSelector } from "react-redux";
 import styles from "./Chat.module.scss";
 import { Item } from "./Item";
 
 export const Chat = () => {
-  const { user } = getUser();
+  const { user } = useSelector( (state: any) => state.user);
 
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);

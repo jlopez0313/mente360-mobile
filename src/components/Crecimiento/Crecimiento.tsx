@@ -12,17 +12,18 @@ import styles from "./Crecimiento.module.scss";
 import "swiper/css";
 import { Swiper, SwiperSlide } from "swiper/react";
 
-import { getUser, setUser } from "@/helpers/onboarding";
 import { update } from "@/services/user";
 import { resetStore } from "@/store/slices/audioSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Card } from "./Card/Card";
 
 import { useDB } from "@/context/Context";
 import CrecimientosDB from "@/database/crecimientos";
 import NivelesDB from "@/database/niveles";
 import { useNetwork } from "@/hooks/useNetwork";
+import { usePayment } from "@/hooks/usePayment";
 import { setPodcast } from "@/store/slices/homeSlice";
+import { setUser } from "@/store/slices/userSlice";
 
 export const Crecimiento = () => {
   const dispatch = useDispatch();
@@ -40,7 +41,8 @@ export const Crecimiento = () => {
   const [present, dismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();
 
-  const user = getUser();
+  const { user } = useSelector( (state: any) => state.user);
+  const { userEnabled } = usePayment();
 
   const [activeIdx, setActiveIdx] = useState(0);
   const [nivelID, setNivelID] = useState<any>(null);
@@ -57,11 +59,11 @@ export const Crecimiento = () => {
         {
           niveles_id: 1,
         },
-        user.user.id
+        user.id
       );
 
       const setUserPromise = updatePromise.then(({ data }) => {
-        return setUser({ ...user, user: data.data });
+        return dispatch(setUser(data.data));
       });
 
       await Promise.all([updatePromise, setUserPromise]);
@@ -104,7 +106,7 @@ export const Crecimiento = () => {
         buttons: ["OK"],
       });
     } finally {
-      setNivelID(user.user.crecimiento?.niveles_id ?? 7); // 7 es el nivel 0
+      setNivelID(user.crecimiento?.niveles_id ?? 7); // 7 es el nivel 0
       dismiss();
     }
   };
@@ -129,9 +131,9 @@ export const Crecimiento = () => {
 
           setCrecimientos(lista);
 
-          if (user.user.crecimientos_id) {
+          if (user.crecimientos_id) {
             const idx = lista.findIndex(
-              (x: any) => x.id == user.user.crecimientos_id
+              (x: any) => x.id == user.crecimientos_id
             );
             swiper.slideTo(idx);
           }
@@ -160,7 +162,7 @@ export const Crecimiento = () => {
 
       if (niveles[nextNivelIdx]) {
         
-        if ( niveles[nextNivelIdx].gratis == '0' && !user.user.has_paid ) {
+        if ( niveles[nextNivelIdx].gratis == '0' && !userEnabled ) {
           return ;
         }
 
@@ -171,11 +173,11 @@ export const Crecimiento = () => {
           {
             niveles_id: _nivelID,
           },
-          user.user.id
+          user.id
         );
 
         const setUserPromise = updatePromise.then(({ data }) => {
-          return setUser({ ...user, user: data.data });
+          return dispatch(setUser(data.data));
         });
 
         await Promise.all([updatePromise, setUserPromise]);
@@ -204,11 +206,11 @@ export const Crecimiento = () => {
         {
           crecimientos_id: crecimientos[idx + 1].id,
         },
-        user.user.id
+        user.id
       );
 
       const setUserPromise = updatePromise.then(({ data }) => {
-        return setUser({ ...user, user: data.data });
+        return dispatch(setUser(data.data));
       });
 
       await Promise.all([updatePromise, setUserPromise]);
@@ -253,7 +255,7 @@ export const Crecimiento = () => {
       >
         {niveles.map((item: any, idx: number) => {
           return (
-            <IonSelectOption disabled={!user.has_paid && item.gratis == 0} key={idx} value={item.id}>
+            <IonSelectOption disabled={!userEnabled && item.gratis == 0} key={idx} value={item.id}>
               {" "}
               {item.nivel}{" "}
             </IonSelectOption>

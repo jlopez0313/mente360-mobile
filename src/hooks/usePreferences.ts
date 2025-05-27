@@ -6,6 +6,7 @@ export interface IKeys {
   CRECIMIENTOS_PAGE_KEY: string;
   HOME_SYNC_KEY: string;
   DARK_MODE: string;
+  TOKEN: string;
 }
 
 interface IPreferences {
@@ -22,6 +23,7 @@ export const usePreferences = (): IPreferences => {
     CLIP_PAGE_KEY: "lastClipPage",
     CRECIMIENTOS_PAGE_KEY: "lastCrecimientoPage",
     DARK_MODE: "darkMode",
+    TOKEN: "token",
   };
 
   const getPreference = async (key: string): Promise<string | null> => {

@@ -1,35 +1,36 @@
-import { getUser, setUser } from "@/helpers/onboarding";
 import { useNetwork } from "@/hooks/useNetwork";
 import { useSqliteDB } from "@/hooks/useSqliteDB";
 import { readData } from "@/services/realtime-db";
+import { setUser } from "@/store/slices/userSlice";
 import { onValue } from "firebase/database";
 import React, { useContext, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 export const DBContext = React.createContext<any>(undefined);
 
 export const DBProvider = ({ children }: any) => {
   const sqlite = useSqliteDB();
+  const dispatch = useDispatch();
 
-  const user = getUser();
+  const { user } = useSelector((state: any) => state.user);
   const network = useNetwork();
   const state = { sqlite };
 
   useEffect(() => {
     const checkPayment = () => {
-      if ( network.status && user?.user) {
-        onValue(readData("payments/" + user.user.id), (snapshot) => {
+      if (network.status && user) {
+        onValue(readData("payments/" + user.id), (snapshot) => {
           const data = snapshot.val();
-          if( data?.ref_payco )
-            setUser({ ...user, user: { ...user.user, has_paid: true, fecha_vencimiento: data.vence } })
-          else 
-            setUser({ ...user, user: { ...user.user, has_paid: null } })
+
+          if (user) {
+            dispatch(setUser({ ...user, ...data }));
+          }
         });
       }
-    }
+    };
 
     checkPayment();
-
-  }, [])
+  }, []);
 
   return <DBContext.Provider value={state}>{children}</DBContext.Provider>;
 };

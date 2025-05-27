@@ -3,9 +3,9 @@ import { find } from "@/services/subscribe";
 import { IonButton, IonCard, IonCardContent, IonCardTitle, IonCol, IonRow, IonText, useIonLoading } from "@ionic/react";
 import { useHistory } from "react-router";
 
-import { getUser } from "@/helpers/onboarding";
 import { useNetwork } from "@/hooks/useNetwork";
-import { writeData } from "@/services/realtime-db";
+import { trial } from "@/services/user";
+import { useSelector } from "react-redux";
 import styles from './Planes.module.scss';
 
 export const Planes = () => {
@@ -14,7 +14,7 @@ export const Planes = () => {
     const network = useNetwork();
     const [present, dismiss] = useIonLoading();
 
-    const { user } = getUser();
+    const { user } = useSelector( (state: any) => state.user);
 
     const goToDetalle = async() => {
         history.replace('/planes/detalle')
@@ -35,25 +35,14 @@ export const Planes = () => {
         try {
             await present({
                 message: 'Cargando...',
-                duration: 3000
+                duration: 5000
             })
 
-            const hora = new Date();
-            const vence = hora;
-            vence.setDate(vence.getDate() + 14);
-            vence.setHours(23, 59, 59, 0);
-            
-            const data = {
-                estado: "completado",
-                hora: hora.toISOString(),
-                ref_payco: 'FREE_TRIAL',
-                vence: vence.toISOString()
-            }
-    
-            await writeData(`payments/${user.id}`, data)
-            dismiss();
-
-            history.replace('/perfil')
+            await trial()
+            setTimeout(() => {
+                dismiss();
+                history.replace('/perfil')
+            }, 2000)
 
         } catch (error) {
             console.log('Error onStartFreeTrial', error)

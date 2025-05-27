@@ -1,9 +1,10 @@
+import { usePayment } from "@/hooks/usePayment";
 import {
   IonAccordion,
   IonButton,
   IonIcon,
   IonItem,
-  IonLabel
+  IonLabel,
 } from "@ionic/react";
 import { trophy } from "ionicons/icons";
 import { useSelector } from "react-redux";
@@ -15,6 +16,7 @@ export const Podcasts = () => {
   const history = useHistory();
 
   const { podcast } = useSelector((state: any) => state.home);
+  const { userEnabled } = usePayment();
 
   const goToPodcast = () => {
     history.replace("/crecimiento");
@@ -31,20 +33,36 @@ export const Podcasts = () => {
         <IonItem slot="header">
           <IonLabel>Audio del día</IonLabel>
           {podcast.done ? (
-            <IonIcon icon={trophy} slot="end" className={styles['trofeo']} />
+            <IonIcon icon={trophy} slot="end" className={styles["trofeo"]} />
           ) : (
-            <IonIcon icon={trophy} slot="end" className={styles['trofeo-gris']} />
+            <IonIcon
+              icon={trophy}
+              slot="end"
+              className={styles["trofeo-gris"]}
+            />
           )}
         </IonItem>
         <div className="ion-padding" slot="content">
-          <IonButton
-            expand="block"
-            type="button"
-            className="ion-margin-top ion-padding-start ion-padding-end"
-            onClick={goToPodcast}
-          >
-            Escuchar
-          </IonButton>
+          {
+            !userEnabled ?
+            <IonButton
+              disabled={true}
+              expand="block"
+              type="button"
+              className="ion-margin-top ion-padding-start ion-padding-end"
+            >
+              Premium
+            </IonButton>
+            :
+            <IonButton
+              expand="block"
+              type="button"
+              className="ion-margin-top ion-padding-start ion-padding-end"
+              onClick={goToPodcast}
+            >
+              Escuchar
+            </IonButton>
+          }
         </div>
       </IonAccordion>
     </>

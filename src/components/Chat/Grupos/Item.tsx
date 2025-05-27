@@ -1,5 +1,4 @@
 import { getDisplayDate } from "@/helpers/Fechas";
-import { getUser } from "@/helpers/onboarding";
 import {
   getArrayData,
   getData,
@@ -15,6 +14,7 @@ import {
 } from "@ionic/react";
 import { onValue } from "firebase/database";
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import styles from "./Grupos.module.scss";
 
@@ -22,7 +22,7 @@ export const Item: React.FC<any> = ({ grupo }) => {
   const baseURL = import.meta.env.VITE_BASE_BACK;
 
   const history = useHistory();
-  const { user } = getUser();
+  const { user } = useSelector( (state: any) => state.user);
 
   const [isLoading, setIsLoading] = useState(true);
   const [lastMsg, setLastMsg] = useState<any>(null);

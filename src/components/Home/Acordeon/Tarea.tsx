@@ -15,7 +15,7 @@ import { useHistory } from "react-router";
 import { Modal } from "@/components/Shared/Modal/Modal";
 import { useDB } from "@/context/Context";
 import TareasDB from "@/database/tareas";
-import { getUser } from "@/helpers/onboarding";
+import { usePayment } from "@/hooks/usePayment";
 import { confirmTarea } from "@/services/home";
 import { setTab } from "@/store/slices/chatSlice";
 import { setTarea } from "@/store/slices/homeSlice";
@@ -26,7 +26,7 @@ import tareaIcon from "/assets/icons/tarea.svg";
 export const Tarea: React.FC<any> = ({network}) => {
   const dispatch = useDispatch();
   const history = useHistory();
-  const { user } = getUser();
+  const { userEnabled } = usePayment();
 
   const [presentAlert] = useIonAlert();
   const { sqlite } = useDB();
@@ -100,8 +100,8 @@ export const Tarea: React.FC<any> = ({network}) => {
       <Modal
         trigger="modal-tarea"
         title="Tarea de la semana"
-        closeText={ user.has_paid ? "Ir a Grupo" : "Premium"}
-        isBtnDisabled={ !user.has_paid }
+        closeText={ userEnabled ? "Ir a Grupo" : "Premium"}
+        isBtnDisabled={ !userEnabled }
         hideButtons={ !network.status || tarea.done || currentDay != 1 || false}
         onConfirm={() => onConfirmTarea()}
       >

@@ -1,4 +1,3 @@
-import { getUser } from "@/helpers/onboarding";
 import { sendPush } from "@/services/push";
 import {
   addData,
@@ -20,10 +19,11 @@ import {
 import { onValue } from "firebase/database";
 import { sendOutline } from "ionicons/icons";
 import { useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
 import styles from "./Interno.module.scss";
 
 export const Interno: React.FC<any> = ({ roomID }) => {
-  const { user } = getUser();
+  const { user } = useSelector( (state: any) => state.user);
   const [mensaje, setMensaje] = useState("");
 
   const chatListRef = useRef<HTMLIonListElement>(null);

@@ -25,13 +25,12 @@ import Categorias from "@/database/categorias";
 import ClipsDB from "@/database/clips";
 
 import { useDB } from "@/context/Context";
-import { getUser } from "@/helpers/onboarding";
 import { useNetwork } from "@/hooks/useNetwork";
 
 export const Clips = () => {
   const dispatch = useDispatch();
 
-  const { user } = getUser();
+  const { user } = useSelector( (state: any) => state.user);
   const { sqlite } = useDB();
   const network = useNetwork();
 

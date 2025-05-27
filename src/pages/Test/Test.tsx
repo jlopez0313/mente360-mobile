@@ -1,5 +1,4 @@
 import {
-  IonBackButton,
   IonButton,
   IonButtons,
   IonContent,
@@ -8,21 +7,20 @@ import {
   IonPage,
   IonText,
   IonTitle,
-  IonToolbar,
+  IonToolbar
 } from "@ionic/react";
 
 import { Test as TestComponent } from "@/components/Test/Test";
-import styles from "./Test.module.scss";
-import { Link, useHistory } from "react-router-dom";
 import { arrowBack } from "ionicons/icons";
+import { Link, useHistory } from "react-router-dom";
+import styles from "./Test.module.scss";
 
-import { useEffect } from "react";
-import { getUser } from "@/helpers/onboarding";
-import { useDispatch, useSelector } from "react-redux";
 import { setShowGlobalAudio } from "@/store/slices/audioSlice";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 const Test: React.FC = () => {
-  const { user } = getUser();
+  const { user } = useSelector( (state: any) => state.user);
   const history = useHistory();
   const dispatch = useDispatch();
 

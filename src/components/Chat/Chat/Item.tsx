@@ -1,7 +1,6 @@
 import Avatar from "@/assets/images/avatar.jpg";
 import { Profile } from "@/components/Chat/Profile/Profile";
 import { getDisplayDate } from "@/helpers/Fechas";
-import { getUser } from "@/helpers/onboarding";
 import {
   getArrayData,
   readData,
@@ -11,13 +10,13 @@ import {
 import { IonAvatar, IonItem, IonNote, IonSkeletonText } from "@ionic/react";
 import { onValue } from "firebase/database";
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import styles from "./Chat.module.scss";
 
 export const Item: React.FC<any> = ({ usuario }) => {
   const baseURL = import.meta.env.VITE_BASE_BACK;
-  const { user } = getUser();
+  const { user } = useSelector( (state: any) => state.user);
 
   const history = useHistory();
   const dispatch = useDispatch();

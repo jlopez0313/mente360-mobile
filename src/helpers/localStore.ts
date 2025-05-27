@@ -1,5 +1,6 @@
 export const DB = {
   HOME: "home",
+  ONBOARDING: "onboarding",
 };
 
 export const localDB = (key: string) => {

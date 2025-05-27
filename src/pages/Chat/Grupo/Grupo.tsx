@@ -21,16 +21,16 @@ import { Footer } from "@/components/Footer/Footer";
 import { Link, useHistory, useParams } from "react-router-dom";
 
 import Avatar from "@/assets/images/avatar.jpg";
-import { getUser } from "@/helpers/onboarding";
 import { readData, removeData, snapshotToArray, writeData } from "@/services/realtime-db";
 import { onValue } from "firebase/database";
 import { useEffect, useState } from "react";
 
 import { Grupo as GrupoComponent } from "@/components/Chat/Grupos/Grupo/Grupo";
+import { useSelector } from "react-redux";
 
 const Grupo: React.FC = () => {
   const { id } = useParams<any>();
-  const { user } = getUser();
+  const { user } = useSelector( (state: any) => state.user);
   const baseURL = import.meta.env.VITE_BASE_BACK;
 
   const history = useHistory();

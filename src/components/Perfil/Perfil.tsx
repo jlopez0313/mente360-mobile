@@ -1,5 +1,4 @@
 import Avatar from "@/assets/images/avatar.jpg";
-import { getUser, setUser } from "@/helpers/onboarding";
 import { update } from "@/services/user";
 import {
   IonAvatar,
@@ -28,13 +27,15 @@ import { updateData } from "@/services/realtime-db";
 import { setRoute } from "@/store/slices/routeSlice";
 import PhoneInput, { isPossiblePhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { useDB } from "@/context/Context";
 import EneatiposDB from "@/database/eneatipos";
 import GenerosDB from "@/database/generos";
 import { diferenciaEnDias } from "@/helpers/Fechas";
 import { useNetwork } from "@/hooks/useNetwork";
+import { usePayment } from "@/hooks/usePayment";
+import { setUser } from "@/store/slices/userSlice";
 
 export const Perfil = () => {
   const fileRef = useRef(null);
@@ -45,14 +46,15 @@ export const Perfil = () => {
 
   const [present, dismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();
+  const { userEnabled, payment_status } = usePayment();
 
-  const user = getUser();
+  const { user } = useSelector( (state: any) => state.user);
   const history = useHistory();
   const network = useNetwork();
 
   const [isLoading, setIsLoading] = useState(true);
   const [photo, setPhoto] = useState("");
-  const [usuario, setUsuario] = useState(user.user);
+  const [usuario, setUsuario] = useState({...user});
   const [edad, setEdad] = useState(0);
   const [generos, setGeneros] = useState([]);
   const [eneatipos, setEneatipos] = useState([]);
@@ -140,10 +142,10 @@ export const Perfil = () => {
         message: "Cargando ...",
       });
 
-      const { data } = await update(usuario, user.user.id);
+      const { data } = await update(usuario, user.id);
 
-      setUser({ ...user, user: data.data });
-      setUsuario(data.data);
+      dispatch(setUser(data.data));
+      setUsuario({...data.data});
 
       const obj = {
         name: data.data.name,
@@ -154,7 +156,7 @@ export const Perfil = () => {
         genero: usuario.genero,
       };
 
-      await updateData(`users/${user.user.id}`, obj);
+      await updateData(`users/${user.id}`, obj);
 
     } catch (error: any) {
       console.log(error);
@@ -179,7 +181,7 @@ export const Perfil = () => {
   }
 
   const getFechaVencimiento = ()=> {
-    return new Date(user.user.fecha_vencimiento).toLocaleDateString('es-ES', {
+    return new Date(user.fecha_vencimiento).toLocaleDateString('es-ES', {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit'
@@ -236,7 +238,7 @@ export const Perfil = () => {
       </div>
 
       {
-        user.user.has_paid ?
+        userEnabled && payment_status != 'free' ?
           <div 
             className={`ion-margin-top ion-margin-bottom ion-text-center ${styles['premium']}`}
             onClick={goToDetalle}

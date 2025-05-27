@@ -8,15 +8,17 @@ import styles from "./Sync.module.scss";
 export const Sync = ({
     loading,
     success,
+    error,
     mensaje,
 }: {
     loading: boolean;
     success: boolean;
+    error: boolean;
     mensaje: string;
 }) => {
     return (
         <AnimatePresence>
-            {(loading || success) && (
+            {(loading || success || error) && (
                 <motion.div
                     className={styles["clip-sync-toast"]}
                     initial={{ opacity: 0, y: 50 }}

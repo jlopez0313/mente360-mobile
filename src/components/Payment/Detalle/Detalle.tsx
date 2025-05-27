@@ -1,11 +1,12 @@
 
-import { getUser } from "@/helpers/onboarding";
 import { useNetwork } from "@/hooks/useNetwork";
-import { writeData } from "@/services/realtime-db";
+import { usePayment } from "@/hooks/usePayment";
+import { updateData } from "@/services/realtime-db";
 import { find } from "@/services/subscribe";
 import { update } from "@/services/user";
 import { IonBadge, IonButton, IonIcon, IonImg, IonItem, IonLabel, IonList, IonText, useIonLoading } from "@ionic/react";
 import { chatboxEllipsesOutline, heartCircleOutline, moonOutline, peopleOutline, ribbonOutline } from "ionicons/icons";
+import { useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import styles from './Detalle.module.scss';
 
@@ -13,13 +14,14 @@ export const Detalle = () => {
 
     const history = useHistory();
     const network = useNetwork();
+    const { userEnabled } = usePayment();
     const [present, dismiss] = useIonLoading(); 
 
-    const { user } = getUser();
+    const { user } = useSelector( (state: any) => state.user);
 
     const onPay = async (item: any) => {
 
-        if (user.has_paid || !network.status)
+        if (userEnabled || !network.status)
             return;
 
         const { data } = await find(item);
@@ -34,7 +36,11 @@ export const Detalle = () => {
             })
 
             await update({ref_payco: null}, user.id);
-            await writeData(`payments/${user.id}/ref_payco`, null)
+            await updateData(`payments/${user.id}`, {
+                estado: 'CANCELADO',
+                hora: new Date().toISOString(),
+                ref_payco: null
+            })
             dismiss();
 
             history.replace('/perfil')
@@ -102,7 +108,7 @@ export const Detalle = () => {
                         <p>Cancela en cualquier momento</p>
                     </IonLabel>
                     {
-                        user.has_paid ?
+                        userEnabled ?
                             null :
                             <IonBadge slot="end">
                                 $39 USD/año
@@ -116,7 +122,7 @@ export const Detalle = () => {
                         <h2>Mensual</h2>
                     </IonLabel>
                     {
-                        user.has_paid ?
+                        userEnabled ?
                             null :
                             <IonBadge slot="end">$3,99 USD/mes</IonBadge>
 
@@ -125,7 +131,7 @@ export const Detalle = () => {
             </IonList>
 
             {
-                user.has_paid ?
+                userEnabled ?
                     <IonButton disabled={!network.status} onClick={onCancelSuscription}> Cancelar Mi Suscripción </IonButton> :
                     <IonText className={`ion-margin-top`}>
                         <b>Cancela en cualquier momento.</b>

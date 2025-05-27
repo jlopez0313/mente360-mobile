@@ -1,3 +1,4 @@
+import Avatar from "@/assets/images/avatar.jpg";
 import {
   IonButton,
   IonCard,
@@ -5,39 +6,37 @@ import {
   IonCol,
   IonDatetime,
   IonGrid,
-  IonIcon,
   IonInput,
-  IonItem,
   IonLoading,
   IonModal,
   IonRow,
   IonSelect,
   IonSelectOption,
   useIonAlert,
-  useIonLoading,
+  useIonLoading
 } from "@ionic/react";
 import styles from "./Registro.module.scss";
-import Avatar from "@/assets/images/avatar.jpg";
 
-import { update } from "@/services/user";
 import { all } from "@/services/constants";
+import { update } from "@/services/user";
 
-import { getUser, setUser } from "@/helpers/onboarding";
-import { useHistory } from "react-router";
 import { useEffect, useRef, useState } from "react";
-import { helpCircleOutline } from "ionicons/icons";
+import { useHistory } from "react-router";
 
-import "react-phone-number-input/style.css";
+import { setUser } from "@/store/slices/userSlice";
 import PhoneInput, { isPossiblePhoneNumber } from "react-phone-number-input";
+import "react-phone-number-input/style.css";
+import { useDispatch, useSelector } from "react-redux";
 
 export const Registro = () => {
   const fileRef = useRef(null);
   const [present, dismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();
   const history = useHistory();
+  const dispatch = useDispatch();
 
-  const user = getUser();
-  const [usuario, setUsuario] = useState({ ...user.user, country: "CO" });
+  const { user } = useSelector( (state: any) => state.user);
+  const [usuario, setUsuario] = useState({ ...user, country: "CO" });
 
   const [photo, setPhoto] = useState("");
   const [constants, setConstants] = useState({ eneatipos: [], generos: [] });
@@ -117,10 +116,10 @@ export const Registro = () => {
 
 
       
-      const updatePromise = update(usuario, user.user.id);
+      const updatePromise = update(usuario, user.id);
       
       const setUserPromise = updatePromise.then( ({ data }) => {
-        return setUser({ ...user, user: data.data });
+        return dispatch(setUser(data.data));
       });
 
       await Promise.all([updatePromise, setUserPromise]);

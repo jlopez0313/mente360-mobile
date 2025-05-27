@@ -1,16 +1,16 @@
 import Avatar from "@/assets/images/avatar.jpg";
 import { Profile } from "@/components/Chat/Profile/Profile";
-import { getUser } from "@/helpers/onboarding";
 import { writeData } from "@/services/realtime-db";
 import { IonAvatar, IonItem, IonLabel, IonSkeletonText } from "@ionic/react";
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import styles from "./Comunidad.module.scss";
 
 export const Item: React.FC<any> = ({ contact }) => {
   const baseURL = import.meta.env.VITE_BASE_BACK;
 
-  const { user } = getUser();
+  const { user } = useSelector( (state: any) => state.user);
   const history = useHistory();
 
   const [isLoading, setIsLoading] = useState(true);

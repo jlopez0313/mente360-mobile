@@ -1,9 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit'
-import { notificationSlice } from './slices/notificationSlice'
 import { audioSlice } from './slices/audioSlice'
 import { chatSlice } from './slices/chatSlice'
-import { routeSlice } from './slices/routeSlice'
 import { homeSlice } from './slices/homeSlice'
+import { notificationSlice } from './slices/notificationSlice'
+import { routeSlice } from './slices/routeSlice'
+import { userSlice } from './slices/userSlice'
 
 export const store = configureStore({
     reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
         chat: chatSlice.reducer,
         route: routeSlice.reducer,
         home: homeSlice.reducer,
+        user: userSlice.reducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({

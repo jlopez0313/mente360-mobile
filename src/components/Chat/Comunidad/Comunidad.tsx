@@ -1,4 +1,3 @@
-import { getUser } from "@/helpers/onboarding";
 import { invitar, misContactos } from "@/services/user";
 import { Contacts } from "@capacitor-community/contacts";
 import { Share } from "@capacitor/share";
@@ -18,10 +17,11 @@ import { useEffect, useState } from "react";
 import { parsePhoneNumber } from "react-phone-number-input";
 import styles from "./Comunidad.module.scss";
 
+import { useSelector } from "react-redux";
 import { Item } from "./Item";
 
 export const Comunidad = () => {
-  const { user } = getUser();
+  const { user } = useSelector( (state: any) => state.user);
 
   const [present, dismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();

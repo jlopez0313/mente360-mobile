@@ -1,14 +1,14 @@
 
-import { getUser } from "@/helpers/onboarding";
 import { useNetwork } from "@/hooks/useNetwork";
-import { writeData } from "@/services/realtime-db";
+import { trial } from "@/services/user";
 import { IonButton, IonText, useIonLoading } from "@ionic/react";
+import { useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import styles from './Welcome.module.scss';
 
 export const Welcome = () => {
 
-    const { user } = getUser();
+    const { user } = useSelector( (state: any) => state.user);
 
     const history = useHistory();
     const network = useNetwork();
@@ -22,25 +22,15 @@ export const Welcome = () => {
         try {
             await present({
                 message: 'Cargando...',
-                duration: 3000
+                duration: 5000
             })
             
-            const hora = new Date();
-            const vence = hora;
-            vence.setDate(vence.getDate() + 14);
-            vence.setHours(23, 59, 59, 0);
+            await trial();
+            setTimeout(() => {
+                dismiss();
+                history.replace('/home')
+            }, 2000)
             
-            const data = {
-                estado: "completado",
-                hora: hora.toISOString(),
-                ref_payco: 'FREE_TRIAL',
-                vence: vence.toISOString()
-            }
-    
-            await writeData(`payments/${user.id}`, data)
-            dismiss();
-
-            history.replace('/home')
         } catch (error) {
             console.log('Error onStartFreeTrial', error)
         }

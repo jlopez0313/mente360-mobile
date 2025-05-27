@@ -34,6 +34,7 @@ export const useGlobalSync = () => {
   
   const [ loading, setLoading ] = useState( false );
   const [ success, setSuccess ] = useState( false );
+  const [ error, setError ] = useState( false );
   const [ mensaje, setMensaje ] = useState( '' );
 
   const syncConstants = async () => {
@@ -94,25 +95,57 @@ export const useGlobalSync = () => {
     );
     let hasMore = true;
 
-    const crecimientosDB = new CrecimientosDB(sqlite.db);
-
+    const MAX_CONCURRENT_REQUESTS = 3;
+    const batchSize = 5;
+    let batchBuffer: any = {
+        crecimientos: []
+    };
+    
     while (hasMore) {
-      try {
-        const {
-          data: { data },
-        } = await getAllCrecimientos(page, fromDate);
+      const requests = [];
 
-        if (!data.length) {
-          hasMore = false;
-          break;
+      for (let i = 0; i < MAX_CONCURRENT_REQUESTS; i++) {
+        const currentPage = page + i;
+        requests.push(getAllCrecimientos(currentPage, fromDate));
+      }
+
+      try {
+
+        const responses = await Promise.all(requests);
+        let totalData = 0;
+
+        for (const res of responses) {
+          const data = res.data?.data ?? [];
+
+          if (!data.length) {
+
+            if (batchBuffer.crecimientos.length > 0) {
+              await processBatch(batchBuffer);
+              batchBuffer = { crecimientos: [] };
+            }
+
+            hasMore = false;
+            break;
+          }
+
+          totalData += data.length;
+          batchBuffer.crecimientos.push(...data);
+
+          if (batchBuffer.crecimientos.length >= 20 * batchSize) {
+              await processBatch(batchBuffer);
+              batchBuffer = { crecimientos: [] };
+          }
+          
         }
 
-        await crecimientosDB.create(sqlite.performSQLAction, () => {}, data);
-
-        page++;
+        if (totalData === 0) {
+          hasMore = false;
+        }
+        
+        page += MAX_CONCURRENT_REQUESTS;
         await setPreference(keys.CRECIMIENTOS_PAGE_KEY, page.toString());
-
         await delay(500);
+
       } catch (err: any) {
         console.log( err );
         throw new Error(`Too many requests en syncCrecimientos.`)
@@ -181,37 +214,66 @@ export const useGlobalSync = () => {
     const lastSync = await getPreference(keys.SYNC_KEY);
     const fromDate = lastSync ?? initSync;
 
-    const clipsDB = new ClipsDB(sqlite.db);
-    const ucDB = new ClipsUsuariosDB(sqlite.db);
-    const likesDB = new LikesDB(sqlite.db);
+    const MAX_CONCURRENT_REQUESTS = 3;
+    const batchSize = 5;
+    let batchBuffer: any = {
+        clips: [],
+        usuarios_clips: [],
+        likes: []
+    };
 
     while (hasMore) {
+
+      const requests = [];
+
+      for (let i = 0; i < MAX_CONCURRENT_REQUESTS; i++) {
+        const currentPage = page + i;
+        requests.push(getAllClips("0", currentPage, "", fromDate));
+      }
+        
       try {
-        const {
-          data: { data },
-        } = await getAllClips("0", page, "", fromDate);
 
-        if (!data.length) {
+        const responses = await Promise.all(requests);
+        let totalData = 0;
+
+        for (const res of responses) {
+          const data = res.data?.data ?? [];
+
+          if (!data.length) {
+
+            if (batchBuffer.clips.length > 0) {
+              await processBatch(batchBuffer);
+              batchBuffer = { clips: [], usuarios_clips: [], likes: [] };
+            }
+            
+            hasMore = false;
+            break;
+          }
+
+          totalData += data.length;
+
+          batchBuffer.clips.push(...data);
+          for (const clip of data) {
+              if (clip.usuarios_clips?.length) {
+                  batchBuffer.usuarios_clips.push(...clip.usuarios_clips);
+              }
+              if (clip.likes?.length) {
+                  batchBuffer.likes.push(...clip.likes);
+              }
+          }
+
+          if (batchBuffer.clips.length >= 20 * batchSize) {
+              await processBatch(batchBuffer);
+              batchBuffer = { clips: [], usuarios_clips: [], likes: [] };
+          }
+
+        }
+
+        if (totalData === 0) {
           hasMore = false;
-          break;
         }
 
-        await clipsDB.create(sqlite.performSQLAction, () => {}, data);
-
-        for (const clip of data) {
-          if (clip.usuarios_clips?.length) {
-            await ucDB.create(
-              sqlite.performSQLAction,
-              () => {},
-              clip.usuarios_clips
-            );
-          }
-          if (clip.likes?.length) {
-            await likesDB.create(sqlite.performSQLAction, () => {}, clip.likes);
-          }
-        }
-
-        page++;
+        page += MAX_CONCURRENT_REQUESTS;
         await setPreference(keys.CLIP_PAGE_KEY, page.toString());
         await delay(500);
         
@@ -223,6 +285,29 @@ export const useGlobalSync = () => {
 
     console.log("syncClips completa.");
   };
+
+  async function processBatch(batch: any) {
+
+    const crecimientosDB = new CrecimientosDB(sqlite.db);
+
+    const clipsDB = new ClipsDB(sqlite.db);
+    const ucDB = new ClipsUsuariosDB(sqlite.db);
+    const likesDB = new LikesDB(sqlite.db);
+
+
+    await sqlite.performSQLAction( async () => {
+      await Promise.all([
+        batch.crecimientos?.length && 
+          crecimientosDB.create(sqlite.performSQLAction, () => {}, batch.crecimientos),
+        batch.clips?.length && 
+          clipsDB.create(sqlite.performSQLAction, () => {}, batch.clips),
+        batch.usuarios_clips?.length &&
+          ucDB.create(sqlite.performSQLAction, () => {}, batch.usuarios_clips),
+        batch.likes?.length &&
+          likesDB.create(sqlite.performSQLAction, () => {}, batch.likes)
+      ]);
+    })
+  }
 
   const syncClipsTrashed = async () => {
     console.log("start syncClipsTrashed");
@@ -288,15 +373,25 @@ export const useGlobalSync = () => {
         console.log("Sincronización completa.");
         
         setSuccess( true );
+        setError( false );
         setLoading( false );
         setMensaje('¡Información actualizada!')
-        
+
+        await delay(5000);
+        setSuccess( false );
+
       } catch (error) {
         console.error(error);
         
-        setLoading( false );
         setSuccess( false );
-        setMensaje('¡Vaya! Intenta luego.')
+        setError( true );
+        setLoading( false );
+
+        setMensaje('Aguarda un momento… vuelve aquí pronto.')
+        await delay(5000);
+
+        setError( false );
+
       }
 
 
@@ -309,6 +404,7 @@ export const useGlobalSync = () => {
   return {
     loading,
     success,
+    error,
     mensaje,
     syncAll
   }

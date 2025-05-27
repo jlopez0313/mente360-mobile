@@ -1,36 +1,22 @@
-import { CapacitorHttp, HttpHeaders } from '@capacitor/core';
+import { usePreferences } from '@/hooks/usePreferences';
+import { CapacitorHttp } from '@capacitor/core';
 import { } from '@ionic-native/http';
-import { getUser } from '@/helpers/onboarding';
-
-/*
-import axios from "axios";
-
-export const baseApi = axios.create({
-    baseURL: import.meta.env.VITE_BASE_API
-})
-
-baseApi.interceptors.request.use((config) => {
-    const user = getUser();
-    config.headers.Authorization =  user ? `Bearer ${user.token}` : '';
-    return config;
-})
-
-*/
 
 export const baseApi = () => {
     
     const baseURL = import.meta.env.VITE_BASE_API;
+    const { keys, getPreference } = usePreferences();
     
-    const headers = () => {
-        const user = getUser();
-        const Authorization =  user?.token ? `Bearer ${user.token}` : '';
+    const headers = async() => {
+        const token = await getPreference( keys.TOKEN);
+        const Authorization =  token ? `Bearer ${token}` : '';
         return { 
             Authorization,
         };
     }
 
     const get = async (url: string, customHeaders: any = {}) => {
-        const myHeaders = headers();
+        const myHeaders = await headers();
         
         const options = {
             url: `${baseURL}${url}`,
@@ -52,7 +38,7 @@ export const baseApi = () => {
     };
     
     const post = async (url: string, formData: any, customHeaders: any = {}) => {
-        const myHeaders = headers();
+        const myHeaders = await headers();
 
         const options = {
             url: `${baseURL}${url}`,
@@ -75,7 +61,7 @@ export const baseApi = () => {
 
 
     const put = async (url: string, formData: any, customHeaders: any = {}) => {
-        const myHeaders = headers();
+        const myHeaders = await headers();
 
         const options = {
             url: `${baseURL}${url}`,
@@ -96,7 +82,7 @@ export const baseApi = () => {
     };
 
     const remove = async (url: string, formData: any, customHeaders: any = {}) => {
-        const myHeaders = headers();
+        const myHeaders = await headers();
 
         const options = {
             url: `${baseURL}${url}`,

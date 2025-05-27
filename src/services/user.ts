@@ -78,3 +78,23 @@ export const find = async(id: number): Promise<any> => {
         }    
     })   
 }
+
+
+export const trial = async(): Promise<any> => {
+
+    return new Promise( async (resolve, reject) => {
+        const { get } = baseApi();
+    
+        try {
+            resolve ( await get('/usuarios/trial') )
+        } catch( error: any ) {
+            if (error.response) {
+                reject(error.response)
+            } else if (error.request) {
+                reject(error.request)
+            } else {
+                reject(error)
+            }
+        }    
+    })   
+}

@@ -16,18 +16,25 @@ import {
 import styles from "../Login.module.scss";
 
 import { GmailLogin } from "@/firebase/auth";
-import { clearUser, setUser } from "@/helpers/onboarding";
+import { clearUser } from "@/helpers/onboarding";
 import { login, register } from "@/services/auth";
 
+import { usePreferences } from "@/hooks/usePreferences";
+import { setUser } from "@/store/slices/userSlice";
 import { FCM } from "@capacitor-community/fcm";
 import { eye, eyeOff } from "ionicons/icons";
 import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { useHistory } from "react-router";
 
 export const Register = () => {
+
+  const { keys, setPreference } = usePreferences();
   const [present, dismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();
+
   const history = useHistory();
+  const dispatch = useDispatch();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -47,7 +54,7 @@ export const Register = () => {
         message: "Cargando ...",
       });
 
-      const { data } = await register({
+      const { data }: any = await register({
         email,
         password,
         device: "app",
@@ -58,7 +65,8 @@ export const Register = () => {
 
       data.fcm_token = token.token;
 
-      await setUser(data);
+      await setPreference(keys.TOKEN, data.token);
+      dispatch(setUser(data.user));
 
       setTimeout(() => {
         history.replace("/registro");
@@ -92,8 +100,8 @@ export const Register = () => {
               device: "gmail",
             });
 
-            const setUserPromise = loginPromise.then(({ data }) => {
-              return setUser(data);
+            const setUserPromise = loginPromise.then(({ data }: any) => {
+              return dispatch(setUser(data));
             });
 
             await Promise.all([
@@ -117,8 +125,8 @@ export const Register = () => {
                 device: "gmail",
               });
 
-              const setUserPromise = registerPromise.then(({ data }) => {
-                return setUser(data);
+              const setUserPromise = registerPromise.then(({ data }: any) => {
+                return dispatch(setUser(data));
               });
 
               await Promise.all([

@@ -12,7 +12,7 @@ import { useHistory } from "react-router";
 import styles from "./Acordeon.module.scss";
 
 import { Modal } from "@/components/Shared/Modal/Modal";
-import { getUser } from "@/helpers/onboarding";
+import { usePayment } from "@/hooks/usePayment";
 import { activar } from "@/services/sos";
 import { setMsgSource, setPanico } from "@/store/slices/homeSlice";
 import { shareSocialOutline } from "ionicons/icons";
@@ -23,13 +23,12 @@ import { Texto } from "../Texto/Texto";
 import panico from "/assets/icons/panico.svg";
 
 export const Panico: React.FC<any> = ({ network }) => {
-  const { audio, currentDate } = useSelector((state: any) => state.home);
-
-  const { user } = getUser();
+  const { user } = useSelector( (state: any) => state.user);
   const history = useHistory();
   const dispatch = useDispatch()
   const [present, dismiss] = useIonLoading();
-
+  
+  const { userEnabled } = usePayment();
   const [sos, setSOS] = useState<any>({});
   const [isOpen, setIsOpen] = useState(false);
 
@@ -81,7 +80,7 @@ export const Panico: React.FC<any> = ({ network }) => {
         </IonItem>
         <div className="ion-padding" slot="content">
           {
-            !user.has_paid ?
+            !userEnabled?
               <IonButton
                 disabled={true}
                 expand="block"

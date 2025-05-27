@@ -7,8 +7,8 @@ import {
 } from "@ionic/react";
 import styles from "./Footer.module.scss";
 
-import { getUser } from "@/helpers/onboarding";
 import { useNetwork } from "@/hooks/useNetwork";
+import { usePayment } from "@/hooks/usePayment";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useHistory } from "react-router-dom";
@@ -20,8 +20,7 @@ import grupo from "/assets/icons/grupo.svg";
 export const Footer = (props: any) => {
   const history = useHistory();
   const network = useNetwork();
-
-  const { user } = getUser();
+  const { userEnabled } = usePayment();
 
   const [tab, setTab] = useState(history.location.pathname);
 
@@ -54,7 +53,7 @@ export const Footer = (props: any) => {
           </Link>
 
           {
-            !user.has_paid ?
+            !userEnabled ?
               <IonButton>
                 <IonIcon slot="icon-only" src={auriculares}></IonIcon>
               </IonButton>
@@ -73,7 +72,7 @@ export const Footer = (props: any) => {
           }
 
           {
-            !user.has_paid ?
+            !userEnabled ?
               <IonButton>
                 <IonIcon slot="icon-only" src={grupo}></IonIcon>
               </IonButton>
