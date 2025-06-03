@@ -17,6 +17,7 @@ import User from "@/database/user";
 import UsuariosClips from "@/database/usuarios_clips";
 
 import { Capacitor } from "@capacitor/core";
+import { Device } from "@capacitor/device";
 import { Directory, Encoding, Filesystem } from "@capacitor/filesystem";
 
 let globalSQLite: SQLiteConnection | null = null;
@@ -26,55 +27,63 @@ export const useSqliteDB = () => {
   const [initialized, setInitialized] = useState<boolean>(false);
 
   const initializeDB = async (): Promise<SQLiteDBConnection> => {
-    if (!globalSQLite) {
-      globalSQLite = new SQLiteConnection(CapacitorSQLite);
-    }
+    try {
+      if (!globalSQLite) {
+        globalSQLite = new SQLiteConnection(CapacitorSQLite);
+      }
 
-    if (Capacitor.getPlatform() === "web") {
-      await globalSQLite.initWebStore();
-    }
+      if (Capacitor.getPlatform() === "web") {
+        await globalSQLite.initWebStore();
+      }
 
-    const ret = await globalSQLite.checkConnectionsConsistency();
-    const isConn = (
-      await globalSQLite.isConnection(import.meta.env.VITE_DB_NAME, false)
-    ).result;
+      const dbName = import.meta.env.VITE_DB_NAME;
+      // const ret = await globalSQLite.checkConnectionsConsistency();
+      const isConn = (await globalSQLite.isConnection(dbName, false)).result;
 
-    if (ret.result && isConn) {
-      try {
-        globalDB = await globalSQLite.retrieveConnection(
-          import.meta.env.VITE_DB_NAME,
-          false
-        );
-        if ((await globalDB.isDBOpen()).result === false) {
+      if (
+        // ret.result &&
+        isConn
+      ) {
+        try {
+          globalDB = await globalSQLite.retrieveConnection(dbName, false);
+          if ((await globalDB.isDBOpen()).result === false) {
+            console.log("DB is opening on line 50");
+            await globalDB.open();
+          }
+        } catch (err) {
+          console.warn(
+            "Error al recuperar conexión existente, recreando...",
+            err
+          );
+          await globalSQLite.closeConnection(dbName, false);
+          globalDB = await globalSQLite.createConnection(
+            dbName,
+            false,
+            "no-encryption",
+            1,
+            false
+          );
+          console.log("DB is opening on line 69");
           await globalDB.open();
         }
-      } catch (err) {
-        console.warn(
-          "Error al recuperar conexión existente, recreando...",
-          err
-        );
-        await globalSQLite.closeConnection(import.meta.env.VITE_DB_NAME, false);
+      } else {
         globalDB = await globalSQLite.createConnection(
-          import.meta.env.VITE_DB_NAME,
+          dbName,
           false,
           "no-encryption",
           1,
           false
         );
+
+        console.log("DB is opening on line 80");
         await globalDB.open();
       }
-    } else {
-      globalDB = await globalSQLite.createConnection(
-        import.meta.env.VITE_DB_NAME,
-        false,
-        "no-encryption",
-        1,
-        false
-      );
-      await globalDB.open();
-    }
 
-    return globalDB;
+      return globalDB;
+    } catch (error) {
+      console.log("error initialize DB", error);
+      throw error;
+    }
   };
 
   const performSQLAction = async (
@@ -83,6 +92,7 @@ export const useSqliteDB = () => {
   ) => {
     try {
       if (globalDB && !(await globalDB.isDBOpen()).result) {
+        console.log("DB is opening");
         await globalDB.open();
         console.log("DB has been opened");
       }
@@ -171,32 +181,43 @@ export const useSqliteDB = () => {
 
   const exportJson = async () => {
     try {
-      const dbName = import.meta.env.VITE_DB_NAME;
+      if (!globalDB || !(await globalDB.isDBOpen()).result) {
+        throw new Error("La base de datos no está abierta");
+      }
 
-      const db = await CapacitorSQLite.open({ database: dbName });
-
-      const dbExport = await CapacitorSQLite.exportToJson({
-        database: dbName,
-        jsonexportmode: "full",
-      });
+      await requestPermissions();
+      const dbExport = await globalDB.exportToJson("full");
 
       if (dbExport?.export?.database) {
-        console.log("Contenido exportado:", JSON.stringify(dbExport.export, null, 2));
-        
-        const targetPath = "Download/db_backup.json";
+        console.log(
+          "Contenido exportado:",
+          JSON.stringify(dbExport.export, null, 2)
+        );
+
+        const targetPath = "db_backup.json";
 
         try {
           await Filesystem.deleteFile({
             path: targetPath,
-            directory: Directory.ExternalStorage,
+            directory: Directory.Data,
           });
-        } catch {}
+          console.log("Archivo anterior eliminado.");
+        } catch {
+          console.log("No se encontró archivo previo, continuando...");
+        }
 
         await Filesystem.writeFile({
           path: targetPath,
           data: JSON.stringify(dbExport.export, null, 2),
-          directory: Directory.ExternalStorage,
+          directory: Directory.Data,
           encoding: Encoding.UTF8,
+        });
+
+        await Filesystem.copy({
+          from: targetPath,
+          directory: Directory.Data,
+          to: 'Download/' + targetPath,
+          toDirectory: Directory.Documents,
         });
 
         console.log("Base de datos exportada con éxito");
@@ -206,6 +227,15 @@ export const useSqliteDB = () => {
     } catch (error) {
       console.error("Error exportando la base de datos:", error);
       throw error;
+    }
+  };
+
+  const requestPermissions = async () => {
+    const info = await Device.getInfo();
+
+    if (info.platform === "android") {
+      const permResult = await Filesystem.requestPermissions();
+      console.log("Permisos solicitados:", permResult);
     }
   };
 

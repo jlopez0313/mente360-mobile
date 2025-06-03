@@ -1,6 +1,6 @@
 import { IonRouterOutlet, setupIonicReact } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
-import { Redirect, Route } from "react-router-dom";
+import { Route } from "react-router-dom";
 
 import Chat from "./pages/Chat/Chat";
 import Grupo from "./pages/Chat/Grupo/Grupo";
@@ -20,6 +20,7 @@ import Recordatorios from "./pages/Recordatorios/Recordatorios";
 import Registro from "./pages/Registro/Registro";
 import Reset from "./pages/Reset/Reset";
 import Test from "./pages/Test/Test";
+import Thanks from './pages/Thanks/Thanks';
 
 
 import { DBProvider } from "./context/Context";
@@ -47,6 +48,7 @@ import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import Detalle from "./pages/Planes/Detalle/Detalle";
 import Planes from "./pages/Planes/Planes/Planes";
+import Splash from "./pages/Splash/Splash";
 import Welcome from "./pages/Welcome/Wecome";
 import "./theme/variables.css";
 
@@ -89,14 +91,14 @@ const App: React.FC = () => {
   return (
     <>
       <IonReactRouter>
-        
-        {globalAudio && showGlobalAudio && <Toast />}
-
         <DBProvider>
+          
+          {globalAudio && showGlobalAudio && <Toast />}
+
           <IonRouterOutlet>
-            <Route exact path="/" render={() => <Redirect to="/login" />} />
+            <Route exact path="/" component={Splash} />
 
-
+            <Route exact={true} path="/thanks" component={Thanks} />
             <Route exact={true} path="/welcome" component={Welcome} />
 
             <Route exact={true} path="/planes" component={Planes} />
@@ -110,7 +112,6 @@ const App: React.FC = () => {
 
             <Route exact={true} path="/home" component={Home} />
             <Route exact={true} path="/share" component={Sharing} />
-            
 
             <Route exact={true} path="/crecimiento" component={Crecimiento} />
             <Route exact={true} path="/configuracion" component={Configuracion} />

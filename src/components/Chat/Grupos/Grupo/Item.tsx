@@ -13,7 +13,7 @@ export const Item: React.FC<any> = ({ msg, usuarios }) => {
   const [usuario, setUsuario] = useState<any>({});
   
   const onGetUser = () => {
-    setUsuario( usuarios.find( (u: any) => u.id == msg.user) )
+    setUsuario( usuarios.find( (u: any) => u.id == msg.user.id) )
   }
 
   useEffect(() => {

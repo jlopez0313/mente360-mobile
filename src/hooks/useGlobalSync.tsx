@@ -387,7 +387,7 @@ export const useGlobalSync = () => {
         setError( true );
         setLoading( false );
 
-        setMensaje('Aguarda un momento… vuelve aquí pronto.')
+        setMensaje('Estamos preparando todo para ti… vuelve aquí pronto.')
         await delay(5000);
 
         setError( false );

@@ -43,7 +43,7 @@ export const Item: React.FC<any> = ({ grupo }) => {
     const lastMsg = listaMensajes.pop();
 
     if (lastMsg) {
-      const data = await getData(`users/${lastMsg.user}`);
+      const data = await getData(`users/${lastMsg.user.id}`);
       const userData = data.val();
       setLastMsg({ ...lastMsg, from: { ...userData } });
     }
@@ -74,7 +74,7 @@ export const Item: React.FC<any> = ({ grupo }) => {
 
       const lastMsg = listaMensajes.pop();
       if (lastMsg) {
-        const data = await getData(`users/${lastMsg.user}`);
+        const data = await getData(`users/${lastMsg.user.id}`);
         const userData = data.val();
         setLastMsg({ ...lastMsg, from: { ...userData } });
       }

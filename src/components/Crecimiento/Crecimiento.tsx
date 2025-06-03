@@ -42,7 +42,7 @@ export const Crecimiento = () => {
   const [presentAlert] = useIonAlert();
 
   const { user } = useSelector( (state: any) => state.user);
-  const { userEnabled } = usePayment();
+  const { userEnabled, payment_status } = usePayment();
 
   const [activeIdx, setActiveIdx] = useState(0);
   const [nivelID, setNivelID] = useState<any>(null);
@@ -162,7 +162,7 @@ export const Crecimiento = () => {
 
       if (niveles[nextNivelIdx]) {
         
-        if ( niveles[nextNivelIdx].gratis == '0' && !userEnabled ) {
+        if ( niveles[nextNivelIdx].gratis == '0' && (!userEnabled  || payment_status == 'free') ) {
           return ;
         }
 
@@ -255,7 +255,7 @@ export const Crecimiento = () => {
       >
         {niveles.map((item: any, idx: number) => {
           return (
-            <IonSelectOption disabled={!userEnabled && item.gratis == 0} key={idx} value={item.id}>
+            <IonSelectOption disabled={(!userEnabled || payment_status == 'free') && item.gratis == 0} key={idx} value={item.id}>
               {" "}
               {item.nivel}{" "}
             </IonSelectOption>

@@ -7,9 +7,14 @@ type SubscriptionStatus =
   | "trial"
   | "paid"
   | "expired"
+  | "canceled"
   | "payment_failed";
 
-const disabledStatus: SubscriptionStatus[] = ["expired", "payment_failed"];
+const disabledStatus: SubscriptionStatus[] = [
+  "canceled",
+  "expired",
+  "payment_failed",
+];
 
 export const usePayment = () => {
   const { user } = useSelector((state: any) => state.user);
@@ -18,39 +23,38 @@ export const usePayment = () => {
   const [userEnabled, setUserEnabled] = useState<boolean>(true);
 
   useEffect(() => {
-    const getSubscriptionStatus = () => {
-      const now = new Date();
-      now.setHours(0, 0, 0, 0);
+    if (!user) return;
 
-      if (!user?.fecha_vencimiento) {
-        setStatus("free");
-        return;
-      }
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
 
-      if (user.ref_payco && user.ref_status === "failed") {
-        setStatus("payment_failed");
-        return;
-      }
+    const fechaVencimiento = user.fecha_vencimiento
+      ? new Date(user.fecha_vencimiento)
+      : null;
 
-      const fechaVence = new Date(user.fecha_vencimiento);
-      const diasHastaVence = diferenciaRealEnDias(now, fechaVence);
+    const diasHastaVence =
+      fechaVencimiento !== null
+        ? diferenciaRealEnDias(now, fechaVencimiento)
+        : null;
 
-      if (user.has_paid) {
-        setStatus(diasHastaVence >= 0 ? "paid" : "expired");
-        return;
-      } else {
-        setStatus(diasHastaVence >= 0 ? "trial" : "expired");
-        return;
-      }
-    };
-
-    if (user) getSubscriptionStatus();
+    if (!fechaVencimiento) {
+      setStatus("free");
+    } else if (user.ref_payco && user.ref_status == "failed") {
+      setStatus("payment_failed");
+    } else if (user.has_paid == 1) {
+      setStatus(diasHastaVence! >= 0 ? "paid" : "expired");
+    } else if (user.has_paid == 0) {
+      setStatus(diasHastaVence! >= 0 ? "canceled" : "expired");
+    } else {
+      setStatus(diasHastaVence! >= 0 ? "trial" : "expired");
+    }
   }, [user]);
 
   useEffect(() => {
     const isUserEnabled = () => {
       setUserEnabled(!disabledStatus.includes(payment_status));
     };
+
     isUserEnabled();
   }, [payment_status]);
 

@@ -4,14 +4,16 @@ import {
   IonIcon,
   IonItem,
   IonLabel,
-  useIonAlert
+  useIonAlert,
 } from "@ionic/react";
 import { trophy } from "ionicons/icons";
-import React from "react";
+import React, { useState } from "react";
 import styles from "./Acordeon.module.scss";
 import auriculares from "/assets/icons/auriculares.svg";
 
 import { Modal } from "@/components/Shared/Modal/Modal";
+import { Buttons } from "@/components/Shared/Premium/Buttons/Buttons";
+import { Premium } from "@/components/Shared/Premium/Premium";
 import { useDB } from "@/context/Context";
 import AudiosDB from "@/database/audios";
 import { usePayment } from "@/hooks/usePayment";
@@ -20,18 +22,21 @@ import { useDispatch, useSelector } from "react-redux";
 import { Audio as AudioShared } from "../Audio/Audio";
 
 export const Audio: React.FC<any> = ({ network }) => {
-
   const dispatch = useDispatch();
   const [presentAlert] = useIonAlert();
   const { sqlite } = useDB();
 
-  const { userEnabled } = usePayment();
+  const [isOpen, setIsOpen] = useState(false);
+  const [isPremiumOpen, setIsPremiumOpen] = useState(false);
+
+  const { userEnabled, payment_status } = usePayment();
+
   const { audio } = useSelector((state: any) => state.home);
 
   const onConfirmAudio = async () => {
     try {
       const audiosDB = new AudiosDB(sqlite.db);
-      await audiosDB.markAsDone(sqlite.performSQLAction, () => { }, {
+      await audiosDB.markAsDone(sqlite.performSQLAction, () => {}, {
         id: audio.id,
         done: 1,
       });
@@ -67,42 +72,60 @@ export const Audio: React.FC<any> = ({ network }) => {
         <IonItem slot="header">
           <IonLabel>Audio de la noche</IonLabel>
           {audio.done ? (
-            <IonIcon icon={trophy} slot="end" className={styles['trofeo']} />
+            <IonIcon icon={trophy} slot="end" className={styles["trofeo"]} />
           ) : (
-            <IonIcon icon={trophy} slot="end" className={styles['trofeo-gris']} />
+            <IonIcon
+              icon={trophy}
+              slot="end"
+              className={styles["trofeo-gris"]}
+            />
           )}
         </IonItem>
         <div className="ion-padding" slot="content">
-          {
-            !userEnabled ?
-              <IonButton
-                disabled={true}
-                expand="block"
-                type="button"
-                className="ion-margin-top ion-padding-start ion-padding-end"
-              >
-                Premium
-              </IonButton> :
-              <IonButton
-                expand="block"
-                type="button"
-                className="ion-margin-top ion-padding-start ion-padding-end"
-                id="modal-auricular"
-              >
-                Escuchar
-              </IonButton>
-
-          }
+          {!userEnabled || payment_status == "free" ? (
+            <IonButton
+              onClick={() => setIsPremiumOpen(true)}
+              expand="block"
+              type="button"
+              className="ion-margin-top ion-padding-start ion-padding-end"
+            >
+              Premium
+            </IonButton>
+          ) : (
+            <IonButton
+              onClick={() => setIsOpen(true)}
+              expand="block"
+              type="button"
+              className="ion-margin-top ion-padding-start ion-padding-end"
+              id="modal-noche"
+            >
+              Escuchar
+            </IonButton>
+          )}
         </div>
       </IonAccordion>
 
       <Modal
-        trigger="modal-auricular"
+        isOpen={isOpen}
         title="Audio de la noche"
         hideButtons={!network.status || audio.done || false}
         onConfirm={() => onConfirmAudio()}
       >
         <AudioShared audio={audio} onConfirm={() => onConfirmAudio()} />
+      </Modal>
+
+      <Modal
+        isOpen={isPremiumOpen}
+        title={import.meta.env.VITE_NAME + " premium"}
+        hideButtons={!network.status || audio.done || false}
+        showButtons={false}
+        onConfirm={() => {}}
+        onWillDismiss={() => setIsPremiumOpen(false)}
+      >
+        <div className="ion-padding">
+          <Premium />
+          <Buttons />
+        </div>
       </Modal>
     </>
   );

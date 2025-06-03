@@ -9,6 +9,12 @@ const config: CapacitorConfig = {
     allowNavigation: []
   },
   plugins: {
+    SplashScreen: {
+      launchAutoHide: false,
+      showSpinner: true,
+      splashFullScreen: true,
+      splashImmersive: true
+    },
     CapacitorHttp: {
       enabled: true,
     },

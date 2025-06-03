@@ -26,7 +26,7 @@ import tareaIcon from "/assets/icons/tarea.svg";
 export const Tarea: React.FC<any> = ({network}) => {
   const dispatch = useDispatch();
   const history = useHistory();
-  const { userEnabled } = usePayment();
+  const { userEnabled, payment_status } = usePayment();
 
   const [presentAlert] = useIonAlert();
   const { sqlite } = useDB();
@@ -100,8 +100,8 @@ export const Tarea: React.FC<any> = ({network}) => {
       <Modal
         trigger="modal-tarea"
         title="Tarea de la semana"
-        closeText={ userEnabled ? "Ir a Grupo" : "Premium"}
-        isBtnDisabled={ !userEnabled }
+        closeText={ userEnabled && payment_status != 'free' ? "Ir a Grupo" : "Premium"}
+        isBtnDisabled={ !userEnabled || payment_status == 'free' }
         hideButtons={ !network.status || tarea.done || currentDay != 1 || false}
         onConfirm={() => onConfirmTarea()}
       >

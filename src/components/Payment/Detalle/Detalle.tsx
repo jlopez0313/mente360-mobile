@@ -1,145 +1,127 @@
-
+import { Modal } from "@/components/Shared/Modal/Modal";
+import { Premium } from "@/components/Shared/Premium/Premium";
 import { useNetwork } from "@/hooks/useNetwork";
 import { usePayment } from "@/hooks/usePayment";
 import { updateData } from "@/services/realtime-db";
 import { find } from "@/services/subscribe";
 import { update } from "@/services/user";
-import { IonBadge, IonButton, IonIcon, IonImg, IonItem, IonLabel, IonList, IonText, useIonLoading } from "@ionic/react";
-import { chatboxEllipsesOutline, heartCircleOutline, moonOutline, peopleOutline, ribbonOutline } from "ionicons/icons";
-import { useSelector } from "react-redux";
+import { setUser } from "@/store/slices/userSlice";
+import { IonBadge, IonButton, IonItem, IonLabel, IonList, IonText, useIonLoading } from "@ionic/react";
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
-import styles from './Detalle.module.scss';
+import { Cancel } from "../Cancel/Cancel";
+import styles from "./Detalle.module.scss";
 
 export const Detalle = () => {
+  const history = useHistory();
+  const network = useNetwork();
+  const dispatch = useDispatch();
+  const { userEnabled, payment_status } = usePayment();
+  const [present, dismiss] = useIonLoading();
 
-    const history = useHistory();
-    const network = useNetwork();
-    const { userEnabled } = usePayment();
-    const [present, dismiss] = useIonLoading(); 
+  const [isOpen, setIsOpen] = useState(false);
 
-    const { user } = useSelector( (state: any) => state.user);
+  const { user } = useSelector((state: any) => state.user);
 
-    const onPay = async (item: any) => {
+  const onPay = async (item: any) => {
+    if ((userEnabled && payment_status != "free") || !network.status) return;
 
-        if (userEnabled || !network.status)
-            return;
+    const { data } = await find(item);
+    window.open(data.url, "_blank");
+  };
 
-        const { data } = await find(item);
-        window.open(data.url, '_blank');
+  const onCancelSuscription = async () => {
+    try {
+      setIsOpen(false);
+      await present({
+        message: "Cargando...",
+        duration: 3000,
+      });
+
+      const {
+        data: { data: updated },
+      } = await update({ has_paid: false }, user.id);
+      dispatch(setUser({ ...updated }));
+      dismiss();
+
+      await updateData(`payments/${user.id}`, {
+        ref_status: "canceled",
+        hora: new Date().toISOString(),
+        has_paid: false,
+      });
+
+      history.replace("/perfil");
+    } catch (error) {
+      console.log("Error Cancelando", error);
     }
+  };
 
-    const onCancelSuscription = async () => {
-        try {
-            await present({
-                message: 'Cargando...',
-                duration: 3000
-            })
+  return (
+    <div className={`${styles["content"]}`}>
+      <Premium onPay={onPay} setIsOpen={setIsOpen} />
 
-            await update({ref_payco: null}, user.id);
-            await updateData(`payments/${user.id}`, {
-                estado: 'CANCELADO',
-                hora: new Date().toISOString(),
-                ref_payco: null
-            })
-            dismiss();
+      <IonList
+        className={`ion-text-justify ion-margin-top ion-margin-bottom ${styles["w-100"]} ${styles["precios"]}`}
+      >
+        <span className={``}>Mejor Opción</span>
+        <IonItem
+          button={true}
+          onClick={() => onPay({ precio: "39", titulo: "plan anual" })}
+        >
+          <IonLabel className={`ion-text-left`}>
+            <h2>Anual</h2>
+            <p>Cancela en cualquier momento</p>
+          </IonLabel>
+          {userEnabled && payment_status != "free" ? null : (
+            <IonBadge slot="end">
+              $39 USD/año
+              <p>(Ahorra más de 60%)</p>
+            </IonBadge>
+          )}
+        </IonItem>
+        <IonItem
+          button={true}
+          onClick={() => onPay({ precio: "3.99", titulo: "plan mensual" })}
+          lines="none"
+        >
+          <IonLabel className={`ion-text-left`}>
+            <h2>Mensual</h2>
+          </IonLabel>
+          {userEnabled && payment_status != "free" ? null : (
+            <IonBadge slot="end">$3,99 USD/mes</IonBadge>
+          )}
+        </IonItem>
+      </IonList>
 
-            history.replace('/perfil')
+      {userEnabled && payment_status != "free" ? (
+        <IonButton disabled={!network.status} onClick={() => setIsOpen(true)}>
+          {" "}
+          Cancelar Mi Suscripción{" "}
+        </IonButton>
+      ) : (
+        <IonText className={`ion-margin-top`}>
+          <b>Cancela en cualquier momento.</b>
+          <br />
+          La suscripción se renueva automáticamente a menos que se cancele 24
+          horas antes del final del período.
+        </IonText>
+      )}
 
-        } catch (error) {
-            console.log('Error Cancelando', error)
-        }
-    }
-
-    return (
-        <div className={`${styles["content"]}`}>
-            <IonImg
-                src="assets/images/logo.png"
-                className={`ion-margin-top ${styles['logo']}`}
-            />
-
-            <IonText className='ion-text-center ion-margin-bottom'> {import.meta.env.VITE_NAME} </IonText>
-
-            <IonText className={`ion-text-center ion-margin-bottom ${styles['ready']}`}>
-                Desbloquea todo tu potencial con {import.meta.env.VITE_NAME} premium.
-            </IonText>
-
-            <IonList className={`ion-text-justify ${styles["caracteristicas"]} ${styles["w-100"]}`}>
-                <IonItem>
-                    <IonIcon aria-hidden="true" icon={ribbonOutline} slot="start" />
-                    <IonLabel className={`ion-text-left`}>
-                        Acceso ilimitado a formaciones, meditaciones, musicoterapia y tareas personalizadas
-                    </IonLabel>
-                </IonItem>
-                <IonItem>
-                    <IonIcon aria-hidden="true" icon={moonOutline} slot="start" />
-
-                    <IonLabel className={`ion-text-left`}>
-                        Audios nocturnos personalizados para tu tipo de personalidad
-                    </IonLabel>
-                </IonItem>
-                <IonItem>
-                    <IonIcon aria-hidden="true" icon={chatboxEllipsesOutline} slot="start" />
-
-                    <IonLabel className={`ion-text-left`}>
-                        Frases diarias de motivación adaptadas a tu eneagrama
-                    </IonLabel>
-                </IonItem>
-                <IonItem>
-                    <IonIcon aria-hidden="true" icon={peopleOutline} slot="start" />
-
-                    <IonLabel className={`ion-text-left`}>
-                        Acceso a la comunidad exclusiva para compartir tu crecimiento personal
-                    </IonLabel>
-                </IonItem>
-                <IonItem lines="none">
-                    <IonIcon aria-hidden="true" icon={heartCircleOutline} slot="start" />
-
-                    <IonLabel className={`ion-text-left`}>
-                        S.O.S Emocional
-                    </IonLabel>
-                </IonItem>
-            </IonList>
-
-            <IonList className={`ion-text-justify ion-margin-top ion-margin-bottom ${styles["w-100"]} ${styles["precios"]}`}>
-                <span className={``}>Mejor Opción</span>
-                <IonItem button={true} onClick={() => onPay({ precio: '39', titulo: 'plan anual' })}>
-                    <IonLabel className={`ion-text-left`}>
-                        <h2>Anual</h2>
-                        <p>Cancela en cualquier momento</p>
-                    </IonLabel>
-                    {
-                        userEnabled ?
-                            null :
-                            <IonBadge slot="end">
-                                $39 USD/año
-                                <p>(Ahorra más de 60%)</p>
-                            </IonBadge>
-
-                    }
-                </IonItem>
-                <IonItem button={true} onClick={() => onPay({ precio: '3.99', titulo: 'plan mensual' })} lines="none">
-                    <IonLabel className={`ion-text-left`}>
-                        <h2>Mensual</h2>
-                    </IonLabel>
-                    {
-                        userEnabled ?
-                            null :
-                            <IonBadge slot="end">$3,99 USD/mes</IonBadge>
-
-                    }
-                </IonItem>
-            </IonList>
-
-            {
-                userEnabled ?
-                    <IonButton disabled={!network.status} onClick={onCancelSuscription}> Cancelar Mi Suscripción </IonButton> :
-                    <IonText className={`ion-margin-top`}>
-                        <b>Cancela en cualquier momento.</b>
-                        <br />
-                        La suscripción se renueva automáticamente a menos que se cancele 24 horas antes del final del período.
-                    </IonText>
-            }
-
-        </div>
-    );
+      <Modal
+        style={{ "--height": "80%" }}
+        title="¿Deseas cancelar?"
+        isOpen={isOpen}
+        hideButtons={true}
+        showButtons={false}
+        onConfirm={onCancelSuscription}
+        onWillDismiss={() => setIsOpen(false)}
+      >
+        <Cancel
+          onClose={() => setIsOpen(false)}
+          onConfirm={onCancelSuscription}
+        />
+      </Modal>
+    </div>
+  );
 };

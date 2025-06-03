@@ -31,13 +31,17 @@ import {
   setIsGlobalPlaying,
 } from "@/store/slices/audioSlice";
 
+import PlaylistDB from "@/database/playlist";
 import { startBackground } from "@/helpers/background";
 import { create, destroy, updateElapsed } from "@/helpers/musicControls";
+import { useSqliteDB } from "@/hooks/useSqliteDB";
 
 export const Toast = () => {
+  
   const history = useHistory();
-
   const dispatch = useDispatch();
+
+  const { db, performSQLAction } = useSqliteDB();
 
   const { baseURL, audioSrc, globalAudio, listAudios, globalPos, isGlobalPlaying } = useSelector(
     (state: any) => state.audio
@@ -61,19 +65,12 @@ export const Toast = () => {
     audioRef,
     () => {}
   );
-
+  
   const { user } = useSelector( (state: any) => state.user);
   const [present, dismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();
 
   const [hasClip, setHasClip] = useState<any>(null);
-
-  const hasThisUser = (usuarios_clips: any[]) => {
-    const hasUserClip = usuarios_clips?.find(
-      (item) => item.users_id == user?.id
-    );
-    setHasClip(hasUserClip);
-  };
 
   const onClear = () => {
     // setShowGlobalAudio( false );
@@ -122,16 +119,17 @@ export const Toast = () => {
         message: "Cargando ...",
       });
 
-      await trash(hasClip?.id);
+      await trash(globalAudio.in_my_playlist);
 
-      const clip = {
+      const playlistDB = new PlaylistDB(db);
+      await playlistDB.delete(performSQLAction, () => { }, globalAudio.in_my_playlist);
+
+      const newItem = {
         ...globalAudio,
-        usuarios_clips: globalAudio.usuarios_clips.filter(
-          (uc: any) => uc != hasClip
-        ),
+        in_my_playlist: null,
       };
-      
-      dispatch(setGlobalAudio(clip));
+
+      dispatch(setGlobalAudio({ ...newItem }));
       // onGetClips();
     } catch (error: any) {
       console.error(error);
@@ -149,6 +147,7 @@ export const Toast = () => {
 
   const onAdd = async () => {
     try {
+
       present({
         message: "Cargando ...",
       });
@@ -159,25 +158,30 @@ export const Toast = () => {
       };
 
       const {
-        data: { data },
+        data: { data: added },
       } = await add(formData);
 
-      const updatedUsuariosClips = [
-        ...globalAudio.usuarios_clips,
-        {
-          id: data.id,
-          clips_id: data.clip.id,
-          users_id: user.id,
-        },
-      ];
       
-      const updatedGlobalAudio = {
-        ...globalAudio,
-        usuarios_clips: updatedUsuariosClips,
-      };
+      const playlistDB = new PlaylistDB(db);
+      await playlistDB.create(performSQLAction, () => { }, [
+        {
+          id: added.id,
+          clip: {
+            id: globalAudio.id,
+          },
+          user: {
+            id: user.id,
+          },
+        },
+      ]);
 
-      console.log(globalAudio);
-      dispatch(setGlobalAudio({ ...updatedGlobalAudio }));
+      const newItem = {
+        ...globalAudio,
+        in_my_playlist: added.id,
+      };
+      
+      dispatch(setGlobalAudio({ ...newItem }));
+
     } catch (error: any) {
       console.log( error )
 
@@ -230,10 +234,6 @@ export const Toast = () => {
       onPause();
     }
   }, [isGlobalPlaying]);
-
-  useEffect(() => {
-    hasThisUser(globalAudio.usuarios_clips);
-  }, [globalAudio.usuarios_clips]);
 
   return (
     <div className={`${styles["custom-toast"]}`}>
@@ -297,7 +297,7 @@ export const Toast = () => {
           icon={playSkipForward}
         />
 
-        {hasClip ? (
+        {globalAudio.in_my_playlist ? (
           <IonIcon
             aria-hidden="true"
             slot="end"

@@ -1,0 +1,27 @@
+@import "@/styles.scss";
+
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .logo {
+        width: 50px;
+    }
+
+    .ready {
+        text-transform: uppercase;
+        font-weight: bold;
+    }
+
+
+    .w-100 {
+        width: 100%;
+
+        &.caracteristicas {
+            --background: none;
+            background: none;
+        }
+    }
+
+}

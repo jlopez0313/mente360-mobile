@@ -87,12 +87,15 @@ export const Home = () => {
           await dispatch(getHomeThunk(sqlite, audiosDB, mensajesDB, tareasDB));
         } else {
           await audiosDB.all(sqlite.performSQLAction, (data: any) => {
+            console.log('DATA DE audiosDB', data)
             if (data?.length) dispatch(setAudio(data[0]));
           });
           await mensajesDB.all(sqlite.performSQLAction, (data: any) => {
+            console.log('DATA DE mensajesDB', data)
             if (data?.length) dispatch(setMensaje(data[0]));
           });
           await tareasDB.all(sqlite.performSQLAction, (data: any) => {
+            console.log('DATA DE tareasDB', data)
             if (data?.length) dispatch(setTarea(data[0]));
           });
 

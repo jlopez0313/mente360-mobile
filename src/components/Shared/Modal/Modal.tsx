@@ -60,8 +60,8 @@ export const Modal: React.FC<Props> = memo(
       <IonModal
         className={styles["example-modal"]}
         ref={modal}
-        trigger={trigger}
-        isOpen={isOpen}
+        isOpen={isOpen ?? undefined}
+        trigger={isOpen ? undefined : trigger}
         canDismiss={canDismiss}
         onWillDismiss={onWillDismiss}
         {...props}
@@ -76,7 +76,7 @@ export const Modal: React.FC<Props> = memo(
           )}
 
           <IonToolbar>
-            <IonTitle> {title} </IonTitle>
+            <IonTitle className={styles["title"]}> {title} </IonTitle>
           </IonToolbar>
 
           {children.length

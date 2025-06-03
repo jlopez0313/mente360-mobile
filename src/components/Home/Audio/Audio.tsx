@@ -27,7 +27,7 @@ interface Props {
 }
 
 export const Audio: React.FC<Props> = ({ audio, onConfirm }) => {
-  
+
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true);
 

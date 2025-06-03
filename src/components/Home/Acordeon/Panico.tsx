@@ -12,6 +12,8 @@ import { useHistory } from "react-router";
 import styles from "./Acordeon.module.scss";
 
 import { Modal } from "@/components/Shared/Modal/Modal";
+import { Buttons } from "@/components/Shared/Premium/Buttons/Buttons";
+import { Premium } from "@/components/Shared/Premium/Premium";
 import { usePayment } from "@/hooks/usePayment";
 import { activar } from "@/services/sos";
 import { setMsgSource, setPanico } from "@/store/slices/homeSlice";
@@ -28,9 +30,11 @@ export const Panico: React.FC<any> = ({ network }) => {
   const dispatch = useDispatch()
   const [present, dismiss] = useIonLoading();
   
-  const { userEnabled } = usePayment();
+  const { userEnabled, payment_status } = usePayment();
+
   const [sos, setSOS] = useState<any>({});
   const [isOpen, setIsOpen] = useState(false);
+  const [isPremiumOpen, setIsPremiumOpen] = useState(false);
 
   const onGetSos = async () => {
 
@@ -80,9 +84,9 @@ export const Panico: React.FC<any> = ({ network }) => {
         </IonItem>
         <div className="ion-padding" slot="content">
           {
-            !userEnabled?
+            !userEnabled || payment_status == 'free' ?
               <IonButton
-                disabled={true}
+                onClick={() => setIsPremiumOpen(true)}
                 expand="block"
                 type="button"
                 className="ion-margin-top ion-padding-start ion-padding-end"
@@ -132,6 +136,20 @@ export const Panico: React.FC<any> = ({ network }) => {
         </Texto>
 
         <Audio audio={sos.audio} onConfirm={() => { }} />
+      </Modal>
+
+      <Modal
+        isOpen={isPremiumOpen}
+        title={import.meta.env.VITE_NAME + " premium"}
+        hideButtons={!network.status || false}
+        showButtons={false}
+        onConfirm={() => {}}
+        onWillDismiss={() => setIsPremiumOpen(false)}
+      >
+        <div className="ion-padding">
+          <Premium />
+          <Buttons />
+        </div>
       </Modal>
     </>
   );
