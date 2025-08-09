@@ -1,5 +1,4 @@
 import { create } from "@/services/alarmas";
-import { LocalNotifications } from "@capacitor/local-notifications";
 import {
   IonButton,
   IonChip,
@@ -49,7 +48,7 @@ export const Add = () => {
       if (item.selected) newArray.push(index + 1);
       return newArray;
     }, []);
-
+/*
     const notifications = selectedIndexes.map((day: any, index: number) => ({
       id: Math.floor(Date.now() % 1000000) + index,
       title: titulo,
@@ -57,24 +56,18 @@ export const Add = () => {
       smallIcon: "icon.png",
       schedule: {
         repeats: true,
-        on: {
-          weekday: day,
-          hour: hora,
-          minute: mins,
-        },
+        every: "week",
+        at: getNextDateForWeekday(day, hora, mins),
       },
     }));
-
-    const save = await LocalNotifications.schedule({ notifications });
+*/
+    const save = { notifications: []} // await LocalNotifications.schedule({ notifications });
     console.log(save);
 
     const dataNotification = {
       notification_id: save.notifications,
       title: titulo,
-      days: days.reduce((indices, day, index) => {
-        if (day.selected) indices.push(index);
-        return indices;
-      }, []),
+      days: selectedIndexes.map((i: number) => i - 1),
       hora: hora < 10 ? `0${hora}` : `${hora}`,
       min: mins < 10 ? `0${mins}` : `${mins}`,
     };
@@ -83,6 +76,34 @@ export const Add = () => {
 
     history.replace("/recordatorios");
   };
+
+  function getNextDateForWeekday(
+    weekday: number,
+    hour: number,
+    minute: number
+  ): Date {
+    const now = new Date();
+    const result = new Date();
+    const today = now.getDay() === 0 ? 7 : now.getDay();
+
+    let daysUntilNext = weekday - today;
+    if (
+      daysUntilNext < 0 ||
+      (daysUntilNext === 0 &&
+        (now.getHours() > hour ||
+          (now.getHours() === hour && now.getMinutes() >= minute)))
+    ) {
+      daysUntilNext += 7;
+    }
+
+    result.setDate(now.getDate() + daysUntilNext);
+    result.setHours(hour);
+    result.setMinutes(minute);
+    result.setSeconds(0);
+    result.setMilliseconds(0);
+
+    return result;
+  }
 
   return (
     <>

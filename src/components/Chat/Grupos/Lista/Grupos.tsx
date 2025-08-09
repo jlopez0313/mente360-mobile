@@ -10,7 +10,7 @@ import {
 import { IonButton, IonIcon, IonItemGroup, IonList } from "@ionic/react";
 import { add } from "ionicons/icons";
 import { useEffect, useState } from "react";
-import { Add } from "./Add/Add";
+import { Add } from "../Add/Add";
 import styles from "./Grupos.module.scss";
 
 import { setGrupo } from "@/store/slices/notificationSlice";
@@ -25,7 +25,6 @@ export const Grupos = () => {
 
   const [grupos, setGrupos] = useState<any>([]);
   const [messages, setMessages] = useState<any>([]);
-  const [unreadList, setUnreadList] = useState<any>([]);
 
   const addDocument = async (grupo: any) => {
     try {
@@ -66,6 +65,9 @@ export const Grupos = () => {
   };
 
   const onGetAll = async () => {
+
+    dispatch(setGrupo(false));
+
     const grupos = await getArrayData(`users/${user.id}/grupos`);
 
     const lista: any = [];
@@ -82,20 +84,9 @@ export const Grupos = () => {
     setGrupos(lista);
   };
 
-  const onCheckUnreads = () => {
-    const noUnreads = unreadList.every((x) => x === 0);
-    if (noUnreads) {
-      dispatch(setGrupo(false));
-    }
-  };
-
   useEffect(() => {
     onCheckStatus();
   }, []);
-
-  useEffect(() => {
-    onCheckUnreads();
-  }, [unreadList]);
 
   return (
     <div className={styles["ion-content"]}>

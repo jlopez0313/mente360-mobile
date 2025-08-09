@@ -19,7 +19,7 @@ const disabledStatus: SubscriptionStatus[] = [
 export const usePayment = () => {
   const { user } = useSelector((state: any) => state.user);
 
-  const [payment_status, setStatus] = useState<SubscriptionStatus>("free");
+  const [payment_status, setStatus] = useState<SubscriptionStatus>("");
   const [userEnabled, setUserEnabled] = useState<boolean>(true);
 
   useEffect(() => {
@@ -37,16 +37,23 @@ export const usePayment = () => {
         ? diferenciaRealEnDias(now, fechaVencimiento)
         : null;
 
+    const hasPaid =
+      user.has_paid !== null && user.has_paid !== undefined
+        ? Number(user.has_paid)
+        : null;
+
     if (!fechaVencimiento) {
       setStatus("free");
     } else if (user.ref_payco && user.ref_status == "failed") {
       setStatus("payment_failed");
-    } else if (user.has_paid == 1) {
+    } else if (hasPaid === 1) {
       setStatus(diasHastaVence! >= 0 ? "paid" : "expired");
-    } else if (user.has_paid == 0) {
+    } else if (hasPaid === 0) {
       setStatus(diasHastaVence! >= 0 ? "canceled" : "expired");
-    } else {
+    } else if (fechaVencimiento) {
       setStatus(diasHastaVence! >= 0 ? "trial" : "expired");
+    } else {
+      setStatus("free");
     }
   }, [user]);
 

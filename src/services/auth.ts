@@ -1,7 +1,6 @@
 import { baseApi } from "./api";
-import { HttpHeaders } from "@capacitor/core";
 
-export const login = async (formData: {}) => {
+export const login = async (formData: {}): Promise<any> => {
   return new Promise(async (resolve, reject) => {
     const { post } = baseApi();
 

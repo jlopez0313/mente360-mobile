@@ -59,7 +59,7 @@ export const Detalle = () => {
 
   return (
     <div className={`${styles["content"]}`}>
-      <Premium onPay={onPay} setIsOpen={setIsOpen} />
+      <Premium />
 
       <IonList
         className={`ion-text-justify ion-margin-top ion-margin-bottom ${styles["w-100"]} ${styles["precios"]}`}

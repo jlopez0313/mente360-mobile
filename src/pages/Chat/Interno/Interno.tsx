@@ -21,14 +21,19 @@ import { Link, useHistory, useParams } from "react-router-dom";
 
 import Avatar from "@/assets/images/avatar.jpg";
 import { getDisplayDate } from "@/helpers/Fechas";
-import { getData, readData, writeData } from "@/services/realtime-db";
+import {
+  doDisconnect,
+  getData,
+  readData,
+  writeData,
+} from "@/services/realtime-db";
 import { onValue } from "firebase/database";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 const Interno: React.FC = () => {
   const history = useHistory();
-  const { user } = useSelector( (state: any) => state.user);
+  const { user } = useSelector((state: any) => state.user);
   const { room } = useParams<{ room: string }>();
   const baseURL = import.meta.env.VITE_BASE_BACK;
 
@@ -68,6 +73,17 @@ const Interno: React.FC = () => {
     ]);
   };
 
+  const onDisconnect = () => {
+    try {
+      doDisconnect(`rooms/${room}/users/${user.id}`, {
+        writing: false,
+        exit_time: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     onGetRoom();
   }, [room]);
@@ -88,6 +104,7 @@ const Interno: React.FC = () => {
 
   useEffect(() => {
     onEnter();
+    // onDisconnect();
 
     return () => {
       onExit();
@@ -140,7 +157,9 @@ const Interno: React.FC = () => {
               <span className={styles["status"]}>
                 {dataUserRoom?.exit_time
                   ? getDisplayDate(dataUserRoom.exit_time)
-                  : dataUserRoom ? "En línea" : ""}
+                  : dataUserRoom
+                  ? "En línea"
+                  : ""}
               </span>
             )}
           </div>
@@ -165,7 +184,7 @@ const Interno: React.FC = () => {
           </IonToolbar>
         </IonHeader>
 
-        <InternoComponent roomID={room} />
+        <InternoComponent usuario={otherUser} roomID={room} />
       </IonContent>
 
       {showProfileModal && (

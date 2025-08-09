@@ -26,6 +26,7 @@ import { onValue } from "firebase/database";
 import { useEffect, useState } from "react";
 
 import { Grupo as GrupoComponent } from "@/components/Chat/Grupos/Grupo/Grupo";
+import { useAppExitTracker } from "@/hooks/useAppExitTracker";
 import { useSelector } from "react-redux";
 
 const Grupo: React.FC = () => {
@@ -37,7 +38,7 @@ const Grupo: React.FC = () => {
 
   const [removed, setRemoved] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [isWriting, setIsWriting] = useState(false);
+  const [isWriting, setIsWriting] = useState<any>(null);
 
   const [grupo, setGrupo] = useState({ grupo: "", photo: "" });
 
@@ -56,7 +57,7 @@ const Grupo: React.FC = () => {
       const isWriting = users.find(
         (usario: any) => usario.writing && usario.id != user.id
       );
-      setIsWriting(isWriting ?? false);
+      setIsWriting(isWriting ?? null);
 
     });
   };
@@ -110,6 +111,8 @@ const Grupo: React.FC = () => {
     };
   }, []);
 
+  const appExitTracker = useAppExitTracker( onExit );
+
   return (
     <IonPage>
       <IonHeader>
@@ -148,7 +151,7 @@ const Grupo: React.FC = () => {
           <div className={styles["title-container"]}>
             <IonTitle className="title">{grupo.grupo}</IonTitle>{" "}
             {isWriting ? (
-              <span className={styles["status"]}>Escribiendo...</span>
+              <span className={styles["status"]}>{isWriting.name} Escribiendo...</span>
             ) : null}{" "}
           </div>
 

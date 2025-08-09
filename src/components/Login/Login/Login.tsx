@@ -58,7 +58,7 @@ export const Login = () => {
         password,
         device: "app",
       });
-      /*
+/*
       const token = await FCM.getToken();
       console.log("FCM Token:", token.token);
 

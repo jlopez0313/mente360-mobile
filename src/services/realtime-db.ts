@@ -1,4 +1,12 @@
-import { get, push, ref, remove, set, update } from "firebase/database";
+import {
+  get,
+  onDisconnect,
+  push,
+  ref,
+  remove,
+  set,
+  update,
+} from "firebase/database";
 import { rtDatabase } from "../firebase/config";
 
 export const writeData = (route: string, data: any) => {
@@ -41,4 +49,8 @@ export const snapshotToArray = (data: any) => {
   return data
     ? Object.keys(data).map((key) => ({ id: key, ...data[key] }))
     : [];
+};
+
+export const doDisconnect = (route: string, data: any) => {
+  onDisconnect(ref(rtDatabase, route)).update(data);
 };

@@ -7,6 +7,7 @@ import {
   snapshotToArray,
   writeData,
 } from "@/services/realtime-db";
+import { setRoom } from "@/store/slices/notificationSlice";
 import { IonAvatar, IonItem, IonNote, IonSkeletonText } from "@ionic/react";
 import { onValue } from "firebase/database";
 import React, { useEffect, useState } from "react";
@@ -82,8 +83,8 @@ export const Item: React.FC<any> = ({ usuario }) => {
   };
 
   const onCheckUnreads = () => {
-    if (unreads == 0) {
-      // dispatch(setRoom(false));
+    if (unreads != 0) {
+      dispatch(setRoom(true));
     }
   };
 

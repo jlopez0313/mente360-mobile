@@ -15,9 +15,9 @@ import styles from "./Chat.module.scss";
 import { IonIcon } from "@ionic/react";
 import { arrowBack } from "ionicons/icons";
 
-import { Chat as ChatComponent } from "@/components/Chat/Chat/Chat";
+import { Chat as ChatComponent } from "@/components/Chat/Chat/Lista/Chat";
 import { Comunidad as ComunidadComponent } from "@/components/Chat/Comunidad/Comunidad";
-import { Grupos as GruposComponent } from "@/components/Chat/Grupos/Grupos";
+import { Grupos as GruposComponent } from "@/components/Chat/Grupos/Lista/Grupos";
 import { Footer } from "@/components/Footer/Footer";
 import { Link, useHistory } from "react-router-dom";
 

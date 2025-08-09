@@ -6,6 +6,7 @@ import {
   snapshotToArray,
   writeData,
 } from "@/services/realtime-db";
+import { setGrupo } from "@/store/slices/notificationSlice";
 import {
   IonAvatar,
   IonItem,
@@ -14,7 +15,7 @@ import {
 } from "@ionic/react";
 import { onValue } from "firebase/database";
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import styles from "./Grupos.module.scss";
 
@@ -22,6 +23,7 @@ export const Item: React.FC<any> = ({ grupo }) => {
   const baseURL = import.meta.env.VITE_BASE_BACK;
 
   const history = useHistory();
+  const dispatch = useDispatch();
   const { user } = useSelector( (state: any) => state.user);
 
   const [isLoading, setIsLoading] = useState(true);
@@ -74,16 +76,26 @@ export const Item: React.FC<any> = ({ grupo }) => {
 
       const lastMsg = listaMensajes.pop();
       if (lastMsg) {
-        const data = await getData(`users/${lastMsg.user.id}`);
+        const data = await getData(`users/${lastMsg.user}`);
         const userData = data.val();
         setLastMsg({ ...lastMsg, from: { ...userData } });
       }
     });
   };
 
+  const onCheckUnreads = () => {
+    if (unreads != 0) {
+      dispatch(setGrupo(true));
+    }
+  };
+
   useEffect(() => {
     onCheckStatus();
   }, []);
+
+  useEffect(() => {
+    onCheckUnreads();
+  }, [unreads]);
 
   return (
     <IonItem

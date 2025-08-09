@@ -2,17 +2,23 @@ import { getArrayData, getData } from "@/services/realtime-db";
 import { IonItemGroup, IonList, IonSearchbar } from "@ionic/react";
 import { useEffect, useState } from "react";
 
-import { useSelector } from "react-redux";
+import { setRoom } from "@/store/slices/notificationSlice";
+import { useDispatch, useSelector } from "react-redux";
 import styles from "./Chat.module.scss";
 import { Item } from "./Item";
 
 export const Chat = () => {
+
   const { user } = useSelector( (state: any) => state.user);
+  const dispatch = useDispatch();
 
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
 
   const onGetRooms = async () => {
+    
+    dispatch(setRoom(false));
+
     const rooms = await getArrayData(`users/${user.id}/rooms`);
 
     const usuarios: any = [];

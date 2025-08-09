@@ -1,7 +1,5 @@
-import Avatar from "@/assets/images/avatar.jpg";
 import { getData, removeData, writeData } from "@/services/realtime-db";
 import {
-  IonAvatar,
   IonIcon,
   IonItem,
   IonItemOption,
@@ -9,28 +7,23 @@ import {
   IonItemSliding,
   IonModal,
   IonPopover,
-  IonSkeletonText,
   IonText,
 } from "@ionic/react";
 import EmojiPicker, { SkinTonePickerLocation } from "emoji-picker-react";
 import { returnUpBack } from "ionicons/icons";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import styles from "./Grupo.module.scss";
+import styles from "./Interno.module.scss";
 
 export const Item: React.FC<any> = ({
-  msg,
-  grupoID,
   idx,
+  roomID,
   setReplyTo,
-  usuarios,
+  msg,
+  usuario,
+  closeFromParent,
 }) => {
-  const baseURL = import.meta.env.VITE_BASE_BACK;
   const { user } = useSelector((state: any) => state.user);
-
-  const [isLoading, setIsLoading] = useState(true);
-  const [usuario, setUsuario] = useState<any>({});
-  const [otherUser, setOtherUser] = useState<any>({});
 
   const [touchStartY, setTouchStartY] = useState<number | null>(null);
   const [showEmojiModal, setShowEmojiModal] = useState(false);
@@ -100,7 +93,7 @@ export const Item: React.FC<any> = ({
   };
 
   const reactToMessage = async (messageId: string | null, emoji: string) => {
-    const reactionPath = `grupos/${grupoID}/messages/${messageId}/reactions/${user.id}`;
+    const reactionPath = `rooms/${roomID}/messages/${messageId}/reactions/${user.id}`;
 
     const snapshot = await getData(reactionPath);
     const currentReaction = snapshot.exists() ? snapshot.val() : null;
@@ -126,28 +119,17 @@ export const Item: React.FC<any> = ({
     return grouped;
   };
 
-  useEffect(() => {
-    const onGetUser = () => {
-      setUsuario(usuarios.find((u: any) => u.id == msg.user));
-    };
-
-    const onGetOtherUser = () => {
-      setOtherUser(usuarios.find((u: any) => u.id == msg.reply?.from) ?? {});
-    };
-
-    onGetUser();
-    onGetOtherUser();
-  }, [usuarios]);
-
   return (
     <IonItemSliding
+      key={idx}
       onIonDrag={(e) => {
         const detail = (e as CustomEvent).detail;
         if (detail.ratio < -1.75) {
           (e.target as HTMLIonItemSlidingElement).close();
-          setReplyTo({ ...msg, index: idx, reply: { from: msg.user } });
+          setReplyTo({ ...msg, reply: { from: msg.user }, index: idx });
         }
       }}
+      onClick={closeFromParent}
     >
       <IonItem
         id={`msg-${idx}`}
@@ -159,26 +141,6 @@ export const Item: React.FC<any> = ({
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        {msg.user !== user.id && (
-          <IonAvatar aria-hidden="true" slot="start">
-            {isLoading && (
-              <IonSkeletonText
-                animated
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  borderRadius: "50%",
-                }}
-              />
-            )}
-            <img
-              alt=""
-              src={usuario?.photo ? baseURL + usuario.photo : Avatar}
-              style={{ display: isLoading ? "none" : "block" }}
-              onLoad={() => setIsLoading(false)}
-            />
-          </IonAvatar>
-        )}
         <div>
           {msg.reply && (
             <div
@@ -186,19 +148,17 @@ export const Item: React.FC<any> = ({
               onClick={() => onScrollToMessage(msg)}
             >
               <IonText color="medium" className={styles["reply-name"]}>
-                {msg.reply.from == user.id ? "Tu" : otherUser.name}
+                {msg.reply.from == user.id ? "Tu" : usuario.name}
               </IonText>
               <IonText color="medium" className={styles["reply-text"]}>
                 {msg.reply.mensaje}
               </IonText>
             </div>
           )}
-
-          {msg.user !== user.id && (
-            <span className={styles["name"]}> {usuario?.name} </span>
-          )}
-          <IonText className={styles["message"]}> {msg.mensaje} </IonText>
-          <span className={styles["time"]}> {msg.hora} </span>
+          <div>
+            <IonText className={styles["message"]}> {msg.mensaje} </IonText>
+            <span className={styles["time"]}> {msg.hora} </span>
+          </div>
         </div>
       </IonItem>
 
@@ -239,6 +199,8 @@ export const Item: React.FC<any> = ({
       </IonPopover>
 
       <IonModal
+        handleBehavior="cycle"
+        canDismiss={true}
         isOpen={showEmojiModal}
         className={styles["emoji-modal"]}
         initialBreakpoint={0.75}

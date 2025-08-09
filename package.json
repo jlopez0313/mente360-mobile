@@ -45,6 +45,7 @@
     "canvas-confetti": "^1.9.3",
     "capacitor-music-controls-plugin": "^6.0.1",
     "dayjs": "^1.11.13",
+    "emoji-picker-react": "^4.12.2",
     "epayco-sdk-node": "^1.4.2",
     "firebase": "^10.12.3",
     "framer-motion": "^12.7.4",

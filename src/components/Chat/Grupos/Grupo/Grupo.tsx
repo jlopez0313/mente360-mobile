@@ -13,31 +13,42 @@ import {
   IonItemGroup,
   IonList,
   IonRow,
+  IonText,
   IonTextarea,
 } from "@ionic/react";
 import { onValue } from "firebase/database";
-import { sendOutline } from "ionicons/icons";
+import { close, sendOutline } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import styles from "./Grupo.module.scss";
 import { Item } from "./Item";
 
 export const Grupo: React.FC<any> = ({ grupoID, grupo, removed }) => {
-  const { user } = useSelector( (state: any) => state.user);
+  const { user } = useSelector((state: any) => state.user);
   const [mensaje, setMensaje] = useState("");
+  const [replyTo, setReplyTo] = useState<any>(null);
 
   const chatListRef = useRef<HTMLIonListElement>(null);
 
   const [isScrolledUp, setIsScrolledUp] = useState(false);
   const [messagesList, setMessagesList] = useState<any>([]);
   const [usuarios, setUsuarios] = useState<any>([]);
+  const [otherUser, setOtherUser] = useState<any>({});
+
+  const onGetOtherUser = () => {
+    setOtherUser(
+      replyTo?.reply?.from == user.id
+        ? { name: "Tu" }
+        : usuarios.find((u: any) => u.id == replyTo?.reply?.from) ?? {}
+    );
+  };
 
   const onGetChat = async () => {
     onValue(readData("users"), (snapshot) => {
       const lista = snapshotToArray(snapshot.val());
       setUsuarios(lista);
     });
-    
+
     onValue(readData("grupos/" + grupoID + "/messages"), (snapshot) => {
       const messagesList = snapshotToArray(snapshot.val());
       setMessagesList(messagesList);
@@ -57,9 +68,15 @@ export const Grupo: React.FC<any> = ({ grupoID, grupo, removed }) => {
         }),
         date: fecha.toISOString(),
         mensaje,
+        reply: {
+          from: replyTo?.user ?? null,
+          mensaje: replyTo?.mensaje ?? null,
+          index: replyTo?.index ?? null,
+        },
       };
 
       setMensaje("");
+      setReplyTo(null);
 
       const otherUsers = grupo.users.filter((x: any) => x.id != user.id) || [];
 
@@ -81,6 +98,8 @@ export const Grupo: React.FC<any> = ({ grupoID, grupo, removed }) => {
         writeData(`grupos/${grupoID}/users/${user.id}/writing`, false),
         sendPushPromise,
       ]);
+
+      requestAnimationFrame(() => scrollToBottom());
     } catch (error) {
       console.error("Error enviando mensaje al grupo:", error);
     }
@@ -101,7 +120,7 @@ export const Grupo: React.FC<any> = ({ grupoID, grupo, removed }) => {
       const scrollContainer = chatListRef.current;
       scrollContainer.scrollTo({
         top: scrollContainer.scrollHeight,
-        behavior: "smooth",
+        behavior: "auto",
       });
     }
   };
@@ -109,7 +128,7 @@ export const Grupo: React.FC<any> = ({ grupoID, grupo, removed }) => {
   const handleScroll = (e: any) => {
     const element = e.target;
     const isAtBottom =
-      element.scrollHeight - element.scrollTop === element.clientHeight;
+      element.scrollHeight - element.scrollTop - element.clientHeight < 50;
     setIsScrolledUp(!isAtBottom);
   };
 
@@ -120,6 +139,10 @@ export const Grupo: React.FC<any> = ({ grupoID, grupo, removed }) => {
       });
     }
   }, [messagesList, isScrolledUp]);
+
+  useEffect(() => {
+    onGetOtherUser();
+  }, [replyTo]);
 
   useEffect(() => {
     onGetChat();
@@ -135,7 +158,16 @@ export const Grupo: React.FC<any> = ({ grupoID, grupo, removed }) => {
       >
         <IonItemGroup>
           {messagesList.map((msg: any, idx: number) => {
-            return <Item key={idx} msg={msg} usuarios={usuarios} />;
+            return (
+              <Item
+                key={idx}
+                idx={idx}
+                msg={msg}
+                usuarios={usuarios}
+                grupoID={grupoID}
+                setReplyTo={setReplyTo}
+              />
+            );
           })}
         </IonItemGroup>
       </IonList>
@@ -150,13 +182,29 @@ export const Grupo: React.FC<any> = ({ grupoID, grupo, removed }) => {
         <IonRow className={styles["chatbox"]}>
           <IonCol size="10">
             <IonItem lines="none">
-              <IonTextarea
-                rows={1}
-                placeholder="Mensaje..."
-                onIonInput={onCheckInput}
-                value={mensaje}
-                autoGrow={true}
-              />
+              <div className={styles["wrapper"]}>
+                {replyTo && (
+                  <div className={styles["reply-bar"]}>
+                    <IonText
+                      color="medium"
+                      className={`ion-text-truncate ${styles["name"]}`}
+                    >
+                      {otherUser.name}
+                    </IonText>
+                    <IonText color="medium" className="ion-text-truncate">
+                      {replyTo.mensaje}
+                    </IonText>
+                    <IonIcon icon={close} onClick={() => setReplyTo(null)} />
+                  </div>
+                )}
+                <IonTextarea
+                  rows={1}
+                  placeholder="Mensaje..."
+                  onIonInput={onCheckInput}
+                  value={mensaje}
+                  autoGrow={true}
+                />
+              </div>
             </IonItem>
           </IonCol>
           <IonCol size="2">

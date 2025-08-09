@@ -17,19 +17,28 @@ import {
   IonTextarea,
 } from "@ionic/react";
 import { onValue } from "firebase/database";
-import { sendOutline } from "ionicons/icons";
+import { close, sendOutline } from "ionicons/icons";
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import styles from "./Interno.module.scss";
+import { Item } from "./Item";
 
-export const Interno: React.FC<any> = ({ roomID }) => {
-  const { user } = useSelector( (state: any) => state.user);
+export const Interno: React.FC<any> = ({ usuario, roomID }) => {
+  const { user } = useSelector((state: any) => state.user);
   const [mensaje, setMensaje] = useState("");
 
   const chatListRef = useRef<HTMLIonListElement>(null);
 
   const [isScrolledUp, setIsScrolledUp] = useState(false);
+  const [replyTo, setReplyTo] = useState<any>(null);
   const [messagesList, setMessagesList] = useState<any>([]);
+  const [otherUser, setOtherUser] = useState<any>({});
+
+  const onGetOtherUser = () => {
+    setOtherUser(
+      replyTo?.reply?.from == user.id ? { name: "Tu" } : { ...usuario }
+    );
+  };
 
   const onGetChat = async () => {
     onValue(readData("rooms/" + roomID + "/messages"), (snapshot) => {
@@ -51,9 +60,15 @@ export const Interno: React.FC<any> = ({ roomID }) => {
         }),
         date: fecha.toISOString(),
         mensaje,
+        reply: {
+          from: replyTo?.user ?? null,
+          mensaje: replyTo?.mensaje ?? null,
+          index: replyTo?.index ?? null,
+        },
       };
 
       setMensaje("");
+      setReplyTo(null);
 
       const otherUsers =
         roomID.split("_").filter((x: any) => x != String(user.id)) || [];
@@ -76,6 +91,8 @@ export const Interno: React.FC<any> = ({ roomID }) => {
         writeData(`rooms/${roomID}/users/${user.id}/writing`, false),
         sendPushPromise,
       ]);
+
+      requestAnimationFrame(() => scrollToBottom());
     } catch (error) {
       console.error("Error enviando mensaje:", error);
     }
@@ -93,7 +110,7 @@ export const Interno: React.FC<any> = ({ roomID }) => {
       const scrollContainer = chatListRef.current;
       scrollContainer.scrollTo({
         top: scrollContainer.scrollHeight,
-        behavior: "smooth",
+        behavior: "auto",
       });
     }
   };
@@ -101,7 +118,7 @@ export const Interno: React.FC<any> = ({ roomID }) => {
   const handleScroll = (e: any) => {
     const element = e.target;
     const isAtBottom =
-      element.scrollHeight - element.scrollTop === element.clientHeight;
+      element.scrollHeight - element.scrollTop - element.clientHeight < 50;
     setIsScrolledUp(!isAtBottom);
   };
 
@@ -114,11 +131,16 @@ export const Interno: React.FC<any> = ({ roomID }) => {
   }, [messagesList, isScrolledUp]);
 
   useEffect(() => {
+    onGetOtherUser();
+  }, [replyTo]);
+
+  useEffect(() => {
     onGetChat();
   }, []);
 
   return (
     <div className={`${styles["ion-content"]}`}>
+
       <IonList
         ref={chatListRef}
         className={`ion-padding`}
@@ -128,21 +150,14 @@ export const Interno: React.FC<any> = ({ roomID }) => {
         <IonItemGroup>
           {messagesList.map((msg: any, idx: number) => {
             return (
-              <IonItem
+              <Item
                 key={idx}
-                button={true}
-                className={`${styles["message"]} ${
-                  msg.user === user.id ? styles["sender"] : styles["receiver"]
-                } `}
-              >
-                <div>
-                  <IonText className={styles["message"]}>
-                    {" "}
-                    {msg.mensaje}{" "}
-                  </IonText>
-                  <span className={styles["time"]}> {msg.hora} </span>
-                </div>
-              </IonItem>
+                idx={idx}
+                setReplyTo={setReplyTo}
+                msg={msg}
+                roomID={roomID}
+                usuario={usuario}
+              />
             );
           })}
         </IonItemGroup>
@@ -151,13 +166,29 @@ export const Interno: React.FC<any> = ({ roomID }) => {
       <IonRow className={styles["chatbox"]}>
         <IonCol size="10">
           <IonItem lines="none">
-            <IonTextarea
-              rows={1}
-              placeholder="Mensaje..."
-              onIonInput={onCheckInput}
-              value={mensaje}
-              autoGrow={true}
-            />
+            <div className={styles["wrapper"]}>
+              {replyTo && (
+                <div className={styles["reply-bar"]}>
+                  <IonText
+                    color="medium"
+                    className={`ion-text-truncate ${styles["name"]}`}
+                  >
+                    {otherUser.name}
+                  </IonText>
+                  <IonText color="medium" className="ion-text-truncate">
+                    {replyTo.mensaje}
+                  </IonText>
+                  <IonIcon icon={close} onClick={() => setReplyTo(null)} />
+                </div>
+              )}
+              <IonTextarea
+                rows={1}
+                placeholder="Mensaje..."
+                onIonInput={onCheckInput}
+                value={mensaje}
+                autoGrow={true}
+              />
+            </div>
           </IonItem>
         </IonCol>
         <IonCol size="2">

@@ -19,10 +19,9 @@ import {
   cogOutline,
   documentLockOutline,
   documentTextOutline,
-  downloadOutline,
   hammerOutline,
   peopleOutline,
-  trashOutline,
+  trashOutline
 } from "ionicons/icons";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -199,6 +198,7 @@ export const Configuracion = () => {
           <IonIcon slot="start" icon={hammerOutline} />
           <IonLabel>Soporte</IonLabel>
         </IonItem>
+{/* 
 
         <IonItem
           lines="none"
@@ -217,7 +217,7 @@ export const Configuracion = () => {
           <IonIcon slot="start" icon={downloadOutline} />
           <IonLabel>Backup JSON</IonLabel>
         </IonItem>
-
+*/}
         <IonItem
           lines="none"
           className={"ion-margin-bottom"}
