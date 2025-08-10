@@ -38,7 +38,7 @@ export const add = async( payload: {} ): Promise<any> => {
     })
 }
 
-export const trash = async( id: string ): Promise<any> => {
+export const trash = async( id: number ): Promise<any> => {
 
     return new Promise( async (resolve, reject) => {
         const { remove } = baseApi();

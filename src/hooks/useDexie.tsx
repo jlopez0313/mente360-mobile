@@ -4,10 +4,12 @@ import Clips from "@/database/clips";
 import Crecimientos from "@/database/crecimientos";
 import Eneatipos from "@/database/eneatipos";
 import Generos from "@/database/generos";
+import Likes from "@/database/likes";
 import Mensajes from "@/database/mensajes";
 import Niveles from "@/database/niveles";
 import Playlist from "@/database/playlist";
 import Tareas from "@/database/tareas";
+import UsuariosClips from "@/database/usuarios_clips";
 
 import Dexie, { Table } from "dexie";
 
@@ -18,10 +20,12 @@ export class Mente360DB extends Dexie {
   crecimientos!: Table<Crecimientos, number>;
   eneatipos!: Table<Eneatipos, number>;
   generos!: Table<Generos, number>;
+  likes!: Table<Likes, number>;
   mensajes!: Table<Mensajes, number>;
   niveles!: Table<Niveles, number>;
   playlist!: Table<Playlist, number>;
   tareas!: Table<Tareas, number>;
+  usuarios_clips!: Table<UsuariosClips, number>;
 
   constructor() {
     super("Mente360DB");
@@ -32,10 +36,12 @@ export class Mente360DB extends Dexie {
       crecimientos: "++id",
       eneatipos: "++id",
       generos: "++id",
+      likes: "++id,users_id,clips_id",
       mensajes: "++id",
       niveles: "++id,orden",
       playlist: "++id,users_id",
       tareas: "++id",
+      usuarios_clips: "++id,users_id,clips_id",
     });
   }
 }

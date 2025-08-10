@@ -6,7 +6,6 @@ import { setListAudios, setShowGlobalAudio } from "@/store/slices/audioSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { Item } from "./Item";
 
-import { useDB } from "@/context/Context";
 import { db } from "@/hooks/useDexie";
 import { useNetwork } from "@/hooks/useNetwork";
 import { useLiveQuery } from "dexie-react-hooks";
@@ -14,11 +13,8 @@ import { useLiveQuery } from "dexie-react-hooks";
 export const Playlist = () => {
   const dispatch = useDispatch();
 
-  const { sqlite } = useDB();
   const network = useNetwork();
   const { user } = useSelector((state: any) => state.user);
-
-  const { listAudios, globalAudio } = useSelector((state: any) => state.audio);
 
   const [search, setSearch] = useState<any>("");
 
@@ -28,11 +24,23 @@ export const Playlist = () => {
         .where("users_id")
         .equals(user.id)
         .toArray()
-        .then((lista) =>
-          lista.map((item: any) => {
-            return item.clip;
-          })
-        ),
+        .then((resultados) =>
+          resultados.filter((c) =>
+            c?.clip && c.clip.titulo.toLowerCase().includes(search.toLowerCase())
+          )
+        )
+        .then((lista) => {
+          const results = lista
+            .filter((item) => item?.clip)
+            .map((item: any) => {
+              return item.clip;
+            })
+            .sort((a, b) => a?.titulo.localeCompare(b?.titulo));
+
+          dispatch(setListAudios([...results]));
+
+          return results;
+        }),
     [search]
   );
 
@@ -40,34 +48,9 @@ export const Playlist = () => {
     setSearch(e.target.value);
   };
 
-  const onUpdateList = () => {
-    if (!listAudios.length) {
-      dispatch(setListAudios(playlist?.map((clip: any) => clip.clip)));
-    }
-  };
-
-  const onSetClips = (idx: number, item: any) => {
-    let lista = [...(playlist ?? [])];
-
-    if (!item) {
-      lista = lista.slice(idx, 1);
-    } else {
-      lista[idx] = { ...item };
-    }
-
-    console.log(idx, lista);
-    // setFilteredPlaylist(lista);
-  };
-
   useEffect(() => {
-    if (sqlite.initialized) {
-      dispatch(setShowGlobalAudio(true));
-    }
-  }, [sqlite.initialized]);
-
-  useEffect(() => {
-    globalAudio && onUpdateList();
-  }, [globalAudio]);
+    dispatch(setShowGlobalAudio(true));
+  }, []);
 
   return (
     <div className={styles["ion-content"]}>
@@ -84,16 +67,7 @@ export const Playlist = () => {
       <IonList className="ion-no-padding ion-margin-bottom" lines="none">
         {playlist?.map((item: any, idx: any) => {
           if (item)
-            return (
-              <Item
-                key={idx}
-                item={item}
-                idx={idx}
-                sqlite={sqlite}
-                network={network}
-                onSetClips={onSetClips}
-              />
-            );
+            return <Item key={idx} item={item} idx={idx} network={network} />;
         })}
       </IonList>
     </div>

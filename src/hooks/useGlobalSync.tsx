@@ -11,9 +11,6 @@ import { all as getAllPlaylist } from "@/services/playlist";
 import { useState } from "react";
 import { useNetwork } from "./useNetwork";
 
-import LikesDB from "@/database/likes";
-import ClipsUsuariosDB from "@/database/usuarios_clips";
-
 import { useDB } from "@/context/Context";
 import { db } from "@/hooks/useDexie";
 import { usePreferences } from "@/hooks/usePreferences";
@@ -270,18 +267,11 @@ export const useGlobalSync = () => {
     if ( batch.crecimientos?.length ) 
       await db.crecimientos.bulkPut(batch.crecimientos);
 
-    // const clipsDB = new ClipsDB(sqlite.db);
-    const ucDB = new ClipsUsuariosDB(sqlite.db);
-    const likesDB = new LikesDB(sqlite.db);
+    if ( batch.usuarios_clips?.length ) 
+      await db.usuarios_clips.bulkPut(batch.usuarios_clips);
 
-    await sqlite.performSQLAction(async () => {
-      await Promise.all([
-        batch.usuarios_clips?.length &&
-          ucDB.create(sqlite.performSQLAction, () => {}, batch.usuarios_clips),
-        batch.likes?.length &&
-          likesDB.create(sqlite.performSQLAction, () => {}, batch.likes),
-      ]);
-    });
+    if ( batch.likes?.length ) 
+      await db.likes.bulkPut(batch.likes);
   }
 
   const syncClipsTrashed = async () => {

@@ -36,27 +36,46 @@ import { useHistory } from "react-router";
 import AudioNoWifi from "@/assets/images/audio_no_wifi.jpg";
 import MusicBar from "@/components/Shared/MusicBar/MusicBar";
 // import ClipsDB from "@/database/clips";
-import LikesDB from "@/database/likes";
+import Likes from "@/database/likes";
 import { useAudio } from "@/hooks/useAudio";
 import { db } from '@/hooks/useDexie';
 import { dislike, like } from "@/services/likes";
 import { trash } from "@/services/playlist";
+import { useLiveQuery } from "dexie-react-hooks";
 
 export const Item: React.FC<any> = ({
   idx,
   item,
-  sqlite,
   network,
-  onSetClips,
 }) => {
-  const { performSQLAction } = sqlite;
-
   const { user } = useSelector( (state: any) => state.user);
   const history = useHistory();
   const dispatch = useDispatch();
 
   const { baseURL, globalAudio, isGlobalPlaying } = useSelector(
     (state: any) => state.audio
+  );
+
+  const in_my_playlist = useLiveQuery(
+    () =>
+      db.playlist
+        .where("users_id")
+        .equals(user.id)
+        .and((playlist: any) => playlist?.clip?.id === globalAudio.id)
+        .first(),
+    [globalAudio]
+  );
+
+  const likes = useLiveQuery(() =>
+    db.likes.where("clips_id").equals(item.id).toArray()
+  );
+
+  const my_like = useLiveQuery(() =>
+    db.likes
+      .where("users_id")
+      .equals(user.id)
+      .and((like: Likes) => like.clips_id === item.id)
+      .first()
   );
 
   const audioRef = useRef();
@@ -98,19 +117,16 @@ export const Item: React.FC<any> = ({
         message: "Cargando ...",
       });
 
-      await trash(item.id);
-      await db.playlist.where('id').equals(item.id).delete();
+      await trash(in_my_playlist?.id ?? 0);
+      await db.playlist.where('id').equals(in_my_playlist?.id ?? 0).delete();
 
       const newItem = {
         ...item,
-        in_my_playlist: null,
       };
 
       if (globalAudio?.id == item.id) {
-        dispatch(setGlobalAudio({ newItem }));
+        dispatch(setGlobalAudio(newItem));
       }
-
-      onSetClips(idx);
     } catch (error: any) {
       console.log(error);
 
@@ -131,24 +147,17 @@ export const Item: React.FC<any> = ({
         message: "Cargando ...",
       });
 
-      await dislike(item.my_like);
-
-      const likes = new LikesDB(db);
-      await likes.delete(performSQLAction, () => {}, item.my_like);
+      await dislike(my_like?.id ?? 0);
+      await db.likes.where("id").equals(my_like?.id ?? 0).delete();
 
       const newItem = {
         ...item,
-        all_likes: item.all_likes - 1,
-        my_like: null,
       };
 
       if (globalAudio?.id == item.id) {
         dispatch(setGlobalAudio(newItem));
       }
 
-      onSetClips(idx, newItem);
-
-      // onGetClips();
     } catch (error: any) {
       console.log(error);
 
@@ -178,25 +187,19 @@ export const Item: React.FC<any> = ({
         data: { data: added },
       } = await like(data);
 
-      const likesDB = new LikesDB(db);
-      await likesDB.create(performSQLAction, () => {}, [
-        {
-          ...data,
-          id: added.id,
-        },
-      ]);
+      await db.likes.add({
+        ...data,
+        id: added.id,
+      });
 
       const newItem = {
         ...item,
-        all_likes: item.all_likes + 1,
-        my_like: added.id,
       };
 
       if (globalAudio?.id == item.id) {
         dispatch(setGlobalAudio(newItem));
       }
 
-      onSetClips(idx, newItem);
     } catch (error: any) {
       console.log(error);
 
@@ -231,14 +234,13 @@ export const Item: React.FC<any> = ({
       const ruta = "RUTA__RUTA";
       */
       console.log("Ruta es ", ruta);
-/*
-      const clipsDB = new ClipsDB(db);
-      await clipsDB.download(performSQLAction, () => {}, {
-        id: item.id,
-        imagen: item.imagen,
-        audio: ruta,
+      
+      await db.clips.update(item.id, {
+        imagen_local: item.imagen,
+        audio_local: ruta,
+        downloaded: 1,
       });
-*/
+
       dispatch(
         setAudioItem({
           index: idx,
@@ -261,10 +263,13 @@ export const Item: React.FC<any> = ({
   };
 
   const onRemoveLocal = async () => {
-    /*
-    const clipsDB = new ClipsDB(db);
-    await clipsDB.unload(performSQLAction, () => {}, { id: item.id });
-*/
+
+    await db.crecimientos.update(item.id, {
+      imagen_local: "",
+      audio_local: "",
+      downloaded: 0,
+    });
+
     await deleteAudio(item.audio_local);
 
     onPresentToast(
@@ -300,9 +305,9 @@ export const Item: React.FC<any> = ({
       buttons: [
         {
           disabled: !network.status,
-          text: item.all_likes > 0 ? item.all_likes + " Me gusta" : "Me gusta",
-          icon: item.my_like ? heart : heartOutline,
-          handler: () => (item.my_like ? onDislike() : onLike()),
+          text: likes && likes.length > 0 ? likes.length + " Me gusta" : "Me gusta",
+          icon: my_like ? heart : heartOutline,
+          handler: () => (my_like ? onDislike() : onLike()),
         },
         {
           disabled: !network.status,

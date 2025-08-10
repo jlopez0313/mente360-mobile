@@ -46,11 +46,12 @@ import { create, updateElapsed } from "@/helpers/musicControls";
 
 import AudioProgressCircle from "@/components/Shared/Animations/ProgressCircle/ProgressCircle";
 // import ClipsDB from "@/database/clips";
-import LikesDB from "@/database/likes";
+import Likes from "@/database/likes";
 import { db } from "@/hooks/useDexie";
 import { useNetwork } from "@/hooks/useNetwork";
 import { dislike, like } from "@/services/likes";
 import { add, trash } from "@/services/playlist";
+import { useLiveQuery } from "dexie-react-hooks";
 
 export const Clip = () => {
   const { user } = useSelector((state: any) => state.user);
@@ -67,6 +68,31 @@ export const Clip = () => {
 
   const { audioSrc, globalAudio, globalPos, listAudios } = useSelector(
     (state: any) => state.audio
+  );
+
+  const likes = useLiveQuery(
+    () => db.likes.where("clips_id").equals(globalAudio.id).toArray(),
+    [globalAudio]
+  );
+
+  const in_my_playlist = useLiveQuery(
+    () =>
+      db.playlist
+        .where("users_id")
+        .equals(user.id)
+        .and((playlist: any) => playlist?.clip?.id === globalAudio.id)
+        .first(),
+    [globalAudio]
+  );
+
+  const my_like = useLiveQuery(
+    () =>
+      db.likes
+        .where("users_id")
+        .equals(user.id)
+        .and((like: Likes) => like.clips_id === globalAudio.id)
+        .first(),
+    [globalAudio]
   );
 
   const audioRef = useRef<any>();
@@ -127,13 +153,11 @@ export const Clip = () => {
       console.log("Ruta es ", ruta);
       setPercent(0);
 
-      /*const clipsDB = new ClipsDB(db);
-      await clipsDB.download(performSQLAction, () => { }, {
-        id: globalAudio.id,
-        imagen: globalAudio.imagen,
-        audio: ruta,
+      await db.clips.update(globalAudio.id, {
+        imagen_local: globalAudio.imagen,
+        audio_local: ruta,
+        downloaded: 1,
       });
-      */
 
       dispatch(
         setAudioItem({
@@ -157,10 +181,11 @@ export const Clip = () => {
   };
 
   const onRemoveLocal = async () => {
-    /*
-    const clipsDB = new ClipsDB(db);
-    await clipsDB.unload(performSQLAction, () => { }, { id: globalAudio.id });
-    */
+    await db.clips.update(globalAudio.id, {
+      imagen_local: '',
+      audio_local: '',
+      downloaded: 0,
+    });
 
     await deleteAudio(globalAudio.audio_local);
 
@@ -190,16 +215,19 @@ export const Clip = () => {
         message: "Cargando ...",
       });
 
-      await trash(globalAudio.in_my_playlist);
+      await trash(in_my_playlist?.id ?? 0);
 
-      await db.playlist.where("id").equals(globalAudio.in_my_playlist).delete();
+      await db.playlist
+        .where("id")
+        .equals(in_my_playlist?.id ?? 0)
+        .delete();
 
       const newItem = {
         ...globalAudio,
-        in_my_playlist: null,
       };
 
-      dispatch(setGlobalAudio({ newItem }));
+      dispatch(setGlobalAudio(newItem));
+
     } catch (error: any) {
       console.log(error);
 
@@ -236,7 +264,6 @@ export const Clip = () => {
 
       const newItem = {
         ...globalAudio,
-        in_my_playlist: added.id,
       };
 
       dispatch(setGlobalAudio(newItem));
@@ -260,15 +287,14 @@ export const Clip = () => {
         message: "Cargando ...",
       });
 
-      await dislike(globalAudio.my_like);
-
-      const likes = new LikesDB(db);
-      // await likes.delete(performSQLAction, () => {}, globalAudio.my_like);
+      await dislike(my_like?.id ?? 0);
+      await db.likes
+        .where("id")
+        .equals(my_like?.id ?? 0)
+        .delete();
 
       const newItem = {
         ...globalAudio,
-        all_likes: globalAudio.all_likes - 1,
-        my_like: null,
       };
 
       dispatch(setGlobalAudio(newItem));
@@ -301,20 +327,13 @@ export const Clip = () => {
         data: { data: added },
       } = await like(data);
 
-      const likesDB = new LikesDB(db);
-      /*
-      await likesDB.create(performSQLAction, () => {}, [
-        {
-          ...data,
-          id: added.id,
-        },
-      ]);
-      */
+      await db.likes.add({
+        ...data,
+        id: added.id,
+      });
 
       const newItem = {
         ...globalAudio,
-        all_likes: globalAudio.all_likes + 1,
-        my_like: added.id,
       };
 
       dispatch(setGlobalAudio(newItem));
@@ -414,7 +433,7 @@ export const Clip = () => {
         <IonCardHeader className="ion-no-padding">
           <IonCardSubtitle className="ion-no-padding">
             <IonText> {globalAudio.titulo} </IonText>
-            <span> {globalAudio.categoria} </span>
+            <span> {globalAudio.categoria?.categoria} </span>
           </IonCardSubtitle>
 
           <IonCardSubtitle className={"ion-no-padding"}>
@@ -437,28 +456,26 @@ export const Clip = () => {
               <IonChip
                 disabled={!network.status}
                 onClick={() =>
-                  globalAudio.in_my_playlist
-                    ? onTrashFromPlaylist()
-                    : onAddToPlaylist()
+                  in_my_playlist ? onTrashFromPlaylist() : onAddToPlaylist()
                 }
               >
                 <IonIcon
                   className={`${styles["share-icon"]}`}
-                  icon={globalAudio.in_my_playlist ? star : starOutline}
+                  icon={in_my_playlist ? star : starOutline}
                 />
                 Favoritos
               </IonChip>
 
               <IonChip
                 disabled={!network.status}
-                onClick={() => (globalAudio.my_like ? onDislike() : onLike())}
+                onClick={() => (my_like ? onDislike() : onLike())}
               >
                 <IonIcon
                   className={`${styles["share-icon"]}`}
-                  icon={globalAudio.my_like ? heart : heartOutline}
+                  icon={my_like ? heart : heartOutline}
                 />
-                {globalAudio.all_likes > 0
-                  ? globalAudio.all_likes + " Me gusta"
+                {likes && likes.length > 0
+                  ? likes.length + " Me gusta"
                   : "Me gusta"}
               </IonChip>
 

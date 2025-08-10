@@ -38,7 +38,7 @@ export const like = async( payload: {} ): Promise<any> => {
     })
 }
 
-export const dislike = async( id: string ): Promise<any> => {
+export const dislike = async( id: number ): Promise<any> => {
 
     return new Promise( async (resolve, reject) => {
         const { remove } = baseApi();

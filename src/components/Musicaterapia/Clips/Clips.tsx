@@ -7,27 +7,20 @@ import {
 } from "@ionic/react";
 import styles from "../Musicaterapia.module.scss";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-import { clearListAudios } from "@/store/slices/audioSlice";
-import { useDispatch, useSelector } from "react-redux";
-import { Item } from "./Item";
-
-// import ClipsDB from "@/database/clips";
-
-import { useDB } from "@/context/Context";
 import { db } from "@/hooks/useDexie";
 import { useNetwork } from "@/hooks/useNetwork";
+import { clearListAudios, setListAudios } from "@/store/slices/audioSlice";
 import { useLiveQuery } from "dexie-react-hooks";
+import { useDispatch, useSelector } from "react-redux";
+import { Item } from "./Item";
 
 export const Clips = () => {
   const dispatch = useDispatch();
 
   const { user } = useSelector((state: any) => state.user);
-  const { sqlite } = useDB();
   const network = useNetwork();
-
-  const { globalAudio, listAudios } = useSelector((state: any) => state.audio);
 
   const [categoria, setCategoria] = useState("All");
   const [chip, setChip] = useState<string>("0");
@@ -57,20 +50,15 @@ export const Clips = () => {
     const paginados = resultados.slice(0, limit);
 
     setHasMore(paginados.length < resultados.length);
+
+    dispatch(setListAudios([...paginados]));
+
     return paginados;
   }, [chip, page, search]);
 
   const onSetPage = (evt: any, page: any) => {
     if (hasMore) setPage(page);
     else evt.target.complete();
-  };
-
-  const onUpdateList = () => {
-    const tmpClips = clips?.map((item: any) => {
-      return item.id == globalAudio.id ? globalAudio : item;
-    });
-
-    // setClips([...tmpClips]);
   };
 
   const handleChipChange = (id: string) => {
@@ -99,25 +87,6 @@ export const Clips = () => {
       setPage(1);
     }
   };
-
-  const onSetClips = (idx: number, item: any) => {
-    /*
-    const lista = [...clips];
-    lista[idx] = {...item}
-
-    dispatch(setListAudios([...lista]))
-    */
-  };
-
-  useEffect(() => {
-    if (sqlite.initialized) {
-      globalAudio && onUpdateList();
-    }
-  }, [sqlite.initialized, globalAudio]);
-
-  useEffect(() => {
-    //setClips([...listAudios]);
-  }, [listAudios]);
 
   return (
     <>
@@ -161,9 +130,7 @@ export const Clips = () => {
                 key={idx}
                 idx={idx}
                 item={item}
-                sqlite={sqlite}
                 network={network}
-                onSetClips={onSetClips}
               />
             );
           })}
