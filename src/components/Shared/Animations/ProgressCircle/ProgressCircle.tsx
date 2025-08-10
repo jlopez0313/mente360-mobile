@@ -4,7 +4,7 @@ import React from "react";
 import styles from './ProgressCircle.module.scss';
 
 interface AudioProgressCircleProps {
-  progress: number;
+  
 }
 
 const AudioProgressCircle: React.FC<AudioProgressCircleProps> = () => {

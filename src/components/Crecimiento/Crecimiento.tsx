@@ -1,9 +1,7 @@
 import {
   IonProgressBar,
   IonSelect,
-  IonSelectOption,
-  useIonAlert,
-  useIonLoading,
+  IonSelectOption
 } from "@ionic/react";
 import { useEffect, useState } from "react";
 import { Audio } from "./Audio/Audio";
@@ -17,18 +15,16 @@ import { resetStore } from "@/store/slices/audioSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { Card } from "./Card/Card";
 
-import { useDB } from "@/context/Context";
-import CrecimientosDB from "@/database/crecimientos";
-import NivelesDB from "@/database/niveles";
+import { db } from "@/hooks/useDexie";
 import { useNetwork } from "@/hooks/useNetwork";
 import { usePayment } from "@/hooks/usePayment";
 import { setPodcast } from "@/store/slices/homeSlice";
 import { setUser } from "@/store/slices/userSlice";
+import { useLiveQuery } from "dexie-react-hooks";
 
 export const Crecimiento = () => {
   const dispatch = useDispatch();
 
-  const { sqlite } = useDB();
   const network = useNetwork();
 
   const [swiper, setSwiper] = useState({
@@ -37,18 +33,46 @@ export const Crecimiento = () => {
     slidePrev: () => {},
     slideNext: () => {},
   });
+  
 
-  const [present, dismiss] = useIonLoading();
-  const [presentAlert] = useIonAlert();
-
-  const { user } = useSelector( (state: any) => state.user);
+  const { user } = useSelector((state: any) => state.user);
   const { userEnabled, payment_status } = usePayment();
 
+  
   const [activeIdx, setActiveIdx] = useState(0);
   const [nivelID, setNivelID] = useState<any>(null);
   const [progress, setProgress] = useState(0);
-  const [niveles, setNiveles] = useState<any[]>([]);
-  const [crecimientos, setCrecimientos] = useState<any[]>([]);
+
+  const niveles = useLiveQuery(() => db.niveles.orderBy("orden").toArray());
+  
+  const crecimientos = useLiveQuery(
+    () =>
+      db.crecimientos
+        .toArray()
+        .then((lista) => {
+          swiper.slideTo(0);
+          return lista;
+        })
+        .then((resultados) => {
+          return resultados
+            .filter((r: any) => r.nivel?.id == Number(nivelID))
+            .map((item: any) => {
+              return { ...item, playing: false };
+            });
+        })
+        .then((resultados) => {
+          if (user.crecimientos_id) {
+            const idx = resultados.findIndex(
+              (x: any) => x.id == user.crecimientos_id
+            );
+            swiper.slideTo(idx);
+          }
+          
+          return resultados;
+        }),
+    [nivelID]
+  );
+
   const [crecimiento, setCrecimiento] = useState<any>({});
 
   const onSetNivel = async (level: any) => {
@@ -74,7 +98,7 @@ export const Crecimiento = () => {
     // BackgroundMode.disable();
     // destroy();
 
-    if (crecimientos.length) {
+    if (crecimientos?.length) {
       setActiveIdx(swiper.activeIndex + 1);
       setProgress((swiper.activeIndex + 1) / crecimientos.length);
       setCrecimiento(crecimientos[swiper.activeIndex]);
@@ -85,85 +109,17 @@ export const Crecimiento = () => {
     }
   };
 
-  const onGetNiveles = async () => {
-    try {
-      present({
-        message: "Cargando ...",
-        duration: 200,
-      });
-
-      const nivelesDB = new NivelesDB(sqlite.db);
-      await nivelesDB.all(sqlite.performSQLAction, (data: any) => {
-        setNiveles(data);
-      });
-    } catch (error: any) {
-      console.log(error);
-
-      presentAlert({
-        header: "Alerta!",
-        subHeader: "Mensaje importante.",
-        message: error.data?.message || "Error Interno",
-        buttons: ["OK"],
-      });
-    } finally {
-      setNivelID(user.crecimiento?.niveles_id ?? 7); // 7 es el nivel 0
-      dismiss();
-    }
-  };
-
-  const onGetCrecimientos = async (nivelesID: string) => {
-    try {
-      present({
-        message: "Cargando ...",
-        duration: 200,
-      });
-
-      swiper.slideTo(0);
-      setNivelID(nivelesID);
-
-      const crecimientosDB = new CrecimientosDB(sqlite.db);
-      await crecimientosDB.byNivel(
-        sqlite.performSQLAction,
-        (data: any) => {
-          const lista: any[] = data.map((item: any) => {
-            return { ...item, playing: false };
-          });
-
-          setCrecimientos(lista);
-
-          if (user.crecimientos_id) {
-            const idx = lista.findIndex(
-              (x: any) => x.id == user.crecimientos_id
-            );
-            swiper.slideTo(idx);
-          }
-        },
-        {
-          nivel: nivelesID,
-        }
-      );
-    } catch (error: any) {
-      console.log(error);
-
-      presentAlert({
-        header: "Alerta!",
-        subHeader: "Mensaje importante.",
-        message: error.data?.message || "Error Interno",
-        buttons: ["OK"],
-      });
-    } finally {
-      dismiss();
-    }
-  };
-
   const onGoNext = async () => {
-    if (swiper.activeIndex + 1 == crecimientos.length) {
-      const nextNivelIdx = niveles.map((i) => i.id).indexOf(nivelID) + 1;
+    if (swiper.activeIndex + 1 == crecimientos?.length) {
+      const nextNivelIdx =
+        (niveles?.map((i) => i.id).indexOf(nivelID) ?? -1) + 1;
 
-      if (niveles[nextNivelIdx]) {
-        
-        if ( niveles[nextNivelIdx].gratis == '0' && (!userEnabled  || payment_status == 'free') ) {
-          return ;
+      if (niveles && niveles[nextNivelIdx]) {
+        if (
+          niveles[nextNivelIdx].gratis === 0 &&
+          (!userEnabled || payment_status == "free")
+        ) {
+          return;
         }
 
         const _nivelID = niveles[nextNivelIdx].id;
@@ -189,9 +145,10 @@ export const Crecimiento = () => {
 
   const onGoBack = async () => {
     if (swiper.activeIndex == 0) {
-      const prevNivelIdx = niveles.map((i) => i.id).indexOf(nivelID) - 1;
+      const prevNivelIdx =
+        (niveles?.map((i) => i.id).indexOf(nivelID) ?? -1) - 1;
 
-      if (niveles[prevNivelIdx]) {
+      if (niveles && niveles[prevNivelIdx]) {
         const _nivelID = niveles[prevNivelIdx].id;
         setNivelID(_nivelID);
       }
@@ -201,7 +158,7 @@ export const Crecimiento = () => {
   };
 
   const onSaveNext = async (idx: number) => {
-    if (crecimientos[idx + 1]) {
+    if (crecimientos && crecimientos[idx + 1]) {
       const updatePromise = update(
         {
           crecimientos_id: crecimientos[idx + 1].id,
@@ -225,18 +182,9 @@ export const Crecimiento = () => {
   };
 
   useEffect(() => {
-    if (sqlite.initialized) {
-      onGetNiveles();
-      dispatch(resetStore());
-    }
-  }, [sqlite.initialized]);
-
-  useEffect(() => {
-    if (nivelID !== null && nivelID !== undefined) {
-      setCrecimientos([]);
-      onGetCrecimientos(nivelID);
-    }
-  }, [nivelID]);
+    setNivelID(user.crecimiento?.niveles_id ?? 7); // 7 es el nivel 0
+    dispatch(resetStore());
+  }, []);
 
   useEffect(() => {
     onSetActiveIdx();
@@ -253,9 +201,15 @@ export const Crecimiento = () => {
         className={`ion-margin-bottom ${styles["nivel"]}`}
         onIonChange={(e) => onSetNivel(e.target.value)}
       >
-        {niveles.map((item: any, idx: number) => {
+        {niveles?.map((item: any, idx: number) => {
           return (
-            <IonSelectOption disabled={(!userEnabled || payment_status == 'free') && item.gratis == 0} key={idx} value={item.id}>
+            <IonSelectOption
+              disabled={
+                (!userEnabled || payment_status == "free") && item.gratis == 0
+              }
+              key={idx}
+              value={item.id}
+            >
               {" "}
               {item.nivel}{" "}
             </IonSelectOption>
@@ -271,7 +225,7 @@ export const Crecimiento = () => {
         <div className={`${styles.time}`}>
           <span>
             {" "}
-            {progress * crecimientos.length}/{crecimientos.length}{" "}
+            {progress * (crecimientos?.length ?? 0)}/{crecimientos?.length ?? 1}{" "}
           </span>
         </div>
       </div>
@@ -287,14 +241,13 @@ export const Crecimiento = () => {
         onSlideChange={(e) => onSetActiveIdx()}
         onSwiper={(swiper) => setSwiper(swiper)}
       >
-        {crecimientos.map((item: any, idx: number) => {
+        {crecimientos?.map((item: any, idx: number) => {
           return (
             <SwiperSlide key={idx}>
               {idx == swiper.activeIndex ? (
                 <Audio
                   activeIndex={swiper.activeIndex}
                   audio={item}
-                  sqlite={sqlite}
                   network={network}
                   onGoBack={onGoBack}
                   onGoNext={onGoNext}

@@ -37,9 +37,8 @@ import { useHistory } from "react-router";
 import AudioNoWifi from "@/assets/images/audio_no_wifi.jpg";
 import AudioProgressCircle from "@/components/Shared/Animations/ProgressCircle/ProgressCircle";
 import MusicBar from "@/components/Shared/MusicBar/MusicBar";
-import ClipsDB from "@/database/clips";
+// import ClipsDB from "@/database/clips";
 import LikesDB from "@/database/likes";
-import PlaylistDB from "@/database/playlist";
 import { useAudio } from "@/hooks/useAudio";
 import { dislike, like } from "@/services/likes";
 import { add, trash } from "@/services/playlist";
@@ -106,9 +105,7 @@ export const Item: React.FC<any> = ({
       });
 
       await trash(item.in_my_playlist);
-
-      const playlistDB = new PlaylistDB(db);
-      await playlistDB.delete(performSQLAction, () => { }, item.in_my_playlist);
+      await db.playlist.where("id").equals(globalAudio.in_my_playlist).delete();
 
       const newItem = {
         ...item,
@@ -148,18 +145,11 @@ export const Item: React.FC<any> = ({
         data: { data: added },
       } = await add(data);
 
-      const playlistDB = new PlaylistDB(db);
-      await playlistDB.create(performSQLAction, () => { }, [
-        {
-          id: added.id,
-          clip: {
-            id: item.id,
-          },
-          user: {
-            id: user.id,
-          },
-        },
-      ]);
+      await db.playlist.add({
+        id: added.id,
+        clip: item,
+        users_id: user.id,
+      });
 
       const newItem = {
         ...item,
@@ -293,14 +283,14 @@ export const Item: React.FC<any> = ({
       */
       console.log("Ruta es ", ruta);
       setPercent(0)
-
+/*
       const clipsDB = new ClipsDB(db);
       await clipsDB.download(performSQLAction, () => { }, {
         id: item.id,
         imagen: item.imagen,
         audio: ruta,
       });
-
+*/
       dispatch(
         setAudioItem({
           index: idx,
@@ -323,9 +313,10 @@ export const Item: React.FC<any> = ({
   };
 
   const onRemoveLocal = async () => {
+/*    
     const clipsDB = new ClipsDB(db);
     await clipsDB.unload(performSQLAction, () => { }, { id: item.id });
-
+*/
     await deleteAudio(item.audio_local);
 
     dispatch(
@@ -368,7 +359,7 @@ export const Item: React.FC<any> = ({
     await presentSheet({
       cssClass: "custom-action-sheet",
       header: item.titulo,
-      subHeader: item.categoria,
+      subHeader: item.categoria?.categoria,
       buttons: [
         {
           disabled: !network.status,
@@ -430,7 +421,7 @@ export const Item: React.FC<any> = ({
         title.classList.add("title");
 
         const subTitle = document.createElement("span");
-        subTitle.textContent = item.categoria || "";
+        subTitle.textContent = item.categoria?.categoria || "";
         subTitle.classList.add("sub-title");
 
         textContainer.appendChild(title);
@@ -508,7 +499,7 @@ export const Item: React.FC<any> = ({
           ) : null}
           {item.titulo}{" "}
         </IonLabel>
-        <span className={styles["categoria"]}> {item.categoria} </span>
+        <span className={styles["categoria"]}> {item.categoria?.categoria} </span>
       </div>
 
       {

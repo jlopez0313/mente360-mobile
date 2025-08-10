@@ -14,19 +14,18 @@ import { shareSocialOutline, trophy } from "ionicons/icons";
 import mensajeIcon from "/assets/icons/mensaje.svg";
 
 import { Modal } from "@/components/Shared/Modal/Modal";
-import { useDB } from "@/context/Context";
-import MensajesDB from "@/database/mensajes";
-import { setMensaje, setMsgSource } from "@/store/slices/homeSlice";
-import { useDispatch, useSelector } from "react-redux";
+import { db } from "@/hooks/useDexie";
+import { setMsgSource } from "@/store/slices/homeSlice";
+import { useLiveQuery } from "dexie-react-hooks";
+import { useDispatch } from "react-redux";
 import { Texto } from "../Texto/Texto";
 
 export const Mensaje: React.FC<any> = ({network}) => {
+  const dispatch = useDispatch();
   const history = useHistory();
-  const { mensaje } = useSelector((state: any) => state.home);
+  const mensaje = useLiveQuery( ( ) => db.mensajes.toCollection().first() )
 
   const [presentAlert] = useIonAlert();
-  const dispatch = useDispatch();
-  const { sqlite } = useDB();
 
   const onSetSource = () => {
     dispatch(setMsgSource('mensaje'));
@@ -34,18 +33,7 @@ export const Mensaje: React.FC<any> = ({network}) => {
 
   const onConfirmMensaje = async () => {
     try {
-      const mensajesDB = new MensajesDB(sqlite.db);
-      await mensajesDB.markAsDone(sqlite.performSQLAction, () => {}, {
-        id: mensaje.id,
-        done: 1,
-      });
-
-      const newData = {
-        ...mensaje,
-        done: 1,
-      };
-
-      dispatch(setMensaje({ ...newData }));
+      await db.mensajes.update(mensaje?.id ?? 1, { done: 1 });
     } catch (error: any) {
       console.log(error);
 
@@ -89,10 +77,10 @@ export const Mensaje: React.FC<any> = ({network}) => {
       <Modal
         trigger="modal-comentario"
         title="Mensaje del día"
-        hideButtons={!network.status || mensaje.done || false}
+        hideButtons={!network.status || mensaje?.done == 1 || false}
         onConfirm={() => onConfirmMensaje()}
       >
-        <Texto descripcion={mensaje.mensaje || ""}>
+        <Texto descripcion={mensaje?.mensaje || ""}>
           <img
             src="assets/images/logo_texto.png"
             style={{ width: "90px", display: "block", margin: "10px auto" }}

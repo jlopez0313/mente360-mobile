@@ -5,6 +5,8 @@ import styles from "./Sharing.module.scss";
 import { FileSharer } from "@byteowls/capacitor-filesharer";
 import { App } from "@capacitor/app";
 
+import { db } from "@/hooks/useDexie";
+import { useLiveQuery } from "dexie-react-hooks";
 import * as htmlToImage from "html-to-image";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router";
@@ -12,7 +14,9 @@ import { useHistory } from "react-router";
 const Sharing: React.FC = () => {
   const history = useHistory();
 
-  const { mensaje, panico, msgSource } = useSelector(
+  const mensaje = useLiveQuery( ( ) => db.mensajes.toCollection().first() )
+
+  const { panico, msgSource } = useSelector(
     (state: any) => state.home
   );
 
@@ -58,7 +62,7 @@ const Sharing: React.FC = () => {
   };
 
   useEffect(() => {
-    if (mensaje.mensaje || panico.texto) {
+    if (mensaje?.mensaje || panico.texto) {
       requestAnimationFrame(() => {
         shareScreenshot();
       });

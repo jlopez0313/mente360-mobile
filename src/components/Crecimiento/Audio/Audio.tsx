@@ -11,7 +11,7 @@ import {
   IonRange,
   IonSkeletonText,
   IonText,
-  useIonToast
+  useIonToast,
 } from "@ionic/react";
 import {
   downloadOutline,
@@ -28,12 +28,11 @@ import styles from "./Audio.module.scss";
 
 import AudioNoWifi from "@/assets/images/audio_no_wifi.jpg";
 import AudioProgressCircle from "@/components/Shared/Animations/ProgressCircle/ProgressCircle";
-import CrecimientosDB from "@/database/crecimientos";
+import { db } from "@/hooks/useDexie";
 
 interface Props {
   activeIndex: any;
   audio: any;
-  sqlite: any;
   network: any;
   onGoBack: () => void;
   onGoNext: () => void;
@@ -41,9 +40,7 @@ interface Props {
 }
 
 export const Audio: React.FC<Props> = memo(
-  ({ activeIndex, audio, sqlite, network, onGoBack, onGoNext, onSaveNext }) => {
-    const { db, initialized, performSQLAction } = sqlite;
-
+  ({ activeIndex, audio, network, onGoBack, onGoNext, onSaveNext }) => {
     const { isGlobalPlaying }: any = useSelector((state: any) => state.audio);
 
     const [presentToast] = useIonToast();
@@ -55,9 +52,9 @@ export const Audio: React.FC<Props> = memo(
     const audioRef: any = useRef({
       currentTime: 0,
       duration: 0,
-      pause: () => { },
-      play: () => { },
-      fastSeek: (time: number) => { },
+      pause: () => {},
+      play: () => {},
+      fastSeek: (time: number) => {},
     });
 
     const {
@@ -79,7 +76,7 @@ export const Audio: React.FC<Props> = memo(
       downloadAudio,
       deleteAudio,
       getDownloadedAudio,
-    } = useAudio(audioRef, () => { });
+    } = useAudio(audioRef, () => {});
 
     const onDoPlay = () => {
       // toggle(true)
@@ -109,19 +106,18 @@ export const Audio: React.FC<Props> = memo(
           baseURL + audio.audio,
           "podcast_" + audio.id,
           async (p: any) => {
-            setPercent(p)
+            setPercent(p);
             console.log("P es ", p);
           }
         );
 
         console.log("Ruta es ", ruta);
-        setPercent(0)
+        setPercent(0);
 
-        const crecimientosDB = new CrecimientosDB(db);
-        await crecimientosDB.download(performSQLAction, () => { }, {
-          id: audio.id,
-          imagen: audio.imagen,
-          audio: ruta,
+        await db.crecimientos.update(audio.id, {
+          imagen_local: audio.imagen,
+          audio_local: ruta,
+          downloaded: 1,
         });
 
         onPresentToast(
@@ -140,8 +136,11 @@ export const Audio: React.FC<Props> = memo(
     const onRemoveLocal = async () => {
       console.log("removing");
 
-      const crecimientosDB = new CrecimientosDB(db);
-      await crecimientosDB.unload(performSQLAction, () => { }, { id: audio.id });
+      await db.crecimientos.update(audio.id, {
+        imagen_local: "",
+        audio_local: "",
+        downloaded: 0,
+      });
 
       await deleteAudio(localSrc);
 
@@ -168,20 +167,9 @@ export const Audio: React.FC<Props> = memo(
     };
 
     const getLocalSrc = async () => {
-      try {
-        const crecimientosDB = new CrecimientosDB(db);
-        await crecimientosDB.find(
-          performSQLAction,
-          async (clip: any) => {
-            if (clip?.downloaded == "1") {
-              const audioBlob = await getDownloadedAudio(clip.audio_local);
-              setLocalSrc(audioBlob);
-            }
-          },
-          audio.id
-        );
-      } catch (error) {
-        console.log("error get local src", error);
+      if (audio?.downloaded == "1") {
+        const audioBlob = await getDownloadedAudio(audio.audio_local);
+        setLocalSrc(audioBlob);
       }
     };
 
@@ -209,8 +197,8 @@ export const Audio: React.FC<Props> = memo(
     }, [isGlobalPlaying]);
 
     useEffect(() => {
-      initialized && getLocalSrc();
-    }, [initialized]);
+      getLocalSrc();
+    }, [audio]);
 
     useEffect(() => {
       goStart();
@@ -243,17 +231,15 @@ export const Audio: React.FC<Props> = memo(
               <IonText> {audio.titulo} </IonText>
             </IonCardSubtitle>
 
-            <IonCardSubtitle className="ion-no-padding"
+            <IonCardSubtitle
+              className="ion-no-padding"
               style={{
-                display: 'flex',
-                justifyContent: 'space-around',
-                alignItems: 'center',
+                display: "flex",
+                justifyContent: "space-around",
+                alignItems: "center",
               }}
             >
-              {
-                percent > 0 &&
-                <span style={{ width: '30px' }}></span>
-              }
+              {percent > 0 && <span style={{ width: "30px" }}></span>}
               <div className={styles["chip-list"]}>
                 <IonChip
                   disabled={!network.status && !localSrc}
@@ -267,12 +253,7 @@ export const Audio: React.FC<Props> = memo(
                 </IonChip>
               </div>
 
-              {
-                percent > 0 &&
-                <AudioProgressCircle />
-              }
-
-
+              {percent > 0 && <AudioProgressCircle />}
             </IonCardSubtitle>
           </IonCardHeader>
 
@@ -314,7 +295,7 @@ export const Audio: React.FC<Props> = memo(
                   <IonIcon
                     style={{
                       opacity: !network.status && !localSrc ? 0.2 : 1,
-                      "pointer-events":
+                      "pointerEvents":
                         !network.status && !localSrc ? "none" : "auto",
                     }}
                     className={styles["icon-play"]}

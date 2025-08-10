@@ -13,12 +13,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 
 import { Modal } from "@/components/Shared/Modal/Modal";
-import { useDB } from "@/context/Context";
-import TareasDB from "@/database/tareas";
+import { db } from "@/hooks/useDexie";
 import { usePayment } from "@/hooks/usePayment";
 import { confirmTarea } from "@/services/home";
 import { setTab } from "@/store/slices/chatSlice";
-import { setTarea } from "@/store/slices/homeSlice";
+import { useLiveQuery } from "dexie-react-hooks";
 import { trophy } from "ionicons/icons";
 import { Texto } from "../Texto/Texto";
 import tareaIcon from "/assets/icons/tarea.svg";
@@ -29,31 +28,22 @@ export const Tarea: React.FC<any> = ({network}) => {
   const { userEnabled, payment_status } = usePayment();
 
   const [presentAlert] = useIonAlert();
-  const { sqlite } = useDB();
 
-  const { tarea, currentDay } = useSelector((state: any) => state.home);
+  const tarea = useLiveQuery( ( ) => db.tareas.toCollection().first() );
+  
+  const { currentDay } = useSelector((state: any) => state.home);
 
   const onConfirmTarea = async () => {
     try {
       if (currentDay == 1) {
-        const mensajesDB = new TareasDB(sqlite.db);
-        await mensajesDB.markAsDone(sqlite.performSQLAction, () => {}, {
-          id: tarea.id,
-          done: 1,
-        });
+        
+        await db.tareas.update(tarea?.id ?? 1, { done: 1 });
 
         const formData = {
-          tareas_id: tarea.id,
+          tareas_id: tarea?.id,
         };
 
         await confirmTarea(formData);
-
-        const newData = {
-          ...tarea,
-          done: 1,
-        };
-
-        dispatch(setTarea({ ...newData }));
       }
 
       dispatch(setTab("grupos"));
@@ -79,7 +69,7 @@ export const Tarea: React.FC<any> = ({network}) => {
       >
         <IonItem slot="header">
           <IonLabel>Tarea de la semana</IonLabel>
-          {tarea.done ? (
+          {tarea?.done ? (
             <IonIcon icon={trophy} slot="end" className={styles['trofeo']} />
           ) : (
             <IonIcon icon={trophy} slot="end" className={styles['trofeo-gris']} />
@@ -102,10 +92,10 @@ export const Tarea: React.FC<any> = ({network}) => {
         title="Tarea de la semana"
         closeText={ userEnabled && payment_status != 'free' ? "Ir a Grupo" : "Premium"}
         isBtnDisabled={ !userEnabled || payment_status == 'free' }
-        hideButtons={ !network.status || tarea.done || currentDay != 1 || false}
+        hideButtons={ !network.status || tarea?.done == 1 || currentDay != 1 || false}
         onConfirm={() => onConfirmTarea()}
       >
-        <Texto descripcion={tarea.tarea || ""} children={null} />
+        <Texto descripcion={tarea?.tarea || ""} children={null} />
       </Modal>
     </>
   );

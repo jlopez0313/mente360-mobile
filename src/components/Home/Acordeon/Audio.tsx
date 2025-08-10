@@ -14,39 +14,24 @@ import auriculares from "/assets/icons/auriculares.svg";
 import { Modal } from "@/components/Shared/Modal/Modal";
 import { Buttons } from "@/components/Shared/Premium/Buttons/Buttons";
 import { Premium } from "@/components/Shared/Premium/Premium";
-import { useDB } from "@/context/Context";
-import AudiosDB from "@/database/audios";
+import { db } from "@/hooks/useDexie";
 import { usePayment } from "@/hooks/usePayment";
-import { setAudio } from "@/store/slices/homeSlice";
-import { useDispatch, useSelector } from "react-redux";
+import { useLiveQuery } from "dexie-react-hooks";
 import { Audio as AudioShared } from "../Audio/Audio";
 
 export const Audio: React.FC<any> = ({ network }) => {
-  const dispatch = useDispatch();
   const [presentAlert] = useIonAlert();
-  const { sqlite } = useDB();
 
   const [isOpen, setIsOpen] = useState(false);
   const [isPremiumOpen, setIsPremiumOpen] = useState(false);
 
   const { userEnabled, payment_status } = usePayment();
 
-  const { audio } = useSelector((state: any) => state.home);
+  const audio = useLiveQuery( ( ) => db.audios.toCollection().first() );
 
   const onConfirmAudio = async () => {
     try {
-      const audiosDB = new AudiosDB(sqlite.db);
-      await audiosDB.markAsDone(sqlite.performSQLAction, () => {}, {
-        id: audio.id,
-        done: 1,
-      });
-
-      const newData = {
-        ...audio,
-        done: 1,
-      };
-
-      dispatch(setAudio({ ...newData }));
+      await db.audios.update(audio?.id ?? 1, { done: 1 });
     } catch (error: any) {
       console.error(error);
 
@@ -71,7 +56,7 @@ export const Audio: React.FC<any> = ({ network }) => {
       >
         <IonItem slot="header">
           <IonLabel>Audio de la noche</IonLabel>
-          {audio.done ? (
+          {audio?.done ? (
             <IonIcon icon={trophy} slot="end" className={styles["trofeo"]} />
           ) : (
             <IonIcon
@@ -108,7 +93,7 @@ export const Audio: React.FC<any> = ({ network }) => {
       <Modal
         isOpen={isOpen}
         title="Audio de la noche"
-        hideButtons={!network.status || audio.done || false}
+        hideButtons={!network.status || audio?.done == 1 || false}
         onConfirm={() => onConfirmAudio()}
       >
         <AudioShared audio={audio} onConfirm={() => onConfirmAudio()} />
@@ -117,7 +102,7 @@ export const Audio: React.FC<any> = ({ network }) => {
       <Modal
         isOpen={isPremiumOpen}
         title={import.meta.env.VITE_NAME + " premium"}
-        hideButtons={!network.status || audio.done || false}
+        hideButtons={!network.status || audio?.done == 1 || false}
         showButtons={false}
         onConfirm={() => {}}
         onWillDismiss={() => setIsPremiumOpen(false)}

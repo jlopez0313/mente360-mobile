@@ -35,10 +35,10 @@ import { useHistory } from "react-router";
 
 import AudioNoWifi from "@/assets/images/audio_no_wifi.jpg";
 import MusicBar from "@/components/Shared/MusicBar/MusicBar";
-import ClipsDB from "@/database/clips";
+// import ClipsDB from "@/database/clips";
 import LikesDB from "@/database/likes";
-import PlaylistDB from "@/database/playlist";
 import { useAudio } from "@/hooks/useAudio";
+import { db } from '@/hooks/useDexie';
 import { dislike, like } from "@/services/likes";
 import { trash } from "@/services/playlist";
 
@@ -49,7 +49,7 @@ export const Item: React.FC<any> = ({
   network,
   onSetClips,
 }) => {
-  const { db, performSQLAction } = sqlite;
+  const { performSQLAction } = sqlite;
 
   const { user } = useSelector( (state: any) => state.user);
   const history = useHistory();
@@ -98,10 +98,8 @@ export const Item: React.FC<any> = ({
         message: "Cargando ...",
       });
 
-      await trash(item.in_my_playlist);
-
-      const playlistDB = new PlaylistDB(db);
-      await playlistDB.delete(performSQLAction, () => {}, item.in_my_playlist);
+      await trash(item.id);
+      await db.playlist.where('id').equals(item.id).delete();
 
       const newItem = {
         ...item,
@@ -233,14 +231,14 @@ export const Item: React.FC<any> = ({
       const ruta = "RUTA__RUTA";
       */
       console.log("Ruta es ", ruta);
-
+/*
       const clipsDB = new ClipsDB(db);
       await clipsDB.download(performSQLAction, () => {}, {
         id: item.id,
         imagen: item.imagen,
         audio: ruta,
       });
-
+*/
       dispatch(
         setAudioItem({
           index: idx,
@@ -263,9 +261,10 @@ export const Item: React.FC<any> = ({
   };
 
   const onRemoveLocal = async () => {
+    /*
     const clipsDB = new ClipsDB(db);
     await clipsDB.unload(performSQLAction, () => {}, { id: item.id });
-
+*/
     await deleteAudio(item.audio_local);
 
     onPresentToast(
@@ -297,7 +296,7 @@ export const Item: React.FC<any> = ({
     const action = await presentSheet({
       cssClass: "custom-action-sheet",
       header: item.titulo,
-      subHeader: item.categoria,
+      subHeader: item.categoria?.categoria ?? '',
       buttons: [
         {
           disabled: !network.status,
@@ -356,7 +355,7 @@ export const Item: React.FC<any> = ({
         title.classList.add("title");
 
         const subTitle = document.createElement("span");
-        subTitle.textContent = item.categoria || "";
+        subTitle.textContent = item.categoria?.categoria ?? '';
         subTitle.classList.add("sub-title");
 
         textContainer.appendChild(title);
@@ -430,7 +429,7 @@ export const Item: React.FC<any> = ({
           ) : null}
           {item?.titulo}{" "}
         </IonLabel>
-        <span className={styles["categoria"]}> {item?.categoria} </span>
+        <span className={styles["categoria"]}> {item?.categoria?.categoria} </span>
       </div>
 
       <IonIcon

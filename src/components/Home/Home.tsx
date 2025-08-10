@@ -24,26 +24,25 @@ import { useNetwork } from "@/hooks/useNetwork";
 import { usePreferences } from "@/hooks/usePreferences";
 import {
   setAdmin,
-  setAudio,
-  setMensaje,
-  setPodcast,
-  setTarea,
+  setPodcast
 } from "@/store/slices/homeSlice";
 
 import { SuccessOverlay } from "@/components/Shared/Animations/Success/SuccessOverlay";
 import { useDB } from "@/context/Context";
-import AudiosDB from "@/database/audios";
-import MensajesDB from "@/database/mensajes";
-import TareasDB from "@/database/tareas";
 import { diferenciaEnDias } from "@/helpers/Fechas";
 import { DB, localDB } from "@/helpers/localStore";
+import { db } from "@/hooks/useDexie";
 import { setUser } from "@/store/slices/userSlice";
 import { getHomeThunk } from "@/store/thunks/home";
+import { useLiveQuery } from "dexie-react-hooks";
 
 export const Home = () => {
   const { getPreference, setPreference, keys } = usePreferences();
+  const audio = useLiveQuery( ( ) => db.audios.toCollection().first() );
+  const tarea = useLiveQuery( ( ) => db.tareas.toCollection().first() );
+  const mensaje = useLiveQuery( ( ) => db.mensajes.toCollection().first() );
 
-  const { audio, mensaje, tarea, podcast } = useSelector(
+  const { podcast } = useSelector(
     (state: any) => state.home
   );
 
@@ -65,10 +64,6 @@ export const Home = () => {
 
   const onGetHome = async () => {
     try {
-      const audiosDB = new AudiosDB(sqlite.db);
-      const mensajesDB = new MensajesDB(sqlite.db);
-      const tareasDB = new TareasDB(sqlite.db);
-
       if (user.eneatipo) {
         const lastDateStr =
           (await getPreference(keys.HOME_SYNC_KEY)) ?? "2024-01-01T00:00:00Z";
@@ -84,21 +79,8 @@ export const Home = () => {
             message: "Cargando ...",
           });
 
-          await dispatch(getHomeThunk(sqlite, audiosDB, mensajesDB, tareasDB));
+          await dispatch(getHomeThunk(sqlite));
         } else {
-          await audiosDB.all(sqlite.performSQLAction, (data: any) => {
-            console.log('DATA DE audiosDB', data)
-            if (data?.length) dispatch(setAudio(data[0]));
-          });
-          await mensajesDB.all(sqlite.performSQLAction, (data: any) => {
-            console.log('DATA DE mensajesDB', data)
-            if (data?.length) dispatch(setMensaje(data[0]));
-          });
-          await tareasDB.all(sqlite.performSQLAction, (data: any) => {
-            console.log('DATA DE tareasDB', data)
-            if (data?.length) dispatch(setTarea(data[0]));
-          });
-
           dispatch(setPodcast(localData.podcast));
           dispatch(setAdmin(localData.admin));
         }
@@ -165,9 +147,9 @@ export const Home = () => {
 
   useEffect(() => {
     if (
-      audio.done &&
-      mensaje.done &&
-      tarea.done &&
+      audio?.done == 1 &&
+      mensaje?.done == 1 &&
+      tarea?.done == 1 &&
       podcast.done &&
       !localData.showSuccess
     ) {

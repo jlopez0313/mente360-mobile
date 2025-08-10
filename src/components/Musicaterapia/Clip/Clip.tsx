@@ -45,19 +45,17 @@ import { startBackground } from "@/helpers/background";
 import { create, updateElapsed } from "@/helpers/musicControls";
 
 import AudioProgressCircle from "@/components/Shared/Animations/ProgressCircle/ProgressCircle";
-import ClipsDB from "@/database/clips";
+// import ClipsDB from "@/database/clips";
 import LikesDB from "@/database/likes";
-import PlaylistDB from "@/database/playlist";
+import { db } from "@/hooks/useDexie";
 import { useNetwork } from "@/hooks/useNetwork";
-import { useSqliteDB } from "@/hooks/useSqliteDB";
 import { dislike, like } from "@/services/likes";
 import { add, trash } from "@/services/playlist";
 
 export const Clip = () => {
-  const { user } = useSelector( (state: any) => state.user);
+  const { user } = useSelector((state: any) => state.user);
 
   const dispatch = useDispatch();
-  const { db, performSQLAction } = useSqliteDB();
   const network = useNetwork();
 
   const [presentToast] = useIonToast();
@@ -92,8 +90,8 @@ export const Clip = () => {
     getDownloadedAudio,
   } = useAudio(
     audioRef,
-    () => { },
-    () => { }
+    () => {},
+    () => {}
   );
 
   const onPresentToast = (
@@ -121,20 +119,21 @@ export const Clip = () => {
         baseURL + globalAudio.audio,
         "audio_" + globalAudio.id,
         async (p: any) => {
-          setPercent(p)
+          setPercent(p);
           console.log("P es ", p);
         }
       );
 
       console.log("Ruta es ", ruta);
-      setPercent(0)
+      setPercent(0);
 
-      const clipsDB = new ClipsDB(db);
+      /*const clipsDB = new ClipsDB(db);
       await clipsDB.download(performSQLAction, () => { }, {
         id: globalAudio.id,
         imagen: globalAudio.imagen,
         audio: ruta,
       });
+      */
 
       dispatch(
         setAudioItem({
@@ -158,8 +157,10 @@ export const Clip = () => {
   };
 
   const onRemoveLocal = async () => {
+    /*
     const clipsDB = new ClipsDB(db);
     await clipsDB.unload(performSQLAction, () => { }, { id: globalAudio.id });
+    */
 
     await deleteAudio(globalAudio.audio_local);
 
@@ -174,9 +175,7 @@ export const Clip = () => {
       })
     );
 
-    dispatch(
-      putGlobalAudio({ ...globalAudio, audio_local: null })
-    );
+    dispatch(putGlobalAudio({ ...globalAudio, audio_local: null }));
 
     onPresentToast(
       "bottom",
@@ -193,12 +192,7 @@ export const Clip = () => {
 
       await trash(globalAudio.in_my_playlist);
 
-      const playlistDB = new PlaylistDB(db);
-      await playlistDB.delete(
-        performSQLAction,
-        () => { },
-        globalAudio.in_my_playlist
-      );
+      await db.playlist.where("id").equals(globalAudio.in_my_playlist).delete();
 
       const newItem = {
         ...globalAudio,
@@ -234,18 +228,11 @@ export const Clip = () => {
         data: { data: added },
       } = await add(data);
 
-      const playlistDB = new PlaylistDB(db);
-      await playlistDB.create(performSQLAction, () => { }, [
-        {
-          id: added.id,
-          clip: {
-            id: globalAudio.id,
-          },
-          user: {
-            id: globalAudio.id,
-          },
-        },
-      ]);
+      await db.playlist.add({
+        id: added.id,
+        clip: globalAudio,
+        users_id: user.id,
+      });
 
       const newItem = {
         ...globalAudio,
@@ -276,7 +263,7 @@ export const Clip = () => {
       await dislike(globalAudio.my_like);
 
       const likes = new LikesDB(db);
-      await likes.delete(performSQLAction, () => { }, globalAudio.my_like);
+      // await likes.delete(performSQLAction, () => {}, globalAudio.my_like);
 
       const newItem = {
         ...globalAudio,
@@ -315,12 +302,14 @@ export const Clip = () => {
       } = await like(data);
 
       const likesDB = new LikesDB(db);
-      await likesDB.create(performSQLAction, () => { }, [
+      /*
+      await likesDB.create(performSQLAction, () => {}, [
         {
           ...data,
           id: added.id,
         },
       ]);
+      */
 
       const newItem = {
         ...globalAudio,
@@ -535,13 +524,13 @@ export const Clip = () => {
             src={audioSrc}
           />
 
-
-          {
-            percent > 0 &&
-            <div style={{ width: '100%', display: 'flex', justifyContent: 'end' }}>
+          {percent > 0 && (
+            <div
+              style={{ width: "100%", display: "flex", justifyContent: "end" }}
+            >
               <AudioProgressCircle />
             </div>
-          }
+          )}
         </IonCardContent>
       </IonCard>
     </div>

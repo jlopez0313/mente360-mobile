@@ -30,12 +30,12 @@ import "react-phone-number-input/style.css";
 import { useDispatch, useSelector } from "react-redux";
 
 import { useDB } from "@/context/Context";
-import EneatiposDB from "@/database/eneatipos";
-import GenerosDB from "@/database/generos";
 import { diferenciaEnDias } from "@/helpers/Fechas";
+import { db } from '@/hooks/useDexie';
 import { useNetwork } from "@/hooks/useNetwork";
 import { usePayment } from "@/hooks/usePayment";
 import { setUser } from "@/store/slices/userSlice";
+import { useLiveQuery } from "dexie-react-hooks";
 
 export const Perfil = () => {
   const fileRef = useRef(null);
@@ -56,8 +56,8 @@ export const Perfil = () => {
   const [photo, setPhoto] = useState("");
   const [usuario, setUsuario] = useState({...user});
   const [edad, setEdad] = useState(0);
-  const [generos, setGeneros] = useState([]);
-  const [eneatipos, setEneatipos] = useState([]);
+  const generos = useLiveQuery(() => db.eneatipos.toArray());
+  const eneatipos = useLiveQuery(() => db.eneatipos.toArray());
 
   const getMaxDate = () => {
     const today = new Date();
@@ -74,16 +74,6 @@ export const Perfil = () => {
 
       setPhoto(usuario.photo ? baseURL + usuario.photo : Avatar);
 
-      const generosDB = new GenerosDB(sqlite.db);
-      const eneatiposDB = new EneatiposDB(sqlite.db);
-
-      await generosDB.all(sqlite.performSQLAction, (data: any) => {
-        setGeneros(data);
-      });
-
-      await eneatiposDB.all(sqlite.performSQLAction, (data: any) => {
-        setEneatipos(data);
-      });
     } catch (error: any) {
       console.log(error);
 

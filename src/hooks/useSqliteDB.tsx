@@ -2,19 +2,6 @@ import { CapacitorSQLite, SQLiteConnection } from "@capacitor-community/sqlite";
 import { useEffect, useState } from "react";
 import { SQLiteDBConnection } from "react-sqlite-hook";
 
-import Audios from "@/database/audios";
-import Categorias from "@/database/categorias";
-import Clips from "@/database/clips";
-import Crecimientos from "@/database/crecimientos";
-import Eneatipos from "@/database/eneatipos";
-import Generos from "@/database/generos";
-import Likes from "@/database/likes";
-import Mensajes from "@/database/mensajes";
-import Niveles from "@/database/niveles";
-import Playlist from "@/database/playlist";
-import Tareas from "@/database/tareas";
-import User from "@/database/user";
-import UsuariosClips from "@/database/usuarios_clips";
 
 import { Capacitor } from "@capacitor/core";
 import { Device } from "@capacitor/device";
@@ -114,6 +101,7 @@ export const useSqliteDB = () => {
 
   const initializeTables = async (db: SQLiteDBConnection | null) => {
     try {
+      /*
       const user = new User(db);
       const clips = new Clips(db);
       const categorias = new Categorias(db);
@@ -141,7 +129,7 @@ export const useSqliteDB = () => {
       await audios.init();
       await mensajes.init();
       await tareas.init();
-
+*/
       console.log("tables has been initialized");
     } catch (error) {
       console.log(`Error ${error} creating Tables`);

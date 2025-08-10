@@ -31,9 +31,9 @@ import {
   setIsGlobalPlaying,
 } from "@/store/slices/audioSlice";
 
-import PlaylistDB from "@/database/playlist";
 import { startBackground } from "@/helpers/background";
 import { create, destroy, updateElapsed } from "@/helpers/musicControls";
+import { db } from '@/hooks/useDexie';
 import { useSqliteDB } from "@/hooks/useSqliteDB";
 
 export const Toast = () => {
@@ -41,7 +41,7 @@ export const Toast = () => {
   const history = useHistory();
   const dispatch = useDispatch();
 
-  const { db, performSQLAction } = useSqliteDB();
+  const { performSQLAction } = useSqliteDB();
 
   const { baseURL, audioSrc, globalAudio, listAudios, globalPos, isGlobalPlaying } = useSelector(
     (state: any) => state.audio
@@ -119,10 +119,8 @@ export const Toast = () => {
         message: "Cargando ...",
       });
 
-      await trash(globalAudio.in_my_playlist);
-
-      const playlistDB = new PlaylistDB(db);
-      await playlistDB.delete(performSQLAction, () => { }, globalAudio.in_my_playlist);
+      await trash(globalAudio.id);
+      await db.playlist.where("id").equals(globalAudio.id).delete();
 
       const newItem = {
         ...globalAudio,
@@ -161,19 +159,11 @@ export const Toast = () => {
         data: { data: added },
       } = await add(formData);
 
-      
-      const playlistDB = new PlaylistDB(db);
-      await playlistDB.create(performSQLAction, () => { }, [
-        {
-          id: added.id,
-          clip: {
-            id: globalAudio.id,
-          },
-          user: {
-            id: user.id,
-          },
-        },
-      ]);
+      await db.playlist.add({
+        id: added.id,
+        clip: globalAudio,
+        users_id: user.id,
+      });
 
       const newItem = {
         ...globalAudio,
@@ -247,7 +237,7 @@ export const Toast = () => {
       <IonItem lines="none" button={true} detail={false}>
         <div style={{display: 'flex', flexDirection: 'column', flexGrow: '1'}} onClick={goToClip}>
           <IonLabel class={`ion-text-justify ${styles.title}`}> {globalAudio.titulo} </IonLabel>
-          <span className={`${styles.categoria}`}> {globalAudio.categoria} </span>
+          <span className={`${styles.categoria}`}> {globalAudio.categoria?.categoria} </span>
 
         </div>
 
