@@ -19,6 +19,7 @@ import { GmailLogin } from "@/firebase/auth";
 import { clearUser } from "@/helpers/onboarding";
 import { login, register } from "@/services/auth";
 
+import { db } from "@/hooks/useDexie";
 import { usePreferences } from "@/hooks/usePreferences";
 import { setUser } from "@/store/slices/userSlice";
 import { FCM } from "@capacitor-community/fcm";
@@ -66,6 +67,8 @@ export const Register = () => {
       data.fcm_token = token.token;
 
       await setPreference(keys.TOKEN, data.token);
+      
+      await db.user.put(data.user);
       dispatch(setUser(data.user));
 
       setTimeout(() => {

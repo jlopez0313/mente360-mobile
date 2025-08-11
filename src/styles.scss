@@ -65,6 +65,11 @@ body.dark {
     --background: none;
     background: none;
   }
+
+  ion-chip {
+    --bg-main: #fff;
+    --ion-color: #555;
+  }
 }
 
 ion-header {

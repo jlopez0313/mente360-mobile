@@ -29,7 +29,6 @@ import PhoneInput, { isPossiblePhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { useDispatch, useSelector } from "react-redux";
 
-import { useDB } from "@/context/Context";
 import { diferenciaEnDias } from "@/helpers/Fechas";
 import { db } from '@/hooks/useDexie';
 import { useNetwork } from "@/hooks/useNetwork";
@@ -42,7 +41,6 @@ export const Perfil = () => {
   const baseURL = import.meta.env.VITE_BASE_BACK;
 
   const dispatch = useDispatch();
-  const { sqlite } = useDB();
 
   const [present, dismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();
@@ -56,7 +54,7 @@ export const Perfil = () => {
   const [photo, setPhoto] = useState("");
   const [usuario, setUsuario] = useState({...user});
   const [edad, setEdad] = useState(0);
-  const generos = useLiveQuery(() => db.eneatipos.toArray());
+  const generos = useLiveQuery(() => db.generos.toArray());
   const eneatipos = useLiveQuery(() => db.eneatipos.toArray());
 
   const getMaxDate = () => {
@@ -180,10 +178,8 @@ export const Perfil = () => {
 
   useEffect(() => {
     dispatch(setRoute("/perfil"));
-    if (sqlite.initialized) {
-      onGetConstants();
-    }
-  }, [sqlite.initialized]);
+    onGetConstants();
+  }, []);
 
   useEffect(() => {
     onGetEdad();

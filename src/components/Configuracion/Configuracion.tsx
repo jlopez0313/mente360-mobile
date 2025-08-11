@@ -1,6 +1,5 @@
 import { openWhatsApp } from "@/helpers/Whatsapp";
 import { usePreferences } from "@/hooks/usePreferences";
-import { useSqliteDB } from "@/hooks/useSqliteDB";
 import { setRoute } from "@/store/slices/routeSlice";
 import {
   IonButton,
@@ -32,7 +31,6 @@ import styles from "./Configuracion.module.scss";
 export const Configuracion = () => {
   const history = useHistory();
   const dispatch = useDispatch();
-  const { makeBackup, exportJson } = useSqliteDB();
   const { removePreference, keys } = usePreferences();
 
   const [presentToast] = useIonToast();
@@ -64,7 +62,7 @@ export const Configuracion = () => {
   };
 
   const onDownloadBackup = async () => {
-    await makeBackup();
+    // await makeBackup();
     onPresentToast("bottom", "El Backup ha sido descargado.", "");
   };
 
@@ -78,7 +76,7 @@ export const Configuracion = () => {
   };
 
   const onDownloadJson = async () => {
-    await exportJson();
+    // await exportJson();
     onPresentToast("bottom", "El Backup ha sido descargado.", "");
   };
 

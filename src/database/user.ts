@@ -1,73 +1,26 @@
-import { SQLiteDBConnection } from "react-sqlite-hook";
+import Crecimientos from "./crecimientos";
 
-export default class User {
-  private db: SQLiteDBConnection | null;
-
-  constructor(db: SQLiteDBConnection | null) {
-    this.db = db;
-  }
-
-  async drop() {
-    try {
-      await this.db?.execute(`DROP TABLE IF EXISTS users;`);
-    } catch (error) {
-      console.log(error);
-      throw error;
-    }
-  }
-
-  async init() {
-    try {
-      await this.db?.execute(`
-            CREATE TABLE IF NOT EXISTS users (
-              id INTEGER PRIMARY KEY AUTOINCREMENT,
-              user TEXT
-            );
-        `);
-
-      console.log(`Users has been created`);
-    } catch (error) {
-      console.log(error);
-      throw error;
-    }
-  }
-
-  async create(performSQLAction: any, callback: any, user: any) {
-    try {
-      performSQLAction(async () => {
-        const query = await this.db?.query(
-          `INSERT OR REPLACE INTO users (id, user) values (?,?);`,
-          [Date.now(), user]
-        );
-        callback();
-      });
-    } catch (error) {
-      console.log("error create usuarios", error);
-      throw error;
-    }
-  }
-
-  async find(performSQLAction: any, callback: any) {
-    try {
-      performSQLAction(async () => {
-        const result = await this.db?.query("SELECT * FROM users", []);
-        callback(result?.values);
-      });
-    } catch (error) {
-      console.log("error find usuarios", error);
-      throw error;
-    }
-  }
-
-  async remove(performSQLAction: any, callback: any) {
-    try {
-      performSQLAction(async () => {
-        const query = await this.db?.query(`DELETE FROM users;`, []);
-        callback();
-      });
-    } catch (error) {
-      console.log("error remove usuarios", error);
-      throw error;
-    }
-  }
+export default interface User {
+  id: number;
+  name: string;
+  email: string;
+  country: string;
+  phone: string;
+  is_admin: string;
+  has_paid: string;
+  fecha_nacimiento: string;
+  eneatipo: string;
+  eneatipo_label: string;
+  genero: string;
+  genero_label: string;
+  crecimientos_id: string;
+  photo: string;
+  invitados: User[];
+  fcm_token: string;
+  device: string;
+  ref_payco: string;
+  ref_status: string;
+  fecha_pago: string;
+  fecha_vencimiento: string;
+  crecimiento: Crecimientos;
 }

@@ -31,7 +31,6 @@ import { Sync } from "@/components/Shared/Animations/Sync/Sync";
 import { diferenciaEnDias } from "@/helpers/Fechas";
 import { useGlobalSync } from "@/hooks/useGlobalSync";
 import { usePreferences } from "@/hooks/usePreferences";
-import { useSqliteDB } from "@/hooks/useSqliteDB";
 
 const Home: React.FC = () => {
   const { getPreference, setPreference, keys } = usePreferences();
@@ -40,22 +39,10 @@ const Home: React.FC = () => {
   const { loading, error, success, mensaje, syncAll } = useGlobalSync();
 
   const { isGeneral } = useSelector((state: any) => state.notifications);
-  const { db, initialized, performSQLAction } = useSqliteDB();
 
   const onGetNotifications = async () => {
     dispatch(getNotifications());
   };
-
-  const onGlobalSync = async () => {
-    const lastDateStr =
-      (await getPreference(keys.SYNC_KEY)) ?? "2024-01-01T00:00:00Z";
-    const lastDate = new Date(lastDateStr);
-    const now = new Date();
-    now.setHours(0, 0, 0, 0);
-    if (diferenciaEnDias(now, lastDate) > 0) {
-      syncAll();
-    }
-  }
 
   useEffect(() => {
     dispatch(setShowGlobalAudio(true));
@@ -64,19 +51,19 @@ const Home: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    /*
-      const onGetUser = async () => {
-        const userDB = new User(db);
-        await userDB.find(performSQLAction, (data: any) => {
-          console.log( data )
-          // dispatch( setUser( data[0] ) )
-        });
-      };
-    */
+    const onGlobalSync = async () => {
+      const lastDateStr =
+        (await getPreference(keys.SYNC_KEY)) ?? "2024-01-01T00:00:00Z";
+      const lastDate = new Date(lastDateStr);
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      if (diferenciaEnDias(now, lastDate) > 0) {
+        syncAll();
+      }
+    };
 
-    initialized && onGlobalSync();
-    
-  }, [initialized]);
+    onGlobalSync();
+  }, []);
 
   return (
     <IonPage>
@@ -114,7 +101,12 @@ const Home: React.FC = () => {
       </IonHeader>
 
       <IonContent fullscreen className={styles["ion-content"]}>
-        <Sync loading={loading} success={success} error={error} mensaje={mensaje} />
+        <Sync
+          loading={loading}
+          success={success}
+          error={error}
+          mensaje={mensaje}
+        />
         <HomeComponent />
       </IonContent>
 

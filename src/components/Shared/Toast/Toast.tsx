@@ -34,14 +34,11 @@ import {
 import { startBackground } from "@/helpers/background";
 import { create, destroy, updateElapsed } from "@/helpers/musicControls";
 import { db } from '@/hooks/useDexie';
-import { useSqliteDB } from "@/hooks/useSqliteDB";
 
 export const Toast = () => {
   
   const history = useHistory();
   const dispatch = useDispatch();
-
-  const { performSQLAction } = useSqliteDB();
 
   const { baseURL, audioSrc, globalAudio, listAudios, globalPos, isGlobalPlaying } = useSelector(
     (state: any) => state.audio

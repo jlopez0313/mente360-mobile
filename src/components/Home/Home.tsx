@@ -28,7 +28,6 @@ import {
 } from "@/store/slices/homeSlice";
 
 import { SuccessOverlay } from "@/components/Shared/Animations/Success/SuccessOverlay";
-import { useDB } from "@/context/Context";
 import { diferenciaEnDias } from "@/helpers/Fechas";
 import { DB, localDB } from "@/helpers/localStore";
 import { db } from "@/hooks/useDexie";
@@ -49,7 +48,6 @@ export const Home = () => {
   const localHome = localDB(DB.HOME);
   const localData = localHome.get();
 
-  const { sqlite } = useDB();
   const network = useNetwork();
 
   const { user } = useSelector((state: any) => state.user);
@@ -79,7 +77,7 @@ export const Home = () => {
             message: "Cargando ...",
           });
 
-          await dispatch(getHomeThunk(sqlite));
+          await dispatch(getHomeThunk());
         } else {
           dispatch(setPodcast(localData.podcast));
           dispatch(setAdmin(localData.admin));
@@ -141,9 +139,9 @@ export const Home = () => {
 
     if (network.status) {
       onUpdateFCM();
-      sqlite.initialized && onGetHome();
+      onGetHome();
     }
-  }, [sqlite.initialized]);
+  }, []);
 
   useEffect(() => {
     if (

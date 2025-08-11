@@ -9,6 +9,7 @@ import Mensajes from "@/database/mensajes";
 import Niveles from "@/database/niveles";
 import Playlist from "@/database/playlist";
 import Tareas from "@/database/tareas";
+import User from "@/database/user";
 import UsuariosClips from "@/database/usuarios_clips";
 
 import Dexie, { Table } from "dexie";
@@ -26,6 +27,7 @@ export class Mente360DB extends Dexie {
   playlist!: Table<Playlist, number>;
   tareas!: Table<Tareas, number>;
   usuarios_clips!: Table<UsuariosClips, number>;
+  user!: Table<User, number>;
 
   constructor() {
     super("Mente360DB");
@@ -42,6 +44,7 @@ export class Mente360DB extends Dexie {
       playlist: "++id,users_id",
       tareas: "++id",
       usuarios_clips: "++id,users_id,clips_id",
+      user: "++id,name,email",
     });
   }
 }

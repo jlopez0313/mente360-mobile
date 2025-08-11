@@ -11,7 +11,6 @@ import { all as getAllPlaylist } from "@/services/playlist";
 import { useState } from "react";
 import { useNetwork } from "./useNetwork";
 
-import { useDB } from "@/context/Context";
 import { db } from "@/hooks/useDexie";
 import { usePreferences } from "@/hooks/usePreferences";
 
@@ -23,7 +22,6 @@ export const useGlobalSync = () => {
   const { getPreference, setPreference, keys } = usePreferences();
 
   const network = useNetwork();
-  const { sqlite } = useDB();
 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -280,8 +278,6 @@ export const useGlobalSync = () => {
     const lastSync = await getPreference(keys.SYNC_KEY);
     const fromDate = lastSync ?? initSync;
 
-    // const clipsDB = new ClipsDB(sqlite.db);
-
     try {
       const {
         data: { data },
@@ -292,7 +288,7 @@ export const useGlobalSync = () => {
       }
 
       for (const clip of data) {
-        // await clipsDB.delete(sqlite.performSQLAction, () => {}, clip.id);
+        await db.clips.delete(clip.id);
       }
     } catch (err: any) {
       console.log(err);

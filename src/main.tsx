@@ -1,16 +1,16 @@
+import { IonApp } from "@ionic/react";
 import { createRoot } from "react-dom/client";
-import App from "./App";
-import { IonApp, IonNav, IonRouterOutlet } from "@ionic/react";
 import { Provider } from "react-redux";
+import App from "./App";
 import { store } from "./store/store";
 /* Theme variables */
 import "@ionic/react/css/palettes/dark.class.css";
-import "./theme/variables.css";
 import "./styles.scss";
+import "./theme/variables.css";
 
-import { JeepSqlite } from "jeep-sqlite/dist/components/jeep-sqlite";
 import { CapacitorSQLite, SQLiteConnection } from "@capacitor-community/sqlite";
 import { Capacitor } from "@capacitor/core";
+import { JeepSqlite } from "jeep-sqlite/dist/components/jeep-sqlite";
 
 const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
 prefersDark.addEventListener("change", (e) => toggleDarkMode());

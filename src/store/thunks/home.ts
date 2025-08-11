@@ -3,7 +3,7 @@ import { db } from "@/hooks/useDexie";
 import { getHome } from "@/services/home";
 import { setAdmin, setPodcast } from "@/store/slices/homeSlice";
 
-export const getHomeThunk = (sqlite: any): any => {
+export const getHomeThunk = (): any => {
   return async (dispatch: any) => {
     const { data } = await getHome({});
 

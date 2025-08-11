@@ -17,6 +17,7 @@ import styles from "../Login.module.scss";
 import { GmailLogin } from "@/firebase/auth";
 import { login, register } from "@/services/auth";
 
+import { db } from "@/hooks/useDexie";
 import { usePreferences } from "@/hooks/usePreferences";
 import { setUser } from "@/store/slices/userSlice";
 import { eye, eyeOff } from "ionicons/icons";
@@ -58,13 +59,10 @@ export const Login = () => {
         password,
         device: "app",
       });
-/*
-      const token = await FCM.getToken();
-      console.log("FCM Token:", token.token);
 
-      data.fcm_token = token.token;
-*/
       await setPreference(keys.TOKEN, data.token);
+
+      await db.user.put(data.user);
       dispatch(setUser(data.user));
 
       setTimeout(() => {
