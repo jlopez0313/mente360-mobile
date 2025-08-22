@@ -1,5 +1,25 @@
 import { baseApi } from './api';
 
+export const nextCrecimiento = async( formData: {}, userID: string ): Promise<any> => {
+
+    return new Promise( async (resolve, reject) => {
+        const { post } = baseApi();
+    
+        try {
+            resolve ( await post('/usuarios/next_crecimiento/' + userID, formData, { "Content-type": "application/json" } ) )
+        } catch( error: any ) {
+            if (error.response) {
+                reject(error.response)
+            } else if (error.request) {
+                reject(error.request)
+            } else {
+                reject(error)
+            }
+        }    
+    })
+    
+}
+
 export const update = async( formData: {}, userID: string ): Promise<any> => {
 
     return new Promise( async (resolve, reject) => {

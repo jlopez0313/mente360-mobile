@@ -46,12 +46,12 @@ export const Footer = (props: any) => {
             </Link>
 
             <Link
-              to="/crecimiento"
+              to="/comunidades"
               replace={true}
               onClick={() => setTab(history.location.pathname)}
             >
               <IonButton
-                className={tab.includes("/crecimiento") ? styles.active : ""}
+                className={tab.includes("/comunidades") ? styles.active : ""}
               >
                 <IonIcon slot="icon-only" src={crecimiento}></IonIcon>
               </IonButton>

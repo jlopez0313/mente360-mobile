@@ -29,6 +29,7 @@
     --color-secondary: #F2B10A;
     --ion-color-primary: #ffc547;
     --ion-color: #555;
+    
 
     --fade-background-rgb: 255,245,236;
 
@@ -68,19 +69,25 @@ body.dark {
 
   ion-chip {
     --bg-main: #fff;
-    --ion-color: #555;
+    --ion-color: #666;
   }
 }
 
 ion-header {
+
+  ion-toolbar {
+    padding-top: 3px !important;
+    padding-bottom: 3px!important;
+  }
  
     ion-button {
       color: #000;
     }
   
     ion-title {
-      font-weight: 500;
-      color: #fff;;
+      color: var(--ion-color);
+      font-weight: bold;
+      font-size: 1.2rem;
     }
 }
 

@@ -6,7 +6,7 @@ import Chat from "./pages/Chat/Chat";
 import Grupo from "./pages/Chat/Grupo/Grupo";
 import Info from "./pages/Chat/Grupo/Info/Info";
 import Interno from "./pages/Chat/Interno/Interno";
-import Configuracion from "./pages/Configuracion/Configuración";
+import Configuracion from "./pages/Configuracion/Configuracion";
 import Crecimiento from "./pages/Crecimiento/Crecimiento";
 import Home from "./pages/Home/Home";
 import Sharing from "./pages/Home/Share/Sharing";
@@ -46,6 +46,10 @@ import { Toast } from "@/components/Shared/Toast/Toast";
 import { CapacitorUpdater } from '@capgo/capacitor-updater';
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
+import Canales from "./pages/Canales/Canales";
+import Comunidades from "./pages/Comunidades/Comunidades";
+import Subscribe from "./pages/Comunidades/Subscribe/Subscribe";
+import Lider from "./pages/Lider/Lider";
 import Detalle from "./pages/Planes/Detalle/Detalle";
 import Planes from "./pages/Planes/Planes/Planes";
 import Splash from "./pages/Splash/Splash";
@@ -110,12 +114,16 @@ const App: React.FC = () => {
             <Route exact={true} path="/grupo/info/:id" component={Info} />
             <Route exact={true} path="/grupo/:id" component={Grupo} />
 
+            <Route exact={true} path="/comunidades" component={Comunidades} />
+            <Route exact={true} path="/comunidades/:id/subscribe" component={Subscribe} />
+            <Route exact={true} path="/crecimiento/:id" component={Crecimiento} />
+            
+            <Route exact={true} path="/lideres/:id/canales" component={Canales} />
+            <Route exact={true} path="/lider/:id/:canal" component={Lider} />
+
             <Route exact={true} path="/home" component={Home} />
             <Route exact={true} path="/share" component={Sharing} />
-
-            <Route exact={true} path="/crecimiento" component={Crecimiento} />
             <Route exact={true} path="/configuracion" component={Configuracion} />
-
             <Route exact={true} path="/login" component={Login} />
             <Route exact={true} path="/reset" component={Reset} />
             <Route exact={true} path="/registro" component={Registro} />

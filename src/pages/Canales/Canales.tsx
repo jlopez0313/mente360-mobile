@@ -1,0 +1,64 @@
+import {
+  IonButton,
+  IonButtons,
+  IonContent,
+  IonHeader,
+  IonIcon,
+  IonPage,
+  IonTitle,
+  IonToolbar
+} from "@ionic/react";
+
+import { Canales as CanalesComponent } from "@/components/Canales/Canales";
+import { Footer } from "@/components/Footer/Footer";
+import { arrowBack } from "ionicons/icons";
+import { useEffect } from "react";
+import { Link, useHistory } from "react-router-dom";
+import styles from "./Canales.module.scss";
+
+const Canales: React.FC = () => {
+  
+  const history = useHistory();
+
+  useEffect(() => {
+    const handleBackButton = (ev: Event) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      history.replace("/comunidades");
+    };
+
+    document.addEventListener("ionBackButton", handleBackButton);
+
+    return () => {
+      document.removeEventListener("ionBackButton", handleBackButton);
+    };
+  }, [history]);
+
+  return (
+    <IonPage>
+      <IonHeader>
+        <IonToolbar className={styles['ion-header']}>
+          <IonButtons slot="start">
+            <Link to='/comunidades' replace={true}>
+              <IonButton fill="clear"  className={styles.backButton}>
+                <IonIcon slot="start" icon={arrowBack} />
+              </IonButton>
+            </Link>
+          </IonButtons>
+
+          <IonTitle className="ion-no-padding ion-padding-end ion-text-center"> Canales </IonTitle>
+        </IonToolbar>
+      </IonHeader>
+
+      <IonContent fullscreen className={styles['ion-content']}>
+
+        <CanalesComponent />
+
+      </IonContent>
+
+      <Footer />
+    </IonPage>
+  );
+};
+
+export default Canales;

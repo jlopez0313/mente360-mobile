@@ -75,7 +75,7 @@ export const Register = () => {
         history.replace("/registro");
       }, 1000);
     } catch (error: any) {
-      console.log(error);
+      console.error(error);
 
       presentAlert({
         header: "Alerta!",

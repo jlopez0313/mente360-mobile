@@ -1,0 +1,34 @@
+.ion-content { 
+    ion-list {
+        background: none;
+
+        ion-item-group {
+            --background: var(--bg-secondary);
+
+            ion-item-divider {
+                --background: none;
+                border-bottom: none;
+                padding: 0;
+
+                ion-label {
+                    color: #787878 !important;
+                    font-weight: bold;
+                }
+            }
+        }
+    }
+
+    ion-item {
+        background: none;
+        border: 1px solid var(--bg-main);
+        --border-radius: 3px;
+
+        ion-label {
+            text-align: justify;
+        }
+    }
+
+    .version {
+        font-size: .8rem;
+    }
+}

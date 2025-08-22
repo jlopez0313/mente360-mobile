@@ -34,6 +34,7 @@ import { db } from '@/hooks/useDexie';
 import { useNetwork } from "@/hooks/useNetwork";
 import { usePayment } from "@/hooks/usePayment";
 import { setUser } from "@/store/slices/userSlice";
+import { toastController } from "@ionic/core";
 import { useLiveQuery } from "dexie-react-hooks";
 
 export const Perfil = () => {
@@ -145,6 +146,13 @@ export const Perfil = () => {
       };
 
       await updateData(`users/${user.id}`, obj);
+
+      const toast = await toastController.create({
+        message: "Perfil Actualizado!",
+        duration: 1000
+      });
+
+      toast.present();
 
     } catch (error: any) {
       console.log(error);

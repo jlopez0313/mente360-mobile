@@ -12,7 +12,7 @@ export const DBProvider = ({ children }: any) => {
 
   const { user } = useSelector((state: any) => state.user);
   const network = useNetwork();
-  const state = { };
+  const state = {};
 
   useEffect(() => {
     const checkPayment = () => {
@@ -23,6 +23,30 @@ export const DBProvider = ({ children }: any) => {
           if (user) {
             dispatch(setUser({ ...user, ...data }));
           }
+        });
+
+        onValue(readData("subscriptions/" + user.id), (snapshot) => {
+          const data = snapshot.val();
+          const suscripciones = data
+            ?.filter((item: any) => item)
+            .map((item: any) => {
+              return {
+                comunidad: '',
+                created_at: null,
+                deleted_at: null,
+                id: item.comunidades_id,
+                pivot: {
+                  comunidades_id: item.comunidades_id,
+                  fecha_pago: item.fecha_pago,
+                  fecha_vencimiento: item.fecha_vencimiento,
+                  id: item.id,
+                  users_id: user.id,
+                },
+                updated_at: null,
+              };
+            });
+
+          dispatch(setUser({ ...user, suscripciones: [...suscripciones] }));
         });
       }
     };

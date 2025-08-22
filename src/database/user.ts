@@ -23,4 +23,5 @@ export default interface User {
   fecha_pago: string;
   fecha_vencimiento: string;
   crecimiento: Crecimientos;
+  suscripciones: any[];
 }

@@ -11,24 +11,20 @@
         justify-content: center;
         width: 100%;
 
-        .canal {
-          font-weight: bold;
-        }
-
         .lider {
-          font-size: .8rem;
+          font-weight: bold;
         }
     }
   }
 }
 
-.ion-content {    
-  /*  
+.ion-content {
+/*
   --background: url('/images/modal.png') no-repeat cover fixed center;
 
   background: url('/assets/images/modal.png') no-repeat fixed center; 
   background-size: cover;
-  */
+*/
   --background: var(--bg-content);
   background: var(--bg-content);
 }

@@ -1,52 +1,43 @@
 import Avatar from "@/assets/images/avatar.jpg";
-import { Crecimiento as CrecimientoComponent } from "@/components/Crecimiento/Crecimiento";
 import {
   IonAvatar,
   IonButton,
   IonButtons,
   IonContent,
   IonHeader,
+  IonIcon,
   IonItem,
   IonPage,
   IonText,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import styles from "./Crecimiento.module.scss";
 
 import { Footer } from "@/components/Footer/Footer";
-import { IonIcon } from "@ionic/react";
-import { arrowBack } from "ionicons/icons";
-import { Link, useHistory, useParams } from "react-router-dom";
-
-import { destroy } from "@/helpers/musicControls";
+import { Lider as LiderComponent } from "@/components/Lider/Lider";
 import { db } from "@/hooks/useDexie";
-import { setShowGlobalAudio } from "@/store/slices/audioSlice";
 import { useLiveQuery } from "dexie-react-hooks";
+import { arrowBack } from "ionicons/icons";
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { Link, useHistory, useParams } from "react-router-dom";
+import styles from "./Lider.module.scss";
 
-const Crecimiento: React.FC = () => {
+const Lider: React.FC = () => {
   const baseURL = import.meta.env.VITE_BASE_BACK;
 
-  const { id } = useParams<any>();
-  const dispatch = useDispatch();
   const history = useHistory();
+  const { canal } = useParams<any>();
 
-  const canal = useLiveQuery(() =>
-    db.canales.where("id").equals(Number(id)).first()
+  const objCanal = useLiveQuery(
+    () => db.canales.where("id").equals(Number(canal)).first(),
+    [canal]
   );
-
-  const goToLider = () => {
-    if (canal?.lider?.id)
-      history.replace(`/lider/${canal.lider?.id}/${canal.id}`);
-  };
 
   useEffect(() => {
     const handleBackButton = (ev: Event) => {
       ev.preventDefault();
       ev.stopPropagation();
-      history.replace(`/lideres/${canal?.lider?.id}/canales`);
+      history.replace(`/crecimiento/${canal}`);
     };
 
     document.addEventListener("ionBackButton", handleBackButton);
@@ -56,46 +47,41 @@ const Crecimiento: React.FC = () => {
     };
   }, [history]);
 
-  useEffect(() => {
-    dispatch(setShowGlobalAudio(true));
-
-    return () => {
-      destroy();
-    };
-  }, []);
-
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar className={styles["ion-header"]}>
           <IonButtons slot="start">
-            <Link to={`/lideres/${canal?.lider?.id}/canales`} replace={true}>
+            <Link to={`/crecimiento/${canal}`} replace={true}>
               <IonButton fill="clear" className={styles.backButton}>
                 <IonIcon slot="start" icon={arrowBack} />
               </IonButton>
             </Link>
           </IonButtons>
 
-          <IonTitle class="ion-no-padding ion-padding-end ion-text-center">
-            {" "}
+          <IonTitle className="ion-no-padding ion-padding-end ion-text-center">
             <IonItem lines="none" className={`${styles["canal"]}`}>
               <div className={styles["info"]}>
-                <IonText className={styles["canal"]}> {canal?.canal} </IonText>
                 <IonText className={styles["lider"]}>
                   {" "}
-                  {canal?.lider?.name}{" "}
+                  {objCanal?.lider?.name}{" "}
                 </IonText>
               </div>
-              <IonAvatar slot="end" onClick={goToLider}>
-                <img alt=""  src={canal?.lider?.photo ? baseURL + canal?.lider?.photo : Avatar} />
+              <IonAvatar slot="end">
+                <img
+                  alt=""
+                  src={
+                    objCanal?.lider?.photo ? baseURL + objCanal?.lider?.photo : Avatar
+                  }
+                />
               </IonAvatar>
             </IonItem>{" "}
           </IonTitle>
         </IonToolbar>
       </IonHeader>
 
-      <IonContent fullscreen className={`ion-padding ${styles["ion-content"]}`}>
-        <CrecimientoComponent />
+      <IonContent fullscreen className={styles["ion-content"]}>
+        <LiderComponent />
       </IonContent>
 
       <Footer />
@@ -103,4 +89,4 @@ const Crecimiento: React.FC = () => {
   );
 };
 
-export default Crecimiento;
+export default Lider;

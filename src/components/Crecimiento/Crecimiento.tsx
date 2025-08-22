@@ -1,3 +1,4 @@
+
 import {
   IonProgressBar,
   IonSelect,
@@ -10,7 +11,7 @@ import styles from "./Crecimiento.module.scss";
 import "swiper/css";
 import { Swiper, SwiperSlide } from "swiper/react";
 
-import { update } from "@/services/user";
+import { nextCrecimiento } from "@/services/user";
 import { resetStore } from "@/store/slices/audioSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { Card } from "./Card/Card";
@@ -21,8 +22,10 @@ import { usePayment } from "@/hooks/usePayment";
 import { setPodcast } from "@/store/slices/homeSlice";
 import { setUser } from "@/store/slices/userSlice";
 import { useLiveQuery } from "dexie-react-hooks";
+import { useParams } from "react-router";
 
 export const Crecimiento = () => {
+  const { id } = useParams<any>();
   const dispatch = useDispatch();
 
   const network = useNetwork();
@@ -33,18 +36,33 @@ export const Crecimiento = () => {
     slidePrev: () => {},
     slideNext: () => {},
   });
-  
 
   const { user } = useSelector((state: any) => state.user);
   const { userEnabled, payment_status } = usePayment();
 
-  
   const [activeIdx, setActiveIdx] = useState(0);
-  const [nivelID, setNivelID] = useState<any>(null);
+  const [nivelID, setNivelID] = useState<number>(1);
   const [progress, setProgress] = useState(0);
 
-  const niveles = useLiveQuery(() => db.niveles.orderBy("orden").toArray());
-  
+  const niveles = useLiveQuery(
+    () =>
+      db.niveles
+        .orderBy("orden")
+        .filter((n: any) => n?.canal?.id == id)
+        .toArray(),
+    [id]
+  );
+
+  const nivel = useLiveQuery(() => {
+    if (!nivelID) return null;
+    return db.niveles.where("id").equals(nivelID).first();
+  }, [nivelID]);
+
+  const canal = useLiveQuery(() => {
+    if (!nivel?.canal?.id) return null;
+    return db.canales.where("id").equals(nivel?.canal?.id).first();
+  }, [nivel]);
+
   const crecimientos = useLiveQuery(
     () =>
       db.crecimientos
@@ -67,19 +85,17 @@ export const Crecimiento = () => {
             );
             swiper.slideTo(idx);
           }
-          
+
           return resultados;
         }),
     [nivelID]
   );
 
-  const [crecimiento, setCrecimiento] = useState<any>({});
-
   const onSetNivel = async (level: any) => {
     setNivelID(level);
 
     if (level == 0) {
-      const updatePromise = update(
+      const updatePromise = nextCrecimiento(
         {
           niveles_id: 1,
         },
@@ -101,11 +117,9 @@ export const Crecimiento = () => {
     if (crecimientos?.length) {
       setActiveIdx(swiper.activeIndex + 1);
       setProgress((swiper.activeIndex + 1) / crecimientos.length);
-      setCrecimiento(crecimientos[swiper.activeIndex]);
     } else {
       setActiveIdx(0);
       setProgress(0);
-      setCrecimiento({});
     }
   };
 
@@ -125,7 +139,7 @@ export const Crecimiento = () => {
         const _nivelID = niveles[nextNivelIdx].id;
         setNivelID(_nivelID);
 
-        const updatePromise = update(
+        const updatePromise = nextCrecimiento(
           {
             niveles_id: _nivelID,
           },
@@ -159,7 +173,7 @@ export const Crecimiento = () => {
 
   const onSaveNext = async (idx: number) => {
     if (crecimientos && crecimientos[idx + 1]) {
-      const updatePromise = update(
+      const updatePromise = nextCrecimiento(
         {
           crecimientos_id: crecimientos[idx + 1].id,
         },
@@ -172,6 +186,7 @@ export const Crecimiento = () => {
 
       await Promise.all([updatePromise, setUserPromise]);
     }
+    
     onGoNext();
 
     await dispatch(setPodcast({ done: 1 }));
@@ -180,9 +195,16 @@ export const Crecimiento = () => {
   const compareWithFn = (o1: any, o2: any) => {
     return o1 && o2 && o1 == o2;
   };
-
+  
   useEffect(() => {
-    setNivelID(user.crecimiento?.niveles_id ?? 7); // 7 es el nivel 0
+    const onStartNivel = () => {
+      if (!user.crecimientos) {
+        const nivel = user.crecimientos.find( (c: any) => c.nivel?.canales_id == id);
+        setNivelID(nivel ?? 7); // 7 es el nivel 0
+      }
+    }
+
+    onStartNivel();
     dispatch(resetStore());
   }, []);
 
@@ -192,6 +214,8 @@ export const Crecimiento = () => {
 
   return (
     <div className={`ion-no-padding ${styles["ion-content"]}`}>
+      
+
       <IonSelect
         placeholder="Nivel"
         labelPlacement="stacked"

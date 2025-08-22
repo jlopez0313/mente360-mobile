@@ -1,8 +1,10 @@
+import { all as getAllCanales } from "@/services/canales";
 import { all as getAllCategorias } from "@/services/categorias";
 import {
   all as getAllClips,
   trashed as getTrashedClips,
 } from "@/services/clips";
+import { all as getAllComunidades } from "@/services/comunidades";
 import { all as getAllConstants } from "@/services/constants";
 import { all as getAllCrecimientos } from "@/services/crecimientos";
 import { all as getAllNiveles } from "@/services/niveles";
@@ -35,6 +37,7 @@ export const useGlobalSync = () => {
       const { data } = await getAllConstants();
       await db.generos.bulkPut(data.generos);
       await db.eneatipos.bulkPut(data.eneatipos);
+      await db.planes.bulkPut(data.planes);
 
       console.log("syncConstants completa.");
     } catch (error) {
@@ -62,6 +65,53 @@ export const useGlobalSync = () => {
       console.log("syncNiveles completa.");
     } catch (error) {
       console.error("Error syncNiveles:", error);
+    }
+  };
+
+  const syncComunidades = async () => {
+    try {
+      console.log("start syncComunidades");
+
+      const lastSync = await getPreference(keys.SYNC_KEY);
+      const fromDate = lastSync ?? initSync;
+
+      const {
+        data: { data },
+      } = await getAllComunidades(fromDate);
+
+      if (!data.length) {
+        return;
+      }
+
+      await db.comunidades.bulkPut(data);
+
+      console.log("syncComunidades completa.");
+    } catch (error) {
+      console.error("Error syncComunidades:", error);
+    }
+  };
+
+  
+  const syncCanales = async () => {
+    try {
+      console.log("start syncCanales");
+
+      const lastSync = await getPreference(keys.SYNC_KEY);
+      const fromDate = lastSync ?? initSync;
+
+      const {
+        data: { data },
+      } = await getAllCanales(fromDate);
+
+      if (!data.length) {
+        return;
+      }
+
+      await db.canales.bulkPut(data);
+
+      console.log("syncCanales completa.");
+    } catch (error) {
+      console.error("Error syncCanales:", error);
     }
   };
 
@@ -309,6 +359,8 @@ export const useGlobalSync = () => {
         await Promise.all([
           syncConstants(),
           syncNiveles(),
+          syncComunidades(),
+          syncCanales(),
           syncCategorias(),
           syncPlaylist(),
         ]);
