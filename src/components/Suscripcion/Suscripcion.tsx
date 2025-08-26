@@ -24,26 +24,31 @@ import { cardOutline } from "ionicons/icons";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router";
+import styles from "./Suscripcion.module.scss";
 
-import styles from "./Comunidades.module.scss";
-
-export const Comunidades = () => {
+export const Suscripcion = () => {
   const baseURL = import.meta.env.VITE_BASE_BACK;
 
   const history = useHistory();
   const network = useNetwork();
 
-  const [present, dismiss] = useIonLoading();
-  const [presentSheet, dismissSheet] = useIonActionSheet();
-
   const { user } = useSelector((state: any) => state.user);
+  const suscripciones = user.suscripciones.map((s: any) => s.id);
 
-  const { userEnabled, payment_status } = usePayment();
-
-  const comunidades = useLiveQuery(() => db.comunidades.toArray());
   const plan = useLiveQuery(() =>
     db.planes.where("key").equals("COMUNIDAD").first()
   );
+
+  const [present, dismiss] = useIonLoading();
+  const [presentSheet, dismissSheet] = useIonActionSheet();
+
+  const comunidades = useLiveQuery(
+    () =>
+      db.comunidades.filter((c: any) => suscripciones.includes(c.id)).toArray(),
+    [suscripciones]
+  );
+
+  const { userEnabled, payment_status } = usePayment();
 
   const [isPremiumOpen, setIsPremiumOpen] = useState(false);
 
@@ -51,46 +56,52 @@ export const Comunidades = () => {
     if (!userEnabled || payment_status == "free") {
       setIsPremiumOpen(true);
     } else {
-      if (user.suscripciones.some((s: any) => s.id == comunidadId)) {
-        history.replace(`/lideres/${liderId}/canales`);
+      if (!user.suscripciones.some((s: any) => s.id == comunidadId)) {
+        setIsPremiumOpen(true);
       } else {
-        return;
+        history.replace(`/lideres/${liderId}/canales`);
       }
     }
   };
 
-  const hasSuscription = (comunidadId: number) => {
+  const getFechaVencimiento = () => {
+    return new Date(user.fecha_vencimiento)
+      .toLocaleDateString("es-ES", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      })
+      .replaceAll("/", "-");
+  };
 
-    
-    if (
-      !userEnabled ||
-      payment_status == "free" ||
-      !user.suscripciones.some((s: any) => s.id == comunidadId)
-    ) {
-      return false;
-    } else if (user.suscripciones.some((s: any) => s.id == comunidadId)) {
-      const fecha_vencimiento = user.suscripciones.find(
-        (s: any) => s.id == comunidadId
-      )?.pivot?.fecha_vencimiento;
-      if (!fecha_vencimiento) {
-        return null;
-      }
-
-      const fecha = new Date(fecha_vencimiento);
-      const hoy = new Date();
-
-      if ( fecha < hoy ) {
-        return false;
-      }
+  const getFinSuscripcion = (comunidadID: number) => {
+    const fecha_vencimiento = user.suscripciones.find(
+      (s: any) => s.id == comunidadID
+    )?.pivot?.fecha_vencimiento;
+    if (!fecha_vencimiento) {
+      return null;
     }
-    return true;
+
+    const fecha = new Date(fecha_vencimiento);
+    const hoy = new Date();
+
+    return {
+      fecha_formateada: new Date(fecha_vencimiento)
+        .toLocaleDateString("es-ES", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        })
+        .replaceAll("/", "-"),
+      vencida: fecha < hoy,
+    };
   };
 
   const onPresentSheet = async (comunidad: any) => {
     await presentSheet({
       cssClass: "custom-action-sheet",
-      header: comunidad?.comunidad,
-      subHeader: comunidad?.lider?.name,
+      header: comunidad.comunidad,
+      subHeader: comunidad.lider?.name,
       buttons:
         plan?.valor?.map((p: any) => {
           const tipo_plan =
@@ -110,7 +121,7 @@ export const Comunidades = () => {
               onSubscribe({
                 precio: p.valor,
                 titulo: "plan " + tipo_plan,
-                comunidad: comunidad?.id,
+                comunidad: comunidad.id,
               }),
           };
         }) ?? [],
@@ -128,7 +139,7 @@ export const Comunidades = () => {
         const avatar = document.createElement("img");
 
         if (network.status) {
-          avatar.src = baseURL + comunidad?.imagen;
+          avatar.src = baseURL + comunidad.imagen;
         } else {
           avatar.src = AudioNoWifi;
         }
@@ -140,11 +151,11 @@ export const Comunidades = () => {
         textContainer.classList.add("text-container");
 
         const title = document.createElement("span");
-        title.textContent = comunidad?.comunidad;
+        title.textContent = comunidad.comunidad;
         title.classList.add("title");
 
         const subTitle = document.createElement("span");
-        subTitle.textContent = comunidad?.lider?.name || "";
+        subTitle.textContent = comunidad.lider?.name || "";
         subTitle.classList.add("sub-title");
 
         textContainer.appendChild(title);
@@ -160,8 +171,6 @@ export const Comunidades = () => {
   };
 
   const onSubscribe = async (item: any) => {
-    if ((userEnabled && payment_status != "free") || !network.status) return;
-
     try {
       await present({
         message: "Cargando...",
@@ -180,37 +189,62 @@ export const Comunidades = () => {
 
   return (
     <div className={styles["ion-content"]}>
-      <IonGrid>
+      {userEnabled && payment_status != "free" ? (
+        <div
+          className={`ion-margin-top ion-margin-bottom ion-text-center ${styles["premium"]}`}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "baseline",
+          }}
+        >
+          <span style={{ fontWeight: "bold" }}>
+            {import.meta.env.VITE_NAME} PREMIUM
+          </span>
+          <span>Vence el: {getFechaVencimiento()}</span>
+        </div>
+      ) : null}
+
+      <IonGrid className="ion-no-padding">
         <IonRow>
           {comunidades?.map((comunidad: any, idx: number) => {
+            const finSuscripcion = getFinSuscripcion(comunidad.id);
+
             return (
               <IonCol size="6" key={idx}>
                 <IonCard
                   onClick={() =>
-                    hasSuscription(comunidad?.id) &&
-                    goToCanales(comunidad?.id, comunidad?.lider?.id)
+                    !finSuscripcion?.vencida &&
+                    goToCanales(comunidad.id, comunidad.lider?.id)
                   }
                 >
                   <img
-                    alt={comunidad?.comunidad}
+                    alt={comunidad.comunidad}
                     src={
-                      network.status ? baseURL + comunidad?.imagen : AudioNoWifi
+                      network.status ? baseURL + comunidad.imagen : AudioNoWifi
                     }
                   />
-
                   <IonCardHeader>
-                    <IonCardTitle> {comunidad?.comunidad} </IonCardTitle>
-                    <IonCardSubtitle> {comunidad?.lider?.name} </IonCardSubtitle>
+                    <IonCardTitle> {comunidad.comunidad} </IonCardTitle>
+                    <IonCardSubtitle> {comunidad.lider?.name} </IonCardSubtitle>
                   </IonCardHeader>
                   <IonCardContent>
-                    {!hasSuscription(comunidad?.id) && (
-                      <IonButton
-                        onClick={() => onPresentSheet(comunidad)}
-                        expand="block"
-                        className={styles["suscribete"]}
-                      >
-                        Suscribete
-                      </IonButton>
+                    {finSuscripcion?.vencida ? (
+                      <>
+                        <span>
+                          Venció el: {finSuscripcion.fecha_formateada}
+                        </span>
+
+                        <IonButton
+                          onClick={() => onPresentSheet(comunidad)}
+                          className={styles["suscribete"]}
+                          expand="block"
+                        >
+                          Suscribete
+                        </IonButton>
+                      </>
+                    ) : (
+                      <span>Vence el: {finSuscripcion?.fecha_formateada}</span>
                     )}
                   </IonCardContent>
                 </IonCard>

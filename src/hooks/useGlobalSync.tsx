@@ -35,8 +35,14 @@ export const useGlobalSync = () => {
       console.log("start syncConstants");
       
       const { data } = await getAllConstants();
+      
+      await db.generos.clear();
       await db.generos.bulkPut(data.generos);
+      
+      await db.eneatipos.clear();
       await db.eneatipos.bulkPut(data.eneatipos);
+      
+      await db.planes.clear();
       await db.planes.bulkPut(data.planes);
 
       console.log("syncConstants completa.");
@@ -90,7 +96,6 @@ export const useGlobalSync = () => {
       console.error("Error syncComunidades:", error);
     }
   };
-
   
   const syncCanales = async () => {
     try {

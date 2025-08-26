@@ -87,7 +87,7 @@ export const Perfil = () => {
     }
   };
 
-  const onSetUser = (idx: string, value: string | boolean) => {
+  const onSetUser = (idx: string, value: any) => {
     usuario[idx] = value;
     setUsuario({ ...usuario });
   };
@@ -172,8 +172,8 @@ export const Perfil = () => {
     history.replace('/planes');
   }
 
-  const goToDetalle = async () => {
-    history.replace('/planes/detalle');
+  const goToSuscripcion = async () => {
+    history.replace('/suscripcion');
   }
 
   const getFechaVencimiento = ()=> {
@@ -235,7 +235,7 @@ export const Perfil = () => {
         userEnabled && payment_status != 'free' ?
           <div 
             className={`ion-margin-top ion-margin-bottom ion-text-center ${styles['premium']}`}
-            onClick={goToDetalle}
+            onClick={goToSuscripcion}
           >
             <div style={{display: 'flex', flexDirection: 'column', alignItems: 'baseline'}}>
               <span style={{fontWeight: 'bold'}}>{import.meta.env.VITE_NAME} PREMIUM</span>

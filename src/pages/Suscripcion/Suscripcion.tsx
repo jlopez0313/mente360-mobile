@@ -9,21 +9,21 @@ import {
   IonToolbar,
 } from "@ionic/react";
 
-import { Subscribe as SubscribeComponent } from "@/components/Comunidades/Subscribe/Subscribe";
 import { Footer } from "@/components/Footer/Footer";
+import { Suscripcion as SuscripcionComponent } from "@/components/Suscripcion/Suscripcion";
 import { arrowBack } from "ionicons/icons";
 import { useEffect } from "react";
 import { Link, useHistory } from "react-router-dom";
-import styles from "./Subscribe.module.scss";
+import styles from "./Suscripcion.module.scss";
 
-const Subscribe: React.FC = () => {
+const Suscripcion: React.FC = () => {
   const history = useHistory();
 
   useEffect(() => {
     const handleBackButton = (ev: Event) => {
       ev.preventDefault();
       ev.stopPropagation();
-      history.replace("/home");
+      history.replace("/perfil");
     };
 
     document.addEventListener("ionBackButton", handleBackButton);
@@ -38,7 +38,7 @@ const Subscribe: React.FC = () => {
       <IonHeader>
         <IonToolbar className={styles["ion-header"]}>
           <IonButtons slot="start">
-            <Link to="/comunidades" replace={true}>
+            <Link to="/perfil" replace={true}>
               <IonButton fill="clear" className={styles.backButton}>
                 <IonIcon slot="start" icon={arrowBack} />
               </IonButton>
@@ -47,13 +47,13 @@ const Subscribe: React.FC = () => {
 
           <IonTitle className="ion-no-padding ion-padding-end ion-text-center">
             {" "}
-            Suscribete{" "}
+            Mi Suscripción{" "}
           </IonTitle>
         </IonToolbar>
       </IonHeader>
 
-      <IonContent fullscreen className={styles["ion-content"]}>
-        <SubscribeComponent />
+      <IonContent fullscreen className={`ion-padding ${styles["ion-content"]}`}>
+        <SuscripcionComponent />
       </IonContent>
 
       <Footer />
@@ -61,4 +61,4 @@ const Subscribe: React.FC = () => {
   );
 };
 
-export default Subscribe;
+export default Suscripcion;

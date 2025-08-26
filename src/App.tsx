@@ -20,8 +20,7 @@ import Recordatorios from "./pages/Recordatorios/Recordatorios";
 import Registro from "./pages/Registro/Registro";
 import Reset from "./pages/Reset/Reset";
 import Test from "./pages/Test/Test";
-import Thanks from './pages/Thanks/Thanks';
-
+import Thanks from "./pages/Thanks/Thanks";
 
 import { DBProvider } from "./context/Context";
 
@@ -43,16 +42,16 @@ import "@ionic/react/css/text-transformation.css";
 
 /* Theme variables */
 import { Toast } from "@/components/Shared/Toast/Toast";
-import { CapacitorUpdater } from '@capgo/capacitor-updater';
+import { CapacitorUpdater } from "@capgo/capacitor-updater";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import Canales from "./pages/Canales/Canales";
 import Comunidades from "./pages/Comunidades/Comunidades";
-import Subscribe from "./pages/Comunidades/Subscribe/Subscribe";
 import Lider from "./pages/Lider/Lider";
 import Detalle from "./pages/Planes/Detalle/Detalle";
 import Planes from "./pages/Planes/Planes/Planes";
 import Splash from "./pages/Splash/Splash";
+import Suscripcion from "./pages/Suscripcion/Suscripcion";
 import Welcome from "./pages/Welcome/Wecome";
 import "./theme/variables.css";
 
@@ -61,7 +60,6 @@ setupIonicReact({
 });
 
 const App: React.FC = () => {
-
   const { globalAudio, showGlobalAudio } = useSelector(
     (state: any) => state.audio
   );
@@ -71,23 +69,23 @@ const App: React.FC = () => {
       const updateAvailable = await CapacitorUpdater.isAutoUpdateAvailable();
 
       if (updateAvailable) {
-        console.log('Actualización automática disponible');
+        console.log("Actualización automática disponible");
 
         // Escucha cuando la app está lista después de la actualización
-        CapacitorUpdater.addListener('appReady', () => {
-          console.log('La aplicación se actualizó y está lista');
+        CapacitorUpdater.addListener("appReady", () => {
+          console.log("La aplicación se actualizó y está lista");
           CapacitorUpdater.reload();
         });
 
-        console.log('Esperando la aplicación actualizada...');
+        console.log("Esperando la aplicación actualizada...");
       } else {
-        console.log('No hay actualizaciones automáticas disponibles');
+        console.log("No hay actualizaciones automáticas disponibles");
       }
     } catch (error) {
-      console.error('Error verificando actualizaciones:', error);
+      console.error("Error verificando actualizaciones:", error);
     }
   };
-  
+
   useEffect(() => {
     checkForUpdates();
   }, []);
@@ -96,7 +94,6 @@ const App: React.FC = () => {
     <>
       <IonReactRouter>
         <DBProvider>
-          
           {globalAudio && showGlobalAudio && <Toast />}
 
           <IonRouterOutlet>
@@ -115,20 +112,36 @@ const App: React.FC = () => {
             <Route exact={true} path="/grupo/:id" component={Grupo} />
 
             <Route exact={true} path="/comunidades" component={Comunidades} />
-            <Route exact={true} path="/comunidades/:id/subscribe" component={Subscribe} />
-            <Route exact={true} path="/crecimiento/:id" component={Crecimiento} />
-            
-            <Route exact={true} path="/lideres/:id/canales" component={Canales} />
+            <Route
+              exact={true}
+              path="/crecimiento/:id"
+              component={Crecimiento}
+            />
+
+            <Route
+              exact={true}
+              path="/lideres/:id/canales"
+              component={Canales}
+            />
             <Route exact={true} path="/lider/:id/:canal" component={Lider} />
 
             <Route exact={true} path="/home" component={Home} />
             <Route exact={true} path="/share" component={Sharing} />
-            <Route exact={true} path="/configuracion" component={Configuracion} />
+            <Route
+              exact={true}
+              path="/configuracion"
+              component={Configuracion}
+            />
             <Route exact={true} path="/login" component={Login} />
             <Route exact={true} path="/reset" component={Reset} />
             <Route exact={true} path="/registro" component={Registro} />
+            <Route exact={true} path="/suscripcion" component={Suscripcion} />
 
-            <Route exact={true} path="/musicaterapia" component={Musicaterapia} />
+            <Route
+              exact={true}
+              path="/musicaterapia"
+              component={Musicaterapia}
+            />
             <Route exact={true} path="/musicaterapia/clip" component={Clip} />
 
             <Route
@@ -139,14 +152,16 @@ const App: React.FC = () => {
 
             <Route exact={true} path="/perfil" component={Perfil} />
             <Route exact={true} path="/test" component={Test} />
-            <Route exact={true} path="/recordatorios" component={Recordatorios} />
+            <Route
+              exact={true}
+              path="/recordatorios"
+              component={Recordatorios}
+            />
             <Route exact={true} path="/recordatorios/Add" component={Add} />
-
           </IonRouterOutlet>
         </DBProvider>
       </IonReactRouter>
     </>
-
   );
 };
 

@@ -153,7 +153,7 @@ export const Comunidad = () => {
     await Share.share({
       title: "¡Únete a Mente360!",
       text: "Descubre contenido exclusivo y mejora tu bienestar con Mente360. ¡Haz clic para saber más!",
-      url: "https://soymente360.com/invitacion/",
+      url: "https://soymente360.com/#invitacion",
       dialogTitle: "Comparte Mente360 con tus amigos",
     });
   };

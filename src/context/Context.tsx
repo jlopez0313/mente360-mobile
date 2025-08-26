@@ -46,7 +46,7 @@ export const DBProvider = ({ children }: any) => {
               };
             });
 
-          dispatch(setUser({ ...user, suscripciones: [...suscripciones] }));
+            suscripciones && dispatch(setUser({ ...user, suscripciones: [...suscripciones] }));
         });
       }
     };

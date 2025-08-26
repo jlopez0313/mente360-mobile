@@ -1,4 +1,19 @@
-.ion-content { 
+.ion-content {
+    .premium {
+        background-color: var(--bg-main);
+        border-radius: 5px;
+    
+        font-size: 11px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 5px 15px;
+    }
+    
+    .detalle {
+        color: #ffffff !important;
+    }
+    
     ion-list {
         background: none;
 
