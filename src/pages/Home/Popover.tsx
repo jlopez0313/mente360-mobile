@@ -12,15 +12,15 @@ import {
   logoWhatsapp,
   peopleOutline,
   readerOutline,
+  swapHorizontal,
   timeOutline,
 } from "ionicons/icons";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 export const Popover = ({ trigger = "" }) => {
-  
   const network = useNetwork();
-  const { admin } = useSelector( (state: any) => state.home);
+  const { admin } = useSelector((state: any) => state.home);
 
   return (
     <IonPopover trigger={trigger} dismissOnSelect={true}>
@@ -30,6 +30,13 @@ export const Popover = ({ trigger = "" }) => {
             <IonItem button={true} detail={true}>
               <IonIcon slot="start" icon={readerOutline}></IonIcon>
               Realizar Test
+            </IonItem>
+          </Link>
+
+          <Link to="/comunidades/principal" replace={true}>
+            <IonItem button={true} detail={true}>
+              <IonIcon slot="start" icon={swapHorizontal}></IonIcon>
+              Seleccionar comunidad activa
             </IonItem>
           </Link>
 
@@ -93,7 +100,7 @@ export const Popover = ({ trigger = "" }) => {
               <IonIcon slot="start" icon={peopleOutline}></IonIcon>
               Contacta con {admin.name}
             </IonItem>
-          ): null }
+          ) : null}
         </IonList>
       </IonContent>
     </IonPopover>

@@ -65,10 +65,10 @@ export const Tarea: React.FC<any> = ({network}) => {
         value="tarea"
         toggleIcon={tareaIcon}
         toggleIconSlot="start"
-        className={styles["custom-accordion"]}
+        className={`ion-no-padding ${styles["custom-accordion"]}`}
       >
-        <IonItem slot="header">
-          <IonLabel>Tarea de la semana</IonLabel>
+        <IonItem slot="header" lines="none">
+          <IonLabel className="ion-padding">Tarea de la semana</IonLabel>
           {tarea?.done ? (
             <IonIcon icon={trophy} slot="end" className={styles['trofeo']} />
           ) : (

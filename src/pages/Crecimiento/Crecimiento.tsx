@@ -38,15 +38,15 @@ const Crecimiento: React.FC = () => {
   );
 
   const goToLider = () => {
-    if (canal?.lider?.id)
-      history.replace(`/lider/${canal.lider?.id}/${canal.id}`);
+    if (canal?.comunidad?.lider?.id)
+      history.replace(`/lider/${canal.comunidad?.lider?.id}/${canal.id}`);
   };
 
   useEffect(() => {
     const handleBackButton = (ev: Event) => {
       ev.preventDefault();
       ev.stopPropagation();
-      history.replace(`/lideres/${canal?.lider?.id}/canales`);
+      history.replace(`/comunidades/${canal?.comunidad?.id}/canales`);
     };
 
     document.addEventListener("ionBackButton", handleBackButton);
@@ -69,7 +69,7 @@ const Crecimiento: React.FC = () => {
       <IonHeader>
         <IonToolbar className={styles["ion-header"]}>
           <IonButtons slot="start">
-            <Link to={`/lideres/${canal?.lider?.id}/canales`} replace={true}>
+            <Link to={`/comunidades/${canal?.comunidad?.id}/canales`} replace={true}>
               <IonButton fill="clear" className={styles.backButton}>
                 <IonIcon slot="start" icon={arrowBack} />
               </IonButton>
@@ -83,11 +83,11 @@ const Crecimiento: React.FC = () => {
                 <IonText className={styles["canal"]}> {canal?.canal} </IonText>
                 <IonText className={styles["lider"]}>
                   {" "}
-                  {canal?.lider?.name}{" "}
+                  {canal?.comunidad?.lider?.name}{" "}
                 </IonText>
               </div>
               <IonAvatar slot="end" onClick={goToLider}>
-                <img alt=""  src={canal?.lider?.photo ? baseURL + canal?.lider?.photo : Avatar} />
+                <img alt=""  src={canal?.comunidad?.lider?.photo ? baseURL + canal?.comunidad?.lider?.photo : Avatar} />
               </IonAvatar>
             </IonItem>{" "}
           </IonTitle>

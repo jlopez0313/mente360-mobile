@@ -52,14 +52,14 @@ export const Suscripcion = () => {
 
   const [isPremiumOpen, setIsPremiumOpen] = useState(false);
 
-  const goToCanales = (comunidadId: number, liderId: number) => {
+  const goToCanales = (comunidadId: number) => {
     if (!userEnabled || payment_status == "free") {
       setIsPremiumOpen(true);
     } else {
       if (!user.suscripciones.some((s: any) => s.id == comunidadId)) {
         setIsPremiumOpen(true);
       } else {
-        history.replace(`/lideres/${liderId}/canales`);
+        history.replace(`/comunidades/${comunidadId}/canales`);
       }
     }
   };
@@ -215,7 +215,7 @@ export const Suscripcion = () => {
                 <IonCard
                   onClick={() =>
                     !finSuscripcion?.vencida &&
-                    goToCanales(comunidad.id, comunidad.lider?.id)
+                    goToCanales(comunidad.id)
                   }
                 >
                   <img

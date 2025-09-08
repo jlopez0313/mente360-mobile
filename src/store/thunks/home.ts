@@ -5,7 +5,9 @@ import { setAdmin, setPodcast } from "@/store/slices/homeSlice";
 
 export const getHomeThunk = (): any => {
   return async (dispatch: any) => {
-    const { data } = await getHome({});
+    const { data } = await getHome({
+      comunidad: localStorage.getItem("principal") ?? "1"
+    });
 
     await db.audios.clear();
     await db.audios.add({

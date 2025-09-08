@@ -22,12 +22,13 @@ export const Canales = () => {
   const history = useHistory();
   const network = useNetwork();
 
-  const canales = useLiveQuery(() =>
-    db.canales.filter((c) => c.lider?.id == id).toArray()
+  const comunidad = useLiveQuery(() =>
+    db.comunidades.filter((c) => c.id == id).first()
   );
 
-  const comunidad = useLiveQuery(() =>
-    db.comunidades.filter((c) => c.lider?.id == id).first()
+  const canales = useLiveQuery(
+    () => db.canales.filter((c) => c.comunidad?.id == comunidad?.id).toArray(),
+    [comunidad]
   );
 
   const goToCrecimiento = (canalId: number) => {

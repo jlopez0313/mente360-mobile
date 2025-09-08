@@ -52,10 +52,10 @@ export const Audio: React.FC<any> = ({ network }) => {
         value="audio"
         toggleIcon={auriculares}
         toggleIconSlot="start"
-        className={styles["custom-accordion"]}
+        className={`ion-no-padding ${styles["custom-accordion"]}`}
       >
-        <IonItem slot="header">
-          <IonLabel>Audio de la noche</IonLabel>
+        <IonItem slot="header" lines="none">
+          <IonLabel className="ion-padding">Audio de la noche</IonLabel>
           {audio?.done ? (
             <IonIcon icon={trophy} slot="end" className={styles["trofeo"]} />
           ) : (

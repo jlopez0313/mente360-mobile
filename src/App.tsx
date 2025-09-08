@@ -47,6 +47,7 @@ import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import Canales from "./pages/Canales/Canales";
 import Comunidades from "./pages/Comunidades/Comunidades";
+import Principal from "./pages/Comunidades/Principal/Principal";
 import Lider from "./pages/Lider/Lider";
 import Detalle from "./pages/Planes/Detalle/Detalle";
 import Planes from "./pages/Planes/Planes/Planes";
@@ -114,15 +115,20 @@ const App: React.FC = () => {
             <Route exact={true} path="/comunidades" component={Comunidades} />
             <Route
               exact={true}
+              path="/comunidades/principal"
+              component={Principal}
+            />
+            <Route
+              exact={true}
+              path="/comunidades/:id/canales"
+              component={Canales}
+            />
+            <Route
+              exact={true}
               path="/crecimiento/:id"
               component={Crecimiento}
             />
 
-            <Route
-              exact={true}
-              path="/lideres/:id/canales"
-              component={Canales}
-            />
             <Route exact={true} path="/lider/:id/:canal" component={Lider} />
 
             <Route exact={true} path="/home" component={Home} />

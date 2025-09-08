@@ -21,12 +21,13 @@ export const Lider = () => {
 
   const { id } = useParams<any>();
 
-  const canales = useLiveQuery(() =>
-    db.canales.filter((c) => c.lider?.id == id).toArray()
-  );
-
   const comunidad = useLiveQuery(() =>
     db.comunidades.filter((c) => c.lider?.id == id).first()
+  );
+
+  const canales = useLiveQuery(
+    () => db.canales.filter((c) => c.comunidad?.id == comunidad?.id).toArray(),
+    [comunidad]
   );
 
   return (

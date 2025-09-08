@@ -1,0 +1,26 @@
+.ion-content { 
+    ion-list {
+        background: none;
+
+    }
+
+    ion-item {
+        background: none;
+        border: 1px solid var(--bg-main);
+        --border-radius: 3px;
+
+        .texto {
+            display: flex;
+            flex-direction: column;
+
+            .titulo {
+                font-size: 14px;
+                font-weight: bold;
+            }
+
+            .subtitulo {
+                font-size: .8rem;
+            }
+        }
+    }
+}

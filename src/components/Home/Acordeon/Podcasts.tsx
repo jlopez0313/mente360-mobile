@@ -16,16 +16,22 @@ import { useHistory } from "react-router";
 import styles from "./Acordeon.module.scss";
 import crecimiento from "/assets/icons/crecimiento.svg";
 
-export const Podcasts: React.FC<any> = ({network}) => {
+export const Podcasts: React.FC<any> = ({ network }) => {
   const history = useHistory();
 
+  const { user } = useSelector((state: any) => state.user);
   const { podcast } = useSelector((state: any) => state.home);
   const { userEnabled, payment_status } = usePayment();
 
   const [isPremiumOpen, setIsPremiumOpen] = useState(false);
 
   const goToPodcast = () => {
-    history.replace("/crecimiento");
+    const canalID = user.crecimientos.find(
+      (c: any) =>
+        c.nivel?.canal?.comunidades_id ==
+        (localStorage.getItem("principal") ?? "1")
+    )?.canal?.id ?? '1';
+    history.replace("/crecimiento/" + canalID);
   };
 
   return (
@@ -34,10 +40,10 @@ export const Podcasts: React.FC<any> = ({network}) => {
         value="podcast"
         toggleIcon={crecimiento}
         toggleIconSlot="start"
-        className={styles["custom-accordion"]}
+        className={`ion-no-padding ${styles["custom-accordion"]}`}
       >
-        <IonItem slot="header">
-          <IonLabel>Audio del día</IonLabel>
+        <IonItem slot="header" lines="none">
+          <IonLabel className="ion-padding">Audio del día</IonLabel>
           {podcast.done ? (
             <IonIcon icon={trophy} slot="end" className={styles["trofeo"]} />
           ) : (
@@ -49,8 +55,7 @@ export const Podcasts: React.FC<any> = ({network}) => {
           )}
         </IonItem>
         <div className="ion-padding" slot="content">
-          {
-            !userEnabled || payment_status == 'free' ?
+          {!userEnabled || payment_status == "free" ? (
             <IonButton
               onClick={() => setIsPremiumOpen(true)}
               expand="block"
@@ -59,7 +64,7 @@ export const Podcasts: React.FC<any> = ({network}) => {
             >
               Premium
             </IonButton>
-            :
+          ) : (
             <IonButton
               expand="block"
               type="button"
@@ -68,7 +73,7 @@ export const Podcasts: React.FC<any> = ({network}) => {
             >
               Escuchar
             </IonButton>
-          }
+          )}
         </div>
       </IonAccordion>
 

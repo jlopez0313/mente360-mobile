@@ -53,16 +53,6 @@ export const Crecimiento = () => {
     [id]
   );
 
-  const nivel = useLiveQuery(() => {
-    if (!nivelID) return null;
-    return db.niveles.where("id").equals(nivelID).first();
-  }, [nivelID]);
-
-  const canal = useLiveQuery(() => {
-    if (!nivel?.canal?.id) return null;
-    return db.canales.where("id").equals(nivel?.canal?.id).first();
-  }, [nivel]);
-
   const crecimientos = useLiveQuery(
     () =>
       db.crecimientos

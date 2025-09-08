@@ -64,14 +64,14 @@ const Lider: React.FC = () => {
               <div className={styles["info"]}>
                 <IonText className={styles["lider"]}>
                   {" "}
-                  {objCanal?.lider?.name}{" "}
+                  {objCanal?.comunidad?.lider?.name}{" "}
                 </IonText>
               </div>
               <IonAvatar slot="end">
                 <img
                   alt=""
                   src={
-                    objCanal?.lider?.photo ? baseURL + objCanal?.lider?.photo : Avatar
+                    objCanal?.comunidad?.lider?.photo ? baseURL + objCanal?.comunidad?.lider?.photo : Avatar
                   }
                 />
               </IonAvatar>

@@ -51,10 +51,10 @@ export const Mensaje: React.FC<any> = ({network}) => {
         value="mensaje"
         toggleIcon={mensajeIcon}
         toggleIconSlot="start"
-        className={styles["custom-accordion"]}
+        className={`ion-no-padding ${styles["custom-accordion"]}`}
       >
-        <IonItem slot="header">
-          <IonLabel>Mensaje del día</IonLabel>
+        <IonItem slot="header" lines="none">
+          <IonLabel className="ion-padding">Mensaje del día</IonLabel>
           {mensaje?.done ? (
             <IonIcon icon={trophy} slot="end" className={styles['trofeo']} />
           ) : (

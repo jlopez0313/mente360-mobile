@@ -17,7 +17,7 @@ import {
   IonGrid,
   IonRow,
   useIonActionSheet,
-  useIonLoading,
+  useIonLoading
 } from "@ionic/react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { cardOutline } from "ionicons/icons";
@@ -47,21 +47,19 @@ export const Comunidades = () => {
 
   const [isPremiumOpen, setIsPremiumOpen] = useState(false);
 
-  const goToCanales = (comunidadId: number, liderId: number) => {
+  const goToCanales = (comunidadId: number) => {
     if (!userEnabled || payment_status == "free") {
       setIsPremiumOpen(true);
     } else {
       if (user.suscripciones.some((s: any) => s.id == comunidadId)) {
-        history.replace(`/lideres/${liderId}/canales`);
+        history.replace(`/comunidades/${comunidadId}/canales`);
       } else {
         return;
       }
     }
   };
 
-  const hasSuscription = (comunidadId: number) => {
-
-    
+  const hasSuscription = (comunidadId: number) => {  
     if (
       !userEnabled ||
       payment_status == "free" ||
@@ -160,8 +158,6 @@ export const Comunidades = () => {
   };
 
   const onSubscribe = async (item: any) => {
-    if ((userEnabled && payment_status != "free") || !network.status) return;
-
     try {
       await present({
         message: "Cargando...",
@@ -188,7 +184,7 @@ export const Comunidades = () => {
                 <IonCard
                   onClick={() =>
                     hasSuscription(comunidad?.id) &&
-                    goToCanales(comunidad?.id, comunidad?.lider?.id)
+                    goToCanales(comunidad?.id)
                   }
                 >
                   <img
@@ -203,7 +199,7 @@ export const Comunidades = () => {
                     <IonCardSubtitle> {comunidad?.lider?.name} </IonCardSubtitle>
                   </IonCardHeader>
                   <IonCardContent>
-                    {!hasSuscription(comunidad?.id) && (
+                    {!hasSuscription(comunidad?.id) ? (
                       <IonButton
                         onClick={() => onPresentSheet(comunidad)}
                         expand="block"
@@ -211,7 +207,13 @@ export const Comunidades = () => {
                       >
                         Suscribete
                       </IonButton>
-                    )}
+                    ):
+                      <IonButton
+                        expand="block"
+                        fill="outline"
+                        className={styles["suscrito"]}
+                      > Suscrito </IonButton>
+                    }
                   </IonCardContent>
                 </IonCard>
               </IonCol>
