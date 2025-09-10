@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import { all } from "@/services/alarmas";
+import { IonButton } from "@ionic/react";
+import { useEffect, useState } from "react";
+import { useHistory } from "react-router";
 import { Card } from "./Card";
 import styles from "./Recordatorios.module.scss";
-import { IonButton } from "@ionic/react";
-import { useHistory } from "react-router";
-import { all } from "@/services/alarmas";
 
 export const Recordatorios = () => {
   const history = useHistory();
@@ -12,7 +12,6 @@ export const Recordatorios = () => {
 
   const getNotifications = async () => {
     const {data: {data}} = await all();
-    console.log( data )
     setLista(data);
   };
 

@@ -276,12 +276,13 @@ export const Item: React.FC<any> = ({ idx, item, network }) => {
         "audio_" + item.id,
         async (p: any) => {
           setPercent(p);
-          console.log("P es ", p);
         }
       );
-      /*
-      const ruta = "RUTA__RUTA";
-      */
+
+      if(!ruta) {
+        throw new Error("No se pudo descargar el audio");
+      }
+
       console.log("Ruta es ", ruta);
       setPercent(0);
 

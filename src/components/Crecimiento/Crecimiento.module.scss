@@ -1,12 +1,9 @@
 @import url('@/styles.scss');
-
+@import "@/css/_common.scss";
 
 .ion-content {
     .nivel {
-        border: 1px solid var(--bg-main);
-        border-radius: 5px;
-        --background: var(--bg-secondary);
-        background: var(--bg-secondary);
+        @include base-ion-item(5px, var(--bg-secondary));
 
         &::part(text),
         &::part(placeholder) {

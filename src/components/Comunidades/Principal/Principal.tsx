@@ -30,7 +30,7 @@ export const Principal = () => {
   );
 
   const compareWith = (a: any, b: any) => {
-    return a === b;
+    return a == b;
   };
 
   const onSelectPrincipal = (value: number) => {

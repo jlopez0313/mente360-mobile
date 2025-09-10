@@ -1,29 +1,15 @@
+@import "@/css/_common.scss";
+
 .lista {
     --background: none;
     background: none;
 
     ion-searchbar {
-        --border-radius: 5px;
-
-        &.search {
-            --ion-color-warning: var(--bg-card);
-        }
-
-        ion-icon {
-            margin-top: 4px;
-            opacity: .25;
-        }
-
-        input {
-            padding-top: 10px !important;
-            padding-bottom: 10px !important;
-        }
+        @include searchbar-style;
     }
 
     ion-item {
-        background: none;
-        border: 1px solid var(--bg-main);
-        --border-radius: 5px;
+        @include base-ion-item(3px);
         
         ion-note {
             font-size: 15px;
@@ -37,21 +23,7 @@
             margin-bottom: 5px;
 
             ion-label {
-                margin: 5px 0;
-                
-                span {
-                    display: block;
-                    text-align: justify;
-                    color: #666;
-                    &.name {
-                        font-weight: bold;
-                        font-size: 14px;
-                    }
-                    
-                    &.phone {        
-                        font-size: 13px;
-                    }
-                }
+                @include user-info-label;
             }
             
         }

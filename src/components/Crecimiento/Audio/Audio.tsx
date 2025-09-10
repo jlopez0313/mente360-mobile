@@ -107,9 +107,12 @@ export const Audio: React.FC<Props> = memo(
           "podcast_" + audio.id,
           async (p: any) => {
             setPercent(p);
-            console.log("P es ", p);
           }
         );
+
+        if(!ruta) {
+          throw new Error("No se pudo descargar el audio");
+        }
 
         console.log("Ruta es ", ruta);
         setPercent(0);
@@ -134,8 +137,6 @@ export const Audio: React.FC<Props> = memo(
     };
 
     const onRemoveLocal = async () => {
-      console.log("removing");
-
       await db.crecimientos.update(audio.id, {
         imagen_local: "",
         audio_local: "",

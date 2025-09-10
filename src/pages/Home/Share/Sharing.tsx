@@ -37,8 +37,6 @@ const Sharing: React.FC = () => {
         return;
       }
 
-      console.log("dataURL", dataUrl);
-
       const base64Data = dataUrl.split(",")[1];
       const filename = `mente360-${Date.now()}.png`;
 

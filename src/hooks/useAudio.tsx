@@ -18,7 +18,6 @@ export const useAudio: any = (audio: any, onConfirm: any = () => {}) => {
   const [isPlaying, setIsPlaying] = useState(false);
 
   const createAudioFolder = async () => {
-
     try {
       // Intentamos leer la carpeta
       await Filesystem.readdir({
@@ -53,7 +52,7 @@ export const useAudio: any = (audio: any, onConfirm: any = () => {}) => {
       });
       console.log("Archivo eliminado correctamente");
     } catch (error) {
-      console.error("Error eliminando archivo:", filePath, ': ', error);
+      console.error("Error eliminando archivo:", filePath, ": ", error);
     }
   };
 
@@ -79,35 +78,43 @@ export const useAudio: any = (audio: any, onConfirm: any = () => {}) => {
         chunks.push(value);
         receivedLength += value.length;
 
-        console.log( response, response.body, reader, await reader.read(), receivedLength, contentLength, receivedLength / contentLength, ((receivedLength / contentLength) * 100) )
-
         if (onProgress) {
           onProgress(Math.floor((receivedLength / contentLength) * 100));
         }
       }
 
-      const blob = new Blob(chunks, { type: "audio/mp3" });
+      let fullArray = new Uint8Array(receivedLength);
+      let position = 0;
+      for (let chunk of chunks) {
+        fullArray.set(chunk, position);
+        position += chunk.length;
+      }
+
+      const ext = audioUrl.split(".").pop();
+      const blob = new Blob([fullArray], { type: `audio/${ext}` });
       const base64Data = await convertBlobToBase64(blob);
 
       await Filesystem.writeFile({
-        path: `audio/${fileName}.mp3`,
-        data: base64Data.split(",")[1],
+        path: `audio/${fileName}.${ext}`,
+        data: base64Data,
         directory: Directory.Data,
       });
 
-      return `audio/${fileName}.mp3`;
+      return `audio/${fileName}.${ext}`;
     } catch (error) {
       console.error("Error al descargar el audio:", error);
     }
   };
 
-  const convertBlobToBase64 = (blob: Blob): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result as string);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
+  const convertBlobToBase64 = async (blob: Blob): Promise<string> => {
+    const arrayBuffer = await blob.arrayBuffer();
+    let binary = "";
+    const bytes = new Uint8Array(arrayBuffer);
+    const len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary);
   };
 
   const base64ToBlob = (base64: string, mimeType: string) => {
@@ -125,7 +132,8 @@ export const useAudio: any = (audio: any, onConfirm: any = () => {}) => {
       directory: Directory.Data,
     });
 
-    const blob = base64ToBlob(`${file.data}`, "audio/mp3");
+    const ext = filePath.split(".").pop();
+    const blob = base64ToBlob(`${file.data}`, `audio/${ext}`);
     return URL.createObjectURL(blob);
   };
 

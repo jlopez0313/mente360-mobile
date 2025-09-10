@@ -1,4 +1,5 @@
 @import "@/styles.scss";
+@import "@/css/_common.scss";
 
 .ion-content { 
     ion-list {
@@ -6,10 +7,7 @@
     }
 
     ion-item {
-        background: none;
-        border: 1px solid var(--bg-main);
-        border-radius: 3px;
-        
+        @include base-ion-item(3px);      
         
         &.grupo {
             margin-bottom: 5px;
@@ -20,29 +18,12 @@
                 flex-grow: 1;
 
                 .item-user {
-                    margin: 5px 0;
+                    @include user-info-label;
+
                     flex-grow: 1;
                     display: flex;
                     flex-direction: column;
                     justify-content: center;
-                
-                    span {
-                        display: block;
-                        text-align: justify;
-                        color: #666;
-
-                        &.name {
-                            line-height: 13px;
-                            font-weight: bold;
-                            font-size: 14px;
-                        }
-                        
-                        &.phone {
-                            text-align: left;
-                            line-height: 1rem;
-                            font-size: 13px;
-                        }
-                    }
                 }
             }
 

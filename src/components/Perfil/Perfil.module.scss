@@ -1,4 +1,5 @@
 @import "@/styles.scss";
+@import "@/css/_common.scss";
 
 .premium {
     background-color: var(--bg-main);
@@ -62,8 +63,7 @@ div.phone {
         width: 100%;
 
         ion-chip {
-            border-radius: 3px;
-            border: 1px solid var(--bg-main);
+            @include base-ion-item(3px);
         }
     }
 }

@@ -1,0 +1,65 @@
+// Mixin for standard list items
+@mixin base-ion-item($radius: 3px, $backgroud: none) {
+    background: $backgroud;
+    --background: $backgroud;
+
+    border: 1px solid var(--bg-main);
+    --border-radius: $radius;
+    
+    margin-bottom: 5px;
+}
+
+// Mixin for list item dividers
+@mixin item-divider-style {
+    background: none;
+    --background: none;
+    border-bottom: none;
+    padding: 0;
+
+    ion-label {
+        color: var(--text-muted);
+        font-weight: bold;
+        font-size: 15px !important;
+    }
+}
+
+// Mixin for search bars
+@mixin searchbar-style {
+    --border-radius: 5px;
+    color: var(--color);
+
+    &.search {
+        --ion-color-warning: var(--bg-card);
+    }
+
+    ion-icon {
+        margin-top: 5px;
+    }
+
+    input {
+        padding-top: 10px !important;
+        padding-bottom: 10px !important;
+    }
+}
+
+// Common style for user/contact info in a list item
+@mixin user-info-label {
+    margin: 5px 0;
+    
+    span {
+        display: block;
+        text-align: justify;
+        color: var(--text-light);
+
+        &.name {
+            line-height: 16px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        &.phone {
+            line-height: 1rem;
+            font-size: 13px;
+        }
+    }
+}

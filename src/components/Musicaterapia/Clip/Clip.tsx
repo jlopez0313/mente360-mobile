@@ -146,9 +146,12 @@ export const Clip = () => {
         "audio_" + globalAudio.id,
         async (p: any) => {
           setPercent(p);
-          console.log("P es ", p);
         }
       );
+
+      if(!ruta) {
+        throw new Error("No se pudo descargar el audio");
+      }
 
       console.log("Ruta es ", ruta);
       setPercent(0);

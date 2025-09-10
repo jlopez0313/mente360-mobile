@@ -1,4 +1,5 @@
 @import "@/styles.scss";
+@import "@/css/_common.scss";
 
 .ion-content { 
     height: 100%;
@@ -15,45 +16,23 @@
             --background: var(--bg-secondary);
 
             ion-item-divider {
-                background: none;
-                --background: var(--bg-secondary);
-                border-bottom: none;
-                padding-left: 10px;
+                @include item-divider-style;
 
-                ion-label {
-                    color: #787878 !important;
-                    font-weight: bold;
-                    font-size: 15px !important;
-                }
+                --background: var(--bg-secondary);
+                padding-left: 10px;
             }
         }
     }
 
     ion-item {
-        background: none;
-        border: 1px solid var(--bg-main);
-        --border-radius: 5px;
+        @include base-ion-item(5px);
 
         &.message{
 
             margin-bottom: 5px;
 
             ion-label {
-                margin: 5px 0;
-                
-                span {
-                    display: block;
-                    text-align: justify;
-                    color: #666;
-                    &.name {
-                        font-weight: bold;
-                        font-size: 14px;
-                    }
-                    
-                    &.phone {        
-                        font-size: 13px;
-                    }
-                }
+                @include user-info-label;
             }
         }
         

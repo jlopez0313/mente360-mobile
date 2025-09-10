@@ -227,13 +227,12 @@ export const Item: React.FC<any> = ({
         baseURL + item.audio,
         "audio_" + item.id,
         async (p: any) => {
-          console.log("P es ", p);
         }
       );
-      /*
-      const ruta = "RUTA__RUTA";
-      */
-      console.log("Ruta es ", ruta);
+      
+      if(!ruta) {
+        throw new Error("No se pudo descargar el audio");
+      }
       
       await db.clips.update(item.id, {
         imagen_local: item.imagen,

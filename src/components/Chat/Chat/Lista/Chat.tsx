@@ -8,15 +8,13 @@ import styles from "./Chat.module.scss";
 import { Item } from "./Item";
 
 export const Chat = () => {
-
-  const { user } = useSelector( (state: any) => state.user);
+  const { user } = useSelector((state: any) => state.user);
   const dispatch = useDispatch();
 
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
 
   const onGetRooms = async () => {
-    
     dispatch(setRoom(false));
 
     const rooms = await getArrayData(`users/${user.id}/rooms`);

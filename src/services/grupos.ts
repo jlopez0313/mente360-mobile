@@ -2,8 +2,6 @@ import { baseApi } from './api';
 
 export const create = async( formData: {} ): Promise<any> => {
 
-    console.log(formData)
-
     return new Promise( async (resolve, reject) => {
         const { post } = baseApi();
     

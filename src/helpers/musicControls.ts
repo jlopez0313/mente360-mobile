@@ -5,8 +5,6 @@ let isPlaying = true;
 
 export const create = (baseURL, audio, duration, onPlay, onPause, onGoBack, onGoNext) => {
 
-  console.log( 'has created:', audio, duration )
-
   // destroy();
 
   CapacitorMusicControls.create({
@@ -44,20 +42,16 @@ export const create = (baseURL, audio, duration, onPlay, onPause, onGoBack, onGo
     notificationIcon: "notification",
   })
     .then(() => {
-      console.log("background created");
-
       CapacitorMusicControls.updateElapsed({
         elapsed: elapsedTime,
         isPlaying: true,
       });
 
       CapacitorMusicControls.addListener("controlsNotification", (action) => {
-        console.log("CapacitorMusicControls controlsNotification was fired", action);
         handleControlsEvent(action, onPlay, onPause, onGoBack, onGoNext);
       });
 
       document.addEventListener("controlsNotification", (event: any) => {
-        console.log("document controlsNotification was fired", event);
         const info = { message: event.message, position: event.position || 0, elapsed: elapsedTime };
         handleControlsEvent(info, onPlay, onPause, onGoBack, onGoNext);
       });
@@ -84,50 +78,41 @@ export const handleControlsEvent = (
   onGoBack = () => {},
   onGoNext = () => {}
 ) => {
-  console.log("hello from handleControlsEvent", action);
   const message = action.message;
 
   switch (message) {
     case "music-controls-next":
       toggle(true, 0);
       onGoNext();
-      console.log(" music-controls-next ");
       break;
     case "music-controls-previous":
       toggle(true, 0);
       onGoBack();
-      console.log(" music-controls-previous ");
       break;
     case "music-controls-pause":
-      console.log(" music-controls-pause ");
       toggle(false, action.elapsed);
       onPause();
       break;
     case "music-controls-play":
       toggle(true, action.elapsed);
       onPlay();
-      console.log(" music-controls-play ");
       break;
     case "music-controls-destroy":
       destroy();
-      console.log(" music-controls-destroy ");
       break;
 
     // External controls (iOS only)
     case "music-controls-toggle-play-pause":
       // do something
-      console.log(" music-controls-toggle-play-pause ");
       break;
     case "music-controls-skip-to":
       // do something
-      console.log(" music-controls-skip-to ");
       break;
     case "music-controls-skip-forward":
       // Do something
       break;
     case "music-controls-skip-backward":
       // Do something
-      console.log(" music-controls-skip-backward ");
       break;
 
     // Headset events (Android only)
@@ -137,11 +122,9 @@ export const handleControlsEvent = (
       break;
     case "music-controls-headset-unplugged":
       // Do something
-      console.log(" music-controls-headset-unplugged");
       break;
     case "music-controls-headset-plugged":
       // Do something
-      console.log(" music-controls-headset-plugged ");
       break;
     default:
       break;

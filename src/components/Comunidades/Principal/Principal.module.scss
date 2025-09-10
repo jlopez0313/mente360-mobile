@@ -1,3 +1,5 @@
+@import "@/css/_common.scss";
+
 .ion-content { 
     ion-list {
         background: none;
@@ -5,9 +7,7 @@
     }
 
     ion-item {
-        background: none;
-        border: 1px solid var(--bg-main);
-        --border-radius: 3px;
+        @include base-ion-item(3px);
 
         .texto {
             display: flex;

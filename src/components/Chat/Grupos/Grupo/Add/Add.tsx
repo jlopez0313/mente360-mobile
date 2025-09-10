@@ -92,7 +92,6 @@ export const Add: React.FC<any> = ({ grupoID, users, doChild }) => {
   };
 
   const onSearchContacts = (evt: any) => {
-    console.log(allContacts, evt, evt.target);
 
     setFilteredContacts(
       allContacts.filter(
