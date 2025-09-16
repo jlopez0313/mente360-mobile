@@ -1,9 +1,4 @@
-
-import {
-  IonProgressBar,
-  IonSelect,
-  IonSelectOption
-} from "@ionic/react";
+import { IonProgressBar, IonSelect, IonSelectOption } from "@ionic/react";
 import { useEffect, useState } from "react";
 import { Audio } from "./Audio/Audio";
 import styles from "./Crecimiento.module.scss";
@@ -41,7 +36,7 @@ export const Crecimiento = () => {
   const { userEnabled, payment_status } = usePayment();
 
   const [activeIdx, setActiveIdx] = useState(0);
-  const [nivelID, setNivelID] = useState<number>(1);
+  const [nivelID, setNivelID] = useState<number>(0);
   const [progress, setProgress] = useState(0);
 
   const niveles = useLiveQuery(
@@ -176,7 +171,7 @@ export const Crecimiento = () => {
 
       await Promise.all([updatePromise, setUserPromise]);
     }
-    
+
     onGoNext();
 
     await dispatch(setPodcast({ done: 1 }));
@@ -185,18 +180,34 @@ export const Crecimiento = () => {
   const compareWithFn = (o1: any, o2: any) => {
     return o1 && o2 && o1 == o2;
   };
-  
+
   useEffect(() => {
     const onStartNivel = () => {
-      if (!user.crecimientos) {
-        const nivel = user.crecimientos.find( (c: any) => c.nivel?.canales_id == id);
-        setNivelID(nivel ?? 7); // 7 es el nivel 0
+      if (!niveles?.length) return;
+
+      if (user.crecimientos) {
+        const nivel = user.crecimientos.find(
+          (c: any) => c.nivel?.canales_id == id
+        );
+
+        if(nivel) {
+          console.log( 'nivel', nivel?.niveles_id)
+          setNivelID(nivel?.niveles_id);
+        } else {
+          const nivel = niveles ? niveles[0] : null;
+          setNivelID(id == 1 ? 7 : (nivel?.id ?? 0)); // 7 es el nivel 0
+        }
+
+      } else {
+        const nivel = niveles ? niveles[0] : null;
+        setNivelID(id == 1 ? 7 : (nivel?.id ?? 0)); // 7 es el nivel 0
       }
-    }
+    };
 
     onStartNivel();
+
     dispatch(resetStore());
-  }, []);
+  }, [niveles]);
 
   useEffect(() => {
     onSetActiveIdx();
@@ -204,8 +215,6 @@ export const Crecimiento = () => {
 
   return (
     <div className={`ion-no-padding ${styles["ion-content"]}`}>
-      
-
       <IonSelect
         placeholder="Nivel"
         labelPlacement="stacked"
