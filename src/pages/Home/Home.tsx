@@ -100,7 +100,7 @@ const Home: React.FC = () => {
         </IonToolbar>
       </IonHeader>
 
-      <IonContent fullscreen className={styles["ion-content"]}>
+      <IonContent className={styles["ion-content"]}>
         <Sync
           loading={loading}
           success={success}

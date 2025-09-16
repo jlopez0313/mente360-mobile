@@ -1,5 +1,4 @@
 import {
-  IonBackButton,
   IonButton,
   IonButtons,
   IonContent,
@@ -7,14 +6,14 @@ import {
   IonIcon,
   IonPage,
   IonTitle,
-  IonToolbar,
+  IonToolbar
 } from "@ionic/react";
 
-import {Configuracion as ConfiguracionComponent} from "@/components/Configuracion/Configuracion";
-import styles from "./Configuracion.module.scss";
-import { Link, useHistory } from "react-router-dom";
+import { Configuracion as ConfiguracionComponent } from "@/components/Configuracion/Configuracion";
 import { arrowBack } from "ionicons/icons";
 import { useEffect } from "react";
+import { Link, useHistory } from "react-router-dom";
+import styles from "./Configuracion.module.scss";
 
 const Configuracion: React.FC = () => {
   
@@ -50,7 +49,7 @@ const Configuracion: React.FC = () => {
         </IonToolbar>
       </IonHeader>
 
-      <IonContent fullscreen className={styles['ion-content']}>
+      <IonContent className={styles['ion-content']}>
 
         <ConfiguracionComponent />
 

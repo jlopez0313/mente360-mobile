@@ -52,7 +52,7 @@ const Suscripcion: React.FC = () => {
         </IonToolbar>
       </IonHeader>
 
-      <IonContent fullscreen className={`ion-padding ${styles["ion-content"]}`}>
+      <IonContent className={`ion-padding ${styles["ion-content"]}`}>
         <SuscripcionComponent />
       </IonContent>
 

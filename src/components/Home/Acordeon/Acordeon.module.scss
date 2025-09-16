@@ -19,14 +19,14 @@
             font-size: 1.6rem;
             transition: none !important;
             transform: none !important;
-            filter: invert(.5);
+            
             
             &.trofeo {
                 color: var(--bg-primary) !important;
             }
 
             &.trofeo-gris {
-                color: #bdb9b9 !important;
+                color: #8f8e8e !important;
             }
         }
 

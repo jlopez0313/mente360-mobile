@@ -1,16 +1,19 @@
 @font-face {
     font-family: "arya";
     src: local("arya"),
-      url("../assets/fonts/Poppins/Poppins-Regular.ttf") format("woff");
+      url("../assets/fonts/Poppins/Poppins-Regular.ttf") format("truetype");
 }
 
 @font-face {
     font-family: "arya-bold";
     src: local("arya-bold"),
-      url("../assets/fonts/Poppins/Poppins-Bold.ttf") format("woff");
+      url("../assets/fonts/Poppins/Poppins-Bold.ttf") format("truetype");
 }
 
 :root {
+    --ion-safe-area-top: 2rem;
+    --ion-safe-area-bottom: 1.75rem;
+
     --bg-main-gradient: linear-gradient(193.17deg, #FFB347 9.48%, #FFCC33 63.67%);
     --bg-card: linear-gradient(193.17deg, #FFD599 20%, #FFE08F 80%);
     --bg-main: #ffc547;
@@ -76,7 +79,7 @@ body.dark {
 ion-header {
 
   ion-toolbar {
-    padding-top: 3px !important;
+    padding-top: var(--ion-safe-area-top);
     padding-bottom: 3px!important;
   }
  

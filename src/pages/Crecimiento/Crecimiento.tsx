@@ -94,7 +94,7 @@ const Crecimiento: React.FC = () => {
         </IonToolbar>
       </IonHeader>
 
-      <IonContent fullscreen className={`ion-padding ${styles["ion-content"]}`}>
+      <IonContent className={`ion-padding ${styles["ion-content"]}`}>
         <CrecimientoComponent />
       </IonContent>
 

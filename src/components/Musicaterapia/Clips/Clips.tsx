@@ -7,7 +7,7 @@ import {
 } from "@ionic/react";
 import styles from "../Musicaterapia.module.scss";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { db } from "@/hooks/useDexie";
 import { useNetwork } from "@/hooks/useNetwork";
@@ -20,6 +20,8 @@ export const Clips = () => {
   const dispatch = useDispatch();
 
   const { user } = useSelector((state: any) => state.user);
+  const { globalPos } = useSelector((state: any) => state.audio);
+
   const network = useNetwork();
 
   const [categoria, setCategoria] = useState("All");
@@ -88,6 +90,13 @@ export const Clips = () => {
     }
   };
 
+  useEffect(() => {
+    if ( globalPos == (clips?.length ?? 1) - 1 && hasMore) {
+      setPage( page + 1)
+    }
+
+  }, [globalPos]);
+
   return (
     <>
       <div className={styles["ion-content"]}>
@@ -125,14 +134,7 @@ export const Clips = () => {
 
         <IonList className="ion-no-padding ion-margin-bottom" lines="none">
           {clips?.map((item: any, idx: any) => {
-            return (
-              <Item
-                key={idx}
-                idx={idx}
-                item={item}
-                network={network}
-              />
-            );
+            return <Item key={idx} idx={idx} item={item} network={network} />;
           })}
         </IonList>
 

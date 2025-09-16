@@ -83,7 +83,7 @@ export const Item: React.FC<any> = ({ contact }) => {
 
       {showProfileModal && (
         <Profile
-          userID={contact.id}
+          usuario={contact}
           showProfileModal={showProfileModal}
           setShowProfileModal={setShowProfileModal}
         />

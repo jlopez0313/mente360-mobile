@@ -52,7 +52,7 @@ const Principal: React.FC = () => {
         </IonToolbar>
       </IonHeader>
 
-      <IonContent fullscreen className={styles["ion-content"]}>
+      <IonContent className={styles["ion-content"]}>
         <PrincipalComponent />
       </IonContent>
 

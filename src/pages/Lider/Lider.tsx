@@ -80,7 +80,7 @@ const Lider: React.FC = () => {
         </IonToolbar>
       </IonHeader>
 
-      <IonContent fullscreen className={styles["ion-content"]}>
+      <IonContent className={styles["ion-content"]}>
         <LiderComponent />
       </IonContent>
 

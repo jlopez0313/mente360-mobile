@@ -63,3 +63,28 @@
         }
     }
 }
+
+@mixin descripcion {
+    .texto {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        
+        &.expandido {
+            display: block;
+            -webkit-line-clamp: unset;
+            overflow: visible;
+        }
+    }
+
+    .btn-leer {
+        background: none;
+        border: none;
+        color: var(--bg-primary);
+        cursor: pointer;
+        padding: 0;
+        font-size: 0.9rem;
+    }
+}

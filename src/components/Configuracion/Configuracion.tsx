@@ -37,7 +37,9 @@ export const Configuracion = () => {
   const onLogout = async () => {
     localStorage.removeItem("home");
     localStorage.removeItem("onboarding");
+
     await removePreference(keys.TOKEN);
+    await removePreference(keys.HOME_SYNC_KEY);
 
     history.replace("/login");
   };

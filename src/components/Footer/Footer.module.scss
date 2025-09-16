@@ -2,6 +2,7 @@
 .ion-footer {
   --background: var(--bg-main-gradient);
   --min-height: 50px;
+  --padding-bottom: var(--ion-safe-area-bottom);
 
   ion-buttons {
     display: flex;

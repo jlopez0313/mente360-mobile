@@ -1,5 +1,5 @@
 import { useNetwork } from "@/hooks/useNetwork";
-import { readData } from "@/services/realtime-db";
+import { readData, snapshotToArray } from "@/services/realtime-db";
 import { setUser } from "@/store/slices/userSlice";
 import { onValue } from "firebase/database";
 import React, { useEffect } from "react";
@@ -26,7 +26,9 @@ export const DBProvider = ({ children }: any) => {
         });
 
         onValue(readData("subscriptions/" + user.id), (snapshot) => {
-          const data = snapshot.val();
+          const objData = snapshot.val();
+          const data = snapshotToArray(objData)
+
           const suscripciones = data
             ?.filter((item: any) => item)
             .map((item: any) => {

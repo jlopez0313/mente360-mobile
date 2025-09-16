@@ -85,7 +85,7 @@ const Chat: React.FC = () => {
         </IonToolbar>
       </IonHeader>
 
-      <IonContent fullscreen className={`ion-padding ${styles["ion-content"]}`}>
+      <IonContent className={`ion-padding ${styles["ion-content"]}`}>
         <IonHeader collapse="condense">
           <IonToolbar>
             <IonTitle size="large">Notifications</IonTitle>

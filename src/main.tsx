@@ -12,6 +12,7 @@ import { CapacitorSQLite, SQLiteConnection } from "@capacitor-community/sqlite";
 import { Capacitor } from "@capacitor/core";
 import { JeepSqlite } from "jeep-sqlite/dist/components/jeep-sqlite";
 
+
 const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
 prefersDark.addEventListener("change", (e) => toggleDarkMode());
 
@@ -32,6 +33,7 @@ toggleDarkMode();
 
 window.addEventListener("DOMContentLoaded", async () => {
   try {
+    
     const platform = Capacitor.getPlatform();
 
     if (platform === "web") {

@@ -36,7 +36,7 @@ const Thanks = () => {
           <IonTitle className="ion-no-padding ion-padding-end ion-text-center"> Gracias! </IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent fullscreen className={`${styles['ion-content']}`}>
+      <IonContent className={`${styles['ion-content']}`}>
 
         <ThanksComponent />
 

@@ -1,6 +1,8 @@
 @import "@/css/_common.scss";
 
 .ion-content {
+    @include descripcion();
+
     .premium {
         background-color: var(--bg-main);
         border-radius: 5px;
@@ -11,32 +13,9 @@
         align-items: center;
         padding: 5px 15px;
     }
-    
-    .detalle {
-        color: #ffffff !important;
-    }
-    
-    ion-list {
+
+    .suscrito {
+        --background: none;
         background: none;
-
-        ion-item-group {
-            --background: var(--bg-secondary);
-
-            ion-item-divider {
-                @include item-divider-style;
-            }
-        }
-    }
-
-    ion-item {
-        @include base-ion-item(5px);
-
-        ion-label {
-            text-align: justify;
-        }
-    }
-
-    .version {
-        font-size: .8rem;
     }
 }

@@ -66,7 +66,7 @@ const Test: React.FC = () => {
         </IonToolbar>
       </IonHeader>
 
-      <IonContent fullscreen className={`ion-padding ${styles["ion-content"]}`}>
+      <IonContent className={`ion-padding ${styles["ion-content"]}`}>
         <IonText className="ion-text-justify">
           Por favor, realiza el test de eneagrama para conocer tu Eneatipo
         </IonText>

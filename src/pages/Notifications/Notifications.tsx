@@ -1,5 +1,4 @@
 import {
-  IonBackButton,
   IonButton,
   IonButtons,
   IonContent,
@@ -7,15 +6,15 @@ import {
   IonIcon,
   IonPage,
   IonTitle,
-  IonToolbar,
+  IonToolbar
 } from "@ionic/react";
 
-import { Notifications as NotificationsComponent } from '@/components/Notifications/Notifications';
-import styles from "./Notifications.module.scss";
 import { Footer } from "@/components/Footer/Footer";
-import { Link, useHistory } from "react-router-dom";
+import { Notifications as NotificationsComponent } from '@/components/Notifications/Notifications';
 import { arrowBack } from "ionicons/icons";
 import { useEffect } from "react";
+import { Link, useHistory } from "react-router-dom";
+import styles from "./Notifications.module.scss";
 
 
 const Notifications: React.FC = () => {
@@ -52,7 +51,7 @@ const Notifications: React.FC = () => {
         </IonToolbar>
       </IonHeader>
 
-      <IonContent fullscreen className={styles['ion-content']}>
+      <IonContent className={styles['ion-content']}>
         <NotificationsComponent />
       </IonContent>
 

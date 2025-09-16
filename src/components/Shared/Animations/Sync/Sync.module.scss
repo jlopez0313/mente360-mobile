@@ -1,6 +1,6 @@
 .clip-sync-toast {
   position: fixed;
-  bottom: 70px;
+  bottom: calc(var(--ion-safe-area-bottom) + 70px);
   right: 16px;
   background-color: rgba(33, 33, 33, 0.9);
   border-radius: 12px;

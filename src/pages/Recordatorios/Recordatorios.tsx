@@ -1,3 +1,4 @@
+import { Recordatorios as RecordatoriosComponent } from '@/components/Recordatorios/Recordatorios';
 import {
   IonButton,
   IonButtons,
@@ -5,15 +6,13 @@ import {
   IonHeader,
   IonIcon,
   IonPage,
-  IonText,
   IonTitle,
-  IonToolbar,
+  IonToolbar
 } from "@ionic/react";
 import { arrowBack } from "ionicons/icons";
 import React from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { Recordatorios as RecordatoriosComponent } from '@/components/Recordatorios/Recordatorios'
 import styles from "./Recordatorios.module.scss";
 
 const Recordatorios: React.FC = () => {
@@ -40,7 +39,7 @@ const Recordatorios: React.FC = () => {
         </IonToolbar>
       </IonHeader>
 
-      <IonContent fullscreen className={`ion-padding ${styles["ion-content"]}`}>
+      <IonContent className={`ion-padding ${styles["ion-content"]}`}>
         
         <RecordatoriosComponent />
 

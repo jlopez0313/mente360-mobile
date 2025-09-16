@@ -70,7 +70,7 @@ const Perfil: React.FC = () => {
         </IonToolbar>
       </IonHeader>
 
-      <IonContent fullscreen className={`ion-padding ${styles["ion-content"]}`}>
+      <IonContent className={`ion-padding ${styles["ion-content"]}`}>
         <PerfilComponent />
       </IonContent>
     </IonPage>

@@ -1,25 +1,8 @@
 @import "@/css/_common.scss";
 
-.ion-content { 
-    ion-list {
-        background: none;
+.ion-content {
 
-        ion-item-group {
-            --background: var(--bg-secondary);
-
-            ion-item-divider {
-                @include item-divider-style;
-            }
-        }
-    }
-
-    ion-item {
-        @include base-ion-item(3px);
-
-        ion-label {
-            text-align: justify;
-        }
-    }
+    @include descripcion();
 
     .suscrito {
         --background: none;

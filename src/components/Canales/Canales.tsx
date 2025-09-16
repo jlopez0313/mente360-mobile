@@ -12,11 +12,14 @@ import {
   IonText,
 } from "@ionic/react";
 import { useLiveQuery } from "dexie-react-hooks";
+import { useState } from "react";
 import { useHistory, useParams } from "react-router";
 import styles from "./Canales.module.scss";
 
 export const Canales = () => {
   const baseURL = import.meta.env.VITE_BASE_BACK;
+
+  const [expandido, setExpandido] = useState(false);
 
   const { id } = useParams<any>();
   const history = useHistory();
@@ -46,6 +49,7 @@ export const Canales = () => {
         <IonCardHeader>
           <IonCardTitle> {comunidad?.comunidad} </IonCardTitle>
           <IonCardSubtitle> {comunidad?.lider?.name} </IonCardSubtitle>
+          <p> {comunidad?.descripcion} </p>
         </IonCardHeader>
       </IonCard>
       <IonList className="ion-padding">
