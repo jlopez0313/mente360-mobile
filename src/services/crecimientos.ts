@@ -1,5 +1,24 @@
 import { baseApi } from "./api";
 
+
+export async function json(): Promise<any> {
+  return new Promise( async (resolve, reject) => {
+      const { get } = baseApi();
+  
+      try {
+          resolve ( await get(`/crecimientos/all`, { "Content-type": "stream" } ) )
+      } catch( error: any ) {
+          if (error.response) {
+              reject(error.response)
+          } else if (error.request) {
+              reject(error.request)
+          } else {
+              reject(error)
+          }
+      }    
+  })
+}
+
 export async function all(page = 0, fromDate: string = ""): Promise<any> {
   return new Promise(async (resolve, reject) => {
     const { get } = baseApi();

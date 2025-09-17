@@ -3,10 +3,14 @@ import { all as getAllCategorias } from "@/services/categorias";
 import {
   all as getAllClips,
   trashed as getTrashedClips,
+  json as jsonClips,
 } from "@/services/clips";
 import { all as getAllComunidades } from "@/services/comunidades";
 import { all as getAllConstants } from "@/services/constants";
-import { all as getAllCrecimientos } from "@/services/crecimientos";
+import {
+  all as getAllCrecimientos,
+  json as jsonCrecimientos,
+} from "@/services/crecimientos";
 import { all as getAllNiveles } from "@/services/niveles";
 import { all as getAllPlaylist } from "@/services/playlist";
 
@@ -33,15 +37,15 @@ export const useGlobalSync = () => {
   const syncConstants = async () => {
     try {
       console.log("start syncConstants");
-      
+
       const { data } = await getAllConstants();
-      
+
       await db.generos.clear();
       await db.generos.bulkPut(data.generos);
-      
+
       await db.eneatipos.clear();
       await db.eneatipos.bulkPut(data.eneatipos);
-      
+
       await db.planes.clear();
       await db.planes.bulkPut(data.planes);
 
@@ -96,7 +100,7 @@ export const useGlobalSync = () => {
       console.error("Error syncComunidades:", error);
     }
   };
-  
+
   const syncCanales = async () => {
     try {
       console.log("start syncCanales");
@@ -124,7 +128,7 @@ export const useGlobalSync = () => {
     console.log("start syncCrecimientos");
 
     const lastSync = await getPreference(keys.SYNC_KEY);
-    const fromDate = lastSync ?? initSync;
+    const fromDate = lastSync ?? undefined;
 
     let page = parseInt(
       (await getPreference(keys.CRECIMIENTOS_PAGE_KEY)) ?? "1"
@@ -140,9 +144,14 @@ export const useGlobalSync = () => {
     while (hasMore) {
       const requests = [];
 
-      for (let i = 0; i < MAX_CONCURRENT_REQUESTS; i++) {
-        const currentPage = page + i;
-        requests.push(getAllCrecimientos(currentPage, fromDate));
+      if (!fromDate) {
+        requests.push(jsonCrecimientos());
+        hasMore = false;
+      } else {
+        for (let i = 0; i < MAX_CONCURRENT_REQUESTS; i++) {
+          const currentPage = page + i;
+          requests.push(getAllCrecimientos(currentPage, fromDate));
+        }
       }
 
       try {
@@ -150,7 +159,7 @@ export const useGlobalSync = () => {
         let totalData = 0;
 
         for (const res of responses) {
-          const data = res.data?.data ?? [];
+          const data = res.data?.data  ?? res.data ?? [];
 
           if (!data.length) {
             if (batchBuffer.crecimientos.length > 0) {
@@ -244,7 +253,7 @@ export const useGlobalSync = () => {
     let hasMore = true;
 
     const lastSync = await getPreference(keys.SYNC_KEY);
-    const fromDate = lastSync ?? initSync;
+    const fromDate = lastSync ?? undefined;
 
     const MAX_CONCURRENT_REQUESTS = 3;
     const batchSize = 5;
@@ -257,9 +266,14 @@ export const useGlobalSync = () => {
     while (hasMore) {
       const requests = [];
 
-      for (let i = 0; i < MAX_CONCURRENT_REQUESTS; i++) {
-        const currentPage = page + i;
-        requests.push(getAllClips("0", currentPage, "", fromDate));
+      if (!fromDate) {
+        requests.push(jsonClips());
+        hasMore = false;
+      } else {
+        for (let i = 0; i < MAX_CONCURRENT_REQUESTS; i++) {
+          const currentPage = page + i;
+          requests.push(getAllClips("0", currentPage, "", fromDate));
+        }
       }
 
       try {
@@ -267,7 +281,7 @@ export const useGlobalSync = () => {
         let totalData = 0;
 
         for (const res of responses) {
-          const data = res.data?.data ?? [];
+          const data = res.data?.data ?? res.data ?? [];
 
           if (!data.length) {
             if (batchBuffer.clips.length > 0) {
@@ -282,6 +296,7 @@ export const useGlobalSync = () => {
           totalData += data.length;
 
           batchBuffer.clips.push(...data);
+
           for (const clip of data) {
             if (clip.usuarios_clips?.length) {
               batchBuffer.usuarios_clips.push(...clip.usuarios_clips);
@@ -314,17 +329,15 @@ export const useGlobalSync = () => {
   };
 
   async function processBatch(batch: any) {
-    if ( batch.clips?.length ) 
-      await db.clips.bulkPut(batch.clips);
+    if (batch.clips?.length) await db.clips.bulkPut(batch.clips);
 
-    if ( batch.crecimientos?.length ) 
+    if (batch.crecimientos?.length)
       await db.crecimientos.bulkPut(batch.crecimientos);
 
-    if ( batch.usuarios_clips?.length ) 
+    if (batch.usuarios_clips?.length)
       await db.usuarios_clips.bulkPut(batch.usuarios_clips);
 
-    if ( batch.likes?.length ) 
-      await db.likes.bulkPut(batch.likes);
+    if (batch.likes?.length) await db.likes.bulkPut(batch.likes);
   }
 
   const syncClipsTrashed = async () => {

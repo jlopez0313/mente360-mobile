@@ -1,3 +1,4 @@
+import { useNetwork } from "@/hooks/useNetwork";
 import { all } from "@/services/alarmas";
 import { IonButton } from "@ionic/react";
 import { useEffect, useState } from "react";
@@ -6,7 +7,9 @@ import { Card } from "./Card";
 import styles from "./Recordatorios.module.scss";
 
 export const Recordatorios = () => {
+  
   const history = useHistory();
+  const network = useNetwork();
 
   const [lista, setLista] = useState<any[]>([]);
 
@@ -25,18 +28,12 @@ export const Recordatorios = () => {
 
   return (
     <div className={styles.cards}>
-      {lista.length == 0 && (
-        <h5 className="ion-text-center">
-          {" "}
-          Aun no tienes recordatorios registrtados
-        </h5>
-      )}
       {lista.map((item, idx) => {
         return <Card key={idx} notificacion={item} idx={idx} aferRemove={getNotifications} />;
       })}
 
       <div className="ion-text-center ion-padding">
-        <IonButton expand="block" onClick={goToAdd}>
+        <IonButton disabled={!network.status} expand="block" onClick={goToAdd}>
           Agregar Nuevo Recordatorio
         </IonButton>
       </div>

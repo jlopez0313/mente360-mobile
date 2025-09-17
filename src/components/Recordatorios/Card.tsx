@@ -28,18 +28,13 @@ export const Card: React.FC<any> = ({ notificacion, aferRemove }) => {
 
   const onGetDays = () => {
     setChecked(notificacion.active == "1" ? true : false);
-
-    const recordatorio = notificacion.recordatorios[0];
-    const selectedDays = notificacion.recordatorios.map((r: any) => {
-      return r.day;
-    });
-
-    const date = new Date(recordatorio?.scheduled_time);
-    setHour(`${date.getHours()}:${date.getMinutes()}`);
+    
+    const [hour, minute] = notificacion.time.split(":");
+    setHour(`${hour}:${minute}`);
 
     const days = daysOfWeek.map((day, index) => ({
       ...day,
-      selected: selectedDays.includes(index),
+      selected: notificacion.dias_semana.includes(index),
     }));
 
     setDays(days.filter((day) => day.selected).map((item) => item.day));
