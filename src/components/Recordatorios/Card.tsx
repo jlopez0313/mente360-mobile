@@ -7,7 +7,6 @@ import {
 } from "@ionic/react";
 
 import { remove, toggle } from "@/services/alarmas";
-import { LocalNotifications } from "@capacitor/local-notifications";
 import { timeOutline, trashOutline } from "ionicons/icons";
 import { useEffect, useState } from "react";
 import styles from "./Recordatorios.module.scss";
@@ -28,7 +27,7 @@ export const Card: React.FC<any> = ({ notificacion, aferRemove }) => {
 
   const onGetDays = () => {
     setChecked(notificacion.active == "1" ? true : false);
-    
+
     const [hour, minute] = notificacion.time.split(":");
     setHour(`${hour}:${minute}`);
 
@@ -41,51 +40,11 @@ export const Card: React.FC<any> = ({ notificacion, aferRemove }) => {
   };
 
   const onRemoveReminder = async () => {
-    notificacion.recordatorios.forEach(async (reminder: any) => {
-      await LocalNotifications.cancel({
-        notifications: [{ id: reminder.notification_id }],
-      });
-
-      console.log("Reminder canceled", reminder);
-    });
     await remove(notificacion.id);
     await aferRemove();
   };
 
   const toggleChange = async (ev: ToggleCustomEvent) => {
-    if (!ev.detail.checked) {
-      notificacion.recordatorios.forEach(async (reminder: any) => {
-        await LocalNotifications.cancel({
-          notifications: [{ id: reminder.notification_id }],
-        });
-
-        console.log("Reminder canceled", reminder);
-      });
-    } else {
-      notificacion.recordatorios.forEach(async (reminder: any) => {
-        const date = new Date(reminder?.scheduled_time);
-
-        const notifications = [
-          {
-            id: reminder.notification_id,
-            title: notificacion.title,
-            body: notificacion.body,
-            smallIcon: "icon.png",
-            schedule: {
-              repeats: true,
-              on: {
-                weekday: reminder.day,
-                hour: date.getHours(),
-                minute: date.getMinutes(),
-              },
-            },
-          },
-        ];
-
-        const save = await LocalNotifications.schedule({ notifications });
-        console.log(save);
-      });
-    }
     await toggle(notificacion.id, { activo: ev.detail.checked });
   };
 
