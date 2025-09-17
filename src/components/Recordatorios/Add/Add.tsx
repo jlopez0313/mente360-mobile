@@ -48,24 +48,8 @@ export const Add = () => {
       if (item.selected) newArray.push(index + 1);
       return newArray;
     }, []);
-/*
-    const notifications = selectedIndexes.map((day: any, index: number) => ({
-      id: Math.floor(Date.now() % 1000000) + index,
-      title: titulo,
-      body: "Es hora de tu recordatorio!",
-      smallIcon: "icon.png",
-      schedule: {
-        repeats: true,
-        every: "week",
-        at: getNextDateForWeekday(day, hora, mins),
-      },
-    }));
-*/
-    const save = { notifications: []} // await LocalNotifications.schedule({ notifications });
-    console.log(save);
-
+    
     const dataNotification = {
-      notification_id: save.notifications,
       title: titulo,
       days: selectedIndexes.map((i: number) => i - 1),
       hora: hora < 10 ? `0${hora}` : `${hora}`,
@@ -76,34 +60,6 @@ export const Add = () => {
 
     history.replace("/recordatorios");
   };
-
-  function getNextDateForWeekday(
-    weekday: number,
-    hour: number,
-    minute: number
-  ): Date {
-    const now = new Date();
-    const result = new Date();
-    const today = now.getDay() === 0 ? 7 : now.getDay();
-
-    let daysUntilNext = weekday - today;
-    if (
-      daysUntilNext < 0 ||
-      (daysUntilNext === 0 &&
-        (now.getHours() > hour ||
-          (now.getHours() === hour && now.getMinutes() >= minute)))
-    ) {
-      daysUntilNext += 7;
-    }
-
-    result.setDate(now.getDate() + daysUntilNext);
-    result.setHours(hour);
-    result.setMinutes(minute);
-    result.setSeconds(0);
-    result.setMilliseconds(0);
-
-    return result;
-  }
 
   return (
     <>
