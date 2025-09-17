@@ -1,6 +1,6 @@
 import { useNetwork } from "@/hooks/useNetwork";
 import { all } from "@/services/alarmas";
-import { IonButton } from "@ionic/react";
+import { IonButton, useIonLoading } from "@ionic/react";
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { Card } from "./Card";
@@ -10,12 +10,24 @@ export const Recordatorios = () => {
   
   const history = useHistory();
   const network = useNetwork();
+  const [present, onDismiss] = useIonLoading();
 
   const [lista, setLista] = useState<any[]>([]);
 
   const getNotifications = async () => {
-    const {data: {data}} = await all();
-    setLista(data);
+    try {
+      present({
+        message: "Cargando ...",
+      });
+      
+      const {data: {data}} = await all();
+      setLista(data);
+
+    } catch (error) {
+      console.error(error);
+    } finally {
+      onDismiss();
+    }
   };
 
   const goToAdd = () => {
