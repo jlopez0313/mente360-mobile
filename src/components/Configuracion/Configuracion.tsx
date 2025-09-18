@@ -157,7 +157,7 @@ export const Configuracion = () => {
             lines="none"
             className={"ion-margin-bottom"}
             onClick={() => {
-              window.open("https://soymente360.com/privacy-policy/", "_blank");
+              window.open("https://soymente360.com/terminos_condiciones.html", "_blank");
             }}
           >
             <IonIcon slot="start" icon={documentTextOutline} />
@@ -167,7 +167,7 @@ export const Configuracion = () => {
           <IonItem
             lines="none"
             onClick={() => {
-              window.open("https://soymente360.com/privacy-policy/", "_blank");
+              window.open("https://soymente360.com/politica_privacidad.html", "_blank");
             }}
           >
             <IonIcon slot="start" icon={documentLockOutline} />

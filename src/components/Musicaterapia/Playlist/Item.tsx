@@ -253,7 +253,7 @@ export const Item: React.FC<any> = ({
 
       onPresentToast(
         "bottom",
-        item.titulo + " está listo para escucharse sin conexión.",
+        item.titulo + " está listo para escucharse sin conexión. Podrás acceder a él desde esta misma aplicación",
         musicalNotesOutline
       );
     } catch (error) {

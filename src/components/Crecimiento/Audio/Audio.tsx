@@ -125,7 +125,7 @@ export const Audio: React.FC<Props> = memo(
 
         onPresentToast(
           "bottom",
-          audio.titulo + " está listo para escucharse sin conexión.",
+          audio.titulo + " está listo para escucharse sin conexión. Podrás acceder a él desde esta misma aplicación",
           musicalNotesOutline
         );
 

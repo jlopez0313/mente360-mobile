@@ -175,7 +175,7 @@ export const Clip = () => {
 
       onPresentToast(
         "bottom",
-        globalAudio.titulo + " está listo para escucharse sin conexión.",
+        globalAudio.titulo + " está listo para escucharse sin conexión. Podrás acceder a él desde esta misma aplicación",
         musicalNotesOutline
       );
     } catch (error) {
