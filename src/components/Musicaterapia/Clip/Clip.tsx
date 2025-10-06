@@ -184,13 +184,14 @@ export const Clip = () => {
   };
 
   const onRemoveLocal = async () => {
+    await deleteAudio(globalAudio.audio_local);
+    
     await db.clips.update(globalAudio.id, {
       imagen_local: '',
       audio_local: '',
       downloaded: 0,
     });
 
-    await deleteAudio(globalAudio.audio_local);
 
     dispatch(
       setAudioItem({

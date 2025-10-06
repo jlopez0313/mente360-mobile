@@ -65,11 +65,10 @@ export const Grupos = () => {
   };
 
   const onGetAll = async () => {
-
     dispatch(setGrupo(false));
 
     const grupos = await getArrayData(`users/${user.id}/grupos`);
-
+    
     const lista: any = [];
 
     await Promise.all(
@@ -106,6 +105,7 @@ export const Grupos = () => {
       <Modal
         trigger="add"
         hideButtons={false}
+        validateConfirm={(data) => !!data?.photo && !!data?.grupo}
         onConfirm={(data) => onAddGrupo(data)}
         title="Nuevo Grupo Mente Maestra"
       >

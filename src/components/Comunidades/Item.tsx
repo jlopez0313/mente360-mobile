@@ -4,14 +4,14 @@ import { useNetwork } from "@/hooks/useNetwork";
 import { usePayment } from "@/hooks/usePayment";
 import { find } from "@/services/subscribe";
 import {
-    IonButton,
-    IonCard,
-    IonCardContent,
-    IonCardHeader,
-    IonCardSubtitle,
-    IonCardTitle,
-    useIonActionSheet,
-    useIonLoading,
+  IonButton,
+  IonCard,
+  IonCardContent,
+  IonCardHeader,
+  IonCardSubtitle,
+  IonCardTitle,
+  useIonActionSheet,
+  useIonLoading,
 } from "@ionic/react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { cardOutline } from "ionicons/icons";
@@ -50,16 +50,16 @@ export const Item = ({ comunidad, setIsPremiumOpen }: any) => {
     }
   };
 
-  const hasSuscription = (comunidadId: number) => {
+  const hasSuscription = (comunidad: any) => {
     if (
       !userEnabled ||
       payment_status == "free" ||
-      !user.suscripciones.some((s: any) => s.id == comunidadId)
+      !user.suscripciones.some((s: any) => s.id == comunidad.id)
     ) {
       return false;
-    } else if (user.suscripciones.some((s: any) => s.id == comunidadId)) {
+    } else if (user.suscripciones.some((s: any) => s.id == comunidad.id)) {
       const fecha_vencimiento = user.suscripciones.find(
-        (s: any) => s.id == comunidadId
+        (s: any) => s.id == comunidad.id
       )?.pivot?.fecha_vencimiento;
       if (!fecha_vencimiento) {
         return null;
@@ -71,6 +71,8 @@ export const Item = ({ comunidad, setIsPremiumOpen }: any) => {
       if (fecha < hoy) {
         return false;
       }
+    } else if( comunidad.lider.id != user.id ) {
+      return false;
     }
     return true;
   };
@@ -86,10 +88,10 @@ export const Item = ({ comunidad, setIsPremiumOpen }: any) => {
             p.key == "MES"
               ? "mensual"
               : p.key == "TRIM"
-              ? "trimestral"
-              : p.key == "SEM"
-              ? "semestral"
-              : "anual";
+                ? "trimestral"
+                : p.key == "SEM"
+                  ? "semestral"
+                  : "anual";
 
           return {
             disabled: !network.status,
@@ -176,9 +178,8 @@ export const Item = ({ comunidad, setIsPremiumOpen }: any) => {
         <IonCardTitle> {comunidad?.comunidad} </IonCardTitle>
         <IonCardSubtitle> {comunidad?.lider?.name} </IonCardSubtitle>
         <p
-          className={`${styles["texto"]} ${
-            expandido ? styles["expandido"] : ""
-          }`}
+          className={`${styles["texto"]} ${expandido ? styles["expandido"] : ""
+            }`}
         >
           {" "}
           {comunidad.descripcion}{" "}
@@ -191,7 +192,7 @@ export const Item = ({ comunidad, setIsPremiumOpen }: any) => {
         </button>
       </IonCardHeader>
       <IonCardContent>
-        {!hasSuscription(comunidad?.id) ? (
+        {!hasSuscription(comunidad) ? (
           <IonButton
             onClick={() => onPresentSheet(comunidad)}
             expand="block"
@@ -204,9 +205,7 @@ export const Item = ({ comunidad, setIsPremiumOpen }: any) => {
             expand="block"
             fill="outline"
             className={styles["suscrito"]}
-            onClick={() =>
-              hasSuscription(comunidad?.id) && goToCanales(comunidad?.id)
-            }
+            onClick={() => goToCanales(comunidad?.id)}
           >
             {" "}
             Acceder{" "}

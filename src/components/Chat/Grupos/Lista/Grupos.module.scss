@@ -7,10 +7,9 @@
     }
 
     ion-item {
-        @include base-ion-item(3px);      
+        @include base-ion-item(5px);      
         
         &.grupo {
-            margin-bottom: 5px;
             
             .item-content {
                 display: flex;

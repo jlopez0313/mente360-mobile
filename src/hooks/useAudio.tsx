@@ -53,6 +53,7 @@ export const useAudio: any = (audio: any, onConfirm: any = () => {}) => {
       console.log("Archivo eliminado correctamente");
     } catch (error) {
       console.error("Error eliminando archivo:", filePath, ": ", error);
+      throw new Error('Error....');
     }
   };
 

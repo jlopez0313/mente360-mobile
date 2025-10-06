@@ -18,6 +18,7 @@ import {
   setGlobalAudio,
   setGlobalPos,
   setIsGlobalPlaying,
+  setShowGlobalAudio,
 } from "@/store/slices/audioSlice";
 
 import {
@@ -68,9 +69,8 @@ export const Item: React.FC<any> = ({ idx, item, network }) => {
       db.playlist
         .where("users_id")
         .equals(user.id)
-        .and((playlist: any) => playlist?.clip?.id === globalAudio.id)
-        .first(),
-    [globalAudio]
+        .and((playlist: any) => playlist?.clip?.id === item.id)
+        .first()
   );
 
   const likes = useLiveQuery(() =>
@@ -94,6 +94,7 @@ export const Item: React.FC<any> = ({ idx, item, network }) => {
 
   const onPlayClicked = async () => {
     console.log(item);
+    dispatch(setShowGlobalAudio(true));
 
     if (!globalAudio || item.id != globalAudio.id) {
       if (item.audio_local) {
@@ -315,13 +316,13 @@ export const Item: React.FC<any> = ({ idx, item, network }) => {
 
   const onRemoveLocal = async () => {
     
+    await deleteAudio(item.audio_local);
+
     await db.crecimientos.update(item.id, {
       imagen_local: "",
       audio_local: "",
       downloaded: 0,
     });
-
-    await deleteAudio(item.audio_local);
 
     dispatch(
       setAudioItem({

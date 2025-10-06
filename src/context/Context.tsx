@@ -28,7 +28,7 @@ export const DBProvider = ({ children }: any) => {
         onValue(readData("subscriptions/" + user.id), (snapshot) => {
           const objData = snapshot.val();
           const data = snapshotToArray(objData)
-
+          
           const suscripciones = data
             ?.filter((item: any) => item)
             .map((item: any) => {

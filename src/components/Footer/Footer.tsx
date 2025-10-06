@@ -45,17 +45,23 @@ export const Footer = (props: any) => {
               </IonButton>
             </Link>
 
-            <Link
-              to="/comunidades"
-              replace={true}
-              onClick={() => setTab(history.location.pathname)}
-            >
-              <IonButton
-                className={tab.includes("/comunidades") ? styles.active : ""}
-              >
+            {!userEnabled || payment_status == "free" ? (
+              <IonButton onClick={() => setIsPremiumOpen(true)}>
                 <IonIcon slot="icon-only" src={crecimiento}></IonIcon>
               </IonButton>
-            </Link>
+            ) : (
+              <Link
+                to="/comunidades"
+                replace={true}
+                onClick={() => setTab(history.location.pathname)}
+              >
+                <IonButton
+                  className={tab.includes("/comunidades") ? styles.active : ""}
+                >
+                  <IonIcon slot="icon-only" src={crecimiento}></IonIcon>
+                </IonButton>
+              </Link>
+            )}
 
             {!userEnabled || payment_status == "free" ? (
               <IonButton onClick={() => setIsPremiumOpen(true)}>

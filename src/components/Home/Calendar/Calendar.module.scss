@@ -2,7 +2,7 @@
 
 .card-calendar {
     background: var(--color-secondary-gradient);
-    border: 1px solid var(--ion-background-color-step-300, #b3b3b3);
+    border: 1px solid var(--ion-background-color-step-300, rgba(179, 179, 179, .5));
 
     ion-card-content {
         .header {

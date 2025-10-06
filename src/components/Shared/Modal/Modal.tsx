@@ -22,6 +22,7 @@ interface Props {
   hideButtons: boolean;
   onConfirm: (params?: any) => void;
   onWillDismiss?: (params?: any) => void;
+  validateConfirm?: (data: any) => boolean;
 }
 
 export const Modal: React.FC<Props> = memo(
@@ -37,6 +38,7 @@ export const Modal: React.FC<Props> = memo(
     closeText = 'Cerrar',
     onConfirm,
     onWillDismiss,
+    validateConfirm,
     ...props
   }) => {
     const modal = useRef<HTMLIonModalElement>(null);
@@ -87,7 +89,9 @@ export const Modal: React.FC<Props> = memo(
 
           {showButtons ? (
             !hideButtons ? (
-              <IonButton onClick={() => dismiss()}>Completar</IonButton>
+              <IonButton
+                disabled={validateConfirm ? !validateConfirm(data) : isBtnDisabled}
+                onClick={() => dismiss()}>Completar</IonButton>
             ) : (
               <IonButton disabled={isBtnDisabled} onClick={() => dismiss()}>
                 <IonIcon icon={close} slot="start" />

@@ -41,6 +41,7 @@ interface Props {
 
 export const Audio: React.FC<Props> = memo(
   ({ activeIndex, audio, network, onGoBack, onGoNext, onSaveNext }) => {
+
     const { isGlobalPlaying }: any = useSelector((state: any) => state.audio);
 
     const [presentToast] = useIonToast();
@@ -137,21 +138,25 @@ export const Audio: React.FC<Props> = memo(
     };
 
     const onRemoveLocal = async () => {
-      await db.crecimientos.update(audio.id, {
-        imagen_local: "",
-        audio_local: "",
-        downloaded: 0,
-      });
+      try {
+        await deleteAudio(audio.audio_local);
 
-      await deleteAudio(localSrc);
-
-      onPresentToast(
-        "bottom",
-        audio.titulo + " ha sido eliminado de tu biblioteca.",
-        musicalNotesOutline
-      );
-
-      setLocalSrc(null);
+        await db.crecimientos.update(audio.id, {
+          imagen_local: "",
+          audio_local: "",
+          downloaded: 0,
+        });
+  
+        onPresentToast(
+          "bottom",
+          audio.titulo + " ha sido eliminado de tu biblioteca.",
+          musicalNotesOutline
+        );
+  
+        setLocalSrc(null);
+      } catch (error) {
+        console.log( error )
+      }
     };
 
     const onPresentToast = (

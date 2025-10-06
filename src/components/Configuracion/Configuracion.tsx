@@ -109,7 +109,7 @@ export const Configuracion = () => {
             <IonLabel>Configuracion Personal</IonLabel>
           </IonItemDivider>
 
-          <IonItem button={true} lines="none" className={"ion-margin-bottom"}>
+          <IonItem button={true} lines="none" >
             <IonToggle
               checked={paletteToggle}
               onIonChange={toggleChange}
@@ -120,7 +120,7 @@ export const Configuracion = () => {
           </IonItem>
 
           <Link to="/test">
-            <IonItem button={true} className={"ion-margin-bottom"}>
+            <IonItem button={true} >
               <IonIcon slot="start" icon={cogOutline} />
               <IonLabel>Realizar Test Eneagrama</IonLabel>
             </IonItem>
@@ -144,7 +144,7 @@ export const Configuracion = () => {
 
           <IonItem
             lines="none"
-            className={"ion-margin-bottom"}
+            
             onClick={() => {
               window.open("https://soymente360.com/#quienes-somos", "_blank");
             }}
@@ -155,7 +155,7 @@ export const Configuracion = () => {
 
           <IonItem
             lines="none"
-            className={"ion-margin-bottom"}
+            
             onClick={() => {
               window.open("https://soymente360.com/terminos_condiciones.html", "_blank");
             }}
@@ -185,7 +185,7 @@ export const Configuracion = () => {
 
         <IonItem
           lines="none"
-          className={"ion-margin-bottom"}
+          
           onClick={() =>
             openWhatsApp(
               import.meta.env.VITE_SUPPORT_PHONE,
@@ -201,7 +201,7 @@ export const Configuracion = () => {
 
         <IonItem
           lines="none"
-          className={"ion-margin-bottom"}
+          
           onClick={async () => onDownloadBackup()}
         >
           <IonIcon slot="start" icon={downloadOutline} />
@@ -210,7 +210,7 @@ export const Configuracion = () => {
 
         <IonItem
           lines="none"
-          className={"ion-margin-bottom"}
+          
           onClick={async () => onDownloadJson()}
         >
           <IonIcon slot="start" icon={downloadOutline} />
@@ -219,7 +219,7 @@ export const Configuracion = () => {
 
         <IonItem
           lines="none"
-          className={"ion-margin-bottom"}
+          
           onClick={async () => onClearPreferences()}
         >
           <IonIcon slot="start" icon={trashOutline} />
