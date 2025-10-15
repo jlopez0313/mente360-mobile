@@ -443,21 +443,6 @@ export const Clip = () => {
           <IonCardSubtitle className={"ion-no-padding"}>
             <div className={styles["chip-list"]}>
               <IonChip
-                disabled={!network.status && !globalAudio.audio_local}
-                onClick={() =>
-                  globalAudio.audio_local ? onRemoveLocal() : onDownload()
-                }
-              >
-                <IonIcon
-                  className={`${styles["share-icon"]}`}
-                  icon={
-                    globalAudio.audio_local ? trashBinOutline : downloadOutline
-                  }
-                />
-                {globalAudio.audio_local ? "Eliminar" : "Descargar"}
-              </IonChip>
-
-              <IonChip
                 disabled={!network.status}
                 onClick={() =>
                   in_my_playlist ? onTrashFromPlaylist() : onAddToPlaylist()
@@ -484,6 +469,21 @@ export const Clip = () => {
               </IonChip>
 
               <IonChip
+                disabled={!network.status && !globalAudio.audio_local}
+                onClick={() =>
+                  globalAudio.audio_local ? onRemoveLocal() : onDownload()
+                }
+              >
+                <IonIcon
+                  className={`${styles["share-icon"]}`}
+                  icon={
+                    globalAudio.audio_local ? trashBinOutline : downloadOutline
+                  }
+                />
+                {globalAudio.audio_local ? "Eliminar" : "Descargar"}
+              </IonChip>
+
+              <IonChip
                 disabled={!network.status}
                 onClick={() => onShareLink(globalAudio.id)}
               >
@@ -497,7 +497,7 @@ export const Clip = () => {
           </IonCardSubtitle>
         </IonCardHeader>
 
-        <IonCardContent className="ion-no-padding">
+        <IonCardContent className="ion-padding">
           <div className={`${styles["unread-indicator"]}`}>
             <IonProgressBar
               color="warning"

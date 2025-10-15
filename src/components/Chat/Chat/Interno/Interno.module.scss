@@ -93,10 +93,8 @@
     }
 
     ion-item {
-        background: none;
-        --background: var(--bg-secondary);
-        --border-radius: 5px;
-
+        @include base-ion-item(15px, var(--bg-secondary), 0);
+        
         &.message{
 
             width: 90%;
@@ -110,7 +108,8 @@
             }
     
             &.receiver {
-                --background: rgb(255, 225, 136);
+                --background: #fff;
+                border: 1px solid #78849a;
             }
 
             div {
@@ -155,12 +154,25 @@
     }
 
     .chatbox {
+
+        padding: 10px;
+        padding-bottom: var(--ion-safe-area-bottom) !important;
+        background: #6B768A;
+        --background: #6B768A;
         
+        ion-col {
+            background: #fff !important;
+            --background: #fff !important;
+        }
+
         ion-item {
             --border-radius: 5px;
             --padding-start: 10px;
             --inner-padding-end: 10px;
             --margin: 0;
+            --background: none;
+            background: none;
+            border-color: transparent;
 
             .wrapper {
                 width: 100%;

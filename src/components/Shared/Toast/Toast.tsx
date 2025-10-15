@@ -1,22 +1,28 @@
+import AudioNoWifi from "@/assets/images/audio_no_wifi.jpg";
 import { add, trash } from "@/services/playlist";
 import {
+  IonAvatar,
+  IonContent,
   IonIcon,
   IonItem,
   IonLabel,
+  IonList,
+  IonPopover,
   IonProgressBar,
   useIonAlert,
-  useIonLoading
+  useIonLoading,
 } from "@ionic/react";
 import { useEffect, useRef, useState } from "react";
 
 import {
   closeCircle,
+  ellipsisVertical,
   pauseCircle,
   playCircle,
   playSkipBack,
   playSkipForward,
   star,
-  starOutline
+  starOutline,
 } from "ionicons/icons";
 import styles from "./Toast.module.scss";
 
@@ -33,18 +39,24 @@ import {
 
 import { startBackground } from "@/helpers/background";
 import { create, destroy, updateElapsed } from "@/helpers/musicControls";
-import { db } from '@/hooks/useDexie';
+import { db } from "@/hooks/useDexie";
+import { useNetwork } from "@/hooks/useNetwork";
 
 export const Toast = () => {
-  
   const history = useHistory();
   const dispatch = useDispatch();
 
-  const { baseURL, audioSrc, globalAudio, listAudios, globalPos, isGlobalPlaying } = useSelector(
-    (state: any) => state.audio
-  );
+  const {
+    baseURL,
+    audioSrc,
+    globalAudio,
+    listAudios,
+    globalPos,
+    isGlobalPlaying,
+  } = useSelector((state: any) => state.audio);
 
   const audioRef: any = useRef();
+  const network = useNetwork();
 
   const {
     duration,
@@ -57,17 +69,15 @@ export const Toast = () => {
     onUpdateBuffer,
     onPause,
     onPlay,
-    getDownloadedAudio
-  } = useAudio(
-    audioRef,
-    () => {}
-  );
-  
-  const { user } = useSelector( (state: any) => state.user);
+    getDownloadedAudio,
+  } = useAudio(audioRef, () => {});
+
+  const { user } = useSelector((state: any) => state.user);
   const [present, dismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();
 
   const [hasClip, setHasClip] = useState<any>(null);
+  const [ev, setEv] = useState<MouseEvent | undefined>(undefined);
 
   const onClear = () => {
     // setShowGlobalAudio( false );
@@ -78,11 +88,11 @@ export const Toast = () => {
   };
 
   const goToPrev = async () => {
-    const prevIdx = (globalPos - 1 + listAudios.length) % listAudios.length
+    const prevIdx = (globalPos - 1 + listAudios.length) % listAudios.length;
     dispatch(setGlobalPos(prevIdx));
 
     const prev = listAudios[prevIdx];
-    
+
     if (prev.audio_local) {
       const audioBlob = await getDownloadedAudio(prev.audio_local);
       dispatch(setAudioSrc(audioBlob));
@@ -95,11 +105,11 @@ export const Toast = () => {
 
   const goToNext = async () => {
     // onEnd();
-    const nextIdx = (globalPos + 1) % listAudios.length
+    const nextIdx = (globalPos + 1) % listAudios.length;
     dispatch(setGlobalPos(nextIdx));
 
     const next = listAudios[nextIdx];
-    
+
     if (next.audio_local) {
       const audioBlob = await getDownloadedAudio(next.audio_local);
       dispatch(setAudioSrc(audioBlob));
@@ -142,7 +152,6 @@ export const Toast = () => {
 
   const onAdd = async () => {
     try {
-
       present({
         message: "Cargando ...",
       });
@@ -166,11 +175,10 @@ export const Toast = () => {
         ...globalAudio,
         in_my_playlist: added.id,
       };
-      
-      dispatch(setGlobalAudio({ ...newItem }));
 
+      dispatch(setGlobalAudio({ ...newItem }));
     } catch (error: any) {
-      console.log( error )
+      console.log(error);
 
       presentAlert({
         header: "Alerta!",
@@ -198,24 +206,32 @@ export const Toast = () => {
   };
 
   const onUpdateElapsed = () => {
-    onTimeUpdate()
-    updateElapsed( audioRef.current?.currentTime )
-  }
-  
+    onTimeUpdate();
+    updateElapsed(audioRef.current?.currentTime);
+  };
+
   useEffect(() => {
     onPause();
     onPlay();
   }, [globalAudio]);
 
   useEffect(() => {
-    if ( real_duration ) {
-      startBackground()
-      create( baseURL, globalAudio, real_duration, onPlay, onPause, goToPrev, goToNext );
+    if (real_duration) {
+      startBackground();
+      create(
+        baseURL,
+        globalAudio,
+        real_duration,
+        onPlay,
+        onPause,
+        goToPrev,
+        goToNext
+      );
     }
-  }, [real_duration])
+  }, [real_duration]);
 
   useEffect(() => {
-    if ( isGlobalPlaying ) {
+    if (isGlobalPlaying) {
       onPlay();
     } else {
       onPause();
@@ -224,18 +240,26 @@ export const Toast = () => {
 
   return (
     <div className={`${styles["custom-toast"]}`}>
-      <IonIcon
-        onClick={onClear}
-        aria-hidden="true"
-        icon={closeCircle}
-        className={`${styles["custom-close"]}`}
-      />
-
       <IonItem lines="none" button={true} detail={false}>
-        <div style={{display: 'flex', flexDirection: 'column', flexGrow: '1'}} onClick={goToClip}>
-          <IonLabel class={`ion-text-justify ${styles.title}`}> {globalAudio.titulo} </IonLabel>
-          <span className={`${styles.categoria}`}> {globalAudio.categoria?.categoria} </span>
+        <IonAvatar slot="start">
+          <img
+            alt=""
+            src={!network.status ? AudioNoWifi : baseURL + globalAudio.imagen}
+          />
+        </IonAvatar>
 
+        <div
+          style={{ display: "flex", flexDirection: "column", flexGrow: "1" }}
+          onClick={goToClip}
+        >
+          <IonLabel class={`ion-text-justify ${styles.title}`}>
+            {" "}
+            {globalAudio.titulo}{" "}
+          </IonLabel>
+          <span className={`${styles.categoria}`}>
+            {" "}
+            {globalAudio.categoria?.categoria}{" "}
+          </span>
         </div>
 
         <IonIcon
@@ -284,37 +308,83 @@ export const Toast = () => {
           icon={playSkipForward}
         />
 
-        {globalAudio.in_my_playlist ? (
-          <IonIcon
-            aria-hidden="true"
-            slot="end"
-            icon={star}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onTrash();
-            }}
-          />
-        ) : (
-          <IonIcon
-            aria-hidden="true"
-            slot="end"
-            icon={globalAudio.in_my_playlist ? star : starOutline}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onAdd();
-            }}
-          />
-        )}
+        <IonIcon
+          aria-hidden="true"
+          slot="end"
+          icon={ellipsisVertical}
+          onClick={(e) => {
+            setEv(e.nativeEvent);
+          }}
+        />
+
+        <IonPopover
+          isOpen={!!ev}
+          event={ev}
+          onDidDismiss={() => setEv(undefined)}
+          side="top"
+          alignment="center"
+        >
+          <IonContent class="ion-no-padding">
+            <IonList>
+              {globalAudio.in_my_playlist ? (
+                <IonItem
+                  button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onTrash();
+                  }}
+                  detail={false}
+                  aria-label="Quitar de mi playlist"
+                >
+                  <IonIcon aria-hidden="true" slot="start" icon={star} />
+                  <IonLabel>Quitar de mi playlist</IonLabel>
+                </IonItem>
+              ) : (
+                <IonItem
+                  button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onAdd();
+                  }}
+                  detail={false}
+                  aria-label="Agregar a mi playlist"
+                >
+                  <IonIcon aria-hidden="true" slot="start" icon={starOutline} />
+                  <IonLabel>Agregar a mi playlist</IonLabel>
+                </IonItem>
+              )}
+
+              <IonItem
+                lines="none"
+                button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onClear();
+                }}
+                detail={false}
+                aria-label="Cerrar Reproductor"
+              >
+                <IonIcon aria-hidden="true" slot="start" icon={closeCircle} />
+                <IonLabel>Cerrar Reproductor</IonLabel>
+              </IonItem>
+            </IonList>
+          </IonContent>
+        </IonPopover>
 
         <div className={`${styles["unread-indicator"]}`}>
-          <IonProgressBar buffer={buffer} value={progress / 100} color="warning" />
+          <IonProgressBar
+            buffer={buffer}
+            value={progress / 100}
+            color="warning"
+          />
         </div>
       </IonItem>
 
       <audio
-        ref={ audioRef }
+        ref={audioRef}
         onLoadedMetadata={onLoadedMetadata}
         onTimeUpdate={onUpdateElapsed}
         onProgress={onUpdateBuffer}

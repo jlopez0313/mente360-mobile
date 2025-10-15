@@ -4,6 +4,7 @@ import { useNetwork } from "@/hooks/useNetwork";
 import { usePayment } from "@/hooks/usePayment";
 import { find } from "@/services/subscribe";
 import {
+  IonAvatar,
   IonButton,
   IonCard,
   IonCardContent,
@@ -71,7 +72,7 @@ export const Item = ({ comunidad, setIsPremiumOpen }: any) => {
       if (fecha < hoy) {
         return false;
       }
-    } else if( comunidad.lider.id != user.id ) {
+    } else if (comunidad.lider.id != user.id) {
       return false;
     }
     return true;
@@ -88,10 +89,10 @@ export const Item = ({ comunidad, setIsPremiumOpen }: any) => {
             p.key == "MES"
               ? "mensual"
               : p.key == "TRIM"
-                ? "trimestral"
-                : p.key == "SEM"
-                  ? "semestral"
-                  : "anual";
+              ? "trimestral"
+              : p.key == "SEM"
+              ? "semestral"
+              : "anual";
 
           return {
             disabled: !network.status,
@@ -169,34 +170,42 @@ export const Item = ({ comunidad, setIsPremiumOpen }: any) => {
 
   return (
     <IonCard>
-      <img
-        alt={comunidad?.comunidad}
-        src={network.status ? baseURL + comunidad?.imagen : AudioNoWifi}
-      />
-
       <IonCardHeader>
-        <IonCardTitle> {comunidad?.comunidad} </IonCardTitle>
-        <IonCardSubtitle> {comunidad?.lider?.name} </IonCardSubtitle>
+        <div className={styles['card-header']}>
+          <IonAvatar>
+            <img
+              alt={comunidad?.comunidad}
+              src={network.status ? baseURL + comunidad?.imagen : AudioNoWifi}
+            />
+          </IonAvatar>
+          <div className={styles["card-info"]}>
+            <IonCardTitle> {comunidad?.comunidad} </IonCardTitle>
+            <IonCardSubtitle> {comunidad?.lider?.name} </IonCardSubtitle>
+          </div>
+        </div>
+      </IonCardHeader>
+      <IonCardContent>
         <p
-          className={`${styles["texto"]} ${expandido ? styles["expandido"] : ""
-            }`}
+          className={`${styles["texto"]} ${
+            expandido ? styles["expandido"] : ""
+          }`}
         >
           {" "}
           {comunidad.descripcion}{" "}
         </p>
+        
         <button
-          className={styles["btn-leer"]}
+          className={`ion-margin-bottom ${styles["btn-leer"]}`}
           onClick={() => setExpandido(!expandido)}
         >
           {expandido ? "Leer menos" : "Leer más"}
         </button>
-      </IonCardHeader>
-      <IonCardContent>
+
         {!hasSuscription(comunidad) ? (
           <IonButton
             onClick={() => onPresentSheet(comunidad)}
             expand="block"
-            className={styles["suscribete"]}
+            className={`ion-margin-top ${styles["suscribete"]}`}
           >
             Suscribete
           </IonButton>
@@ -204,7 +213,7 @@ export const Item = ({ comunidad, setIsPremiumOpen }: any) => {
           <IonButton
             expand="block"
             fill="outline"
-            className={styles["suscrito"]}
+            className={`ion-margin-top ${styles["suscrito"]}`}
             onClick={() => goToCanales(comunidad?.id)}
           >
             {" "}

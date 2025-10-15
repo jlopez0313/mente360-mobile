@@ -14,7 +14,6 @@ import {
 } from "@ionic/react";
 import styles from "./Crecimiento.module.scss";
 
-import { Footer } from "@/components/Footer/Footer";
 import { IonIcon } from "@ionic/react";
 import { arrowBack } from "ionicons/icons";
 import { Link, useHistory, useParams } from "react-router-dom";
@@ -76,7 +75,7 @@ const Crecimiento: React.FC = () => {
             </Link>
           </IonButtons>
 
-          <IonTitle class="ion-no-padding ion-padding-end ion-text-center">
+          <IonTitle class="ion-no-padding ion-padding-end ion-text-left">
             {" "}
             <IonItem lines="none" className={`${styles["canal"]}`}>
               <div className={styles["info"]}>
@@ -98,7 +97,6 @@ const Crecimiento: React.FC = () => {
         <CrecimientoComponent />
       </IonContent>
 
-      <Footer />
     </IonPage>
   );
 };

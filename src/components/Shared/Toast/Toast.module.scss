@@ -1,8 +1,12 @@
 @import "@/styles.scss";
 
+ion-popover {
+    --width: 280px;
+}
+
 .custom-toast {
     position: absolute;
-    background: rgba(28,28,30);
+    background: rgba(28, 28, 30, .95);
     min-height: 48px;
     display: flex;
     flex-direction: column;
@@ -12,22 +16,27 @@
     width: 100%;
     padding: 5px 0;
 
+    ion-avatar {
+        --border-radius: 5px;
+    }
 
     .title {
         padding-left: 10px;
         font-size: 13px !important;
-        --color: #aaa !important;
-        color: #aaa !important;
+        --color: #ff !important;
+        color: #fff !important;
     }
 
     .categoria {
         padding-left: 10px;
         font-size: 9px !important;
+        --color: #ff !important;
+        color: #fff !important;
     }
 
     ion-icon {
         font-size: 1.65rem !important;
-        color: #aaa !important;
+        color: #fff !important;
     }
 
 }
@@ -45,9 +54,9 @@
 .unread-indicator {
     width: calc(100% - 16px);
     height: 5px;
-  
+
     position: absolute;
-  
+
     inset-inline-start: 12px;
     bottom: 0;
     left: 0;
@@ -55,4 +64,4 @@
     ion-progress-bar {
         height: 2px;
     }
-  }
+}

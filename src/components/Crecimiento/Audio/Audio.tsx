@@ -2,11 +2,11 @@ import { startBackground } from "@/helpers/background";
 import { create } from "@/helpers/musicControls";
 import { useAudio } from "@/hooks/useAudio";
 import {
+  IonButton,
   IonCard,
   IonCardContent,
   IonCardHeader,
   IonCardSubtitle,
-  IonChip,
   IonIcon,
   IonRange,
   IonSkeletonText,
@@ -41,7 +41,6 @@ interface Props {
 
 export const Audio: React.FC<Props> = memo(
   ({ activeIndex, audio, network, onGoBack, onGoNext, onSaveNext }) => {
-
     const { isGlobalPlaying }: any = useSelector((state: any) => state.audio);
 
     const [presentToast] = useIonToast();
@@ -111,7 +110,7 @@ export const Audio: React.FC<Props> = memo(
           }
         );
 
-        if(!ruta) {
+        if (!ruta) {
           throw new Error("No se pudo descargar el audio");
         }
 
@@ -126,7 +125,8 @@ export const Audio: React.FC<Props> = memo(
 
         onPresentToast(
           "bottom",
-          audio.titulo + " está listo para escucharse sin conexión. Podrás acceder a él desde esta misma aplicación",
+          audio.titulo +
+            " está listo para escucharse sin conexión. Podrás acceder a él desde esta misma aplicación",
           musicalNotesOutline
         );
 
@@ -146,16 +146,16 @@ export const Audio: React.FC<Props> = memo(
           audio_local: "",
           downloaded: 0,
         });
-  
+
         onPresentToast(
           "bottom",
           audio.titulo + " ha sido eliminado de tu biblioteca.",
           musicalNotesOutline
         );
-  
+
         setLocalSrc(null);
       } catch (error) {
-        console.log( error )
+        console.log(error);
       }
     };
 
@@ -246,24 +246,12 @@ export const Audio: React.FC<Props> = memo(
               }}
             >
               {percent > 0 && <span style={{ width: "30px" }}></span>}
-              <div className={styles["chip-list"]}>
-                <IonChip
-                  disabled={!network.status && !localSrc}
-                  onClick={() => (localSrc ? onRemoveLocal() : onDownload())}
-                >
-                  <IonIcon
-                    className={`${styles["donwload-icon"]}`}
-                    icon={localSrc ? trashBinOutline : downloadOutline}
-                  />
-                  {localSrc ? "Eliminar Descarga" : "Descargar"}
-                </IonChip>
-              </div>
 
               {percent > 0 && <AudioProgressCircle />}
             </IonCardSubtitle>
           </IonCardHeader>
 
-          <IonCardContent className="ion-no-padding">
+          <IonCardContent className="ion-padding">
             <IonRange
               disabled={false}
               value={progress}
@@ -284,7 +272,9 @@ export const Audio: React.FC<Props> = memo(
               <span> {duration} </span>
             </div>
 
-            <div className={`${styles.controls}`}>
+            <div
+              className={`ion-margin-bottom ${styles.controls}`}
+            >
               <IonIcon
                 onClick={onGoBack}
                 className={styles.previous}
@@ -301,7 +291,7 @@ export const Audio: React.FC<Props> = memo(
                   <IonIcon
                     style={{
                       opacity: !network.status && !localSrc ? 0.2 : 1,
-                      "pointerEvents":
+                      pointerEvents:
                         !network.status && !localSrc ? "none" : "auto",
                     }}
                     className={styles["icon-play"]}
@@ -316,6 +306,19 @@ export const Audio: React.FC<Props> = memo(
                 icon={playSkipForward}
               ></IonIcon>
             </div>
+
+            <IonButton
+              className={`ion-margin-top ${styles['downloadBtn']}`}
+              disabled={!network.status && !localSrc}
+              onClick={() => (localSrc ? onRemoveLocal() : onDownload())}
+            >
+              <IonIcon
+                slot="start"
+                className={`${styles["donwload-icon"]}`}
+                icon={localSrc ? trashBinOutline : downloadOutline}
+              />
+              {localSrc ? "Eliminar Descarga" : "Descargar"}
+            </IonButton>
 
             <audio
               ref={audioRef}

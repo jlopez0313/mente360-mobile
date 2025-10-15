@@ -21,6 +21,9 @@
         }
     }
 
+    @include cardComunidad();
+    @include descripcion();
+    
     .version {
         font-size: .8rem;
     }

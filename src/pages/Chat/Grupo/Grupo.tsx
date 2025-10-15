@@ -17,7 +17,6 @@ import styles from "./Grupo.module.scss";
 import { IonIcon } from "@ionic/react";
 import { arrowBack, ellipsisVerticalOutline } from "ionicons/icons";
 
-import { Footer } from "@/components/Footer/Footer";
 import { Link, useHistory, useParams } from "react-router-dom";
 
 import Avatar from "@/assets/images/avatar.jpg";
@@ -189,7 +188,6 @@ const Grupo: React.FC = () => {
         </IonContent>
       </IonPopover>
 
-      <Footer />
     </IonPage>
   );
 };

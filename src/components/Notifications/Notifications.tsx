@@ -1,25 +1,26 @@
 import {
-  IonAvatar,
-  IonItem,
-  IonItemDivider,
+  IonIcon,
   IonItemGroup,
   IonLabel,
   IonList,
-  IonText
+  IonSegment,
+  IonSegmentButton
 } from "@ionic/react";
 import styles from "./Notifications.module.scss";
 
-import Logo from "@/assets/images/logo.png";
 import { setShowGlobalAudio } from "@/store/slices/audioSlice";
 import { setGeneral } from "@/store/slices/notificationSlice";
 import dayjs from "dayjs";
+import { checkmark } from "ionicons/icons";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Item } from "./Item";
 
 export const Notifications = () => {
   const dispatch = useDispatch();
   const { notificaciones } = useSelector((state: any) => state.notifications);
 
+  const [segment, setSegment] = useState<string>("hoy");
   const [todayNotifications, setTodayNotifications] = useState([]);
   const [otherNotifications, setOtherNotifications] = useState([]);
 
@@ -49,64 +50,50 @@ export const Notifications = () => {
   }, [notificaciones]);
 
   return (
-    <div className={styles["ion-content"]}>
-      <IonList className="ion-padding-start ion-padding-end">
-        <IonItemGroup>
-          <IonItemDivider>
+    <div className={`ion-padding ${styles["ion-content"]}`}>
+      <IonSegment
+        value={segment}
+        mode="ios"
+        onIonChange={(e) => setSegment(e.detail.value!.toString())}
+      >
+        <IonSegmentButton value="hoy" className={styles["ion-segment-button"]}>
+          <div className="flex items-center gap-4">
+            {segment == "hoy" && <IonIcon slot="start" icon={checkmark} />}
             <IonLabel>Hoy</IonLabel>
-          </IonItemDivider>
-          {todayNotifications.map((item, idx) => {
-            return (
-              <IonItem
-                lines="none"
-                className={styles["notificacion"]}
-                key={idx}
-              >
-                <IonAvatar aria-hidden="true" slot="start">
-                  <img alt="" src={Logo} />
-                </IonAvatar>
-                <div>
-                  <IonText className={styles["message"]}>
-                    {item.notificacion}
-                  </IonText>
-                  <span className={styles["time"]}>
-                    {new Date(item.created_at).toLocaleDateString()}
-                  </span>
-                </div>
-              </IonItem>
-            );
-          })}
-        </IonItemGroup>
-      </IonList>
-
-      <IonList className="ion-padding-start ion-padding-end">
-        <IonItemGroup>
-          <IonItemDivider>
+          </div>
+        </IonSegmentButton>
+        <IonSegmentButton
+          value="anteriores"
+          className={styles["ion-segment-button"]}
+        >
+          <div className="flex items-center gap-4">
+            {segment == "anteriores" && (
+              <IonIcon slot="start" icon={checkmark} />
+            )}
             <IonLabel>Anteriores</IonLabel>
-          </IonItemDivider>
-          {otherNotifications.map((item, idx) => {
-            return (
-              <IonItem
-                lines="none"
-                className={styles["notificacion"]}
-                key={idx}
-              >
-                <IonAvatar aria-hidden="true" slot="start">
-                  <img alt="" src={Logo} />
-                </IonAvatar>
-                <div>
-                  <IonText className={styles["message"]}>
-                    {item.notificacion}
-                  </IonText>
-                  <span className={styles["time"]}>
-                    {new Date(item.created_at).toLocaleDateString()}
-                  </span>
-                </div>
-              </IonItem>
-            );
-          })}
-        </IonItemGroup>
-      </IonList>
+          </div>
+        </IonSegmentButton>
+      </IonSegment>
+
+      {segment == "hoy" && (
+        <IonList className="ion-margin-top">
+          <IonItemGroup>
+            {todayNotifications.map((item, idx) => {
+              return <Item item={item} key={idx} />;
+            })}
+          </IonItemGroup>
+        </IonList>
+      )}
+
+      {segment == "anteriores" && (
+        <IonList className="ion-margin-top">
+          <IonItemGroup>
+            {otherNotifications.map((item, idx) => {
+              return <Item item={item} key={idx} />;
+            })}
+          </IonItemGroup>
+        </IonList>
+      )}
     </div>
   );
 };

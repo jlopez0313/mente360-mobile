@@ -4,6 +4,7 @@ import { useNetwork } from "@/hooks/useNetwork";
 import {
   IonAvatar,
   IonCard,
+  IonCardContent,
   IonCardHeader,
   IonCardSubtitle,
   IonCardTitle,
@@ -40,22 +41,29 @@ export const Canales = () => {
 
   return (
     <div className={styles["ion-content"]}>
-      <h2 className="ion-text-center"> {} </h2>
       <IonCard>
-        <img
-          alt={comunidad?.comunidad}
-          src={network.status ? baseURL + comunidad?.imagen : AudioNoWifi}
-        />
         <IonCardHeader>
-          <IonCardTitle> {comunidad?.comunidad} </IonCardTitle>
-          <IonCardSubtitle> {comunidad?.lider?.name} </IonCardSubtitle>
-          <p> {comunidad?.descripcion} </p>
+          <div className={styles["card-header"]}>
+            <IonAvatar>
+              <img
+                alt={comunidad?.comunidad}
+                src={network.status ? baseURL + comunidad?.imagen : AudioNoWifi}
+              />
+            </IonAvatar>
+            <div className={styles["card-info"]}>
+              <IonCardTitle> {comunidad?.comunidad} </IonCardTitle>
+              <IonCardSubtitle> {comunidad?.lider?.name} </IonCardSubtitle>
+            </div>
+          </div>
         </IonCardHeader>
+        <IonCardContent>
+          <p> {comunidad?.descripcion} </p>
+        </IonCardContent>
       </IonCard>
       <IonList className="ion-padding">
         {canales?.map((canal: any, idx: number) => {
           return (
-            <IonItem key={idx} onClick={() => goToCrecimiento(canal.id)}>
+            <IonItem key={idx} onClick={() => goToCrecimiento(canal.id)} detail>
               <IonAvatar slot="start">
                 <img
                   alt={canal.canal}

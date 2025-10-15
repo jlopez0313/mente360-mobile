@@ -2,8 +2,6 @@
 @import "@/css/_common.scss";
 
 .card {
-    --background: none;
-    box-shadow: none;
     
     ion-card-subtitle {
         display: flex;
@@ -25,26 +23,6 @@
             font-weight: bold;
         }
 
-        .chip-list {
-            
-            display: flex;
-            overflow-x: auto;
-            white-space: nowrap;
-            gap: 0px;
-            
-            ion-chip {
-                @include base-ion-item(5px, #ffedbd);
-                    
-                flex-shrink: 0;
-                font-size: 11px;
-                font-weight: 600;
-                padding: 5px 10px;
-                
-                ion-icon {
-                    margin-inline: 0 10px;
-                }
-            }
-        }
     }
 
     ion-card-content {
@@ -63,7 +41,7 @@
             display: flex;
             justify-content: space-around;
             align-items: center;
-
+            
             .play {
                 border-radius: 50%;
                 padding: 5px;
@@ -89,6 +67,10 @@
                 font-size: 24px;
                 color: var(--bg-main);
             }
+        }
+
+        .downloadBtn {
+            color: #3D3d3d;
         }
     }
 }

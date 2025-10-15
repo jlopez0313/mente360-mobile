@@ -12,6 +12,7 @@ import { Buttons } from "@/components/Shared/Premium/Buttons/Buttons";
 import { Premium } from "@/components/Shared/Premium/Premium";
 import { useNetwork } from "@/hooks/useNetwork";
 import { usePayment } from "@/hooks/usePayment";
+import { notificationsOutline } from "ionicons/icons";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useHistory } from "react-router-dom";
@@ -28,7 +29,9 @@ export const Footer = (props: any) => {
   const [tab, setTab] = useState(history.location.pathname);
   const [isPremiumOpen, setIsPremiumOpen] = useState(false);
 
-  const { isRoom, isGrupo } = useSelector((state: any) => state.notifications);
+  const { isGeneral, isRoom, isGrupo } = useSelector(
+    (state: any) => state.notifications
+  );
 
   return (
     <>
@@ -82,6 +85,21 @@ export const Footer = (props: any) => {
                 </IonButton>
               </Link>
             )}
+
+            <Link
+              to="/notificaciones"
+              replace={true}
+              onClick={() => setTab(history.location.pathname)}
+            >
+              <IonButton
+                className={tab.includes("/notificaciones") ? styles.active : ""}
+              >
+                <IonIcon slot="icon-only" icon={notificationsOutline}></IonIcon>
+                {isGeneral && (
+                  <div className={styles["has-notification"]}></div>
+                )}
+              </IonButton>
+            </Link>
 
             {!userEnabled || payment_status == "free" ? (
               <IonButton onClick={() => setIsPremiumOpen(true)}>

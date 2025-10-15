@@ -1,6 +1,19 @@
 @import "@/css/_common.scss";
 
-.ion-content { 
+.ion-content {
+
+    .ion-segment-button {
+        ion-icon {
+            font-size: 18px;
+            margin-right: 6px;
+            color: var(--ion-color-primary);
+        }
+
+        ion-label {
+            font-weight: 500;
+        }
+    }
+
     ion-list {
         background: none;
         padding-top: 0;
@@ -20,8 +33,10 @@
 
         div {
             flex-grow: 1;
-            padding-top: 10px;
-           
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+
             .message {
                 text-align: justify;
                 line-height: 17px;
@@ -29,13 +44,13 @@
                 display: block;
             }
 
-            
             .time {
-                margin-top: 8px;
-                float: right;
-                font-size: 11px;
+                align-self: flex-end;
+                font-size: 12px;
                 text-align: justify;
                 color: #666;
+                display: flex;
+                gap: .5rem;
             }
         }
     }

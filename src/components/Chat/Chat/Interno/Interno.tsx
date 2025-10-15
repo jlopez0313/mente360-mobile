@@ -165,7 +165,7 @@ export const Interno: React.FC<any> = ({ usuario, roomID }) => {
 
       <IonRow className={styles["chatbox"]}>
         <IonCol size="10">
-          <IonItem lines="none">
+          <IonItem lines="none" className={styles['reply']}>
             <div className={styles["wrapper"]}>
               {replyTo && (
                 <div className={styles["reply-bar"]}>

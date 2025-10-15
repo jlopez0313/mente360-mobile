@@ -7,7 +7,7 @@ import {
   updateData,
   writeData,
 } from "@/services/realtime-db";
-import { IonButton, IonIcon, IonItemGroup, IonList } from "@ionic/react";
+import { IonFab, IonFabButton, IonIcon, IonItemGroup, IonList } from "@ionic/react";
 import { add } from "ionicons/icons";
 import { useEffect, useState } from "react";
 import { Add } from "../Add/Add";
@@ -89,10 +89,11 @@ export const Grupos = () => {
 
   return (
     <div className={styles["ion-content"]}>
-      <IonButton id="add" className="ion-margin-bottom" expand="block">
-        <IonIcon icon={add} slot="start" />
-        Nuevo Grupo Mente Maestra
-      </IonButton>
+      <IonFab horizontal="end" vertical="bottom">
+        <IonFabButton id="add" className="ion-margin-bottom">
+          <IonIcon icon={add}/>
+        </IonFabButton>
+      </IonFab>
 
       <IonList className="ion-no-padding" lines="none">
         <IonItemGroup>

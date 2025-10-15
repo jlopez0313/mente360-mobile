@@ -13,7 +13,7 @@ import {
 import styles from "./Chat.module.scss";
 
 import { IonIcon } from "@ionic/react";
-import { arrowBack } from "ionicons/icons";
+import { arrowBack, chatboxOutline, chatbubblesOutline, peopleOutline } from "ionicons/icons";
 
 import { Chat as ChatComponent } from "@/components/Chat/Chat/Lista/Chat";
 import { Comunidad as ComunidadComponent } from "@/components/Chat/Comunidad/Comunidad";
@@ -70,9 +70,9 @@ const Chat: React.FC = () => {
             </Link>
           </IonButtons>
 
-          <IonTitle className="ion-no-padding ion-padding-end ion-text-center">
+          <IonTitle className="ion-no-padding ion-padding-end">
             {" "}
-            Comunidad{" "}
+            Conexiones{" "}
           </IonTitle>
 
           {/*
@@ -93,21 +93,30 @@ const Chat: React.FC = () => {
         </IonHeader>
 
         <IonSegment value={tab} onIonChange={onSetTab}>
-          <IonSegmentButton value="chat">
-            <IonLabel>
-              Chat
-              {isRoom && <div className={styles["has-notification"]}></div>}
-            </IonLabel>
+          <IonSegmentButton value="chat" className={styles["ion-segment-button"]}>
+            <div className="flex items-center gap-4">
+              <IonIcon slot="start" icon={chatboxOutline} />
+              <IonLabel>
+                Chat
+                {isRoom && <div className={styles["has-notification"]}></div>}
+              </IonLabel>
+            </div>
           </IonSegmentButton>
-          <IonSegmentButton value="grupos">
-            <IonLabel>
-              {" "}
-              Grupos
-              {isGrupo && <div className={styles["has-notification"]}></div>}
-            </IonLabel>
+          <IonSegmentButton value="grupos" className={styles["ion-segment-button"]}>
+            <div className="flex items-center gap-4">
+              <IonIcon slot="start" icon={chatbubblesOutline} />
+              <IonLabel>
+                {" "}
+                Grupos
+                {isGrupo && <div className={styles["has-notification"]}></div>}
+              </IonLabel>
+            </div>
           </IonSegmentButton>
-          <IonSegmentButton value="comunidad">
-            <IonLabel> Comunidad </IonLabel>
+          <IonSegmentButton value="comunidad" className={styles["ion-segment-button"]}>
+            <div className="flex items-center gap-4">
+              <IonIcon slot="start" icon={peopleOutline} />
+              <IonLabel> Comunidad </IonLabel>
+            </div>
           </IonSegmentButton>
         </IonSegment>
 

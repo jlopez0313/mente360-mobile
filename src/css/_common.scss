@@ -1,12 +1,17 @@
 // Mixin for standard list items
-@mixin base-ion-item($radius: 3px, $backgroud: none) {
+@mixin base-ion-item($radius: 3px, $backgroud: none, $margin: 10px) {
     background: $backgroud;
     --background: $backgroud;
 
     border: 1px solid var(--bg-main);
-    --border-radius: $radius;
-    
-    margin-bottom: 10px;
+    margin-bottom: $margin;
+    border-radius: $radius;
+
+    &::part(native) {
+        border-radius: $radius;
+        --border-radius: $radius;
+        overflow: hidden;
+    }
 }
 
 // Mixin for list item dividers
@@ -64,7 +69,43 @@
     }
 }
 
+
+@mixin cardComunidad {
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 0;
+
+        ion-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-info {
+            display: flex;
+            flex-direction: column;
+
+            ion-card-title {
+                font-size: 16px;
+                font-weight: 600;
+                color: var(--ion-color-dark);
+            }
+
+            ion-card-subtitle {
+                font-size: 13px;
+                color: var(--ion-color-medium);
+                margin-top: 2px;
+            }
+        }
+    }
+}
+
 @mixin descripcion {
+    
     .texto {
         display: -webkit-box;
         -webkit-box-orient: vertical;

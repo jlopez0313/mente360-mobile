@@ -16,7 +16,6 @@ import { arrowBack } from "ionicons/icons";
 
 import { Interno as InternoComponent } from "@/components/Chat/Chat/Interno/Interno";
 import { Profile as ProfileModal } from "@/components/Chat/Profile/Profile";
-import { Footer } from "@/components/Footer/Footer";
 import { Link, useHistory, useParams } from "react-router-dom";
 
 import Avatar from "@/assets/images/avatar.jpg";
@@ -194,8 +193,7 @@ const Interno: React.FC = () => {
           setShowProfileModal={setShowProfileModal}
         />
       )}
-
-      <Footer />
+      
     </IonPage>
   );
 };

@@ -102,6 +102,7 @@ export const Item: React.FC<any> = ({ grupo }) => {
       button={true}
       className={`${styles["grupo"]}`}
       onClick={() => goToGrupo()}
+      detail
     >
       <IonAvatar aria-hidden="true" slot="start">
         {isLoading && (

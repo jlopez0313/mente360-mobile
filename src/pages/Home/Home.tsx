@@ -11,8 +11,7 @@ import {
 
 import {
   ellipsisVertical,
-  notificationsOutline,
-  personCircleOutline,
+  personCircleOutline
 } from "ionicons/icons";
 import styles from "./Home.module.scss";
 
@@ -83,14 +82,6 @@ const Home: React.FC = () => {
           <IonTitle className="ion-text-center"> Hoy </IonTitle>
 
           <IonButtons slot="end">
-            <Link to="/notificaciones" replace={true}>
-              <IonButton>
-                <IonIcon slot="icon-only" icon={notificationsOutline}></IonIcon>
-                {isGeneral && (
-                  <div className={styles["has-notification"]}></div>
-                )}
-              </IonButton>
-            </Link>
 
             <IonButton id="popover-button">
               <IonIcon slot="icon-only" icon={ellipsisVertical}></IonIcon>

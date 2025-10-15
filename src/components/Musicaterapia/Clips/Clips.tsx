@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 
 import { db } from "@/hooks/useDexie";
 import { useNetwork } from "@/hooks/useNetwork";
-import { clearListAudios, setListAudios } from "@/store/slices/audioSlice";
+import { clearListAudios, setListAudios, setShowGlobalAudio } from "@/store/slices/audioSlice";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useDispatch, useSelector } from "react-redux";
 import { Item } from "./Item";
@@ -20,7 +20,7 @@ export const Clips = () => {
   const dispatch = useDispatch();
 
   const { user } = useSelector((state: any) => state.user);
-  const { globalPos } = useSelector((state: any) => state.audio);
+  const { globalPos, globalAudio } = useSelector((state: any) => state.audio);
 
   const network = useNetwork();
 
@@ -96,6 +96,10 @@ export const Clips = () => {
     }
 
   }, [globalPos]);
+
+  useEffect(() => {
+    dispatch(setShowGlobalAudio(true));
+  }, [globalAudio]);
 
   return (
     <>

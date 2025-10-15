@@ -101,6 +101,7 @@ ion-header {
 ion-button,
 ion-fab-button {
     --background: linear-gradient(to left bottom, #e6b711, #FFC90A);
+    text-transform: none !important;
 }
 
 ion-datetime::part(calendar-day):focus {
@@ -178,5 +179,13 @@ input{
     min-height: 50px;
     padding-top: 8px;
     padding-bottom: 8px;
+  }
+}
+
+.flex {
+  display: flex;
+  
+  &.items-center {
+    align-items: center;
   }
 }

@@ -97,7 +97,7 @@ export const Item: React.FC<any> = ({ usuario }) => {
   }, [unreads]);
 
   return (
-    <IonItem button={true} className={`${styles["contact"]}`}>
+    <IonItem button={true} className={`${styles["contact"]}`} detail>
       <IonAvatar
         aria-hidden="true"
         slot="start"

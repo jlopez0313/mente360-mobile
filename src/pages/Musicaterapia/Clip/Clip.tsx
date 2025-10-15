@@ -10,9 +10,8 @@ import {
 import styles from "./Clip.module.scss";
 
 import { IonIcon } from "@ionic/react";
-import { arrowBack, musicalNote, musicalNotes } from "ionicons/icons";
+import { arrowBack, musicalNote } from "ionicons/icons";
 
-import { Footer } from "@/components/Footer/Footer";
 import { Clip as ClipComponent } from "@/components/Musicaterapia/Clip/Clip";
 import { useEffect } from "react";
 import { Link, useHistory } from "react-router-dom";
@@ -47,8 +46,7 @@ const Clip: React.FC = () => {
             </Link>
           </IonButtons>
 
-          <IonTitle className="ion-no-padding ion-padding-end ion-text-center">
-            <IonIcon icon={musicalNotes} style={{marginRight: '10px'}}></IonIcon>
+          <IonTitle className="ion-no-padding ion-padding-end">
             En reproducción
           </IonTitle>
 
@@ -69,7 +67,6 @@ const Clip: React.FC = () => {
         
       </IonContent>
 
-      <Footer  id="footer"/>
     </IonPage>
   );
 };

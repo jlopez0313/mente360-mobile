@@ -46,7 +46,7 @@ const Canales: React.FC = () => {
             </Link>
           </IonButtons>
 
-          <IonTitle className="ion-no-padding ion-padding-end ion-text-center"> Canales </IonTitle>
+          <IonTitle className="ion-no-padding ion-padding-end"> Canales </IonTitle>
         </IonToolbar>
       </IonHeader>
 

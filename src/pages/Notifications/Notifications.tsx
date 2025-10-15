@@ -47,7 +47,7 @@ const Notifications: React.FC = () => {
             </Link>
           </IonButtons>
 
-          <IonTitle className="ion-no-padding ion-padding-end ion-text-center"> Notificaciones </IonTitle>
+          <IonTitle className="ion-no-padding ion-padding-end"> Notificaciones </IonTitle>
         </IonToolbar>
       </IonHeader>
 
