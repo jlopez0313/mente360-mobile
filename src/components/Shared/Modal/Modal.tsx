@@ -6,7 +6,7 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import { close, closeCircleOutline } from "ionicons/icons";
+import { closeCircleOutline } from "ionicons/icons";
 import React, { cloneElement, memo, useRef, useState } from "react";
 import styles from "./Modal.module.scss";
 
@@ -94,7 +94,6 @@ export const Modal: React.FC<Props> = memo(
                 onClick={() => dismiss()}>Completar</IonButton>
             ) : (
               <IonButton disabled={isBtnDisabled} onClick={() => dismiss()}>
-                <IonIcon icon={close} slot="start" />
                 {closeText}
               </IonButton>
             )

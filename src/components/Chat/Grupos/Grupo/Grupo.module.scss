@@ -109,7 +109,6 @@
             }
     
             &.receiver {
-                --background: #fff;
                 border: 1px solid #78849a;
             }
 
@@ -160,7 +159,7 @@
     .chatbox {
 
         padding: 10px;
-        padding-bottom: var(--ion-safe-area-bottom) !important;
+        padding-bottom: calc(var(--ion-safe-area-bottom) + 10px) !important;
         background: #6B768A;
         --background: #6B768A;
         

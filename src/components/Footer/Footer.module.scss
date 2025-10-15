@@ -10,11 +10,15 @@
     ion-button {
       --background: none;
       
+      ion-icon {
+        opacity: 1;
+        color: #333 !important;
+      }
+      
       &.active {
         border-radius: 50%;        
         
         ion-icon {
-          opacity: 1;
           transform: scale(1.75);
         }
       }
@@ -23,7 +27,6 @@
         opacity: .3;
 
         ion-icon {
-          opacity: 1;
           transform: scale(1.35);
         }
       }
