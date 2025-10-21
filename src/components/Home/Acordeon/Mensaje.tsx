@@ -49,19 +49,21 @@ export const Mensaje: React.FC<any> = ({network}) => {
     <>
       <IonAccordion
         value="mensaje"
-        toggleIcon={mensajeIcon}
-        toggleIconSlot="start"
         className={`ion-no-padding ${styles["custom-accordion"]}`}
       >
         <IonItem slot="header" lines="none">
-          <IonLabel className="ion-padding">Mensaje del día</IonLabel>
+          <span className="material-symbols-outlined">chat</span>
+          <div className={styles["title-accordion"]}>
+            <IonLabel className="ion-no-padding title-accordion">Mensaje del día</IonLabel>
+            <IonLabel className="ion-no-padding subtitle-accordion">Un recordatorio de tu fortaleza.</IonLabel>
+          </div>
           {mensaje?.done ? (
-            <IonIcon icon={trophy} slot="end" className={styles['trofeo']} />
+            <span slot="end" className={`material-symbols-outlined $styles['trofeo']`}>emoji_events</span>
           ) : (
-            <IonIcon icon={trophy} slot="end" className={styles['trofeo-gris']} />
+            <span slot="end" className={`material-symbols-outlined $styles['trofeo-gris']`}>emoji_events</span>
           )}
         </IonItem>
-        <div className="ion-padding" slot="content">
+        <div className={styles['button-section']} slot="content">
           <IonButton
             expand="block"
             type="button"

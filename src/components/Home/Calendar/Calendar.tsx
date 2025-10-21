@@ -33,9 +33,13 @@ export const Calendar: React.FC<any> = () => {
     >
       <IonCardContent>
         <div className={`ion-text-center ${styles.header}`}>
-            <IonIcon icon={timeOutline} />
-            <IonLabel>
-              <strong> {currentDay} días para finalizar tu tarea </strong>
+            <IonLabel className="title-calendar">
+              <strong > HOY </strong>
+            </IonLabel>
+        </div>
+        <div className={`ion-text-center ${styles.header}`}>
+            <IonLabel className="title-calendar">
+              {currentDay} días para finalizar tu tarea
             </IonLabel>
         </div>
         <div className={styles.daysOfWeek}>
@@ -44,7 +48,7 @@ export const Calendar: React.FC<any> = () => {
               <IonChip
                 key={key}
                 outline={true}
-                className={today != key ? "" : styles.today}
+                className={today != key ? styles.day : styles.today}
               >
                 {day}
               </IonChip>

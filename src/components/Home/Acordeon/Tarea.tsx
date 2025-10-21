@@ -20,7 +20,6 @@ import { setTab } from "@/store/slices/chatSlice";
 import { useLiveQuery } from "dexie-react-hooks";
 import { trophy } from "ionicons/icons";
 import { Texto } from "../Texto/Texto";
-import tareaIcon from "/assets/icons/tarea.svg";
 
 export const Tarea: React.FC<any> = ({network}) => {
   const dispatch = useDispatch();
@@ -63,19 +62,21 @@ export const Tarea: React.FC<any> = ({network}) => {
     <>
       <IonAccordion
         value="tarea"
-        toggleIcon={tareaIcon}
-        toggleIconSlot="start"
         className={`ion-no-padding ${styles["custom-accordion"]}`}
       >
         <IonItem slot="header" lines="none">
-          <IonLabel className="ion-padding">Tarea de la semana</IonLabel>
+          <span className="material-symbols-outlined">task</span>
+          <div className={styles["title-accordion"]}>
+            <IonLabel className="ion-no-padding title-accordion">Tarea de la semana</IonLabel>
+            <IonLabel className="ion-no-padding subtitle-accordion">Un paso más hacia tu bienestar.</IonLabel>
+          </div>
           {tarea?.done ? (
-            <IonIcon icon={trophy} slot="end" className={styles['trofeo']} />
+            <span slot="end" className={`material-symbols-outlined $styles['trofeo']`}>emoji_events</span>
           ) : (
-            <IonIcon icon={trophy} slot="end" className={styles['trofeo-gris']} />
+            <span slot="end" className={`material-symbols-outlined $styles['trofeo-gris']`}>emoji_events</span>
           )}
         </IonItem>
-        <div className="ion-padding" slot="content">
+        <div className={styles['button-section']} slot="content">
           <IonButton
             expand="block"
             type="button"

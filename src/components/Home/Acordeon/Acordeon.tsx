@@ -18,9 +18,9 @@ export const Acordeon = () => {
 
       <Mensaje network={network} />
 
-      <Audio network={network} />
-
       <Podcasts network={network}  />
+
+      <Audio network={network} />
 
       <Panico network={network} />
     </IonAccordionGroup>

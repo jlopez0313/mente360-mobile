@@ -1,7 +1,7 @@
 
 .ion-footer {
-  --background: var(--bg-main-gradient);
-  --min-height: 50px;
+  --background: var(--bg-white);
+  --min-height: 60px;
   --padding-bottom: var(--ion-safe-area-bottom);
 
   ion-buttons {
@@ -16,7 +16,10 @@
       }
       
       &.active {
-        border-radius: 50%;        
+        border-radius: 50%; 
+        span{
+          color: var(--color-main) !important;       
+        }
         
         ion-icon {
           transform: scale(1.75);
@@ -24,8 +27,7 @@
       }
 
       &:not(.active) {
-        opacity: .3;
-
+        
         ion-icon {
           transform: scale(1.35);
         }
