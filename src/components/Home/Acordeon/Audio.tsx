@@ -55,18 +55,18 @@ export const Audio: React.FC<any> = ({ network }) => {
         className={`ion-no-padding ${styles["custom-accordion"]}`}
       >
         <IonItem slot="header" lines="none">
-          <IonLabel className="ion-padding">Audio de la noche</IonLabel>
+          <span className="material-symbols-outlined">music_video</span>
+          <div className={styles["title-accordion"]}>
+            <IonLabel className="ion-no-padding title-accordion">Audio de la noche</IonLabel>
+            <IonLabel className="ion-no-padding subtitle-accordion">Conecta con calma al final del día.</IonLabel>
+          </div>
           {audio?.done ? (
-            <IonIcon icon={trophy} slot="end" className={styles["trofeo"]} />
+            <span slot="end" className={`material-symbols-outlined $styles['trofeo']`}>emoji_events</span>
           ) : (
-            <IonIcon
-              icon={trophy}
-              slot="end"
-              className={styles["trofeo-gris"]}
-            />
+            <span slot="end" className={`material-symbols-outlined $styles['trofeo-gris']`}>emoji_events</span>
           )}
         </IonItem>
-        <div className="ion-padding" slot="content">
+        <div className={styles['button-section']} slot="content">
           {!userEnabled || payment_status == "free" ? (
             <IonButton
               onClick={() => setIsPremiumOpen(true)}

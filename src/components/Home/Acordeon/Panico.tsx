@@ -74,15 +74,17 @@ export const Panico: React.FC<any> = ({ network }) => {
     <>
       <IonAccordion
         value="panico"
-        toggleIcon={panico}
-        toggleIconSlot="start"
         className={`ion-no-padding ${styles["custom-accordion"]}`}
       >
         <IonItem slot="header" lines="none">
-          <IonLabel className="ion-padding">S.O.S Emocional</IonLabel>
+          <span className="material-symbols-outlined">sick</span>
+          <div className={styles["title-accordion"]}>
+            <IonLabel className="ion-no-padding title-accordion">S.O.S Emocional</IonLabel>
+            <IonLabel className="ion-no-padding subtitle-accordion">Un respiro cuando todo se complica</IonLabel>
+          </div>
           <IonText style={{ width: "20px" }}></IonText>
         </IonItem>
-        <div className="ion-padding" slot="content">
+        <div className={styles['button-section']} slot="content">
           {
             !userEnabled || payment_status == 'free' ?
               <IonButton
