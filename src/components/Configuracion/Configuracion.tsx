@@ -2,6 +2,13 @@ import { openWhatsApp } from "@/helpers/Whatsapp";
 import { usePreferences } from "@/hooks/usePreferences";
 import { setRoute } from "@/store/slices/routeSlice";
 import {
+  IonSkeletonText,
+  IonAvatar,
+  IonMenu,
+  IonHeader,
+  IonToolbar,
+  IonContent,
+  IonMenuToggle,
   IonButton,
   IonIcon,
   IonItem,
@@ -22,10 +29,12 @@ import {
   peopleOutline
 } from "ionicons/icons";
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import { Link } from "react-router-dom";
 import styles from "./Configuracion.module.scss";
+import Avatar from "@/assets/images/avatar.jpg";
+import whatsapp from "/assets/icons/whatsapp.svg";
 
 export const Configuracion = () => {
   const history = useHistory();
@@ -33,7 +42,10 @@ export const Configuracion = () => {
   const { removePreference, keys } = usePreferences();
 
   const [presentToast] = useIonToast();
+  const baseURL = import.meta.env.VITE_BASE_BACK;
+  const { usuario } = useSelector((state: any) => state.user);
 
+  const [isLoading, setIsLoading] = useState(true);
   const onLogout = async () => {
     localStorage.removeItem("home");
     localStorage.removeItem("onboarding");
@@ -102,156 +114,223 @@ export const Configuracion = () => {
   }, []);
 
   return (
-    <div className={styles["ion-content"]}>
-      <IonList inset={true}>
-        <IonItemGroup>
-          <IonItemDivider>
-            <IonLabel>Configuracion Personal</IonLabel>
-          </IonItemDivider>
+    <IonMenu contentId="main-content"
+      onIonWillOpen={() => {
+        const content = document.getElementById("main-content");
+        if (content) {
+          // Ocultamos visualmente el contenido antes de que el menú empiece a aparecer
+          //content.style.transition = "opacity 0.2s ease";
+          //content.style.opacity = "0.6";
+          // Le damos un pequeño retardo antes de ponerlo detrás
+          setTimeout(() => {
+            content.style.zIndex = "-1";
+          }, 150);
+        }
+      }}
+      onIonDidClose={() => {
+        const content = document.getElementById("main-content");
+        if (content) {
+          content.style.zIndex = "0";
+          content.style.opacity = "1";
+        }
+      }}
+    >
+      <IonHeader>
+        <IonToolbar className="bg-secondary minheight186">
+          <IonItem lines="none" className="flex bg-secondary minheight186">
+            {isLoading && (
+            <IonSkeletonText
+              animated
+              className={`ion-margin-top ${styles["profile-image"]}`}
+            />
+          )}
+            <IonAvatar className="menu-avatar" slot="start">
+              <img
+                //src={usuario.photo ? baseURL + usuario.photo : Avatar}
+                src={Avatar}
+                onLoad={() => setIsLoading(false)}
+              />
+            </IonAvatar> 
 
-          <IonItem button={true} lines="none" >
-            <IonToggle
-              checked={paletteToggle}
-              onIonChange={toggleChange}
-              color={"warning"}
-            >
-              <IonLabel>Modo Oscuro</IonLabel>
-            </IonToggle>
+            <IonLabel>
+              <h2 style={{ color: '#4b4b4b', margin: 0 }}>Alejandro Mendoza</h2>
+              <p style={{ color: '#4b4b4b', margin: 0 }}>@alejandro</p>
+            </IonLabel>
           </IonItem>
+        </IonToolbar>
+      </IonHeader>
+      <IonContent className={styles["bg-menu"]}>
+        <IonMenuToggle autoHide={true}>
+          <div className={styles["ion-content"]}>
+            <IonList inset={true}>
+              <IonItemGroup>
+                
+                <Link to="/perfil">
+                  <IonItem button={true} >
+                  <span slot="start" className="material-symbols-outlined">account_circle</span>
+                    <IonLabel>Editar Perfil</IonLabel>
+                  </IonItem>
+                </Link>
 
-          <Link to="/test">
-            <IonItem button={true} >
-              <IonIcon slot="start" icon={cogOutline} />
-              <IonLabel>Realizar Test Eneagrama</IonLabel>
-            </IonItem>
-          </Link>
-          {/*
-          <Link to="/recordatorios">
-            <IonItem button={true}>
-              <IonIcon slot="start" icon={timeOutline} />
-              <IonLabel>Mis Recordatorios</IonLabel>
-            </IonItem>
-          </Link>
-*/}
-        </IonItemGroup>
-      </IonList>
+                <Link to="/recordatorios">
+                  <IonItem button={true} >
+                  <span slot="start" className="material-symbols-outlined">alarm</span>
+                    <IonLabel>Mis Recordatorios</IonLabel>
+                  </IonItem>
+                </Link>
 
-      <IonList inset={true}>
-        <IonItemGroup>
-          <IonItemDivider>
-            <IonLabel>Acerca de Mente360</IonLabel>
-          </IonItemDivider>
+                <IonItem button={true} lines="none" >
+                  <span slot="start" className="material-symbols-outlined">dark_mode</span>
 
-          <IonItem
-            lines="none"
+                  <IonToggle
+                    mode="md" 
+                    checked={paletteToggle}
+                    onIonChange={toggleChange}
+                    className="custom-toggle"
+                  >
+                    <IonLabel>Modo Oscuro</IonLabel>
+                  </IonToggle>
+                </IonItem>
+
+                <Link to="/test">
+                  <IonItem button={true} >
+                  <span slot="start" className="material-symbols-outlined">stars</span>
+                    <IonLabel>Realizar Test Eneagrama</IonLabel>
+                  </IonItem>
+                </Link>
+                {/*
+                <Link to="/recordatorios">
+                  <IonItem button={true}>
+                    <IonIcon slot="start" icon={timeOutline} />
+                    <IonLabel>Mis Recordatorios</IonLabel>
+                  </IonItem>
+                </Link>
+      */}
+              </IonItemGroup>
+            </IonList>
             
-            onClick={() => {
-              window.open("https://soymente360.com/#quienes-somos", "_blank");
-            }}
-          >
-            <IonIcon slot="start" icon={peopleOutline} />
-            <IonLabel>Sobre Nosotros</IonLabel>
-          </IonItem>
+            <IonItemDivider className="line-divider"></IonItemDivider>
 
-          <IonItem
-            lines="none"
+            <IonList inset={true}>
+              <IonItemGroup>
+                
+
+                <IonItem
+                  lines="none"
+
+                  onClick={() => {
+                    window.open("https://soymente360.com/#quienes-somos", "_blank");
+                  }}
+                >
+                  <span slot="start" className="material-symbols-outlined">groups</span>
+                  <IonLabel>Sobre Nosotros</IonLabel>
+                </IonItem>
+
+                <IonItem
+                  lines="none"
+
+                  onClick={() => {
+                    window.open("https://soymente360.com/terminos_condiciones.html", "_blank");
+                  }}
+                >
+                  <span slot="start" className="material-symbols-outlined">insert_drive_file</span>
+                  <IonLabel>Términos y Condiciones</IonLabel>
+                </IonItem>
+
+                <IonItem
+                  lines="none"
+                  onClick={() => {
+                    window.open("https://soymente360.com/politica_privacidad.html", "_blank");
+                  }}
+                >
+                  <span slot="start" className="material-symbols-outlined">admin_panel_settings</span>
+                  <IonLabel>Política de Privacidad</IonLabel>
+                </IonItem>
+              </IonItemGroup>
+            </IonList>
             
-            onClick={() => {
-              window.open("https://soymente360.com/terminos_condiciones.html", "_blank");
-            }}
-          >
-            <IonIcon slot="start" icon={documentTextOutline} />
-            <IonLabel>Términos y Condiciones</IonLabel>
-          </IonItem>
+            <IonItemDivider className="line-divider"></IonItemDivider>
 
-          <IonItem
-            lines="none"
-            onClick={() => {
-              window.open("https://soymente360.com/politica_privacidad.html", "_blank");
-            }}
-          >
-            <IonIcon slot="start" icon={documentLockOutline} />
-            <IonLabel>Política de Privacidad</IonLabel>
-          </IonItem>
-        </IonItemGroup>
-      </IonList>
+            <IonList inset={true}>
+              <IonItemGroup>
+                
+              </IonItemGroup>
 
-      <IonList inset={true}>
-        <IonItemGroup>
-          <IonItemDivider>
-            <IonLabel>Contáctanos</IonLabel>
-          </IonItemDivider>
-        </IonItemGroup>
+              <IonItem
+                lines="none"
 
-        <IonItem
-          lines="none"
-          
-          onClick={() =>
-            openWhatsApp(
-              import.meta.env.VITE_SUPPORT_PHONE,
-              `Hola, tengo un problema con la aplicación ${import.meta.env.VITE_NAME
-              } y necesito ayuda. Esto es lo que me sucede: `
-            )
-          }
-        >
-          <IonIcon slot="start" icon={hammerOutline} />
-          <IonLabel>Soporte</IonLabel>
-        </IonItem>
-{/* 
+                onClick={() =>
+                  openWhatsApp(
+                    import.meta.env.VITE_SUPPORT_PHONE,
+                    `Hola, tengo un problema con la aplicación ${import.meta.env.VITE_NAME
+                    } y necesito ayuda. Esto es lo que me sucede: `
+                  )
+                }
+              >
+                <span slot="start" className="material-symbols-outlined">support_agent</span>
+                <IonLabel>Soporte</IonLabel>
+              </IonItem>
+              {/* 
 
-        <IonItem
-          lines="none"
-          
-          onClick={async () => onDownloadBackup()}
-        >
-          <IonIcon slot="start" icon={downloadOutline} />
-          <IonLabel>Backup BD</IonLabel>
-        </IonItem>
+              <IonItem
+                lines="none"
+                
+                onClick={async () => onDownloadBackup()}
+              >
+                <IonIcon slot="start" icon={downloadOutline} />
+                <IonLabel>Backup BD</IonLabel>
+              </IonItem>
 
-        <IonItem
-          lines="none"
-          
-          onClick={async () => onDownloadJson()}
-        >
-          <IonIcon slot="start" icon={downloadOutline} />
-          <IonLabel>Backup JSON</IonLabel>
-        </IonItem>
+              <IonItem
+                lines="none"
+                
+                onClick={async () => onDownloadJson()}
+              >
+                <IonIcon slot="start" icon={downloadOutline} />
+                <IonLabel>Backup JSON</IonLabel>
+              </IonItem>
 
-        <IonItem
-          lines="none"
-          
-          onClick={async () => onClearPreferences()}
-        >
-          <IonIcon slot="start" icon={trashOutline} />
-          <IonLabel>Limpiar Preferencias</IonLabel>
-        </IonItem>
-*/}
-        <IonItem
-          onClick={() =>
-            openWhatsApp(
-              import.meta.env.VITE_CONTACT_PHONE,
-              `¡Hola! Me gustaría obtener más información sobre su servicio en ${import.meta.env.VITE_NAME
-              }. ¿Podrían ayudarme?`
-            )
-          }
-        >
-          <IonIcon slot="start" icon={callOutline} />
-          <IonLabel>Contáctanos</IonLabel>
-        </IonItem>
-      </IonList>
+              <IonItem
+                lines="none"
+                
+                onClick={async () => onClearPreferences()}
+              >
+                <IonIcon slot="start" icon={trashOutline} />
+                <IonLabel>Limpiar Preferencias</IonLabel>
+              </IonItem>
+      */}
+              <IonItem
+                onClick={() =>
+                  openWhatsApp(
+                    import.meta.env.VITE_CONTACT_PHONE,
+                    `¡Hola! Me gustaría obtener más información sobre su servicio en ${import.meta.env.VITE_NAME
+                    }. ¿Podrían ayudarme?`
+                  )
+                }
+              >
+                <IonIcon className="menu-icon" slot="start" src={whatsapp}/>
+                <IonLabel>Escríbenos</IonLabel>
+              </IonItem>
+              
+            </IonList>
 
-      <div className="ion-text-center">
-        <span className={styles["version"]}>
-          {" "}
-          Version. {import.meta.env.VITE_VERSION}{" "}
-        </span>
-      </div>
+            <IonItemDivider className="line-divider"></IonItemDivider>
 
-      <div className="ion-text-center ion-margin-bottom ion-padding">
-        <IonButton onClick={onLogout} expand="block">
-          Cerrar Sesión
-        </IonButton>
-      </div>
-    </div>
+            <IonList inset={true}>
+              <IonItemGroup>
+                  
+                <IonItem lines="none"  onClick={onLogout}>
+                  <span slot="start" className="material-symbols-outlined">logout</span>
+                  <IonLabel>Cerrar Sesión</IonLabel>
+                </IonItem>
+
+              </IonItemGroup>
+            </IonList>
+            
+
+          </div>
+        </IonMenuToggle>
+      </IonContent>
+    </IonMenu>
   );
 };

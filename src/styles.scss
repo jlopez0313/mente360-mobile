@@ -1,54 +1,79 @@
 @font-face {
-    font-family: "arya";
-    src: local("arya"),
-      url("../assets/fonts/Poppins/Poppins-Regular.ttf") format("truetype");
+  font-family: "Roboto";
+  src: local("Roboto"),
+    url("../assets/fonts/Roboto/Roboto-Regular.ttf") format("truetype");
 }
 
 @font-face {
-    font-family: "arya-bold";
-    src: local("arya-bold"),
-      url("../assets/fonts/Poppins/Poppins-Bold.ttf") format("truetype");
+  font-family: "Roboto-bold";
+  src: local("Roboto-bold"),
+    url("../assets/fonts/Roboto/Roboto-Bold.ttf") format("truetype");
 }
 
 :root {
-    --ion-safe-area-top: 2.4rem;
-    --ion-safe-area-bottom: 1.6rem;
+  --ion-safe-area-top: 0px;
+  --ion-safe-area-bottom: 0px;
 
-    --bg-main-gradient: linear-gradient(193.17deg, #FFB347 9.48%, #FFCC33 63.67%);
-    --bg-card: linear-gradient(193.17deg, #FFD599 20%, #FFE08F 80%);
-    --bg-main: #ffc547;
+  --bg-main-gradient: linear-gradient(193.17deg, #FFB347 9.48%, #FFCC33 63.67%);
+  --bg-white: #FFFFFF;
+  --bg-green: #D2E5E1;
+  --bg-p-secondary: #00BFA6;
+  --bg-card: linear-gradient(193.17deg, #FFD599 20%, #FFE08F 80%);
+  --bg-main: #ffc547;
 
-    --color-main-gradient: linear-gradient(to left bottom, #9E9E9E, #FFC90A);
-    --color-main: #FFC90A;
+  --color-main-gradient: linear-gradient(to left bottom, #9E9E9E, #FFC90A);
+  --color-main: #FFD92D;
+  --color-secondary: #FEF17E;
 
-    --color-secondary-gradient: radial-gradient(#f1c689 25%, #d3d2d2 100%);
-    
-    --ion-font-family: arya;
+  --color-secondary-gradient: radial-gradient(#f1c689 25%, #d3d2d2 100%);
 
-    --bg-primary: #ffc547;
-    --bg-secondary: #f6d17f;
-    --bg-content: #FFF5EC;
-    
-    --color-secondary: #F2B10A;
-    --ion-color-primary: #ffc547;
-    --ion-color: #555;
-    
+  --ion-font-family: Roboto;
 
-    --fade-background-rgb: 255,245,236;
+  --bg-primary: #ffc547;
+  --bg-secondary: #f6d17f;
+  --bg-content: #F8F8F8;
 
-    --color: #444 !important;
+  --ion-color-primary: #ffc547;
+  --ion-color: #78849A;
+  --txt-black: #fff;
+  --txt-darkgray: #3D3D3D;
+  --color-divider: #E4E1E7;
+  --bg-black: #1E1E1E;
 
-    --invert: 0;
+  --fade-background-rgb: 255, 245, 236;
 
-    font-size: 14px;
+  --color: #444 !important;
+
+  --invert: 0;
+
+  font-size: 14px;
+}
+
+.title-calendar {
+  color: var(--txt-darkgray) !important;
+}
+
+.material-symbols-outlined.filled {
+  font-variation-settings:
+    'FILL' 1,
+    /* 1 = relleno activo */
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 48;
+}
+
+.ion-center {
+  text-align: center;
 }
 
 :root.ion-palette-dark {
-  --bg-secondary: #333; /* Color para el fondo en modo oscuro */
+  --bg-secondary: #333;
+  /* Color para el fondo en modo oscuro */
 }
 
-html, body {
-    font-family: arya;
+html,
+body {
+  font-family: Roboto;
 }
 
 body.dark {
@@ -60,48 +85,86 @@ body.dark {
 
   --bg-primary: #ffc547;
   --bg-secondary: #333;
+  --bg-p-secondary: #00BFA6;
+  --txt-black: #1e1e1e;
   --invert: 100;
-  --ion-color: #fff;
+  --bg-green: #343434;
+  --bg-white: #1E1E1E;
+  --bg-black: #F5F5F5;
+  --bg-content: #4B4B4B;
+  --txt-darkgray: #F5F5F5;
+  --ion-color: #F5F5F5;
 
-  --ion-backdrop-opacity: 0.75;
-  
-  ion-content {
-    --background: none;
-    background: none;
-  }
+  --ion-backdrop-opacity: 0.6;
+  --color-divider: #5E5D60;
 
   ion-chip {
     --bg-main: #fff;
-    --ion-color: #666;
+
+    &.today {
+      color: #1e1e1e;
+    }
   }
+}
+
+ion-content {
+  --background: none;
+  background: none;
 }
 
 ion-header {
 
   ion-toolbar {
     padding-top: var(--ion-safe-area-top);
-    padding-bottom: 3px!important;
+    padding-bottom: 3px !important;
+    height: 64px;
+    color: var(--ion-color);
   }
- 
-    ion-button {
-      color: #000;
-    }
+
+  ion-icon {
+    color: #000;
+  }
+
+  ion-title {
+    color: var(--ion-color);
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+
   
-    ion-title {
-      color: var(--ion-color);
-      font-weight: bold;
-      font-size: 1.2rem;
-    }
 }
 
-.ion-accordion-toggle-icon  {
+  .sc-ion-label-md-s h2{
+    font-size: 14px !important;
+    font-weight: bold !important;
+    text-align: left;
+    color: #1e1e1e !important;
+    line-height: 24px;
+  }
+
+  .sc-ion-label-md-s p{
+    font-size: 12px !important;
+    font-weight: normal !important;
+    text-align: left;
+    color: #1e1e1e !important;
+  }
+
+.ion-accordion-toggle-icon {
   filter: invert(.5);
 }
 
 ion-button,
 ion-fab-button {
-    --background: linear-gradient(to left bottom, #e6b711, #FFC90A);
-    text-transform: none !important;
+  --background: var(--color-main);
+  text-transform: none !important;
+  width: fit-content;
+  color: #1e1e1e;
+  --font-size: 14px;
+  --border-radius: 20px;
+  --padding-start: 30px !important;
+  --padding-end: 30px !important;
+  --padding-top: 10px;
+  --padding-bottom: 10px;
 }
 
 ion-datetime::part(calendar-day):focus {
@@ -127,7 +190,7 @@ a {
   text-decoration: none;
 }
 
-ion-chip,
+
 ion-label,
 ion-input,
 ion-select,
@@ -135,7 +198,7 @@ ion-text,
 ion-icon,
 p,
 span,
-input{ 
+input {
   color: var(--ion-color) !important;
 }
 
@@ -184,8 +247,91 @@ input{
 
 .flex {
   display: flex;
-  
+
   &.items-center {
     align-items: center;
   }
+
+  &.justify-center {
+    justify-content: center;
+  }
+}
+
+.logo-header {
+  height: 44px;
+  width: fit-content;
+}
+
+.marginleftneg45 {
+  margin-left: -45px;
+}
+
+.bg-secondary {
+  background: var(--color-secondary);
+}
+
+.minheight186 {
+  min-height: 186px;
+}
+
+.title-accordion {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.subtitle-accordion {
+  font-size: 12px;
+  font-weight: normal;
+}
+
+.ion-accordion-toggle-icon {
+  display: none;
+}
+
+
+ion-toggle {
+  --track-background: rgba(0, 0, 0, 0.26);
+  --handle-background: #9e9e9e !important;
+}
+
+
+ion-toggle.custom-toggle {
+  --track-background: rgba(0, 0, 0, 0.2);
+  --track-background-checked: #f5f5f5;
+  --handle-background-checked: #00BFA6;
+}
+
+ion-item-divider.line-divider {
+  --background: transparent;
+  --inner-padding-end: 0;
+  --inner-padding-start: 0;
+  min-height: 1px;
+  border-bottom: 1px solid var(--color-divider) !important;
+  /* color y grosor de la línea */
+  margin-top: -8px;
+  margin-bottom: -8px;
+}
+
+ion-backdrop {
+  --backdrop-color: var(--bg-white) !important;
+}
+
+ion-menu::part(backdrop),
+ion-modal::part(backdrop),
+ion-popover::part(backdrop) {
+  background: var(--bg-black) !important;
+}
+
+
+.menu-icon {
+  font-size: 35px;
+  margin-left: -5px;
+  margin-right: 12px;
+}
+
+.menu-avatar {
+  width: 70px;
+  height: fit-content;
+  margin-left: 8px;
 }

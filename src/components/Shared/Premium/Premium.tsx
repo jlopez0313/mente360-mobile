@@ -14,26 +14,24 @@ import {
     ribbonOutline,
 } from "ionicons/icons";
 import styles from "./Premium.module.scss";
+import Logo from "@/assets/images/logo.png";
 
 export const Premium = () => {
   return (
     <div className={`${styles["content"]}`}>
-      <IonImg
-        src="assets/images/logo.png"
-        className={`${styles["logo"]}`}
-      />
+     
+      <img alt="" className="logo-header" src={Logo} />
+
+
+      <IonText className={`ion-text-center ion-margin-bottom ${styles["ready"]}`}
+      >
+        Desbloquea 12 todo tu potencial con {import.meta.env.VITE_NAME} premium.
+      </IonText>
 
       <IonText className="ion-text-center ion-margin-bottom">
         {" "}
         {import.meta.env.VITE_NAME}{" "}
       </IonText>
-
-      <IonText
-        className={`ion-text-center ion-margin-bottom ${styles["ready"]}`}
-      >
-        Desbloquea todo tu potencial con {import.meta.env.VITE_NAME} premium.
-      </IonText>
-
       <IonList
         className={`ion-text-justify ${styles["caracteristicas"]} ${styles["w-100"]}`}
       >

@@ -43,18 +43,19 @@ export const Podcasts: React.FC<any> = ({ network }) => {
         className={`ion-no-padding ${styles["custom-accordion"]}`}
       >
         <IonItem slot="header" lines="none">
-          <IonLabel className="ion-padding">Audio del día</IonLabel>
+          <span className="material-symbols-outlined">queue_music</span>
+          <div className={styles["title-accordion"]}>
+            <IonLabel className="ion-no-padding title-accordion">Audio del día</IonLabel>
+            <IonLabel className="ion-no-padding subtitle-accordion">Tu dosis diaria de motivación.</IonLabel>
+          </div>
+
           {podcast.done ? (
-            <IonIcon icon={trophy} slot="end" className={styles["trofeo"]} />
+            <span slot="end" className={`material-symbols-outlined $styles['trofeo']`}>emoji_events</span>
           ) : (
-            <IonIcon
-              icon={trophy}
-              slot="end"
-              className={styles["trofeo-gris"]}
-            />
+            <span slot="end" className={`material-symbols-outlined $styles['trofeo-gris']`}>emoji_events</span>
           )}
         </IonItem>
-        <div className="ion-padding" slot="content">
+        <div className={styles['button-section']} slot="content">
           {!userEnabled || payment_status == "free" ? (
             <IonButton
               onClick={() => setIsPremiumOpen(true)}

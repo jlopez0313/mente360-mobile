@@ -1,7 +1,7 @@
 @import "@/styles.scss";
 
 .ion-header {
-    --background: var(--bg-main-gradient);
+    --background: var(--bg-white);
 }
 
 .ion-content {
@@ -17,7 +17,7 @@
     
     ion-segment-button {
         text-transform: capitalize;
-        font-family: 'arya-bold';
+        font-family: 'Roboto-bold';
         font-weight: bold;
         color: var(--color);
         margin-bottom: 15px;

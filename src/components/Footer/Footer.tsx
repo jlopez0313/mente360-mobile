@@ -44,13 +44,13 @@ export const Footer = (props: any) => {
               onClick={() => setTab(history.location.pathname)}
             >
               <IonButton className={tab.includes("/home") ? styles.active : ""}>
-                <IonIcon slot="icon-only" src={calendario}></IonIcon>
+                <span className="material-symbols-outlined filled">home</span>
               </IonButton>
             </Link>
 
             {!userEnabled || payment_status == "free" ? (
               <IonButton onClick={() => setIsPremiumOpen(true)}>
-                <IonIcon slot="icon-only" src={crecimiento}></IonIcon>
+                <span className="material-symbols-outlined filled">diversity_3</span>
               </IonButton>
             ) : (
               <Link
@@ -61,14 +61,14 @@ export const Footer = (props: any) => {
                 <IonButton
                   className={tab.includes("/comunidades") ? styles.active : ""}
                 >
-                  <IonIcon slot="icon-only" src={crecimiento}></IonIcon>
+                  <span className="material-symbols-outlined filled">diversity_3</span>
                 </IonButton>
               </Link>
             )}
 
             {!userEnabled || payment_status == "free" ? (
               <IonButton onClick={() => setIsPremiumOpen(true)}>
-                <IonIcon slot="icon-only" src={auriculares}></IonIcon>
+                <span className="material-symbols-outlined filled">headphones</span>
               </IonButton>
             ) : (
               <Link
@@ -81,7 +81,7 @@ export const Footer = (props: any) => {
                     tab.includes("/musicaterapia") ? styles.active : ""
                   }
                 >
-                  <IonIcon slot="icon-only" src={auriculares}></IonIcon>
+                  <span className="material-symbols-outlined filled">headphones</span>
                 </IonButton>
               </Link>
             )}
@@ -94,7 +94,7 @@ export const Footer = (props: any) => {
               <IonButton
                 className={tab.includes("/notificaciones") ? styles.active : ""}
               >
-                <IonIcon slot="icon-only" icon={notificationsOutline}></IonIcon>
+                <span className="material-symbols-outlined ">notifications</span>
                 {isGeneral && (
                   <div className={styles["has-notification"]}></div>
                 )}
@@ -103,7 +103,7 @@ export const Footer = (props: any) => {
 
             {!userEnabled || payment_status == "free" ? (
               <IonButton onClick={() => setIsPremiumOpen(true)}>
-                <IonIcon slot="icon-only" src={grupo}></IonIcon>
+                <span className="material-symbols-outlined filled">connect_without_contact</span>
               </IonButton>
             ) : (
               <Link
@@ -138,7 +138,7 @@ export const Footer = (props: any) => {
         title={import.meta.env.VITE_NAME + " premium"}
         hideButtons={!network.status || false}
         showButtons={false}
-        onConfirm={() => {}}
+        onConfirm={() => { }}
         onWillDismiss={() => setIsPremiumOpen(false)}
       >
         <div className="ion-padding">

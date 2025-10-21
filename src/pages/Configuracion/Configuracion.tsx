@@ -35,24 +35,8 @@ const Configuracion: React.FC = () => {
 
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar className={styles['ion-header']}>
-          <IonButtons slot="start">
-            <Link to='/perfil' replace={true}>
-              <IonButton fill="clear"  className={styles.backButton}>
-                <IonIcon slot="start" icon={arrowBack} />
-              </IonButton>
-            </Link>
-          </IonButtons>
-
-          <IonTitle className="ion-no-padding ion-padding-end ion-text-center"> Configuración </IonTitle>
-        </IonToolbar>
-      </IonHeader>
-
       <IonContent className={styles['ion-content']}>
-
         <ConfiguracionComponent />
-
       </IonContent>
     </IonPage>
   );

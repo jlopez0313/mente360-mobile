@@ -7,6 +7,8 @@ import {
   IonPage,
   IonTitle,
   IonToolbar,
+  IonMenuButton,
+  IonAvatar
 } from "@ionic/react";
 
 import {
@@ -30,6 +32,7 @@ import { Sync } from "@/components/Shared/Animations/Sync/Sync";
 import { diferenciaEnDias } from "@/helpers/Fechas";
 import { useGlobalSync } from "@/hooks/useGlobalSync";
 import { usePreferences } from "@/hooks/usePreferences";
+import Logo from "@/assets/images/logo.png";
 
 const Home: React.FC = () => {
   const { getPreference, setPreference, keys } = usePreferences();
@@ -69,25 +72,13 @@ const Home: React.FC = () => {
       <IonHeader>
         <IonToolbar className={styles["ion-header"]}>
           <IonButtons slot="start">
-            <Link to="/perfil" replace={true}>
-              <IonButton>
-                <IonIcon
-                  icon={personCircleOutline}
-                  className={styles["large-icon"]}
-                ></IonIcon>
-              </IonButton>
-            </Link>
+            <IonMenuButton/>
           </IonButtons>
-
-          <IonTitle className="ion-text-center"> Hoy </IonTitle>
-
-          <IonButtons slot="end">
-
-            <IonButton id="popover-button">
-              <IonIcon slot="icon-only" icon={ellipsisVertical}></IonIcon>
-              <Popover trigger="popover-button" />
-            </IonButton>
-          </IonButtons>
+          <div className="flex justify-center">
+            <IonAvatar className="marginleftneg45 flex items-center justify-center " aria-hidden="true" slot="start">
+            <img alt="" className="logo-header" src={Logo} />
+            </IonAvatar>
+          </div>
         </IonToolbar>
       </IonHeader>
 
@@ -100,7 +91,6 @@ const Home: React.FC = () => {
         />
         <HomeComponent />
       </IonContent>
-
       <Footer />
     </IonPage>
   );
