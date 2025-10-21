@@ -4,6 +4,7 @@ export default interface Comunidades {
   id: number;
   comunidad: string;
   imagen?: string;
+  video?: string;
   descripcion: string;
   lider: User;
 }
