@@ -307,18 +307,23 @@ export const Audio: React.FC<Props> = memo(
               ></IonIcon>
             </div>
 
-            <IonButton
-              className={`ion-margin-top ${styles['downloadBtn']}`}
-              disabled={!network.status && !localSrc}
-              onClick={() => (localSrc ? onRemoveLocal() : onDownload())}
-            >
-              <IonIcon
-                slot="start"
-                className={`${styles["donwload-icon"]}`}
-                icon={localSrc ? trashBinOutline : downloadOutline}
-              />
-              {localSrc ? "Eliminar Descarga" : "Descargar"}
-            </IonButton>
+            <div className="flex justify-end">
+
+              <IonButton
+                shape="round"
+                className={`ion-margin-top ${styles['downloadBtn']}`}
+                disabled={!network.status && !localSrc}
+                onClick={() => (localSrc ? onRemoveLocal() : onDownload())}
+              >
+                <IonIcon
+                  slot="start"
+                  className={`${styles["donwload-icon"]}`}
+                  icon={localSrc ? trashBinOutline : downloadOutline}
+                />
+                {localSrc ? "Eliminar Descarga" : "Descargar"}
+              </IonButton>
+
+            </div>
 
             <audio
               ref={audioRef}

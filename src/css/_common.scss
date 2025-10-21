@@ -104,7 +104,6 @@
 }
 
 @mixin descripcion {
-    
     .texto {
         display: -webkit-box;
         -webkit-box-orient: vertical;
@@ -127,4 +126,152 @@
         padding: 0;
         font-size: 0.9rem;
     }
+}
+
+// Mixin for Chat Inbox
+@mixin chat-message(
+  $radius: 15px,
+  $bg: var(--bg-white),
+  $padding: 0
+) {
+
+  @include base-ion-item($radius, $bg, $padding);
+
+  &.message {
+    width: 90%;
+    font-size: 0.9rem;
+    margin-top: 5px;
+    color: #2d2d2d;
+
+    &.sender {
+      align-self: flex-end;
+      color: var(--color);
+      border: 1px solid var(--bg-p-secondary);
+      background: var(--bg-p-tertiary);
+
+      .message, .time {
+        color: var(--color-dark) !important;
+      }
+    }
+
+    &.receiver {
+      border: 1px solid #78849a;
+    }
+
+    div {
+      @include user-info-label;
+
+      flex-grow: 1;
+      padding-top: 5px;
+
+      &.reply-preview {
+        padding: 4px 8px;
+        border-left: 3px solid var(--bg-p-secondary);
+        margin-bottom: 4px;
+        font-size: 11px;
+        color: #666;
+        background: rgba(249, 249, 249, 0.5);
+        border-radius: 5px;
+        display: flex;
+        flex-direction: column;
+
+        .reply-name {
+          font-weight: bold;
+        }
+
+        ion-text {
+          color: var(--color-dark) !important;
+        }
+      }
+
+      .message {
+        display: block;
+        line-height: 16px;
+      }
+
+      .time {
+        float: right;
+        font-size: 0.6rem;
+      }
+    }
+
+    &.highlight {
+      --background: rgba(255, 187, 0, 0.7);
+      transition: background-color 0.5s ease;
+    }
+  }
+}
+
+// Mixin for Chat Input
+@mixin chat-input(
+  $padding: 10px,
+  $bg-color: var(--bg-base),
+  $col-bg: #fff
+) {
+  padding: $padding;
+  padding-bottom: calc(var(--ion-safe-area-bottom) + $padding) !important;
+  background: $bg-color;
+  --background: $bg-color;
+
+  ion-col {
+    background: $col-bg !important;
+    --background: $col-bg !important;
+  }
+
+  ion-item {
+    --border-radius: 5px;
+    --padding-start: 10px;
+    --inner-padding-end: 10px;
+    --margin: 0;
+    --background: none;
+    background: none;
+    border-color: transparent;
+
+    .wrapper {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      .reply-bar {
+        position: relative;
+        padding: 8px;
+        margin-top: 10px;
+        background: rgba(249, 249, 249, 0.5);
+        border-left: 3px solid var(--bg-p-secondary);
+        font-size: 11px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        border-radius: 5px;
+
+        ion-text {
+          &.name {
+            font-weight: bold;
+          }
+        }
+
+        ion-icon {
+          position: absolute;
+          right: 3px;
+          top: 3px;
+          width: 14px;
+          height: 14px;
+          padding: 0;
+          margin: 0;
+        }
+      }
+
+      ion-textarea {
+        --padding-top: 1rem;
+        max-height: 100px;
+        overflow: scroll;
+        color: var(--color-dark);
+
+        textarea {
+          line-height: 18px;
+        }
+      }
+    }
+  }
 }

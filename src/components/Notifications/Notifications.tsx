@@ -1,5 +1,4 @@
 import {
-  IonIcon,
   IonItemGroup,
   IonLabel,
   IonList,
@@ -11,7 +10,6 @@ import styles from "./Notifications.module.scss";
 import { setShowGlobalAudio } from "@/store/slices/audioSlice";
 import { setGeneral } from "@/store/slices/notificationSlice";
 import dayjs from "dayjs";
-import { checkmark } from "ionicons/icons";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Item } from "./Item";
@@ -52,13 +50,16 @@ export const Notifications = () => {
   return (
     <div className={`ion-padding ${styles["ion-content"]}`}>
       <IonSegment
+        className={`${styles["ion-segment"]}`}
         value={segment}
         mode="ios"
         onIonChange={(e) => setSegment(e.detail.value!.toString())}
       >
         <IonSegmentButton value="hoy" className={styles["ion-segment-button"]}>
-          <div className="flex items-center gap-4">
-            {segment == "hoy" && <IonIcon slot="start" icon={checkmark} />}
+          <div className="flex items-center gap-2">
+            {segment == "hoy" && (
+              <span className="material-symbols-outlined">check</span>
+            )}
             <IonLabel>Hoy</IonLabel>
           </div>
         </IonSegmentButton>
@@ -66,9 +67,9 @@ export const Notifications = () => {
           value="anteriores"
           className={styles["ion-segment-button"]}
         >
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             {segment == "anteriores" && (
-              <IonIcon slot="start" icon={checkmark} />
+              <span className="material-symbols-outlined">check</span>
             )}
             <IonLabel>Anteriores</IonLabel>
           </div>

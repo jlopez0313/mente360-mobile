@@ -10,7 +10,6 @@ import {
 } from "@ionic/react";
 
 import { Canales as CanalesComponent } from "@/components/Canales/Canales";
-import { Footer } from "@/components/Footer/Footer";
 import { arrowBack } from "ionicons/icons";
 import { useEffect } from "react";
 import { Link, useHistory } from "react-router-dom";
@@ -56,7 +55,6 @@ const Canales: React.FC = () => {
 
       </IonContent>
 
-      <Footer />
     </IonPage>
   );
 };

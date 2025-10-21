@@ -1,5 +1,5 @@
 @import "@/styles.scss";
-@import "@/css/_common.scss";
+@import "@/styles.scss";
 
 .emoji-modal::part(content) {
     height: 100%;
@@ -93,135 +93,10 @@
     }
 
     ion-item {
-        @include base-ion-item(15px, var(--bg-secondary), 0);
-        --background: var(--bg-secondary);
-        
-        &.message{
-
-            width: 90%;
-            font-size: .9rem;
-            margin-bottom: 5px;
-            color: #666;
-
-            &.sender {
-                align-self: flex-end;
-                color: var(--color);
-            }
-    
-            &.receiver {
-                border: 1px solid #78849a;
-            }
-
-            div {
-                @include user-info-label;
-
-                flex-grow: 1;
-                padding-top: 5px;
-
-                &.reply-preview {
-                    padding: 4px 8px;
-                    border-left: 3px solid var(--ion-color-primary);
-                    margin-bottom: 4px;
-                    font-size: 11px;
-                    color: #666;
-                    background: rgba(249, 249, 249, .5);
-                    border-radius: 5px;
-                    display: flex;
-                    flex-direction: column;
-
-                    .reply-name {
-                        font-weight: bold;
-                    }
-                }
-
-                .name,
-                .message { display: block; }
-
-                .message {
-                    display: block;
-                    line-height: 16px;
-                }
-
-                .time {
-                    float: right;
-                    font-size: .6rem;
-                }
-            }
-
-            &.highlight {
-                --background: rgba(255, 187, 0, 0.7);
-                transition: background-color 0.5s ease;
-            }
-        }
-        
+        @include chat-message(5px, var(--bg-white), 0);        
     }
 
     .chatbox {
-
-        padding: 10px;
-        padding-bottom: calc(var(--ion-safe-area-bottom) + 10px) !important;
-        background: #6B768A;
-        --background: #6B768A;
-        
-        ion-col {
-            background: #fff !important;
-            --background: #fff !important;
-        }
-
-        ion-item {
-            --border-radius: 5px;
-            --padding-start: 10px;
-            --inner-padding-end: 10px;
-            --margin: 0;
-            --background: none;
-            background: none;
-            border-color: transparent;
-
-            .wrapper {
-                width: 100%;
-                display: flex;
-                flex-direction: column;
-                gap: 4px;
-            
-                .reply-bar {
-                    position: relative; 
-                    padding: 8px;
-                    margin-top: 10px;
-                    background: rgba(249, 249, 249, .5);
-                    border-left: 3px solid var(--ion-color-primary);
-                    font-size: 11px;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: space-between;
-                    border-radius: 5px;
-            
-                    ion-text {
-                        &.name {
-                            font-weight: bold;
-                        }
-                    }
-            
-                    ion-icon {
-                        position: absolute;
-                        right: 3px;
-                        top: 3px;
-                        width: 14px;
-                        height: 14px;
-                        padding: 0;
-                        margin: 0;
-                    }            
-                }
-
-                ion-textarea {
-                    --padding-top: 1rem;
-                    max-height: 100px;
-                    overflow: scroll;
-                    
-                    textarea {
-                        line-height: 18px;
-                    }
-                }
-            }
-        }
+        @include chat-input();
     }
 }

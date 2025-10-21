@@ -263,6 +263,7 @@ export const Toast = () => {
         </div>
 
         <IonIcon
+          className={styles['backward']}
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -298,6 +299,7 @@ export const Toast = () => {
         )}
 
         <IonIcon
+          className={styles['forward']}
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -309,6 +311,7 @@ export const Toast = () => {
         />
 
         <IonIcon
+          className={styles['ellipsis']}
           aria-hidden="true"
           slot="end"
           icon={ellipsisVertical}

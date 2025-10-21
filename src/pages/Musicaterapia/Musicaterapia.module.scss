@@ -16,24 +16,32 @@
     background: var(--bg-content);
 
     ion-segment-button {
+
+        border-radius: 50rem;
         text-transform: capitalize;
         font-family: 'Roboto-bold';
         font-weight: bold;
         color: var(--color);
-        margin-bottom: 10px;
+        margin-bottom: 15px;
         min-height: 0;
-        --indicator-color: var(--color-main);
-
-        ion-icon {
-            font-size: 18px;
-            margin-right: 6px;
-            color: var(--ion-color-primary);
-        }
+        --indicator-color: transparent;
+        --background-checked: var(--bg-p-secondary);
 
         ion-label {
             font-weight: 500;
             margin-bottom: 10px;
             margin-top: 10px;
+        }
+
+        &:global(.segment-button-checked) {
+            ion-label,
+            span {
+              color: var(--bg-white) !important;
+            }
+
+            span {
+                font-size: 18px;
+            }
         }
     }
 }

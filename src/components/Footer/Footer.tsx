@@ -2,8 +2,7 @@ import {
   IonButton,
   IonButtons,
   IonFooter,
-  IonIcon,
-  IonToolbar,
+  IonToolbar
 } from "@ionic/react";
 import styles from "./Footer.module.scss";
 
@@ -12,14 +11,9 @@ import { Buttons } from "@/components/Shared/Premium/Buttons/Buttons";
 import { Premium } from "@/components/Shared/Premium/Premium";
 import { useNetwork } from "@/hooks/useNetwork";
 import { usePayment } from "@/hooks/usePayment";
-import { notificationsOutline } from "ionicons/icons";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useHistory } from "react-router-dom";
-import auriculares from "/assets/icons/auriculares.svg";
-import calendario from "/assets/icons/calendario.svg";
-import crecimiento from "/assets/icons/crecimiento.svg";
-import grupo from "/assets/icons/grupo.svg";
 
 export const Footer = (props: any) => {
   const history = useHistory();
@@ -36,7 +30,7 @@ export const Footer = (props: any) => {
   return (
     <>
       <IonFooter {...props}>
-        <IonToolbar className={styles["ion-footer"]}>
+        <IonToolbar className={`${styles["ion-footer"]}`}>
           <IonButtons class="ion-justify-content-around">
             <Link
               to="/home"
@@ -125,7 +119,7 @@ export const Footer = (props: any) => {
                   {(isRoom || isGrupo) && (
                     <div className={styles["has-notification"]}></div>
                   )}
-                  <IonIcon slot="icon-only" src={grupo}></IonIcon>
+                  <span className="material-symbols-outlined filled">connect_without_contact</span>
                 </IonButton>
               </Link>
             )}

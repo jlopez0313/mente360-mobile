@@ -1,19 +1,17 @@
 import {
-  IonButton,
   IonButtons,
   IonContent,
   IonHeader,
   IonLabel,
+  IonMenuButton,
   IonPage,
   IonSegment,
   IonSegmentButton,
   IonTitle,
-  IonToolbar,
+  IonToolbar
 } from "@ionic/react";
 import styles from "./Musicaterapia.module.scss";
 
-import { IonIcon } from "@ionic/react";
-import { arrowBack, musicalNoteOutline, musicalNotesOutline } from "ionicons/icons";
 
 import { Footer } from "@/components/Footer/Footer";
 import { Clips as ClipsComponent } from "@/components/Musicaterapia/Clips/Clips";
@@ -21,7 +19,7 @@ import { Playlist as PlaylistComponent } from "@/components/Musicaterapia/Playli
 import { setTab } from "@/store/slices/audioSlice";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
 const Musicaterapia: React.FC = () => {
   const history = useHistory();
@@ -52,11 +50,7 @@ const Musicaterapia: React.FC = () => {
       <IonHeader>
         <IonToolbar className={styles["ion-header"]}>
           <IonButtons slot="start">
-            <Link to="/home" replace={true}>
-              <IonButton fill="clear" className={styles.backButton}>
-                <IonIcon slot="start" icon={arrowBack} />
-              </IonButton>
-            </Link>
+            <IonMenuButton/>
           </IonButtons>
 
           <IonTitle className="ion-no-padding ion-padding-end">
@@ -75,14 +69,18 @@ const Musicaterapia: React.FC = () => {
 
         <IonSegment value={tab} onIonChange={onSetTab}>
           <IonSegmentButton value="clips" className={styles["ion-segment-button"]}>
-            <div className="flex items-center gap-4">
-              <IonIcon slot="start" icon={musicalNoteOutline} />
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined">
+                music_video
+              </span>
               <IonLabel> Clips </IonLabel>
             </div>
           </IonSegmentButton>
           <IonSegmentButton value="playlist" className={styles["ion-segment-button"]}>
-            <div className="flex items-center gap-4">
-              <IonIcon slot="start" icon={musicalNotesOutline} />
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined">
+              queue_music
+              </span>
               <IonLabel> Playlist </IonLabel>
             </div>
           </IonSegmentButton>

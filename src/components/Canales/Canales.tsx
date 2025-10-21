@@ -77,7 +77,7 @@ export const Canales = () => {
           <p> {comunidad?.descripcion} </p>
         </IonCardContent>
       </IonCard>
-      <IonList className="ion-padding">
+      <IonList className="ion-padding" lines="none">
         {canales?.map((canal: any, idx: number) => {
           return (
             <IonItem key={idx} onClick={() => goToCrecimiento(canal.id)} detail>

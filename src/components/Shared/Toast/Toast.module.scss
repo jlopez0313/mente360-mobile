@@ -6,7 +6,7 @@ ion-popover {
 
 .custom-toast {
     position: absolute;
-    background: rgba(28, 28, 30, .95);
+    background: var(--bg-base);
     min-height: 48px;
     display: flex;
     flex-direction: column;
@@ -35,8 +35,14 @@ ion-popover {
     }
 
     ion-icon {
-        font-size: 1.65rem !important;
-        color: #fff !important;
+        font-size: 2.8rem !important;
+        color: var(--bg-primary) !important;
+
+        &.backward,
+        &.forward,
+        &.ellipsis {
+            font-size: 1.4rem !important;
+        }
     }
 
 }

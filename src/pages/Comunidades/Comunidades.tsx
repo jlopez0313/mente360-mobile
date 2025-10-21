@@ -1,19 +1,17 @@
 import {
-  IonButton,
   IonButtons,
   IonContent,
   IonHeader,
-  IonIcon,
+  IonMenuButton,
   IonPage,
   IonTitle,
-  IonToolbar,
+  IonToolbar
 } from "@ionic/react";
 
 import { Comunidades as ComunidadesComponent } from "@/components/Comunidades/Comunidades";
 import { Footer } from "@/components/Footer/Footer";
-import { arrowBack } from "ionicons/icons";
 import { useEffect } from "react";
-import { Link, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import styles from "./Comunidades.module.scss";
 
 const Comunidades: React.FC = () => {
@@ -38,13 +36,8 @@ const Comunidades: React.FC = () => {
       <IonHeader>
         <IonToolbar className={styles["ion-header"]}>
           <IonButtons slot="start">
-            <Link to="/home" replace={true}>
-              <IonButton fill="clear" className={styles.backButton}>
-                <IonIcon slot="start" icon={arrowBack} />
-              </IonButton>
-            </Link>
+            <IonMenuButton/>
           </IonButtons>
-
           <IonTitle className="ion-no-padding ion-padding-end">
             {" "}
             Comunidades{" "}

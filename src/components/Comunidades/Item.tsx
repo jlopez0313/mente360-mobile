@@ -218,25 +218,30 @@ export const Item = ({ comunidad, setIsPremiumOpen }: any) => {
           {expandido ? "Leer menos" : "Leer más"}
         </button>
 
-        {!hasSuscription(comunidad) ? (
-          <IonButton
-            onClick={() => onPresentSheet(comunidad)}
-            expand="block"
-            className={`ion-margin-top ${styles["suscribete"]}`}
-          >
-            Suscribete
-          </IonButton>
-        ) : (
-          <IonButton
-            expand="block"
-            fill="outline"
-            className={`ion-margin-top ${styles["suscrito"]}`}
-            onClick={() => goToCanales(comunidad?.id)}
-          >
-            {" "}
-            Acceder{" "}
-          </IonButton>
-        )}
+        <div className="flex justify-end">
+          {!hasSuscription(comunidad) ? (
+            <IonButton
+              onClick={() => onPresentSheet(comunidad)}
+              expand="full"
+              shape="round"
+              className={`ion-margin-top ${styles["suscribete"]}`}
+            >
+              Suscribete
+            </IonButton>
+          ) : (
+            <IonButton
+              shape="round"
+              expand="full"
+              fill="outline"
+              className={`ion-margin-top ${styles["suscrito"]}`}
+              onClick={() => goToCanales(comunidad?.id)}
+            >
+              {" "}
+              Acceder{" "}
+            </IonButton>
+          )}
+        </div>
+
       </IonCardContent>
     </IonCard>
   );

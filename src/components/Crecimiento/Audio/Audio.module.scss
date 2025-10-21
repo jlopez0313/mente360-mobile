@@ -1,5 +1,5 @@
 @import url('@/styles.scss');
-@import "@/css/_common.scss";
+@import "@/styles.scss";
 
 .card {
     
@@ -71,6 +71,10 @@
 
         .downloadBtn {
             color: #3D3d3d;
+
+            .donwload-icon {
+                color: #3D3d3d !important;
+            }
         }
     }
 }

@@ -1,7 +1,6 @@
 import {
   IonAccordion,
   IonButton,
-  IonIcon,
   IonItem,
   IonLabel,
   useIonAlert
@@ -18,7 +17,6 @@ import { usePayment } from "@/hooks/usePayment";
 import { confirmTarea } from "@/services/home";
 import { setTab } from "@/store/slices/chatSlice";
 import { useLiveQuery } from "dexie-react-hooks";
-import { trophy } from "ionicons/icons";
 import { Texto } from "../Texto/Texto";
 
 export const Tarea: React.FC<any> = ({network}) => {
@@ -76,8 +74,9 @@ export const Tarea: React.FC<any> = ({network}) => {
             <span slot="end" className={`material-symbols-outlined $styles['trofeo-gris']`}>emoji_events</span>
           )}
         </IonItem>
-        <div className={styles['button-section']} slot="content">
+        <div className={` flex justify-end ${styles['button-section']}`} slot="content">
           <IonButton
+            shape="round"
             expand="block"
             type="button"
             className="ion-margin-top ion-padding-start ion-padding-end"

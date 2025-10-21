@@ -17,7 +17,7 @@ import {
   IonTextarea,
 } from "@ionic/react";
 import { onValue } from "firebase/database";
-import { close, sendOutline } from "ionicons/icons";
+import { close } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import styles from "./Grupo.module.scss";
@@ -209,7 +209,7 @@ export const Grupo: React.FC<any> = ({ grupoID, grupo, removed }) => {
           </IonCol>
           <IonCol size="2">
             <IonButton disabled={!mensaje} onClick={onSendMessage}>
-              <IonIcon icon={sendOutline} />
+              <span className="material-symbols-outlined">send</span>
             </IonButton>
           </IonCol>
         </IonRow>

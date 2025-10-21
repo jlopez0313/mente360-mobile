@@ -1,9 +1,9 @@
 import {
-  IonButton,
   IonButtons,
   IonContent,
   IonHeader,
   IonLabel,
+  IonMenuButton,
   IonPage,
   IonSegment,
   IonSegmentButton,
@@ -12,14 +12,12 @@ import {
 } from "@ionic/react";
 import styles from "./Chat.module.scss";
 
-import { IonIcon } from "@ionic/react";
-import { arrowBack, chatboxOutline, chatbubblesOutline, peopleOutline } from "ionicons/icons";
 
 import { Chat as ChatComponent } from "@/components/Chat/Chat/Lista/Chat";
 import { Comunidad as ComunidadComponent } from "@/components/Chat/Comunidad/Comunidad";
 import { Grupos as GruposComponent } from "@/components/Chat/Grupos/Lista/Grupos";
 import { Footer } from "@/components/Footer/Footer";
-import { Link, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
 import { destroy } from "@/helpers/musicControls";
 import { setShowGlobalAudio } from "@/store/slices/audioSlice";
@@ -28,7 +26,6 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const Chat: React.FC = () => {
-  
   const dispatch = useDispatch();
   const history = useHistory();
 
@@ -36,7 +33,7 @@ const Chat: React.FC = () => {
   const { tab } = useSelector((state: any) => state.chat);
 
   const onSetTab = (e) => {
-    dispatch( setTab( e.detail.value ) )
+    dispatch(setTab(e.detail.value));
   };
 
   useEffect(() => {
@@ -54,7 +51,7 @@ const Chat: React.FC = () => {
   }, [history]);
 
   useEffect(() => {
-    dispatch( setShowGlobalAudio( false ) )
+    dispatch(setShowGlobalAudio(false));
     destroy();
   }, []);
 
@@ -63,12 +60,9 @@ const Chat: React.FC = () => {
       <IonHeader>
         <IonToolbar className={styles["ion-header"]}>
           <IonButtons slot="start">
-            <Link to="/home" replace={true}>
-              <IonButton fill="clear" className={styles.backButton}>
-                <IonIcon slot="start" icon={arrowBack} />
-              </IonButton>
-            </Link>
+            <IonMenuButton/>
           </IonButtons>
+
 
           <IonTitle className="ion-no-padding ion-padding-end">
             {" "}
@@ -93,18 +87,24 @@ const Chat: React.FC = () => {
         </IonHeader>
 
         <IonSegment value={tab} onIonChange={onSetTab}>
-          <IonSegmentButton value="chat" className={styles["ion-segment-button"]}>
-            <div className="flex items-center gap-4">
-              <IonIcon slot="start" icon={chatboxOutline} />
+          <IonSegmentButton
+            value="chat"
+            className={styles["ion-segment-button"]}
+          >
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined">chat</span>
               <IonLabel>
                 Chat
                 {isRoom && <div className={styles["has-notification"]}></div>}
               </IonLabel>
             </div>
           </IonSegmentButton>
-          <IonSegmentButton value="grupos" className={styles["ion-segment-button"]}>
-            <div className="flex items-center gap-4">
-              <IonIcon slot="start" icon={chatbubblesOutline} />
+          <IonSegmentButton
+            value="grupos"
+            className={styles["ion-segment-button"]}
+          >
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined">forum</span>
               <IonLabel>
                 {" "}
                 Grupos
@@ -112,9 +112,12 @@ const Chat: React.FC = () => {
               </IonLabel>
             </div>
           </IonSegmentButton>
-          <IonSegmentButton value="comunidad" className={styles["ion-segment-button"]}>
-            <div className="flex items-center gap-4">
-              <IonIcon slot="start" icon={peopleOutline} />
+          <IonSegmentButton
+            value="comunidad"
+            className={styles["ion-segment-button"]}
+          >
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined">diversity_3</span>
               <IonLabel> Comunidad </IonLabel>
             </div>
           </IonSegmentButton>

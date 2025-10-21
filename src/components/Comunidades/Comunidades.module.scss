@@ -1,4 +1,4 @@
-@import "@/css/_common.scss";
+@import "@/styles.scss";
 
 .ion-content {
 
@@ -8,5 +8,6 @@
     .suscrito {
         --background: none;
         background: none;
+        color: var(--ion-color);
     }
 }

@@ -17,7 +17,7 @@ import {
   IonTextarea,
 } from "@ionic/react";
 import { onValue } from "firebase/database";
-import { close, sendOutline } from "ionicons/icons";
+import { close } from "ionicons/icons";
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import styles from "./Interno.module.scss";
@@ -193,7 +193,7 @@ export const Interno: React.FC<any> = ({ usuario, roomID }) => {
         </IonCol>
         <IonCol size="2">
           <IonButton disabled={!mensaje} onClick={onSendMessage}>
-            <IonIcon icon={sendOutline} />
+            <span className="material-symbols-outlined">send</span>
           </IonButton>
         </IonCol>
       </IonRow>

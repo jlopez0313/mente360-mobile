@@ -1,3 +1,7 @@
+@import "./css/_common.scss";
+@import "./css/_utils.scss";
+
+
 @font-face {
   font-family: "Roboto";
   src: local("Roboto"),
@@ -11,13 +15,14 @@
 }
 
 :root {
-  --ion-safe-area-top: 0px;
-  --ion-safe-area-bottom: 0px;
+  --ion-safe-area-top: env(safe-area-inset-top);
+  --ion-safe-area-bottom: env(safe-area-inset-bottom);
 
   --bg-main-gradient: linear-gradient(193.17deg, #FFB347 9.48%, #FFCC33 63.67%);
   --bg-white: #FFFFFF;
   --bg-green: #D2E5E1;
   --bg-p-secondary: #00BFA6;
+  --bg-p-tertiary: #D2E5E1;
   --bg-card: linear-gradient(193.17deg, #FFD599 20%, #FFE08F 80%);
   --bg-main: #ffc547;
 
@@ -28,7 +33,8 @@
   --color-secondary-gradient: radial-gradient(#f1c689 25%, #d3d2d2 100%);
 
   --ion-font-family: Roboto;
-
+  
+  --bg-base: #6B768A;
   --bg-primary: #ffc547;
   --bg-secondary: #f6d17f;
   --bg-content: #F8F8F8;
@@ -42,7 +48,7 @@
 
   --fade-background-rgb: 255, 245, 236;
 
-  --color: #444 !important;
+  --color-dark: #444 !important;
 
   --invert: 0;
 
@@ -77,27 +83,34 @@ body {
 }
 
 body.dark {
+  
+  --bg-white: #1E1E1E;
+  --bg-green: #343434;
+  --bg-p-secondary: #00BFA6;
+  --bg-p-tertiary: #D2E5E1;
   --bg-card: #333;
-
   --bg-main: none;
 
   --color-secondary-gradient: none;
 
+  --bg-base: #6B768A;
   --bg-primary: #ffc547;
   --bg-secondary: #333;
-  --bg-p-secondary: #00BFA6;
-  --txt-black: #1e1e1e;
-  --invert: 100;
-  --bg-green: #343434;
-  --bg-white: #1E1E1E;
-  --bg-black: #F5F5F5;
   --bg-content: #4B4B4B;
-  --txt-darkgray: #F5F5F5;
+  
+
   --ion-color: #F5F5F5;
+  --txt-black: #1e1e1e;
+  --txt-darkgray: #F5F5F5;
+  --color-divider: #5E5D60;
+  --bg-black: #F5F5F5;
+  
+  --color-dark: #444 !important;
+  
+  --invert: 100;
 
   --ion-backdrop-opacity: 0.6;
-  --color-divider: #5E5D60;
-
+  
   ion-chip {
     --bg-main: #fff;
 
@@ -117,7 +130,8 @@ ion-header {
   ion-toolbar {
     padding-top: var(--ion-safe-area-top);
     padding-bottom: 3px !important;
-    height: 64px;
+    min-height: 64px;
+
     color: var(--ion-color);
   }
 
@@ -157,14 +171,8 @@ ion-button,
 ion-fab-button {
   --background: var(--color-main);
   text-transform: none !important;
-  width: fit-content;
   color: #1e1e1e;
   --font-size: 14px;
-  --border-radius: 20px;
-  --padding-start: 30px !important;
-  --padding-end: 30px !important;
-  --padding-top: 10px;
-  --padding-bottom: 10px;
 }
 
 ion-datetime::part(calendar-day):focus {
@@ -254,6 +262,10 @@ input {
 
   &.justify-center {
     justify-content: center;
+  }
+
+  &.justify-end {
+    justify-content: end;
   }
 }
 
