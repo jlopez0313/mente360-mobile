@@ -16,15 +16,17 @@ import {
 } from "@ionic/react";
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import { Route } from "react-router";
+import { Route, useHistory } from "react-router";
 import styles from "./TabLayout.module.scss";
 
 export const TabLayout = () => {
+  const history = useHistory(); 
+
   const network = useNetwork();
   const { userEnabled, payment_status } = usePayment();
 
   const [isPremiumOpen, setIsPremiumOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("home");
+  const [activeTab, setActiveTab] = useState(history.location.pathname);
 
   const { isGeneral, isRoom, isGrupo } = useSelector(
     (state: any) => state.notifications
@@ -55,7 +57,7 @@ export const TabLayout = () => {
           tab="home"
           href="/home"
           onClick={() => setActiveTab("home")}
-          className={activeTab === "home" ? styles.tabSelected : ""}
+          className={activeTab.includes("home") ? styles.tabSelected : ""}
         >
           <span className="material-symbols-outlined filled">home</span>
         </IonTabButton>
@@ -74,7 +76,7 @@ export const TabLayout = () => {
             tab="comunidades"
             href="/comunidades"
             onClick={() => setActiveTab("comunidades")}
-            className={activeTab === "comunidades" ? styles.tabSelected : ""}
+            className={activeTab.includes("comunidades") ? styles.tabSelected : ""}
           >
             <span className="material-symbols-outlined filled">
               diversity_3
@@ -94,7 +96,7 @@ export const TabLayout = () => {
             tab="musicaterapia"
             href="/musicaterapia"
             onClick={() => setActiveTab("musicaterapia")}
-            className={activeTab === "musicaterapia" ? styles.tabSelected : ""}
+            className={activeTab.includes("musicaterapia") ? styles.tabSelected : ""}
           >
             <span className="material-symbols-outlined filled">headphones</span>
           </IonTabButton>
@@ -104,7 +106,7 @@ export const TabLayout = () => {
           tab="notificaciones"
           href="/notificaciones"
           onClick={() => setActiveTab("notificaciones")}
-          className={activeTab === "notificaciones" ? styles.tabSelected : ""}
+          className={activeTab.includes("notificaciones") ? styles.tabSelected : ""}
         >
           <span className="material-symbols-outlined ">notifications</span>
           {isGeneral && <div className={styles["has-notification"]}></div>}
@@ -124,7 +126,7 @@ export const TabLayout = () => {
             tab="chat"
             href="/chat"
             onClick={() => setActiveTab("chat")}
-            className={activeTab === "chat" ? styles.tabSelected : ""}
+            className={activeTab.includes("chat") ? styles.tabSelected : ""}
           >
             <span className="material-symbols-outlined filled">
               connect_without_contact
