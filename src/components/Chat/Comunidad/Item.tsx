@@ -1,6 +1,6 @@
 import Avatar from "@/assets/images/avatar.jpg";
 import { Profile } from "@/components/Chat/Profile/Profile";
-import { writeData } from "@/services/realtime-db";
+import { updateData, writeData } from "@/services/realtime-db";
 import { IonAvatar, IonItem, IonLabel, IonSkeletonText } from "@ionic/react";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
@@ -22,7 +22,7 @@ export const Item: React.FC<any> = ({ contact }) => {
       .join("_");
 
     await Promise.all([
-      writeData("users/" + user.id, {
+      updateData("users/" + user.id, {
         id: user.id,
         name: user.name,
         photo: user.photo || "",
@@ -31,7 +31,7 @@ export const Item: React.FC<any> = ({ contact }) => {
         edad: user.edad || 0,
         genero: user.genero || '--',
       }),
-      writeData("users/" + otroUser.id, {
+      updateData("users/" + otroUser.id, {
         id: otroUser.id,
         name: otroUser.name,
         photo: otroUser.photo || "",

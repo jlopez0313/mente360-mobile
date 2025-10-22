@@ -1,6 +1,8 @@
 @import "@/styles.scss";
 
 .ion-content {
+
+    @include cardComunidad();
     @include descripcion();
 
     .premium {

@@ -10,7 +10,6 @@ import {
 } from "@ionic/react";
 
 import { Principal as PrincipalComponent } from "@/components/Comunidades/Principal/Principal";
-import { Footer } from "@/components/Footer/Footer";
 import { arrowBack } from "ionicons/icons";
 import { useEffect } from "react";
 import { Link, useHistory } from "react-router-dom";
@@ -56,7 +55,6 @@ const Principal: React.FC = () => {
         <PrincipalComponent />
       </IonContent>
 
-      <Footer />
     </IonPage>
   );
 };

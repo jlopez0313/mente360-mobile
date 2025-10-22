@@ -13,7 +13,6 @@ import {
   IonToolbar,
 } from "@ionic/react";
 
-import { Footer } from "@/components/Footer/Footer";
 import { Lider as LiderComponent } from "@/components/Lider/Lider";
 import { db } from "@/hooks/useDexie";
 import { useLiveQuery } from "dexie-react-hooks";
@@ -84,7 +83,6 @@ const Lider: React.FC = () => {
         <LiderComponent />
       </IonContent>
 
-      <Footer />
     </IonPage>
   );
 };

@@ -93,7 +93,7 @@ export const Item: React.FC<any> = ({ idx, item, network }) => {
     );
 
   const onPlayClicked = async () => {
-    console.log(item);
+
     dispatch(setShowGlobalAudio(true));
 
     if (!globalAudio || item.id != globalAudio.id) {

@@ -15,7 +15,6 @@ import {
 } from "ionicons/icons";
 
 import { Info as InfoComponent } from "@/components/Chat/Grupos/Grupo/Info/Info";
-import { Footer } from "@/components/Footer/Footer";
 import { Link, useHistory, useParams } from "react-router-dom";
 
 import { getData } from "@/services/realtime-db";
@@ -92,7 +91,6 @@ const Info: React.FC = () => {
         <InfoComponent grupoID={id} />
       </IonContent>
 
-      <Footer />
     </IonPage>
   );
 };

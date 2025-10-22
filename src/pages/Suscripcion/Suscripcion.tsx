@@ -9,7 +9,6 @@ import {
   IonToolbar,
 } from "@ionic/react";
 
-import { Footer } from "@/components/Footer/Footer";
 import { Suscripcion as SuscripcionComponent } from "@/components/Suscripcion/Suscripcion";
 import { arrowBack } from "ionicons/icons";
 import { useEffect } from "react";
@@ -55,8 +54,7 @@ const Suscripcion: React.FC = () => {
       <IonContent className={`ion-padding ${styles["ion-content"]}`}>
         <SuscripcionComponent />
       </IonContent>
-
-      <Footer />
+      
     </IonPage>
   );
 };

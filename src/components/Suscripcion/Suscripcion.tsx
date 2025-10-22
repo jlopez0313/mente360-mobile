@@ -4,11 +4,6 @@ import { Premium } from "@/components/Shared/Premium/Premium";
 import { db } from "@/hooks/useDexie";
 import { useNetwork } from "@/hooks/useNetwork";
 import { usePayment } from "@/hooks/usePayment";
-import {
-  IonCol,
-  IonGrid,
-  IonRow
-} from "@ionic/react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useState } from "react";
 import { useSelector } from "react-redux";
@@ -24,7 +19,7 @@ export const Suscripcion = () => {
   const comunidades = useLiveQuery(
     () =>
       db.comunidades
-        .filter((c: any) => suscripciones.includes(c.id.toString()))
+        .filter((c: any) => suscripciones.includes(c.id))
         .toArray(),
     [suscripciones]
   );
@@ -84,24 +79,19 @@ export const Suscripcion = () => {
         </div>
       ) : null}
 
-      <IonGrid className="ion-no-padding">
-        <IonRow>
-          {comunidades?.map((comunidad: any, idx: number) => {
-            const finSuscripcion = getFinSuscripcion(comunidad.id);
+      {comunidades?.map((comunidad: any, idx: number) => {
+        const finSuscripcion = getFinSuscripcion(comunidad.id);
 
-            return (
-              <IonCol size="6" key={idx}>
-                <Item
-                  finSuscripcion={finSuscripcion}
-                  comunidad={comunidad}
-                  setIsPremiumOpen={setIsPremiumOpen}
-                />
-              </IonCol>
-            );
-          })}
-        </IonRow>
-      </IonGrid>
-
+        return (
+          <Item
+            key={idx}
+            finSuscripcion={finSuscripcion}
+            comunidad={comunidad}
+            setIsPremiumOpen={setIsPremiumOpen}
+          />
+        );
+      })}
+       
       <Modal
         isOpen={isPremiumOpen}
         title={import.meta.env.VITE_NAME + " premium"}

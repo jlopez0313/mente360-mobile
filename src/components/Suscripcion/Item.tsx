@@ -4,15 +4,17 @@ import { useNetwork } from "@/hooks/useNetwork";
 import { usePayment } from "@/hooks/usePayment";
 import { find } from "@/services/subscribe";
 
+import { getYoutubeVideoId } from "@/helpers/Video";
 import {
-    IonButton,
-    IonCard,
-    IonCardContent,
-    IonCardHeader,
-    IonCardSubtitle,
-    IonCardTitle,
-    useIonActionSheet,
-    useIonLoading,
+  IonAvatar,
+  IonButton,
+  IonCard,
+  IonCardContent,
+  IonCardHeader,
+  IonCardSubtitle,
+  IonCardTitle,
+  useIonActionSheet,
+  useIonLoading,
 } from "@ionic/react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { cardOutline } from "ionicons/icons";
@@ -142,14 +144,41 @@ export const Item = ({ comunidad, finSuscripcion, setIsPremiumOpen }: any) => {
 
   return (
     <IonCard>
-      <img
-        alt={comunidad.comunidad}
-        src={network.status ? baseURL + comunidad.imagen : AudioNoWifi}
-      />
       <IonCardHeader>
-        <IonCardTitle> {comunidad.comunidad} </IonCardTitle>
-        <IonCardSubtitle> {comunidad.lider?.name} </IonCardSubtitle>
-
+        <div className={styles["card-header"]}>
+          <IonAvatar>
+            <img
+              alt={comunidad?.comunidad}
+              src={network.status ? baseURL + comunidad?.imagen : AudioNoWifi}
+            />
+          </IonAvatar>
+          <div className={styles["card-info"]}>
+            <IonCardTitle> {comunidad?.comunidad} </IonCardTitle>
+            <IonCardSubtitle> {comunidad?.lider?.name} </IonCardSubtitle>
+          </div>
+        </div>
+        <div
+          style={{ position: "relative", paddingBottom: "56.25%", height: 0 }}
+        >
+          <iframe
+            src={`https://www.youtube.com/embed/${getYoutubeVideoId(
+              comunidad?.video
+            )}`}
+            title="YouTube video player"
+            allowFullScreen
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+            }}
+          ></iframe>
+        </div>
+      </IonCardHeader>
+      <IonCardContent>
         <p
           className={`${styles["texto"]} ${
             expandido ? styles["expandido"] : ""
@@ -164,10 +193,9 @@ export const Item = ({ comunidad, finSuscripcion, setIsPremiumOpen }: any) => {
         >
           {expandido ? "Leer menos" : "Leer más"}
         </button>
-      </IonCardHeader>
-      <IonCardContent>
+
         {finSuscripcion?.vencida ? (
-          <>
+          <div>
             <span>Venció el: {finSuscripcion.fecha_formateada}</span>
 
             <IonButton
@@ -177,22 +205,25 @@ export const Item = ({ comunidad, finSuscripcion, setIsPremiumOpen }: any) => {
             >
               Suscribete
             </IonButton>
-          </>
+          </div>
         ) : (
-          <>
+          <div>
             <span>Vence el: {finSuscripcion?.fecha_formateada}</span>
-            <IonButton
+
+            <div className="flex justify-end">
+              <IonButton
                 fill="outline"
-              expand="block"
-              className={styles["suscrito"]}
-              onClick={() =>
-                !finSuscripcion?.vencida && goToCanales(comunidad.id)
-              }
-            >
-              {" "}
-              Acceder{" "}
-            </IonButton>
-          </>
+                shape="round"
+                className={styles["suscrito"]}
+                onClick={() =>
+                  !finSuscripcion?.vencida && goToCanales(comunidad.id)
+                }
+              >
+                {" "}
+                Acceder{" "}
+              </IonButton>
+            </div>
+          </div>
         )}
       </IonCardContent>
     </IonCard>
