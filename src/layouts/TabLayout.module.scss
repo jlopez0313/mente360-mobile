@@ -1,0 +1,28 @@
+ion-tab-bar {
+    --background: var(--bg-white);
+    
+    ion-tab-button {
+        --ripple-color: var(--color-main);
+        --color-selected: var(--color-main);
+
+        span {
+            font-size: 30px !important;
+        }
+
+        &.tabSelected {
+          span {
+            color: var(--color-main) !important;
+          }  
+        }
+        
+        .has-notification {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #ff0000;
+            position: absolute;
+            right: -5px;
+            top: -5px;
+        }
+    }
+}

@@ -13,7 +13,6 @@ import {
 import styles from "./Musicaterapia.module.scss";
 
 
-import { Footer } from "@/components/Footer/Footer";
 import { Clips as ClipsComponent } from "@/components/Musicaterapia/Clips/Clips";
 import { Playlist as PlaylistComponent } from "@/components/Musicaterapia/Playlist/Playlist";
 import { setTab } from "@/store/slices/audioSlice";
@@ -89,7 +88,6 @@ const Musicaterapia: React.FC = () => {
         {tab == "clips" ? <ClipsComponent /> : <PlaylistComponent />}
       </IonContent>
 
-      <Footer id="footer" />
     </IonPage>
   );
 };

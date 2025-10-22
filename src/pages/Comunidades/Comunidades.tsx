@@ -9,7 +9,6 @@ import {
 } from "@ionic/react";
 
 import { Comunidades as ComunidadesComponent } from "@/components/Comunidades/Comunidades";
-import { Footer } from "@/components/Footer/Footer";
 import { useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import styles from "./Comunidades.module.scss";
@@ -49,7 +48,6 @@ const Comunidades: React.FC = () => {
         <ComunidadesComponent />
       </IonContent>
 
-      <Footer />
     </IonPage>
   );
 };

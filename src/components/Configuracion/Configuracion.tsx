@@ -1,39 +1,30 @@
+import Avatar from "@/assets/images/avatar.jpg";
 import { openWhatsApp } from "@/helpers/Whatsapp";
 import { usePreferences } from "@/hooks/usePreferences";
 import { setRoute } from "@/store/slices/routeSlice";
 import {
-  IonSkeletonText,
   IonAvatar,
-  IonMenu,
-  IonHeader,
-  IonToolbar,
   IonContent,
-  IonMenuToggle,
-  IonButton,
+  IonHeader,
   IonIcon,
   IonItem,
   IonItemDivider,
   IonItemGroup,
   IonLabel,
   IonList,
+  IonMenu,
+  IonMenuToggle,
+  IonSkeletonText,
   IonToggle,
+  IonToolbar,
   ToggleCustomEvent,
   useIonToast,
 } from "@ionic/react";
-import {
-  callOutline,
-  cogOutline,
-  documentLockOutline,
-  documentTextOutline,
-  hammerOutline,
-  peopleOutline
-} from "ionicons/icons";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import { Link } from "react-router-dom";
 import styles from "./Configuracion.module.scss";
-import Avatar from "@/assets/images/avatar.jpg";
 import whatsapp from "/assets/icons/whatsapp.svg";
 
 export const Configuracion = () => {
@@ -81,8 +72,7 @@ export const Configuracion = () => {
 
   const onClearPreferences = () => {
     Object.keys(keys).forEach((key: string) => {
-      if (key !== keys.TOKEN)
-        removePreference(keys[key]);
+      if (key !== keys.TOKEN) removePreference(keys[key]);
     });
 
     onPresentToast("bottom", "Preferencias Eliminadas.", "");
@@ -114,7 +104,8 @@ export const Configuracion = () => {
   }, []);
 
   return (
-    <IonMenu contentId="main-content"
+    <IonMenu
+      contentId="main-content"
       onIonWillOpen={() => {
         const content = document.getElementById("main-content");
         if (content) {
@@ -139,22 +130,22 @@ export const Configuracion = () => {
         <IonToolbar className="bg-secondary minheight186">
           <IonItem lines="none" className="flex bg-secondary minheight186">
             {isLoading && (
-            <IonSkeletonText
-              animated
-              className={`ion-margin-top ${styles["profile-image"]}`}
-            />
-          )}
+              <IonSkeletonText
+                animated
+                className={`ion-margin-top ${styles["profile-image"]}`}
+              />
+            )}
             <IonAvatar className="menu-avatar" slot="start">
               <img
                 //src={usuario.photo ? baseURL + usuario.photo : Avatar}
                 src={Avatar}
                 onLoad={() => setIsLoading(false)}
               />
-            </IonAvatar> 
+            </IonAvatar>
 
             <IonLabel>
-              <h2 style={{ color: '#4b4b4b', margin: 0 }}>Alejandro Mendoza</h2>
-              <p style={{ color: '#4b4b4b', margin: 0 }}>@alejandro</p>
+              <h2 style={{ color: "#4b4b4b", margin: 0 }}>Alejandro Mendoza</h2>
+              <p style={{ color: "#4b4b4b", margin: 0 }}>@alejandro</p>
             </IonLabel>
           </IonItem>
         </IonToolbar>
@@ -163,38 +154,46 @@ export const Configuracion = () => {
         <IonMenuToggle autoHide={true}>
           <div className={styles["ion-content"]}>
             <IonList inset={true}>
+
               <IonItemGroup>
-                
                 <Link to="/perfil">
-                  <IonItem button={true} >
-                  <span slot="start" className="material-symbols-outlined">account_circle</span>
+                  <IonItem button={true}>
+                    <span slot="start" className="material-symbols-outlined">
+                      account_circle
+                    </span>
                     <IonLabel>Editar Perfil</IonLabel>
                   </IonItem>
                 </Link>
 
-                <Link to="/recordatorios">
-                  <IonItem button={true} >
-                  <span slot="start" className="material-symbols-outlined">alarm</span>
-                    <IonLabel>Mis Recordatorios</IonLabel>
-                  </IonItem>
-                </Link>
-
-                <IonItem button={true} lines="none" >
-                  <span slot="start" className="material-symbols-outlined">dark_mode</span>
+                <IonItem button={true} lines="none">
+                  <span slot="start" className="material-symbols-outlined">
+                    dark_mode
+                  </span>
 
                   <IonToggle
-                    mode="md" 
+                    mode="md"
                     checked={paletteToggle}
                     onIonChange={toggleChange}
-                    className="custom-toggle"
+                    className={styles["custom-toggle"]}
                   >
                     <IonLabel>Modo Oscuro</IonLabel>
                   </IonToggle>
                 </IonItem>
 
+                <Link to="/recordatorios">
+                  <IonItem button={true}>
+                    <span slot="start" className="material-symbols-outlined">
+                      alarm
+                    </span>
+                    <IonLabel>Mis Recordatorios</IonLabel>
+                  </IonItem>
+                </Link>
+
                 <Link to="/test">
-                  <IonItem button={true} >
-                  <span slot="start" className="material-symbols-outlined">stars</span>
+                  <IonItem button={true}>
+                    <span slot="start" className="material-symbols-outlined">
+                      stars
+                    </span>
                     <IonLabel>Realizar Test Eneagrama</IonLabel>
                   </IonItem>
                 </Link>
@@ -207,70 +206,76 @@ export const Configuracion = () => {
                 </Link>
       */}
               </IonItemGroup>
-            </IonList>
-            
-            <IonItemDivider className="line-divider"></IonItemDivider>
 
-            <IonList inset={true}>
+              <IonItemDivider className={styles["line-divider"]}></IonItemDivider>
+
               <IonItemGroup>
-                
-
                 <IonItem
                   lines="none"
-
                   onClick={() => {
-                    window.open("https://soymente360.com/#quienes-somos", "_blank");
+                    window.open(
+                      "https://soymente360.com/#quienes-somos",
+                      "_blank"
+                    );
                   }}
                 >
-                  <span slot="start" className="material-symbols-outlined">groups</span>
+                  <span slot="start" className="material-symbols-outlined">
+                    groups
+                  </span>
                   <IonLabel>Sobre Nosotros</IonLabel>
                 </IonItem>
 
                 <IonItem
                   lines="none"
-
                   onClick={() => {
-                    window.open("https://soymente360.com/terminos_condiciones.html", "_blank");
+                    window.open(
+                      "https://soymente360.com/terminos_condiciones.html",
+                      "_blank"
+                    );
                   }}
                 >
-                  <span slot="start" className="material-symbols-outlined">insert_drive_file</span>
+                  <span slot="start" className="material-symbols-outlined">
+                    insert_drive_file
+                  </span>
                   <IonLabel>Términos y Condiciones</IonLabel>
                 </IonItem>
 
                 <IonItem
                   lines="none"
                   onClick={() => {
-                    window.open("https://soymente360.com/politica_privacidad.html", "_blank");
+                    window.open(
+                      "https://soymente360.com/politica_privacidad.html",
+                      "_blank"
+                    );
                   }}
                 >
-                  <span slot="start" className="material-symbols-outlined">admin_panel_settings</span>
+                  <span slot="start" className="material-symbols-outlined">
+                    admin_panel_settings
+                  </span>
                   <IonLabel>Política de Privacidad</IonLabel>
                 </IonItem>
               </IonItemGroup>
-            </IonList>
-            
-            <IonItemDivider className="line-divider"></IonItemDivider>
 
-            <IonList inset={true}>
+              <IonItemDivider className={styles["line-divider"]}></IonItemDivider>
+
               <IonItemGroup>
-                
-              </IonItemGroup>
-
-              <IonItem
-                lines="none"
-
-                onClick={() =>
-                  openWhatsApp(
-                    import.meta.env.VITE_SUPPORT_PHONE,
-                    `Hola, tengo un problema con la aplicación ${import.meta.env.VITE_NAME
-                    } y necesito ayuda. Esto es lo que me sucede: `
-                  )
-                }
-              >
-                <span slot="start" className="material-symbols-outlined">support_agent</span>
-                <IonLabel>Soporte</IonLabel>
-              </IonItem>
-              {/* 
+                <IonItem
+                  lines="none"
+                  onClick={() =>
+                    openWhatsApp(
+                      import.meta.env.VITE_SUPPORT_PHONE,
+                      `Hola, tengo un problema con la aplicación ${
+                        import.meta.env.VITE_NAME
+                      } y necesito ayuda. Esto es lo que me sucede: `
+                    )
+                  }
+                >
+                  <span slot="start" className="material-symbols-outlined">
+                    support_agent
+                  </span>
+                  <IonLabel>Soporte</IonLabel>
+                </IonItem>
+                {/* 
 
               <IonItem
                 lines="none"
@@ -299,35 +304,32 @@ export const Configuracion = () => {
                 <IonLabel>Limpiar Preferencias</IonLabel>
               </IonItem>
       */}
-              <IonItem
-                onClick={() =>
-                  openWhatsApp(
-                    import.meta.env.VITE_CONTACT_PHONE,
-                    `¡Hola! Me gustaría obtener más información sobre su servicio en ${import.meta.env.VITE_NAME
-                    }. ¿Podrían ayudarme?`
-                  )
-                }
-              >
-                <IonIcon className="menu-icon" slot="start" src={whatsapp}/>
-                <IonLabel>Escríbenos</IonLabel>
-              </IonItem>
-              
-            </IonList>
+                <IonItem
+                  onClick={() =>
+                    openWhatsApp(
+                      import.meta.env.VITE_CONTACT_PHONE,
+                      `¡Hola! Me gustaría obtener más información sobre su servicio en ${
+                        import.meta.env.VITE_NAME
+                      }. ¿Podrían ayudarme?`
+                    )
+                  }
+                >
+                  <IonIcon className="menu-icon" slot="start" src={whatsapp} />
+                  <IonLabel>Escríbenos</IonLabel>
+                </IonItem>
+              </IonItemGroup>
 
-            <IonItemDivider className="line-divider"></IonItemDivider>
+              <IonItemDivider className={styles["line-divider"]}></IonItemDivider>
 
-            <IonList inset={true}>
               <IonItemGroup>
-                  
-                <IonItem lines="none"  onClick={onLogout}>
-                  <span slot="start" className="material-symbols-outlined">logout</span>
+                <IonItem lines="none" onClick={onLogout}>
+                  <span slot="start" className="material-symbols-outlined">
+                    logout
+                  </span>
                   <IonLabel>Cerrar Sesión</IonLabel>
                 </IonItem>
-
               </IonItemGroup>
             </IonList>
-            
-
           </div>
         </IonMenuToggle>
       </IonContent>

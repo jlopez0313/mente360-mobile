@@ -1,26 +1,16 @@
 import {
-  IonButton,
+  IonAvatar,
   IonButtons,
   IonContent,
   IonHeader,
-  IonIcon,
-  IonPage,
-  IonTitle,
-  IonToolbar,
   IonMenuButton,
-  IonAvatar
+  IonPage,
+  IonToolbar
 } from "@ionic/react";
 
-import {
-  ellipsisVertical,
-  personCircleOutline
-} from "ionicons/icons";
 import styles from "./Home.module.scss";
 
-import { Footer } from "@/components/Footer/Footer";
 import { Home as HomeComponent } from "@/components/Home/Home";
-import { Link } from "react-router-dom";
-import { Popover } from "./Popover";
 
 import { destroy } from "@/helpers/musicControls";
 import { setShowGlobalAudio } from "@/store/slices/audioSlice";
@@ -28,11 +18,11 @@ import { getNotifications } from "@/store/thunks/notifications";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
+import Logo from "@/assets/images/logo.png";
 import { Sync } from "@/components/Shared/Animations/Sync/Sync";
 import { diferenciaEnDias } from "@/helpers/Fechas";
 import { useGlobalSync } from "@/hooks/useGlobalSync";
 import { usePreferences } from "@/hooks/usePreferences";
-import Logo from "@/assets/images/logo.png";
 
 const Home: React.FC = () => {
   const { getPreference, setPreference, keys } = usePreferences();
@@ -91,7 +81,7 @@ const Home: React.FC = () => {
         />
         <HomeComponent />
       </IonContent>
-      <Footer />
+
     </IonPage>
   );
 };

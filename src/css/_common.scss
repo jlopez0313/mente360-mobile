@@ -20,6 +20,17 @@
     border-bottom: none;
     padding: 0;
 
+    &.line-divider {
+        --background: transparent;
+        --inner-padding-end: 0;
+        --inner-padding-start: 0;
+        min-height: 1px;
+        border-bottom: 1px solid var(--color-divider) !important;
+        /* color y grosor de la línea */
+        margin-top: 0px;
+        margin-bottom: 10px;
+    }
+
     ion-label {
         color: var(--text-muted);
         font-weight: bold;
@@ -70,6 +81,9 @@
 
 
 @mixin cardComunidad {
+  ion-card {
+    --background: var(--bg-white);
+
     .card-header {
         display: flex;
         align-items: center;
@@ -101,6 +115,8 @@
             }
         }
     }
+
+  }
 }
 
 @mixin descripcion {

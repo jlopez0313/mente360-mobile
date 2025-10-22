@@ -9,7 +9,6 @@ import {
   IonToolbar
 } from "@ionic/react";
 
-import { Footer } from "@/components/Footer/Footer";
 import { Notifications as NotificationsComponent } from '@/components/Notifications/Notifications';
 import { arrowBack } from "ionicons/icons";
 import { useEffect } from "react";
@@ -55,7 +54,6 @@ const Notifications: React.FC = () => {
         <NotificationsComponent />
       </IonContent>
 
-      <Footer />
     </IonPage>
   );
 };

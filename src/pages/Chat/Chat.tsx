@@ -16,7 +16,6 @@ import styles from "./Chat.module.scss";
 import { Chat as ChatComponent } from "@/components/Chat/Chat/Lista/Chat";
 import { Comunidad as ComunidadComponent } from "@/components/Chat/Comunidad/Comunidad";
 import { Grupos as GruposComponent } from "@/components/Chat/Grupos/Lista/Grupos";
-import { Footer } from "@/components/Footer/Footer";
 import { useHistory } from "react-router-dom";
 
 import { destroy } from "@/helpers/musicControls";
@@ -130,7 +129,6 @@ const Chat: React.FC = () => {
         })()}
       </IonContent>
 
-      <Footer />
     </IonPage>
   );
 };
