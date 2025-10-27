@@ -5,15 +5,26 @@
     flex-direction: column;
     align-items: center;
 
+    .example-modal {
+        --max-height: 61%;
+    }
+    
     .logo {
         width: 50px;
     }
 
     .ready {
-        text-transform: uppercase;
+        font-size: 16px;
         font-weight: bold;
+        color: var(--txt-darkgray);
+        margin-top: 15px;
     }
-
+    .name-app{
+        font-size: 24px;
+        font-weight: bold;
+        color: var(--color-main) !important;
+        margin-top: -10px;
+    }
 
     .w-100 {
         width: 100%;
@@ -23,5 +34,8 @@
             background: none;
         }
     }
+}
 
+.ion-text-left{
+    font-size: 12px;
 }

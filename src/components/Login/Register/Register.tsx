@@ -1,4 +1,5 @@
 import {
+  IonLabel,
   IonButton,
   IonCard,
   IonCardContent,
@@ -47,6 +48,10 @@ export const Register = () => {
     setShowPassword(!showPassword);
   };
 
+  const goToLogin = () => {
+    history.replace("/login");
+  }
+
   const doRegister = async (evt: any) => {
     evt.preventDefault();
 
@@ -67,7 +72,7 @@ export const Register = () => {
       data.fcm_token = token.token;
 
       await setPreference(keys.TOKEN, data.token);
-      
+
       await db.user.put(data.user);
       dispatch(setUser(data.user));
 
@@ -171,94 +176,99 @@ export const Register = () => {
     <IonGrid class="ion-text-justify">
       <IonRow>
         <IonCol size="12" class="ion-no-padding">
-          <IonCard className={`ion-no-padding`}>
-            <IonCardContent>
-              <IonInput
-                className={`ion-margin-bottom ${styles.login}`}
-                type="email"
-                labelPlacement="stacked"
-                placeholder="Correo"
-                fill="outline"
-                onIonInput={(evt: any) => setEmail(evt.target.value)}
-              ></IonInput>
 
-              <IonInput
-                className={`ion-margin-bottom ${styles.login}`}
-                type={showPassword ? "text" : "password"}
-                labelPlacement="stacked"
-                placeholder="Contraseña"
-                fill="outline"
-                onIonInput={(evt: any) => setPassword(evt.target.value)}
-              >
-                <IonIcon
-                  icon={showPassword ? eyeOff : eye}
-                  slot="end"
-                  onClick={togglePasswordVisibility}
-                  style={{ cursor: "pointer" }}
-                />
-              </IonInput>
+          <div className={`ion-left ${styles.titlelogin}`}>
+            <IonLabel>Crear Cuenta
+            </IonLabel>
+          </div>
 
-              <IonCheckbox
-                className={`ion-margin-bottom ${styles.login}`}
-                onIonChange={(evt: any) => setPoliticas(!politicas)}
-                labelPlacement="end"
-              >
-                Acepto las &nbsp;
-                < a
-                  href="#"
-                  onClick={() => {
-                    window.open("https://soymente360.com/privacy-policy/", "_blank");
-                  }}
-                >
-                  políticas de privacidad
-                </a>
-              </IonCheckbox>
+          <div className={`ion-left ${styles.subtitlelogin}`}>
+            <IonLabel>¿Ya tienes una cuenta?
+            </IonLabel>
+            <IonNote className={styles.buttonlink}
+              onClick={goToLogin}
+            >Iniciar sesión</IonNote>
+          </div>
 
+          <IonInput
+            className={`ion-margin-bottom ${styles.login}`}
+            type="email"
+            labelPlacement="stacked"
+            placeholder="Correo"
+            fill="outline"
+            onIonInput={(evt: any) => setEmail(evt.target.value)}
+          ></IonInput>
 
-              <IonCheckbox
-                className={`ion-margin-bottom ${styles.login}`}
-                onIonChange={(evt: any) => setTerminos(!terminos)}
-                labelPlacement="end"
-              >
-                He leído los &nbsp;
-                < a
-                  href="#"
-                  onClick={() => {
-                    window.open("https://soymente360.com/privacy-policy/", "_blank");
-                  }}
-                >
-                  términos y condiciones
-                </a>
-              </IonCheckbox>
-
-              <IonButton
-                type="button"
-                className="ion-margin-top ion-margin-bottom"
-                expand="block"
-                disabled={!email || !password || !politicas || !terminos}
-                onClick={(evt) => doRegister(evt)}
-              >
-                {" "}
-                Registrarse{" "}
-              </IonButton>
-
-              <IonNote> &nbsp; </IonNote>
-
-              <IonLoading
-                message="Dismissing after 3 seconds..."
-                duration={3000}
-              />
-            </IonCardContent>
-          </IonCard>
-          {/* 
-            <IonLabel>O ingresa con </IonLabel> <br />
-            <br />
-            <img
-              className={styles["logo-google"]}
-              src="assets/images/logoGoogle.png"
-              onClick={onGmailLogin}
+          <IonInput
+            className={`ion-margin-bottom ${styles.login}`}
+            type={showPassword ? "text" : "password"}
+            labelPlacement="stacked"
+            placeholder="Contraseña"
+            fill="outline"
+            onIonInput={(evt: any) => setPassword(evt.target.value)}
+          >
+            <IonIcon
+              icon={showPassword ? eyeOff : eye}
+              slot="end"
+              onClick={togglePasswordVisibility}
+              style={{ cursor: "pointer" }}
             />
-          */}
+          </IonInput>
+          <div>
+            <IonCheckbox
+              className={`ion-margin-bottom ${styles.subtitlelogin}`}
+              onIonChange={(evt: any) => setPoliticas(!politicas)}
+              labelPlacement="end"
+            >
+              Acepto las &nbsp;
+              < a
+                className={styles.buttonlink}
+                href="#"
+                onClick={() => {
+                  window.open("https://soymente360.com/privacy-policy/", "_blank");
+                }}
+              >
+                políticas de privacidad
+              </a>
+            </IonCheckbox>
+          </div>
+          <div>
+            <IonCheckbox
+              className={`ion-margin-bottom ${styles.subtitlelogin}`}
+              onIonChange={(evt: any) => setTerminos(!terminos)}
+              labelPlacement="end"
+            >
+              He leído los &nbsp;
+              < a
+                className={styles.buttonlink}
+                href="#"
+                onClick={() => {
+                  window.open("https://soymente360.com/privacy-policy/", "_blank");
+                }}
+              >
+                términos y condiciones
+              </a>
+            </IonCheckbox>
+          </div>
+          <IonButton
+            shape="round"
+            type="button"
+            className="ion-margin-top ion-margin-bottom"
+            expand="block"
+            disabled={!email || !password || !politicas || !terminos}
+            onClick={(evt) => doRegister(evt)}
+          >
+            {" "}
+            Registrarse{" "}
+          </IonButton>
+
+          <IonNote> &nbsp; </IonNote>
+
+          <IonLoading
+            message="Dismissing after 3 seconds..."
+            duration={3000}
+          />
+
         </IonCol>
       </IonRow>
     </IonGrid>

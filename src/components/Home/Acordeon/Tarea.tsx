@@ -79,7 +79,7 @@ export const Tarea: React.FC<any> = ({network}) => {
             shape="round"
             expand="block"
             type="button"
-            className="ion-margin-top ion-padding-start ion-padding-end"
+            className="ion-margin-top ion-padding-start ion-padding-end width50"
             id="modal-tarea"
           >
             Ver

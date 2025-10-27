@@ -8,7 +8,8 @@ import Interno from "./pages/Chat/Interno/Interno";
 import Configuracion from "./pages/Configuracion/Configuracion";
 import Crecimiento from "./pages/Crecimiento/Crecimiento";
 import Sharing from "./pages/Home/Share/Sharing";
-import Login from "./pages/Login/Login";
+import Login from "./pages/Login/Login/Login";
+import Register from "./pages/Login/Register/Register";
 import Clip from "./pages/Musicaterapia/Clip/Clip";
 import Perfil from "./pages/Perfil/Perfil";
 import Add from "./pages/Recordatorios/Add/Add";
@@ -143,6 +144,7 @@ const App: React.FC = () => {
                 <Route exact={true} path="/share" component={Sharing} />
 
                 <Route exact={true} path="/login" component={Login} />
+                <Route exact={true} path="/register" component={Register} />
                 <Route exact={true} path="/reset" component={Reset} />
                 <Route exact={true} path="/registro" component={Registro} />
                 <Route

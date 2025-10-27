@@ -1,12 +1,43 @@
 .momentos {
-    background: none;
+
+    padding: 10px;
+    background: var(--bg-content);
 
     .momento {
-        --padding-top: 5px;
-        --padding-bottom: 5px;
-        --padding-start: 5px;
-        --padding-end: 5px;
-        font-size: .9rem;;
+        border-radius: 10px;
+        background: var(--bg-darkgray);
+        margin-bottom: 10px;
+        font-size: .9rem;
+        ;
+        padding: 8px;
+        color: var(--ion-color);
+
+        p {
+            text-align: justify;
+        }
+    }
+
+    .momento:hover {
+        cursor: pointer;
+    }
+
+    .selected {
+        background: var(--color-secondary);
+        border-color: var(--color-secondary);
+
+        p {
+            color: #000000 !important;
+        }
+    }
+
+    .opcionLetra {
+        font-weight: bold !important;
+        font-size: 16px !important;
+        margin-bottom: 5px;
+    }
+
+    .selected .opcionLetra {
+        color: #0286B6 !important;
     }
 }
 

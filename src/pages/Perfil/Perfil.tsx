@@ -52,21 +52,8 @@ const Perfil: React.FC = () => {
             </Link>
           </IonButtons>
 
-          <IonTitle className="ion-text-center"> Mi Perfil </IonTitle>
+          <IonTitle > Mi Perfil </IonTitle>
 
-          <IonButtons slot="end">
-            <Link to="/recordatorios" replace={true}>
-              <IonButton>
-                <IonIcon slot="icon-only" icon={timeOutline}></IonIcon>
-              </IonButton>
-            </Link>
-
-            <Link to="/configuracion" replace={true}>
-              <IonButton>
-                <IonIcon slot="icon-only" icon={settingsOutline} />
-              </IonButton>
-            </Link>
-          </IonButtons>
         </IonToolbar>
       </IonHeader>
 

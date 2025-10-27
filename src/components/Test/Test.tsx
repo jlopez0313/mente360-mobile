@@ -29,6 +29,7 @@ export const Test = () => {
         isOpen={isOpen}
         showButtons={true}
         canDismiss={true}
+        modalHeight="50vh"
         title="El Eneagrama en Mente360"
         hideButtons={true}
         onConfirm={() => setIsOpen(false)}

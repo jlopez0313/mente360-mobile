@@ -1,13 +1,14 @@
 import { useNetwork } from "@/hooks/useNetwork";
 import { all } from "@/services/alarmas";
-import { IonButton, useIonLoading } from "@ionic/react";
+import { IonButton, useIonLoading, IonFab, IonFabButton, IonIcon } from "@ionic/react";
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { Card } from "./Card";
 import styles from "./Recordatorios.module.scss";
+import { add } from "ionicons/icons";
 
 export const Recordatorios = () => {
-  
+
   const history = useHistory();
   const network = useNetwork();
   const [present, onDismiss] = useIonLoading();
@@ -19,8 +20,8 @@ export const Recordatorios = () => {
       present({
         message: "Cargando ...",
       });
-      
-      const {data: {data}} = await all();
+
+      const { data: { data } } = await all();
       setLista(data);
 
     } catch (error) {
@@ -45,9 +46,11 @@ export const Recordatorios = () => {
       })}
 
       <div className="ion-text-center ion-padding">
-        <IonButton disabled={!network.status} expand="block" onClick={goToAdd}>
-          Agregar Nuevo Recordatorio
-        </IonButton>
+        <IonFab horizontal="end" vertical="bottom">
+          <IonFabButton disabled={!network.status} onClick={goToAdd} id="add" className="ion-margin-bottom">
+            <IonIcon icon={add} />
+          </IonFabButton>
+        </IonFab>
       </div>
     </div>
   );

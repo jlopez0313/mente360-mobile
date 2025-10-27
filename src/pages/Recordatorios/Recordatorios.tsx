@@ -31,7 +31,7 @@ const Recordatorios: React.FC = () => {
           </IonButtons>
 
           <div className={`ion-padding ${styles.title}`}>
-            <IonTitle className="ion-text-center">
+            <IonTitle>
               {" "}
               Mis Recordatorios{" "}
             </IonTitle>

@@ -27,7 +27,7 @@ export const Audio: React.FC<any> = ({ network }) => {
 
   const { userEnabled, payment_status } = usePayment();
 
-  const audio = useLiveQuery( ( ) => db.audios.toCollection().first() );
+  const audio = useLiveQuery(() => db.audios.toCollection().first());
 
   const onConfirmAudio = async () => {
     try {
@@ -66,22 +66,24 @@ export const Audio: React.FC<any> = ({ network }) => {
             <span slot="end" className={`material-symbols-outlined $styles['trofeo-gris']`}>emoji_events</span>
           )}
         </IonItem>
-        <div className={styles['button-section']} slot="content">
+        <div className={` flex justify-end ${styles['button-section']}`} slot="content">
           {!userEnabled || payment_status == "free" ? (
             <IonButton
+              shape="round"
               onClick={() => setIsPremiumOpen(true)}
               expand="block"
               type="button"
-              className="ion-margin-top ion-padding-start ion-padding-end"
+              className="width50 ion-margin-top ion-padding-start ion-padding-end"
             >
               Premium
             </IonButton>
           ) : (
             <IonButton
+              shape="round"
               onClick={() => setIsOpen(true)}
               expand="block"
               type="button"
-              className="ion-margin-top ion-padding-start ion-padding-end"
+              className="width50 ion-margin-top ion-padding-start ion-padding-end"
               id="modal-noche"
             >
               Escuchar
@@ -101,10 +103,10 @@ export const Audio: React.FC<any> = ({ network }) => {
 
       <Modal
         isOpen={isPremiumOpen}
-        title={import.meta.env.VITE_NAME + " premium"}
         hideButtons={!network.status || audio?.done == 1 || false}
         showButtons={false}
-        onConfirm={() => {}}
+        modalHeight = "61vh"
+        onConfirm={() => { }}
         onWillDismiss={() => setIsPremiumOpen(false)}
       >
         <div className="ion-padding">

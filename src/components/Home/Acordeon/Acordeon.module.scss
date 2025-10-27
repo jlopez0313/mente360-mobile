@@ -11,40 +11,32 @@
         margin-top: 26px;
         box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.25);
     }
-    
-    .custom-accordion span{
+
+    .custom-accordion span {
         font-size: 40px;
     }
 
-    .title-accordion{
+    .title-accordion {
         display: flex;
         flex-direction: column;
         align-items: start;
         padding: 16px 16px 16px 30px;
     }
-    
-    .button-section{
+
+    .button-section {
         border-top: 1px solid #d9d9d9;
         padding-bottom: 16px;
     }
 
     ion-item {
         font-size: 1.1rem;
-                
-        ion-icon {
-            font-size: 1.6rem;
-            transition: none !important;
-            transform: none !important;
-            
-            
-            &.trofeo {
-                color: var(--color-main) !important;
-            }
 
-            &.trofeo-gris {
-                color: #8f8e8e !important;
-            }
+        .trofeo {
+            color: var(--color-main) !important;
         }
 
+        .trofeo-gris {
+            color: var(--ion-color) !important;
+        }
     }
 }

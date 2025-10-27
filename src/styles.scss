@@ -20,6 +20,7 @@
 
   --bg-main-gradient: linear-gradient(193.17deg, #FFB347 9.48%, #FFCC33 63.67%);
   --bg-white: #FFFFFF;
+  --bg-darkgray: #FFFFFF;
   --bg-green: #D2E5E1;
   --bg-p-secondary: #00BFA6;
   --bg-p-tertiary: #D2E5E1;
@@ -41,6 +42,7 @@
 
   --ion-color-primary: #ffc547;
   --ion-color: #78849A;
+  --bg-player: #78849A;
   --txt-black: #fff;
   --txt-darkgray: #3D3D3D;
   --color-divider: #E4E1E7;
@@ -49,6 +51,13 @@
   --fade-background-rgb: 255, 245, 236;
 
   --color-dark: #444 !important;
+  --bg-modal: #f5f5f5;
+  --bg-blue: #22D6F1;
+
+  --color-dark-green: #009688;
+  --blue-text-button: #0286B6;
+
+  --text-outline-button: #3D3D3D;
 
   --invert: 0;
 
@@ -72,6 +81,14 @@
   text-align: center;
 }
 
+.ion-right {
+  text-align: right;
+}
+
+.ion-left {
+  text-align: left;
+}
+
 :root.ion-palette-dark {
   --bg-secondary: #333;
   /* Color para el fondo en modo oscuro */
@@ -85,12 +102,14 @@ body {
 body.dark {
   
   --bg-white: #1E1E1E;
+  --bg-darkgray: #343434;
   --bg-green: #343434;
   --bg-p-secondary: #00BFA6;
   --bg-p-tertiary: #D2E5E1;
   --bg-card: #333;
   --bg-main: none;
-
+  --bg-player: #151515;
+  --ion-color-primary: #ffc547;
   --color-secondary-gradient: none;
 
   --bg-base: #6B768A;
@@ -110,7 +129,13 @@ body.dark {
   --invert: 100;
 
   --ion-backdrop-opacity: 0.6;
-  
+  --bg-modal: #2E2E2E;
+  --color-dark-green: #00BFA6;
+  --blue-text-button: #22D6F1;
+  --bg-blue: #22D6F1;
+
+  --text-outline-button: #FFD92D;
+
   ion-chip {
     --bg-main: #fff;
 
@@ -129,7 +154,6 @@ ion-header {
 
   ion-toolbar {
     padding-top: var(--ion-safe-area-top);
-    padding-bottom: 3px !important;
     min-height: 64px;
 
     color: var(--ion-color);
@@ -160,7 +184,7 @@ ion-header {
     font-size: 12px !important;
     font-weight: normal !important;
     text-align: left;
-    color: #1e1e1e !important;
+    color: #1e1e1e
   }
 
 .ion-accordion-toggle-icon {
@@ -172,7 +196,7 @@ ion-fab-button {
   --background: var(--color-main);
   text-transform: none !important;
   color: #1e1e1e;
-  --font-size: 14px;
+  font-size: 14px;
 }
 
 ion-datetime::part(calendar-day):focus {
@@ -208,6 +232,31 @@ p,
 span,
 input {
   color: var(--ion-color) !important;
+}
+
+ion-item {
+    --background: none;
+    --border-color: transparent !important; 
+
+    ion-label {
+        text-align: center;
+    }
+}
+
+ion-input,
+ion-select,
+input {
+  background: var(--bg-white) !important;
+  border: none !important;
+  --border-color: transparent; 
+  border-radius: 0px;
+}
+
+ion-select,
+.input-fill-outline{
+    --border-color: transparent !important; 
+    border-bottom: 1px solid var(--ion-color) !important;
+    border-radius: 0px !important;
 }
 
 .custom-action-sheet {
@@ -328,3 +377,96 @@ ion-popover::part(backdrop) {
   height: fit-content;
   margin-left: 8px;
 }
+
+
+.ion-text-left{
+  font-size: 12px !important;
+}
+
+.green-outline-button{
+  --background: inherit;
+  color: var(--color-dark-green);
+  --border-color: var(--color-dark-green) !important;
+}
+
+.green-solid-button{
+  --background: var(--color-dark-green);
+  color: #f5f5f5;
+  --border-color: var(--color-dark-green) !important;
+}
+
+.yellow-outline-button{
+  --background: inherit;
+  color: var(--text-outline-button);
+  --border-color: var(--color-main) !important;
+}
+
+.width50{
+  width: 50%;
+}
+
+.accept-button {
+  --background: #E1F0FB;      
+  color: #0084B4;   
+  --padding-start: 16px;
+  --padding-end: 16px;
+  font-weight: 600;
+}
+
+.share-button {
+  --background: #FEF17E;        /* azul */
+  --color: #3d3d3d;
+  font-weight: 600;
+
+  ion-icon{
+    color: #3d3d3d !important;
+  }
+}
+
+.close-button{
+  --background: none;
+  color: var(--blue-text-button);
+  --box-shadow: none;
+}
+
+.space-around{
+  justify-content: space-around;
+}
+
+.line-divider {
+        --background: transparent;
+        --inner-padding-end: 0;
+        --inner-padding-start: 0;
+        min-height: 1px;
+        border-bottom: 1px solid var(--color-divider) !important;
+        /* color y grosor de la línea */
+        margin-top: 0px;
+        margin-bottom: 10px;
+    }
+  
+.title-bold16{
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.checkbox-checked 
+{
+  --checkbox-background-checked: var(--color-main);
+  --border-color-checked: var(--color-main);
+  --checkmark-color: #ffffff;
+}
+
+.logodiv{
+    height: 350px;
+}
+
+.logoimg{
+    height: 150px;
+}
+
+.font12{
+  font-size: 12px;
+}
+
+
+

@@ -1,4 +1,5 @@
 import {
+  IonItemDivider,
   IonButton,
   IonButtons,
   IonContent,
@@ -20,18 +21,18 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const Test: React.FC = () => {
-  const { user } = useSelector( (state: any) => state.user);
+  
   const history = useHistory();
   const dispatch = useDispatch();
 
-  const { route } = useSelector((state: any)=> state.route);
+  const { route } = useSelector((state: any) => state.route);
 
   useEffect(() => {
 
     const handleBackButton = (ev: Event) => {
       ev.preventDefault();
       ev.stopPropagation();
-      history.replace( route );
+      history.replace(route);
     };
 
     document.addEventListener("ionBackButton", handleBackButton);
@@ -42,7 +43,7 @@ const Test: React.FC = () => {
   }, [history]);
 
   useEffect(() => {
-    dispatch( setShowGlobalAudio( false ) )
+    dispatch(setShowGlobalAudio(false))
   }, [])
 
   return (
@@ -58,18 +59,14 @@ const Test: React.FC = () => {
           </IonButtons>
 
           <div className={`ion-padding ${styles.title}`}>
-            <IonTitle className="ion-text-center">
-              {" "}
-              Hola, <strong className={styles.name}> {user.name} </strong>{" "}
+            <IonTitle >
+              Realizar Test Eneagrama
             </IonTitle>
           </div>
         </IonToolbar>
       </IonHeader>
 
       <IonContent className={`ion-padding ${styles["ion-content"]}`}>
-        <IonText className="ion-text-justify">
-          Por favor, realiza el test de eneagrama para conocer tu Eneatipo
-        </IonText>
         <TestComponent />
       </IonContent>
     </IonPage>
