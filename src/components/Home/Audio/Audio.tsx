@@ -108,12 +108,12 @@ export const Audio: React.FC<Props> = ({ audio, onConfirm }) => {
         onLoad={() => setIsLoading(false)}
       />
 
-      <IonCardHeader className="ion-no-padding">
+      <IonCardHeader className={`ion-no-padding ${styles.headerplayer}`}>
         <IonCardSubtitle className="ion-no-padding">
           {/*
             <IonText> &nbsp; </IonText>
           */}
-          <IonText> {audio?.titulo} </IonText>
+          <IonText> {audio?.titulo}</IonText>
           {/* 
             <IonIcon icon={shareSocial} />
           */}

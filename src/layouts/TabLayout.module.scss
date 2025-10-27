@@ -1,5 +1,8 @@
 ion-tab-bar {
     --background: var(--bg-white);
+    -webkit-box-shadow: 1px -4px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12);
+    box-shadow: 1px -4px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12);
+    --border: none;
     
     ion-tab-button {
         --ripple-color: var(--color-main);

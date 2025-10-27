@@ -75,6 +75,8 @@
         &.phone {
             line-height: 1rem;
             font-size: 13px;
+            background: var(--bg-white) !important;
+            border: none;
         }
     }
 }

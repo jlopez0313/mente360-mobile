@@ -1,6 +1,7 @@
-import Avatar from "@/assets/images/avatar.jpg";
+import Avatar from "@/assets/images/load-avatar.png";
 import { update } from "@/services/user";
 import {
+  IonItemDivider,
   IonAvatar,
   IonButton,
   IonChip,
@@ -47,13 +48,13 @@ export const Perfil = () => {
   const [presentAlert] = useIonAlert();
   const { userEnabled, payment_status } = usePayment();
 
-  const { user } = useSelector( (state: any) => state.user);
+  const { user } = useSelector((state: any) => state.user);
   const history = useHistory();
   const network = useNetwork();
 
   const [isLoading, setIsLoading] = useState(true);
   const [photo, setPhoto] = useState("");
-  const [usuario, setUsuario] = useState({...user});
+  const [usuario, setUsuario] = useState({ ...user });
   const [edad, setEdad] = useState(0);
   const generos = useLiveQuery(() => db.generos.toArray());
   const eneatipos = useLiveQuery(() => db.eneatipos.toArray());
@@ -134,7 +135,7 @@ export const Perfil = () => {
       const { data } = await update(usuario, user.id);
 
       dispatch(setUser(data.data));
-      setUsuario({...data.data});
+      setUsuario({ ...data.data });
 
       const obj = {
         name: data.data.name,
@@ -176,7 +177,7 @@ export const Perfil = () => {
     history.replace('/suscripcion');
   }
 
-  const getFechaVencimiento = ()=> {
+  const getFechaVencimiento = () => {
     return new Date(user.fecha_vencimiento).toLocaleDateString('es-ES', {
       year: 'numeric',
       month: '2-digit',
@@ -194,8 +195,8 @@ export const Perfil = () => {
   }, [usuario]);
 
   return (
-    <div className="">
-      <div>
+    <div>
+      <div className="flex justify-center">
         <IonItem lines="none">
           <input
             type="file"
@@ -204,7 +205,7 @@ export const Perfil = () => {
             onChange={onUploadImage}
             accept="image/png, image/jpeg"
           />
-          <IonAvatar slot="start">
+          <IonAvatar slot="start" className={styles.avatar}>
             {isLoading && (
               <IonSkeletonText
                 animated
@@ -222,37 +223,11 @@ export const Perfil = () => {
               onLoad={() => setIsLoading(false)}
             />
           </IonAvatar>
-          <IonLabel>
-            {usuario.name}
-            <br />
-            {usuario.email}
-          </IonLabel>
-          <span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span>
+
         </IonItem>
       </div>
 
-      {
-        userEnabled && payment_status != 'free' ?
-          <div 
-            className={`ion-margin-top ion-margin-bottom ion-text-center ${styles['premium']}`}
-            onClick={goToSuscripcion}
-          >
-            <div style={{display: 'flex', flexDirection: 'column', alignItems: 'baseline'}}>
-              <span style={{fontWeight: 'bold'}}>{import.meta.env.VITE_NAME} PREMIUM</span>
-              <span>Vence el: { getFechaVencimiento() }</span>
-            </div>
-            <div>
-              <span className={styles['detalle']}>Ver Detalles</span>
-            </div>
-          </div>
-          :
-
-          <div className={`ion-margin-top ion-margin-bottom ion-text-center`}>
-            <IonButton onClick={goToPlanes}> Unete a {import.meta.env.VITE_NAME} PREMIUM </IonButton>
-          </div>
-      }
-
-      <div className={`ion-margin-top ion-margin-bottom ${styles.profile}`}>
+      <div className={`ion-margin-top ion-margin-bottom ${styles.profile} ${styles.paddinginfo}`}>
         <div className={styles.info}>
           <IonChip outline={true}>{edad || "00"}</IonChip>
           <IonNote>
@@ -260,7 +235,7 @@ export const Perfil = () => {
             <strong> Edad </strong>{" "}
           </IonNote>
         </div>
-        <div className={styles.info}>
+        <div className={`${styles.info} ${styles.borderchip}`}>
           <IonChip outline={true} className="ion-padding-start ion-padding-end">
             {usuario.eneatipo || "-"}
           </IonChip>
@@ -278,6 +253,40 @@ export const Perfil = () => {
         </div>
       </div>
 
+      {
+        userEnabled && payment_status != 'free' ?
+          <div
+            className={`ion-margin-top ion-margin-bottom ion-text-center ${styles['premium']}`}
+            onClick={goToSuscripcion}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'baseline' }}>
+              <span style={{ fontWeight: 'bold' }}>{import.meta.env.VITE_NAME} PREMIUM</span>
+              <span>Vence el: {getFechaVencimiento()}</span>
+            </div>
+            <div>
+              <span className={styles['detalle']}>Ver Detalles</span>
+            </div>
+          </div>
+          :
+
+          <div className={`ion-margin-top ion-margin-bottom ion-text-center`}>
+            <IonButton className="green-solid-button" onClick={goToPlanes} expand="block">Unete a {import.meta.env.VITE_NAME} PREMIUM </IonButton>
+          </div>
+      }
+
+      <IonItemDivider className="line-divider"></IonItemDivider>
+
+      <IonItem slot="header" lines="none">
+        <span className="material-symbols-outlined">info</span>
+        <IonLabel className={styles.detailinfo}>Tu información personal permanecerá privada y no podrá ser vista por otros. Solo tú tendrás acceso a ella
+        </IonLabel>
+      </IonItem>
+
+      <div className={styles.titlemargin}>
+        <IonLabel className="title-bold16">Datos Generales
+        </IonLabel>
+      </div>
+
       <IonInput
         labelPlacement="stacked"
         fill="outline"
@@ -285,27 +294,10 @@ export const Perfil = () => {
         className={`ion-margin-bottom ${styles.profile}`}
         value={usuario.name}
         onIonInput={(e) => onSetUser("name", e.target.value)}
-      ></IonInput>
+      >
+        <span slot="start" className="material-symbols-outlined">person</span>
 
-      <PhoneInput
-        defaultCountry={usuario.country}
-        className={`ion-margin-bottom ${styles.phone}`}
-        placeholder="Teléfono"
-        value={usuario.phone}
-        onChange={(e) => onSetUser("phone", e)}
-        onCountryChange={(e) => onSetUser("country", e)}
-        initialValueFormat="national"
-        inputFormat="NATIONAL"
-      />
-
-      <IonInput
-        labelPlacement="floating"
-        fill="outline"
-        placeholder="Correo Electrónico"
-        className={`ion-margin-bottom ${styles.profile}`}
-        value={usuario.email}
-        readonly={true}
-      ></IonInput>
+      </IonInput>
 
       <IonInput
         id="open_cal"
@@ -314,7 +306,9 @@ export const Perfil = () => {
         placeholder="Fecha de Nacimiento"
         value={usuario.fecha_nacimiento}
         className={`ion-margin-bottom ${styles.profile}`}
-      ></IonInput>
+      >
+        <span slot="start" className="material-symbols-outlined">calendar_month</span>
+      </IonInput>
 
       <IonModal
         className={styles["date-modal"]}
@@ -345,6 +339,8 @@ export const Perfil = () => {
         compareWith={compareWithFn}
         onIonChange={(e) => onSetUser("genero", e.target.value)}
       >
+        <span slot="start" className="material-symbols-outlined">transgender</span>
+
         {generos?.map((item: any, idx: any) => {
           return (
             <IonSelectOption key={idx} value={item.key}>
@@ -365,6 +361,8 @@ export const Perfil = () => {
         compareWith={compareWithFn}
         onIonChange={(e) => onSetUser("eneatipo", e.target.value)}
       >
+        <span slot="start" className="material-symbols-outlined">sell</span>
+
         {eneatipos?.map((item: any, idx: any) => {
           return (
             <IonSelectOption key={idx} value={item.key}>
@@ -375,28 +373,53 @@ export const Perfil = () => {
         })}
       </IonSelect>
 
-      <IonGrid>
-        <IonRow>
-          <IonCol size="6" class="ion-no-padding">
-            <Link to="/home" replace={true}>
-              <IonButton expand="block">Cancelar</IonButton>
-            </Link>
-          </IonCol>
-          <IonCol size="6" class="ion-no-padding">
-            <IonButton
-              expand="block"
-              onClick={onUpdateUser}
-              disabled={
-                !network.status ||
-                !usuario.phone ||
-                (usuario.phone && !isPossiblePhoneNumber(usuario.phone))
-              }
-            >
-              Guardar
-            </IonButton>
-          </IonCol>
-        </IonRow>
-      </IonGrid>
+      <IonItemDivider className="line-divider"></IonItemDivider>
+      <div className={styles.titlemargin}>
+        <IonLabel className="title-bold16">Datos De Contacto
+        </IonLabel>
+      </div>
+
+      <IonInput
+        labelPlacement="floating"
+        fill="outline"
+        placeholder="Correo Electrónico"
+        className={`ion-margin-bottom ${styles.profile}`}
+        value={usuario.email}
+        readonly={true}
+      >
+        <span slot="start" className="material-symbols-outlined">mail</span>
+      </IonInput>
+
+      <PhoneInput
+        defaultCountry={usuario.country}
+        className={`ion-margin-bottom ${styles.phone}`}
+        placeholder="Teléfono"
+        value={usuario.phone}
+        onChange={(e) => onSetUser("phone", e)}
+        onCountryChange={(e) => onSetUser("country", e)}
+        initialValueFormat="national"
+        inputFormat="NATIONAL"
+      />
+      <br></br>
+      <div className="ion-no-padding">
+        <IonButton
+          className={styles.titlemargin}
+          shape="round"
+          expand="block"
+          onClick={onUpdateUser}
+          disabled={
+            !network.status ||
+            !usuario.phone ||
+            (usuario.phone && !isPossiblePhoneNumber(usuario.phone))
+          }
+        >
+          Guardar
+        </IonButton>
+
+        <Link to="/home" replace={true}>
+          <IonButton fill="outline" className="yellow-outline-button" shape="round" expand="block">Volver</IonButton>
+        </Link>
+      </div>
     </div>
   );
 };

@@ -1,4 +1,5 @@
 import {
+  IonLabel,
   IonContent,
   IonPage,
   IonSegmentButton
@@ -19,17 +20,30 @@ const Reset: React.FC = () => {
   useEffect(() => {
     dispatch(setGlobalAudio(""));
   }, []);
-  
+
   return (
     <IonPage>
       <IonContent className={`ion-text-center ${styles["ion-content"]}`}>
+
+        <div className={`flex justify-center items-center ${styles.logodiv}`}>
+          <img
+            src="assets/images/logo.png"
+            className={`${styles.logoimg}`}
+          />
+        </div>
+
         
-        <img src="assets/images/logo.png" className="ion-text-center ion-margin-top" />
 
         <div className={`ion-padding ${styles.content}`}>
-          <div className="ion-text-center">
-            <IonSegmentButton>Recuperar Contraseña</IonSegmentButton>        
-          </div>
+          <div className={`ion-left ${styles.titlelogin}`}>
+          <IonLabel>¿Olvidaste tu contraseña?
+          </IonLabel>
+        </div>
+
+        <div className={`ion-left ${styles.subtitlelogin}`}>
+          <IonLabel>Proporciona tu correo y te enviaremos un enlace para restaurar tu contraseña
+          </IonLabel>
+        </div>
           <ResetComponent />
         </div>
       </IonContent>

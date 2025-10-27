@@ -1,4 +1,6 @@
 import {
+  IonLabel,
+  IonItem,
   IonButton,
   IonCard,
   IonCardContent,
@@ -41,9 +43,12 @@ export const Login = () => {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-  
+
   const goToResetPwd = () => {
     history.replace("/reset");
+  }
+  const goToRegister = () => {
+    history.replace("/register");
   }
 
   const doLogin = async (evt: any) => {
@@ -161,54 +166,69 @@ export const Login = () => {
     <IonGrid class="ion-text-center">
       <IonRow>
         <IonCol size="12" class="ion-no-padding">
-          <IonCard className={`ion-no-padding`}>
-            <IonCardContent>
-              <IonInput
-                className={`ion-margin-bottom ${styles.login}`}
-                type="email"
-                labelPlacement="stacked"
-                placeholder="Correo"
-                fill="outline"
-                onIonInput={(evt: any) => setEmail(evt.target.value)}
-              ></IonInput>
 
-              <IonInput
-                className={`ion-margin-bottom ${styles.login}`}
-                type={showPassword ? "text" : "password"}
-                labelPlacement="stacked"
-                placeholder="Contraseña"
-                fill="outline"
-                onIonInput={(evt: any) => setPassword(evt.target.value)}
-              >
-                <IonIcon
-                  icon={showPassword ? eyeOff : eye}
-                  slot="end"
-                  onClick={togglePasswordVisibility}
-                  style={{ cursor: "pointer" }}
-                />
-              </IonInput>
+          <div className={`ion-left ${styles.titlelogin}`}>
+            <IonLabel>Iniciar Sesión
+            </IonLabel>
+          </div>
 
-              <IonButton
-                type="button"
-                className="ion-margin-top ion-margin-bottom"
-                expand="block"
-                disabled={!email || !password}
-                onClick={doLogin}
-              >
-                {" "}
-                Acceder{" "}
-              </IonButton>
+          <div className={`ion-left ${styles.subtitlelogin}`}>
+            <IonLabel>¿No tienes una cuenta?
+            </IonLabel> 
+            <IonNote className={styles.buttonlink}
+              onClick={goToRegister}
+            >Regístrate</IonNote>
+          </div>
 
-              <IonNote
-                onClick={goToResetPwd}
-                >Recuperar Contraseña</IonNote>
+          <IonInput
+            className={`ion-margin-bottom  ${styles.login}`}
+            type="email"
+            labelPlacement="stacked"
+            placeholder="Correo"
+            fill="outline"
+            onIonInput={(evt: any) => setEmail(evt.target.value)}
+          >
+          </IonInput>
 
-              <IonLoading
-                message="Dismissing after 3 seconds..."
-                duration={3000}
-              />
-            </IonCardContent>
-          </IonCard>
+          <IonInput
+            className={`ion-margin-bottom ${styles.login}`}
+            type={showPassword ? "text" : "password"}
+            labelPlacement="stacked"
+            placeholder="Contraseña"
+            fill="outline"
+            onIonInput={(evt: any) => setPassword(evt.target.value)}
+          >
+            <IonIcon
+              icon={showPassword ? eyeOff : eye}
+              slot="end"
+              onClick={togglePasswordVisibility}
+              style={{ cursor: "pointer" }}
+            />
+          </IonInput>
+
+<br></br>
+          <IonButton
+            shape="round"
+            type="button"
+            className="ion-margin-top ion-margin-bottom"
+            expand="block"
+            disabled={!email || !password}
+            onClick={doLogin}
+          >
+            {" "}
+            Acceder{" "}
+          </IonButton>
+
+          <div className="ion-right">
+            <IonNote className={`${styles.buttonlink}`}
+              onClick={goToResetPwd}
+            >¿Olvidaste tu contraseña?</IonNote>
+          </div>
+
+          <IonLoading
+            message="Dismissing after 3 seconds..."
+            duration={3000}
+          />
           {/* 
             <IonLabel>O ingresa con </IonLabel> <br />
             <br />

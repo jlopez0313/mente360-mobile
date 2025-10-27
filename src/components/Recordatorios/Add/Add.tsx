@@ -1,5 +1,6 @@
 import { create } from "@/services/alarmas";
 import {
+  IonItemDivider,
   IonButton,
   IonChip,
   IonCol,
@@ -48,7 +49,7 @@ export const Add = () => {
       if (item.selected) newArray.push(index + 1);
       return newArray;
     }, []);
-    
+
     const dataNotification = {
       title: titulo,
       days: selectedIndexes.map((i: number) => i - 1),
@@ -73,12 +74,14 @@ export const Add = () => {
         onIonInput={(e) => setTitulo(e.target.value)}
       ></IonInput>
 
-      <IonItem lines="none">
+      <IonItemDivider className="line-divider"></IonItemDivider>
+
+      <IonItem lines="none" className={styles.section}>
         <IonIcon icon={timeOutline} slot="start" />
         <IonLabel className="ion-text-justify">Hora</IonLabel>
       </IonItem>
 
-      <IonItem lines="none" className={styles["picker"]}>
+      <IonItem mode="md" lines="none" className={styles["picker"]}>
         <IonPicker>
           <IonPickerColumn
             value={hora}
@@ -92,7 +95,7 @@ export const Add = () => {
           </IonPickerColumn>
         </IonPicker>
 
-        <IonPicker>
+        <IonPicker className={styles.picker}>
           <IonPickerColumn
             value={mins}
             onIonChange={({ detail }) => setMins(detail.value)}
@@ -105,8 +108,10 @@ export const Add = () => {
           </IonPickerColumn>
         </IonPicker>
       </IonItem>
+      <br></br>
+      <IonItemDivider className="line-divider"></IonItemDivider>
 
-      <IonItem lines="none">
+      <IonItem lines="none" className={styles.section}>
         <IonIcon icon={repeatOutline} slot="start" />
         <IonLabel className="ion-text-justify">Repetir</IonLabel>
       </IonItem>
@@ -118,7 +123,7 @@ export const Add = () => {
               <IonChip
                 key={key}
                 outline={true}
-                className={day.selected ? styles["day-selected"] : ""}
+                className={day.selected ? styles.dayselected : ""}
                 onClick={() => onToggleDay(key)}
               >
                 {day.day}
@@ -130,19 +135,21 @@ export const Add = () => {
 
       <IonGrid className="ion-padding-top">
         <IonRow>
-          <IonCol size="6" class="ion-no-padding">
-            <Link to="/recordatorios" replace={true}>
-              <IonButton expand="block">Cancelar</IonButton>
-            </Link>
-          </IonCol>
-          <IonCol size="6" class="ion-no-padding">
+          <IonCol class="ion-no-padding">
+
             <IonButton
+              shape="round"
               expand="block"
               onClick={onCreate}
               disabled={!titulo || !days.some((x: any) => x.selected)}
             >
               Guardar
             </IonButton>
+            <br></br>
+            <Link to="/recordatorios" replace={true}>
+              <IonButton fill="outline" className="yellow-outline-button" shape="round" expand="block">Cancelar</IonButton>
+            </Link>
+
           </IonCol>
         </IonRow>
       </IonGrid>

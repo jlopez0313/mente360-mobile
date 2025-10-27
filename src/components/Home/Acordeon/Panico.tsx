@@ -25,11 +25,11 @@ import { Texto } from "../Texto/Texto";
 import panico from "/assets/icons/panico.svg";
 
 export const Panico: React.FC<any> = ({ network }) => {
-  const { user } = useSelector( (state: any) => state.user);
+  const { user } = useSelector((state: any) => state.user);
   const history = useHistory();
   const dispatch = useDispatch()
   const [present, dismiss] = useIonLoading();
-  
+
   const { userEnabled, payment_status } = usePayment();
 
   const [sos, setSOS] = useState<any>({});
@@ -84,22 +84,24 @@ export const Panico: React.FC<any> = ({ network }) => {
           </div>
           <IonText style={{ width: "20px" }}></IonText>
         </IonItem>
-        <div className={styles['button-section']} slot="content">
+        <div className={` flex justify-end ${styles['button-section']}`} slot="content">
           {
             !userEnabled || payment_status == 'free' ?
               <IonButton
+                shape="round"
                 onClick={() => setIsPremiumOpen(true)}
                 expand="block"
                 type="button"
-                className="ion-margin-top ion-padding-start ion-padding-end"
+                className="width50 ion-margin-top ion-padding-start ion-padding-end"
               >
                 Premium
               </IonButton> :
               <IonButton
+                shape="round"
                 disabled={!network.status}
                 expand="block"
                 type="button"
-                className="ion-margin-top ion-padding-start ion-padding-end"
+                className="width50 ion-margin-top ion-padding-start ion-padding-end"
                 id="modal-panico"
                 onClick={onGetSos}
               >
@@ -112,9 +114,8 @@ export const Panico: React.FC<any> = ({ network }) => {
 
       <Modal
         trigger=""
-        title="S.O.S emocional"
+        modalHeight = "61vh"
         showButtons={false}
-        style={{ "--height": "90%" }}
         onWillDismiss={() => onCloseModal()}
         isOpen={isOpen}
       >
@@ -142,10 +143,10 @@ export const Panico: React.FC<any> = ({ network }) => {
 
       <Modal
         isOpen={isPremiumOpen}
-        title={import.meta.env.VITE_NAME + " premium"}
+        modalHeight = "61vh"
         hideButtons={!network.status || false}
         showButtons={false}
-        onConfirm={() => {}}
+        onConfirm={() => { }}
         onWillDismiss={() => setIsPremiumOpen(false)}
       >
         <div className="ion-padding">

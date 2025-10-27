@@ -1,4 +1,5 @@
 import {
+
   IonButton,
   IonCard,
   IonCardContent,
@@ -17,6 +18,7 @@ import { reset } from "@/services/auth";
 
 import { useState } from "react";
 import { useHistory } from "react-router";
+import { Link } from "react-router-dom";
 
 export const Reset = () => {
   const history = useHistory();
@@ -38,7 +40,7 @@ export const Reset = () => {
         message: "Cargando ...",
       });
 
-      const {data: {message} } = await reset({
+      const { data: { message } } = await reset({
         email,
       });
 
@@ -71,36 +73,38 @@ export const Reset = () => {
     <IonGrid class="ion-text-center">
       <IonRow>
         <IonCol size="12" class="ion-no-padding">
-          <IonCard className={`ion-no-padding`}>
-            <IonCardContent>
-              <IonInput
-                className={`ion-margin-bottom ${styles.login}`}
-                type="email"
-                labelPlacement="stacked"
-                placeholder="Correo"
-                fill="outline"
-                onIonInput={(evt: any) => setEmail(evt.target.value)}
-              ></IonInput>
 
-              <IonButton
-                type="button"
-                className="ion-margin-top ion-margin-bottom"
-                expand="block"
-                disabled={!email}
-                onClick={doReset}
-              >
-                {" "}
-                Enviar{" "}
-              </IonButton>
+          <IonInput
+            className={`ion-margin-bottom ${styles.login}`}
+            type="email"
+            labelPlacement="stacked"
+            placeholder="Correo"
+            fill="outline"
+            onIonInput={(evt: any) => setEmail(evt.target.value)}
+          ></IonInput>
 
-              <IonNote onClick={goToLogin}>Regresar</IonNote>
+          <br></br>
 
-              <IonLoading
-                message="Dismissing after 3 seconds..."
-                duration={3000}
-              />
-            </IonCardContent>
-          </IonCard>
+          <IonButton
+            shape="round"
+            type="button"
+            className="ion-margin-top ion-margin-bottom"
+            expand="block"
+            disabled={!email}
+            onClick={doReset}
+          >
+            {" "}
+            Enviar{" "}
+          </IonButton>
+
+          <Link to="/home" replace={true}>
+            <IonButton fill="outline" className="yellow-outline-button" shape="round" expand="block">Volver</IonButton>
+          </Link>
+
+          <IonLoading
+            message="Dismissing after 3 seconds..."
+            duration={3000}
+          />
         </IonCol>
       </IonRow>
     </IonGrid>

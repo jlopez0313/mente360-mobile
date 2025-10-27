@@ -10,7 +10,7 @@ import React from "react";
 import { useHistory } from "react-router";
 import styles from "./Acordeon.module.scss";
 
-import { shareSocialOutline, trophy } from "ionicons/icons";
+import { shareSocialOutline } from "ionicons/icons";
 import mensajeIcon from "/assets/icons/mensaje.svg";
 
 import { Modal } from "@/components/Shared/Modal/Modal";
@@ -20,10 +20,10 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { useDispatch } from "react-redux";
 import { Texto } from "../Texto/Texto";
 
-export const Mensaje: React.FC<any> = ({network}) => {
+export const Mensaje: React.FC<any> = ({ network }) => {
   const dispatch = useDispatch();
   const history = useHistory();
-  const mensaje = useLiveQuery( ( ) => db.mensajes.toCollection().first() )
+  const mensaje = useLiveQuery(() => db.mensajes.toCollection().first())
 
   const [presentAlert] = useIonAlert();
 
@@ -58,16 +58,17 @@ export const Mensaje: React.FC<any> = ({network}) => {
             <IonLabel className="ion-no-padding subtitle-accordion">Un recordatorio de tu fortaleza.</IonLabel>
           </div>
           {mensaje?.done ? (
-            <span slot="end" className={`material-symbols-outlined $styles['trofeo']`}>emoji_events</span>
+            <span slot="end" className={`material-symbols-outlined ${styles.trofeo}`}>emoji_events</span>
           ) : (
-            <span slot="end" className={`material-symbols-outlined $styles['trofeo-gris']`}>emoji_events</span>
+            <span slot="end" className={`material-symbols-outlined ${styles['trofeo-gris']}`}>emoji_events</span>
           )}
         </IonItem>
-        <div className={styles['button-section']} slot="content">
+        <div className={` flex justify-end ${styles['button-section']}`} slot="content">
           <IonButton
+            shape="round"
             expand="block"
             type="button"
-            className="ion-margin-top ion-padding-start ion-padding-end"
+            className="width50 ion-margin-top ion-padding-start ion-padding-end"
             id="modal-comentario"
             onClick={onSetSource}
           >
@@ -79,26 +80,22 @@ export const Mensaje: React.FC<any> = ({network}) => {
       <Modal
         trigger="modal-comentario"
         title="Mensaje del día"
+        modalHeight="25vh"
         hideButtons={!network.status || mensaje?.done == 1 || false}
         onConfirm={() => onConfirmMensaje()}
+        extraButtons=
+        {mensaje?.done == 1 ? [
+          {
+            text: "Compartir",
+            icon: shareSocialOutline,
+            iconSlot: "start",
+            className: "share-button",
+            onClick: () =>
+              history.replace("/share"),
+          }
+        ] : []}
       >
         <Texto descripcion={mensaje?.mensaje || ""}>
-          <img
-            src="assets/images/logo_texto.png"
-            style={{ width: "90px", display: "block", margin: "10px auto" }}
-          />
-          <IonIcon
-            icon={shareSocialOutline}
-            style={{
-              fontSize: "2rem",
-              width: "90px",
-              display: "block",
-              margin: "15px auto",
-            }}
-            onClick={() => {
-              history.replace("/share");
-            }}
-          />
         </Texto>
       </Modal>
     </>

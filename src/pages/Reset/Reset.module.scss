@@ -9,10 +9,7 @@
 
     box-shadow: none !important;
     -webkit-box-shadow: none !important;
-
-    .content {
-        background: initial;
-    }
+    background: var(--bg-content);
     
     ion-segment-button {
         text-transform: capitalize;
@@ -21,4 +18,17 @@
         color: var(--color);
         --indicator-color: var(--color-main);
     }
+}
+
+
+.titlelogin{
+    font-size: 24px;
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+
+.subtitlelogin{
+    font-size: 12px;
+    font-weight: normal;
+    margin-bottom: 20px;
 }

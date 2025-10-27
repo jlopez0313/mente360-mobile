@@ -2,14 +2,18 @@
 @import "@/styles.scss";
 
 .premium {
-    background-color: var(--bg-main);
+    background-color: var(--bg-blue);
     border-radius: 5px;
 
     font-size: 13px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 5px 15px;
+    padding: 10px 15px;
+
+    span{
+        color: #0286b6 !important;
+    }
 }
 
 .detalle {
@@ -27,23 +31,14 @@
     overflow: hidden;
 }
 
-ion-item {
-    --background: none;
-
-    ion-label {
-        text-align: center;
-    }
-}
-
 div.phone {
     border-radius: 0;
-    --border-color: var(--bg-main);
-    border: 1px solid var(--ion-background-color-step-300, #b3b3b3);
     padding: 16px !important;
+    background: var(--bg-white) !important;
+    min-height: 56px;
+    border-bottom: 1px solid var(--ion-color);
 
     input {
-        background: none;
-        border: none;
         margin-left: 5px;
 
         &:focus {
@@ -55,7 +50,8 @@ div.phone {
 .profile {
     display: flex;
     justify-content: left;
-
+    background: var(--bg-white);
+    
     .info {
         display: flex;
         flex-direction: column;
@@ -63,9 +59,35 @@ div.phone {
         width: 100%;
 
         ion-chip {
-            @include base-ion-item(3px);
+            color: var(--bg-primary);
+            border: none;
+            font-weight: bold;
+            font-size: 16px;
+            margin-top: -2px;
+            margin-bottom: -2px;
         }
+
+        ion-note{
+            font-weight: normal;
+            font-size: 12px;
+            color: var(--ion-color);
+        }
+
     }
+}
+
+.paddinginfo{
+    padding: 8px;
+}
+
+.borderchip{
+    border-left: 1px solid #E1E6EB;
+    border-right: 1px solid #E1E6EB;
+}
+
+.avatar{
+    width: 90px;
+    height: fit-content;
 }
 
 ion-input.profile,
@@ -83,4 +105,15 @@ ion-select.profile {
     --width: 90%;
     --border-radius: 5px;
     --box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+.detailinfo{
+    text-align: justify;
+    font-size: 12px !important;
+    margin-left: 10px;
+}
+
+.titlemargin{
+    margin-bottom: 15px;
+    margin-top: 10px;
 }

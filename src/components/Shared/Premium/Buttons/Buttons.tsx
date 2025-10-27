@@ -40,23 +40,24 @@ export const Buttons = () => {
   return (
     <div className={`${styles["content"]}`}>
       <IonButton
+        shape="round"
         className={`ion-margin-bottom ${styles["all-planes"]}`}
         onClick={goToDetalle}
       >
         Ver todos los planes
       </IonButton>
 
-      {user.fecha_vencimiento ? null : (
+      {/* {user.fecha_vencimiento ? null : ( */}
         <>
           <IonText className="ion-text-center ion-margin-bottom">
             O también puedes
           </IonText>
 
-          <IonButton disabled={!network.status} onClick={onStartFreeTrial}>
+          <IonButton fill="outline" className="green-outline-button" shape="round" disabled={!network.status} onClick={onStartFreeTrial}>
             Comenzar tu prueba gratuita por 15 días
           </IonButton>
         </>
-      )}
+      {/* )} */}
     </div>
   );
 };

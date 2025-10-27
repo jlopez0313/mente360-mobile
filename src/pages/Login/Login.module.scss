@@ -8,12 +8,7 @@
 
     box-shadow: none !important;
     -webkit-box-shadow: none !important;
-
-    
-
-    .content {
-        background: initial;
-    }
+    background: var(--bg-content);
     
     ion-segment-button {
         text-transform: capitalize;
