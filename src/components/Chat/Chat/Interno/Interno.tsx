@@ -164,7 +164,7 @@ export const Interno: React.FC<any> = ({ usuario, roomID }) => {
       </IonList>
 
       <IonRow className={styles["chatbox"]}>
-        <IonCol size="10">
+        <IonCol size="10" className={styles["border-radius-left"]} >
           <IonItem lines="none" className={styles['reply']}>
             <div className={styles["wrapper"]}>
               {replyTo && (
@@ -190,8 +190,8 @@ export const Interno: React.FC<any> = ({ usuario, roomID }) => {
               />
             </div>
           </IonItem>
-        </IonCol>
-        <IonCol size="2">
+        </IonCol >
+        <IonCol size="2" className={styles["border-radius-right"]} >
           <IonButton disabled={!mensaje} onClick={onSendMessage}>
             <span className="material-symbols-outlined">send</span>
           </IonButton>

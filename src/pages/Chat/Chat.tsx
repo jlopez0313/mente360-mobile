@@ -84,7 +84,7 @@ const Chat: React.FC = () => {
             <IonTitle size="large">Notifications</IonTitle>
           </IonToolbar>
         </IonHeader>
-
+<div className="bg-segment-buttons">
         <IonSegment value={tab} onIonChange={onSetTab}>
           <IonSegmentButton
             value="chat"
@@ -121,7 +121,7 @@ const Chat: React.FC = () => {
             </div>
           </IonSegmentButton>
         </IonSegment>
-
+</div>
         {(() => {
           if (tab == "chat") return <ChatComponent />;
           else if (tab == "comunidad") return <ComunidadComponent />;

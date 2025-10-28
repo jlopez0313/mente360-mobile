@@ -1,4 +1,5 @@
 import {
+  IonItemDivider,
   IonChip,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
@@ -91,8 +92,8 @@ export const Clips = () => {
   };
 
   useEffect(() => {
-    if ( globalPos == (clips?.length ?? 1) - 1 && hasMore) {
-      setPage( page + 1)
+    if (globalPos == (clips?.length ?? 1) - 1 && hasMore) {
+      setPage(page + 1)
     }
 
   }, [globalPos]);
@@ -128,13 +129,14 @@ export const Clips = () => {
           </div>
 
           <IonSearchbar
-            className={`ion-no-padding ion-margin-bottom ${styles["search"]}`}
+            className={`ion-no-padding ion-margin-bottom `}
             placeholder="Buscar..."
             color="warning"
             debounce={1000}
             onIonInput={(ev) => handleSearchChange(ev.detail.value!)}
           ></IonSearchbar>
         </div>
+        <IonItemDivider className={styles["line-divider"]}></IonItemDivider>
 
         <IonList className="ion-no-padding ion-margin-bottom" lines="none">
           {clips?.map((item: any, idx: any) => {

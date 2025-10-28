@@ -1,12 +1,11 @@
 @import "@/styles.scss";
 @import "@/styles.scss";
 
-.ion-content { 
+.ion-content {
     .chips {
-        
-        
+
         .chip-list {
-            
+
             display: flex;
             overflow-x: auto;
             white-space: nowrap;
@@ -21,14 +20,14 @@
                 font-size: 11px;
                 font-weight: 400;
                 padding: 5px 10px;
-        
+
                 &.checked {
                     background: var(--color-main);
                     color: var(--color-dark);
                 }
             }
         }
-    
+
 
         ion-searchbar {
             @include searchbar-style;
@@ -38,13 +37,20 @@
     ion-list {
         background: transparent;
         --background: transparent;
-        
+
         ion-item {
             @include base-ion-item(5px, var(--bg-white));
             box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.25);
+            border-radius: 0px;
 
             &.current-playing {
-                background-color: var(--bg-primary);
+                background-color: var(--bg-p-secondary);
+
+                ion-icon,
+                ion-label,
+                span {
+                    color: #ffffff !important;
+                }
             }
 
             ion-avatar {
@@ -56,7 +62,7 @@
                     left: 38px;
                 }
             }
-    
+
             .titulo {
                 font-size: 14px;
 
@@ -70,7 +76,8 @@
                 font-size: .7rem;
             }
 
-            .titulo, .categoria {
+            .titulo,
+            .categoria {
                 line-height: 14px;
             }
 
@@ -84,7 +91,7 @@
             }
         }
     }
-    
+
     .my-action-sheet {
         --color: red;
     }

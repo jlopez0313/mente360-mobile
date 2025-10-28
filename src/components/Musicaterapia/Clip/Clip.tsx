@@ -116,8 +116,8 @@ export const Clip = () => {
     getDownloadedAudio,
   } = useAudio(
     audioRef,
-    () => {},
-    () => {}
+    () => { },
+    () => { }
   );
 
   const onPresentToast = (
@@ -149,7 +149,7 @@ export const Clip = () => {
         }
       );
 
-      if(!ruta) {
+      if (!ruta) {
         throw new Error("No se pudo descargar el audio");
       }
 
@@ -185,7 +185,7 @@ export const Clip = () => {
 
   const onRemoveLocal = async () => {
     await deleteAudio(globalAudio.audio_local);
-    
+
     await db.clips.update(globalAudio.id, {
       imagen_local: '',
       audio_local: '',
@@ -469,6 +469,17 @@ export const Clip = () => {
               </IonChip>
 
               <IonChip
+                disabled={!network.status}
+                onClick={() => onShareLink(globalAudio.id)}
+              >
+                <IonIcon
+                  className={`${styles["share-icon"]}`}
+                  icon={shareSocial}
+                />
+                Compartir
+              </IonChip>
+
+              <IonChip
                 disabled={!network.status && !globalAudio.audio_local}
                 onClick={() =>
                   globalAudio.audio_local ? onRemoveLocal() : onDownload()
@@ -483,16 +494,7 @@ export const Clip = () => {
                 {globalAudio.audio_local ? "Eliminar" : "Descargar"}
               </IonChip>
 
-              <IonChip
-                disabled={!network.status}
-                onClick={() => onShareLink(globalAudio.id)}
-              >
-                <IonIcon
-                  className={`${styles["share-icon"]}`}
-                  icon={shareSocial}
-                />
-                Compartir
-              </IonChip>
+
             </div>
           </IonCardSubtitle>
         </IonCardHeader>
@@ -512,11 +514,11 @@ export const Clip = () => {
           </div>
 
           <div className={`${styles.controls}`}>
-            <IonIcon
-              onClick={goToPrev}
-              className={styles.previous}
-              icon={playSkipBack}
-            ></IonIcon>
+
+
+            <span onClick={goToPrev} className={` material-symbols-outlined filled ${styles.previous}`}>
+              skip_previous
+            </span>
 
             <div className={`${styles.play}`}>
               {isPlaying ? (
@@ -526,11 +528,9 @@ export const Clip = () => {
               )}
             </div>
 
-            <IonIcon
-              onClick={goToNext}
-              className={styles.next}
-              icon={playSkipForward}
-            ></IonIcon>
+            <span onClick={goToNext} className={` material-symbols-outlined filled ${styles.next}`}>
+              skip_next
+            </span>
           </div>
           <audio
             ref={audioRef}

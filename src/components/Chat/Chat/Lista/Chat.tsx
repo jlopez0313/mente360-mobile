@@ -1,5 +1,5 @@
 import { getArrayData, getData } from "@/services/realtime-db";
-import { IonItemGroup, IonList, IonSearchbar } from "@ionic/react";
+import { IonItemDivider, IonItemGroup, IonList, IonSearchbar } from "@ionic/react";
 import { useEffect, useState } from "react";
 
 import { setRoom } from "@/store/slices/notificationSlice";
@@ -64,6 +64,8 @@ export const Chat = () => {
             color="warning"
             onIonInput={(e: any) => onSearchUser(e.target.value)}
           ></IonSearchbar>
+
+          <IonItemDivider className={styles["line-divider"]}></IonItemDivider>
 
           {filteredUsers.map((usuario, idx) => {
             return usuario && <Item key={idx} usuario={usuario} />;

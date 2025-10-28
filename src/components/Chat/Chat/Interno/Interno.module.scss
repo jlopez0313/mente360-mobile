@@ -47,6 +47,16 @@
     display: flex;
     flex-direction: column;
 
+    .border-radius-left {
+        border-top-left-radius: 5px;
+        border-bottom-left-radius: 5px;
+    }
+
+    .border-radius-right {
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+    }
+
     ion-list {
         background: none;
         flex-grow: 1;
@@ -97,5 +107,14 @@
 
     .chatbox {
         @include chat-input();
+        border-top-left-radius: 10px !important;
+        border-top-right-radius: 10px !important;
+        background: var(--bg-input-chat) !important; 
+    }
+
+    ion-button {
+        span {
+            color: #2E2E2E !important;
+        }
     }
 }

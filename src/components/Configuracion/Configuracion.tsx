@@ -108,21 +108,29 @@ export const Configuracion = () => {
       contentId="main-content"
       onIonWillOpen={() => {
         const content = document.getElementById("main-content");
+        const player = document.getElementById("player");
         if (content) {
-          // Ocultamos visualmente el contenido antes de que el menú empiece a aparecer
-          //content.style.transition = "opacity 0.2s ease";
-          //content.style.opacity = "0.6";
-          // Le damos un pequeño retardo antes de ponerlo detrás
           setTimeout(() => {
             content.style.zIndex = "-1";
+          }, 150);
+        }
+
+        if (player) {
+         setTimeout(() => {
+            player.style.zIndex = "-1";
           }, 150);
         }
       }}
       onIonDidClose={() => {
         const content = document.getElementById("main-content");
+        const player = document.getElementById("player");
+
         if (content) {
           content.style.zIndex = "0";
           content.style.opacity = "1";
+        }
+        if (player) {
+          player.style.zIndex = "1";
         }
       }}
     >
@@ -145,7 +153,7 @@ export const Configuracion = () => {
 
             <IonLabel>
               <h2 style={{ color: "#4b4b4b", margin: 0 }}>Alejandro Mendoza</h2>
-              <p style={{ color: "#4b4b4b", margin: 0 }}>@alejandro</p>
+              <h3 className="ion-left" style={{ color: "#4b4b4b", margin: 0 }}>@alejandro</h3>
             </IonLabel>
           </IonItem>
         </IonToolbar>
@@ -174,7 +182,7 @@ export const Configuracion = () => {
                     mode="md"
                     checked={paletteToggle}
                     onIonChange={toggleChange}
-                    className={styles["custom-toggle"]}
+                    className="custom-toggle"
                   >
                     <IonLabel>Modo Oscuro</IonLabel>
                   </IonToggle>
@@ -264,8 +272,7 @@ export const Configuracion = () => {
                   onClick={() =>
                     openWhatsApp(
                       import.meta.env.VITE_SUPPORT_PHONE,
-                      `Hola, tengo un problema con la aplicación ${
-                        import.meta.env.VITE_NAME
+                      `Hola, tengo un problema con la aplicación ${import.meta.env.VITE_NAME
                       } y necesito ayuda. Esto es lo que me sucede: `
                     )
                   }
@@ -308,8 +315,7 @@ export const Configuracion = () => {
                   onClick={() =>
                     openWhatsApp(
                       import.meta.env.VITE_CONTACT_PHONE,
-                      `¡Hola! Me gustaría obtener más información sobre su servicio en ${
-                        import.meta.env.VITE_NAME
+                      `¡Hola! Me gustaría obtener más información sobre su servicio en ${import.meta.env.VITE_NAME
                       }. ¿Podrían ayudarme?`
                     )
                   }

@@ -6,12 +6,6 @@
 
         ion-item-group {
             --background: var(--bg-secondary);
-
-            .custom-toggle {
-                --track-background: rgba(0, 0, 0, 0.2);
-                --track-background-checked: #f5f5f5;
-                --handle-background-checked: #00BFA6;
-            }
         }
 
         ion-item-divider {

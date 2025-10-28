@@ -150,6 +150,7 @@ export const Grupo: React.FC<any> = ({ grupoID, grupo, removed }) => {
 
   return (
     <div className={`${styles["ion-content"]}`}>
+      
       <IonList
         ref={chatListRef}
         className={`ion-padding ${styles["chat"]}`}
@@ -180,7 +181,7 @@ export const Grupo: React.FC<any> = ({ grupoID, grupo, removed }) => {
         </IonRow>
       ) : (
         <IonRow className={styles["chatbox"]}>
-          <IonCol size="10">
+          <IonCol className={styles["border-radius-left"]} size="10">
             <IonItem lines="none">
               <div className={styles["wrapper"]}>
                 {replyTo && (
@@ -207,7 +208,7 @@ export const Grupo: React.FC<any> = ({ grupoID, grupo, removed }) => {
               </div>
             </IonItem>
           </IonCol>
-          <IonCol size="2">
+          <IonCol className={styles["border-radius-right"]}  size="2">
             <IonButton disabled={!mensaje} onClick={onSendMessage}>
               <span className="material-symbols-outlined">send</span>
             </IonButton>

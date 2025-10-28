@@ -72,7 +72,9 @@ export const Add = () => {
         placeholder="Título del Recordatorio"
         className={`ion-margin-bottom`}
         onIonInput={(e) => setTitulo(e.target.value)}
-      ></IonInput>
+      >
+        <span slot="start" className="material-symbols-outlined filled">sell</span>
+      </IonInput>
 
       <IonItemDivider className="line-divider"></IonItemDivider>
 
