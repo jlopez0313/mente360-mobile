@@ -2,6 +2,7 @@ import { invitar, misContactos } from "@/services/user";
 import { Contacts } from "@capacitor-community/contacts";
 import { Share } from "@capacitor/share";
 import {
+  IonButton,
   IonIcon,
   IonItem,
   IonItemDivider,
@@ -21,7 +22,7 @@ import { useSelector } from "react-redux";
 import { Item } from "./Item";
 
 export const Comunidad = () => {
-  const { user } = useSelector( (state: any) => state.user);
+  const { user } = useSelector((state: any) => state.user);
 
   const [present, dismiss] = useIonLoading();
   const [presentAlert] = useIonAlert();
@@ -164,15 +165,12 @@ export const Comunidad = () => {
 
   return (
     <div className={styles["ion-content"]}>
-      <IonItem button={true} lines="none" onClick={onShareLink}>
-        <IonIcon
-          className="ion-no-margin"
-          slot="start"
+
+      <IonButton className="green-solid-button" onClick={onShareLink} expand="block">
+        <IonIcon className="marginright10"
           icon={shareSocialOutline}
-          size="large"
         ></IonIcon>
-        <IonLabel>Enviar Enlace de Invitación</IonLabel>
-      </IonItem>
+        Enviar Enlace de Invitación </IonButton>
 
       <IonList className="ion-no-padding" lines="none">
         <IonItemGroup>
@@ -186,6 +184,8 @@ export const Comunidad = () => {
             color="warning"
             onIonInput={(ev) => onSearchContacts(ev.target.value)}
           ></IonSearchbar>
+          
+          <IonItemDivider className={styles["line-divider"]}></IonItemDivider>
 
           {filteredUserContacts.map((contact: any, idx: number) => {
             return contact && <Item key={idx} contact={contact} />;

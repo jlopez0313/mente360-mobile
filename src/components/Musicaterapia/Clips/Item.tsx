@@ -396,6 +396,7 @@ export const Item: React.FC<any> = ({ idx, item, network }) => {
           icon: item.audio_local ? trashBinOutline : downloadOutline,
           handler: () => (item.audio_local ? onRemoveLocal() : onDownload()),
         },
+        {},
       ],
     });
 

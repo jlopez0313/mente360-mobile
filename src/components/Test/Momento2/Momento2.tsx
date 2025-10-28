@@ -77,12 +77,13 @@ const Momento2: React.FC<any> = memo(({ momentos, onSetMomento }) => {
           (item: any) => item.key == data.data.eneatipo
         );
 
+        const eneatipo_data = eneatipo?.descripcion.split(".");
+
         presentAlert({
-          header: "Alerta!",
-          subHeader: "Mensaje importante.",
-          message:
-            "Tu resultado es " + data.data.eneatipo + ". " + eneatipo?.descripcion,
-          buttons: ["OK"],
+          header: "¡Tu resultado es " + data.data.eneatipo + "!",
+          subHeader: eneatipo_data[0],
+          message: eneatipo_data[1],
+          buttons: ["Aceptar"],
         });
 
         return dispatch(setUser(data.data));

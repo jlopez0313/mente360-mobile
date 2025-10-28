@@ -106,6 +106,7 @@ export const Grupos = () => {
       <Modal
         trigger="add"
         hideButtons={false}
+        modalHeight="49vh"
         validateConfirm={(data) => !!data?.photo && !!data?.grupo}
         onConfirm={(data) => onAddGrupo(data)}
         title="Nuevo Grupo Mente Maestra"

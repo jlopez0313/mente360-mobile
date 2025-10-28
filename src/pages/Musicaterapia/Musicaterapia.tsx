@@ -49,7 +49,7 @@ const Musicaterapia: React.FC = () => {
       <IonHeader>
         <IonToolbar className={styles["ion-header"]}>
           <IonButtons slot="start">
-            <IonMenuButton/>
+            <IonMenuButton />
           </IonButtons>
 
           <IonTitle className="ion-no-padding ion-padding-end">
@@ -66,25 +66,26 @@ const Musicaterapia: React.FC = () => {
           </IonToolbar>
         </IonHeader>
 
-        <IonSegment value={tab} onIonChange={onSetTab}>
-          <IonSegmentButton value="clips" className={styles["ion-segment-button"]}>
-            <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined">
-                music_video
-              </span>
-              <IonLabel> Clips </IonLabel>
-            </div>
-          </IonSegmentButton>
-          <IonSegmentButton value="playlist" className={styles["ion-segment-button"]}>
-            <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined">
-              queue_music
-              </span>
-              <IonLabel> Playlist </IonLabel>
-            </div>
-          </IonSegmentButton>
-        </IonSegment>
-
+        <div className="bg-segment-buttons">
+          <IonSegment value={tab} onIonChange={onSetTab}>
+            <IonSegmentButton value="clips" className={styles["ion-segment-button"]}>
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined">
+                  music_video
+                </span>
+                <IonLabel> Clips </IonLabel>
+              </div>
+            </IonSegmentButton>
+            <IonSegmentButton value="playlist" className={styles["ion-segment-button"]}>
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined">
+                  queue_music
+                </span>
+                <IonLabel> Playlist </IonLabel>
+              </div>
+            </IonSegmentButton>
+          </IonSegment>
+        </div>
         {tab == "clips" ? <ClipsComponent /> : <PlaylistComponent />}
       </IonContent>
 

@@ -3,6 +3,10 @@
 
 .ion-content { 
         
+    img{
+        border-radius: 20px;
+    }
+
     .card {
         --background: none;
         box-shadow: none;
@@ -24,13 +28,15 @@
             flex-direction: column;
             
             ion-text {
-                font-size: 15px;
-                color: var(--bg-main);
+                font-size: 24px;
+                color: var(--color-secondary);
                 font-weight: bold;
+                margin-bottom: 5px;
+                margin-top: 1cqmin;
             }
 
             span {
-                font-size: 10px;
+                font-size: 16px;
             }
 
             .chip-list {
@@ -39,18 +45,18 @@
                 margin-bottom: 10px;
     
                 ion-chip {
-                    @include base-ion-item(5px, #ffedbd);
+                    @include base-ion-item(5px, var(--bg-chips));
                     
                     flex-shrink: 0;
                     font-size: 11px;
                     font-weight: 600;
                     padding: 5px 10px;
-                    color: #3D3d3d !important;
+                    color: var(--ion-color) !important;
 
             
                     ion-icon {
-                        margin-inline: 0 10px;
-                        color: #3D3d3d !important;
+                       margin-inline: 0 10px;
+                       color: var(--ion-color) !important;
                     }
                 }
             }
@@ -58,8 +64,9 @@
 
         ion-card-content {
 
-            background: var(--bg-base);
+            background: var(--bg-player);
             padding-top: var(--ion-padding, 16px);
+            border-radius: 10px;
             --color: #fff;
             color: #fff;
 
@@ -69,7 +76,7 @@
                 
                 ion-progress-bar {
                     height: 2px;
-
+                    background:#E1E6EB !important;
                 }
               }
 
@@ -96,18 +103,18 @@
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    font-size: 20px;
+                    font-size: 40px;
                     
-                    background: var(--bg-primary);
+                    background: var(--color-secondary);
 
                     ion-icon {
-                        color: var(--bg-base) !important;
+                        color: var(--bg-player) !important;
                     }
                 }
 
                 .previous, .next {
-                    font-size: 24px;
-                    color: var(--bg-primary) !important;
+                    font-size: 40px;
+                    color: var(--color-secondary) !important;
                 }
             }
         }

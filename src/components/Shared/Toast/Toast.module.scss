@@ -5,6 +5,8 @@ ion-popover {
 }
 
 .custom-toast {
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
     position: absolute;
     background: var(--bg-base);
     min-height: 48px;
@@ -12,7 +14,7 @@ ion-popover {
     flex-direction: column;
     justify-content: space-between;
     bottom: calc(var(--ion-safe-area-bottom) + 70px);
-    z-index: 90;
+    z-index: 3;
     width: 100%;
     padding: 5px 0;
 
@@ -36,7 +38,7 @@ ion-popover {
 
     ion-icon {
         font-size: 2.8rem !important;
-        color: var(--bg-primary) !important;
+        color: var(--color-main) !important;
 
         &.backward,
         &.forward,
@@ -53,7 +55,7 @@ ion-popover {
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 99;
+    z-index: 3;
 }
 
 
@@ -70,4 +72,8 @@ ion-popover {
     ion-progress-bar {
         height: 2px;
     }
+}
+
+.listplayer {
+    background: var(--bg-modal) !important;
 }

@@ -70,7 +70,7 @@ export const Toast = () => {
     onPause,
     onPlay,
     getDownloadedAudio,
-  } = useAudio(audioRef, () => {});
+  } = useAudio(audioRef, () => { });
 
   const { user } = useSelector((state: any) => state.user);
   const [present, dismiss] = useIonLoading();
@@ -239,7 +239,7 @@ export const Toast = () => {
   }, [isGlobalPlaying]);
 
   return (
-    <div className={`${styles["custom-toast"]}`}>
+    <div id="player" className={`${styles["custom-toast"]}`}>
       <IonItem lines="none" button={true} detail={false}>
         <IonAvatar slot="start">
           <img
@@ -328,7 +328,7 @@ export const Toast = () => {
           alignment="center"
         >
           <IonContent class="ion-no-padding">
-            <IonList>
+            <IonList className={styles.listplayer}>
               {globalAudio.in_my_playlist ? (
                 <IonItem
                   button
@@ -354,8 +354,8 @@ export const Toast = () => {
                   detail={false}
                   aria-label="Agregar a mi playlist"
                 >
-                  <IonIcon aria-hidden="true" slot="start" icon={starOutline} />
-                  <IonLabel>Agregar a mi playlist</IonLabel>
+                  <span className="material-symbols-outlined marginright10">star</span>
+                  <IonLabel className="ion-left" >Agregar a mi playlist</IonLabel>
                 </IonItem>
               )}
 
@@ -370,8 +370,9 @@ export const Toast = () => {
                 detail={false}
                 aria-label="Cerrar Reproductor"
               >
-                <IonIcon aria-hidden="true" slot="start" icon={closeCircle} />
-                <IonLabel>Cerrar Reproductor</IonLabel>
+                <span className="material-symbols-outlined marginright10">close</span>
+
+                <IonLabel className="ion-left">Cerrar Reproductor</IonLabel>
               </IonItem>
             </IonList>
           </IonContent>
