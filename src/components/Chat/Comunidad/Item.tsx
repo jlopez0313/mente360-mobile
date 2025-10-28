@@ -1,6 +1,6 @@
 import Avatar from "@/assets/images/avatar.jpg";
 import { Profile } from "@/components/Chat/Profile/Profile";
-import { updateData, writeData } from "@/services/realtime-db";
+import { updateData } from "@/services/realtime-db";
 import { IonAvatar, IonItem, IonLabel, IonSkeletonText } from "@ionic/react";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
@@ -40,8 +40,12 @@ export const Item: React.FC<any> = ({ contact }) => {
         edad: otroUser.edad || 0,
         genero: otroUser.genero || '--',
       }),
-      writeData("users/" + user.id + "/rooms/" + roomID, true),
-      writeData("users/" + otroUser.id + "/rooms/" + roomID, true),
+      updateData("users/" + user.id + "/rooms", {
+        [roomID]: true
+      }),
+      updateData("users/" + otroUser.id + "/rooms", {
+        [roomID]: true
+      }),
     ]);
 
     history.replace("/chat/" + roomID);
