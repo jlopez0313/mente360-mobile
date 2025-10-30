@@ -4,14 +4,13 @@ import { Share } from "@capacitor/share";
 import {
   IonButton,
   IonIcon,
-  IonItem,
   IonItemDivider,
   IonItemGroup,
   IonLabel,
   IonList,
   IonSearchbar,
   useIonAlert,
-  useIonLoading,
+  useIonLoading
 } from "@ionic/react";
 import { shareSocialOutline } from "ionicons/icons";
 import { useEffect, useState } from "react";
@@ -58,6 +57,15 @@ export const Comunidad = () => {
       present({
         message: "Cargando ...",
       });
+
+      const perm = await Contacts.checkPermissions();
+      
+      if (perm.contacts !== "granted") {
+        const res = await Contacts.requestPermissions();
+        if (res.contacts !== "granted") {
+          throw new Error("Permiso de contactos denegado por el usuario.");
+        }
+      }
 
       const projection = {
         name: true,

@@ -28,6 +28,15 @@ export const Add: React.FC<any> = ({ grupoID, users, doChild }) => {
         message: "Cargando ...",
       });
 
+      const perm = await Contacts.checkPermissions();
+
+      if (perm.contacts !== "granted") {
+        const res = await Contacts.requestPermissions();
+        if (res.contacts !== "granted") {
+          throw new Error("Permiso de contactos denegado por el usuario.");
+        }
+      }
+
       const projection = {
         name: true,
         phones: true,
