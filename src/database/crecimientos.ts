@@ -4,6 +4,7 @@ export default interface Crecimientos {
   id: number;
   nivel: Niveles;
   titulo: string;
+  descripcion: string;
   imagen: string;
   audio: string;
   downloaded?: number;

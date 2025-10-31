@@ -7,4 +7,5 @@ export default interface Canales {
   comunidad: Comunidades;
   colaboradores: User[];
   canal: string;
+  descripcion: string;
 }

@@ -1,13 +1,18 @@
+import AudioNoWifi from "@/assets/images/audio_no_wifi.jpg";
+import Logo from "@/assets/images/logo.png";
+
 import { startBackground } from "@/helpers/background";
 import { create } from "@/helpers/musicControls";
 import { useAudio } from "@/hooks/useAudio";
 import {
+  IonAvatar,
   IonButton,
   IonCard,
   IonCardContent,
   IonCardHeader,
   IonCardSubtitle,
   IonIcon,
+  IonItem,
   IonRange,
   IonSkeletonText,
   IonText,
@@ -26,7 +31,6 @@ import { memo, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import styles from "./Audio.module.scss";
 
-import AudioNoWifi from "@/assets/images/audio_no_wifi.jpg";
 import AudioProgressCircle from "@/components/Shared/Animations/ProgressCircle/ProgressCircle";
 import { db } from "@/hooks/useDexie";
 
@@ -45,6 +49,7 @@ export const Audio: React.FC<Props> = memo(
 
     const [presentToast] = useIonToast();
 
+    const [expandido, setExpandido] = useState(false);
     const [percent, setPercent] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const [localSrc, setLocalSrc] = useState<any>(null);
@@ -212,7 +217,31 @@ export const Audio: React.FC<Props> = memo(
 
     return (
       <>
-        <IonCard className={`ion-text-center ${styles.card}`}>
+        <IonCard className={`ion-no-margin ${styles.card}`}>
+          <IonCardHeader className="ion-no-padding">
+            <IonCardSubtitle className="ion-no-padding">
+              <IonItem>
+                <IonAvatar slot="start">
+                  <img src={Logo} />
+                </IonAvatar>
+                <IonText> {audio.titulo} </IonText>
+              </IonItem>
+            </IonCardSubtitle>
+
+            <IonCardSubtitle
+              className="ion-no-padding"
+              style={{
+                display: "flex",
+                justifyContent: "space-around",
+                alignItems: "center",
+              }}
+            >
+              {percent > 0 && <span style={{ width: "30px" }}></span>}
+
+              {percent > 0 && <AudioProgressCircle />}
+            </IonCardSubtitle>
+          </IonCardHeader>
+
           {isLoading && (
             <IonSkeletonText
               animated
@@ -232,26 +261,24 @@ export const Audio: React.FC<Props> = memo(
             className="ion-margin-bottom"
           />
 
-          <IonCardHeader className="ion-no-padding">
-            <IonCardSubtitle className="ion-no-padding">
-              <IonText> {audio.titulo} </IonText>
-            </IonCardSubtitle>
-
-            <IonCardSubtitle
-              className="ion-no-padding"
-              style={{
-                display: "flex",
-                justifyContent: "space-around",
-                alignItems: "center",
-              }}
-            >
-              {percent > 0 && <span style={{ width: "30px" }}></span>}
-
-              {percent > 0 && <AudioProgressCircle />}
-            </IonCardSubtitle>
-          </IonCardHeader>
-
           <IonCardContent className="ion-padding">
+            <p
+              className={`${styles["texto"]} ${
+                expandido ? styles["expandido"] : ""
+              }`}
+            >
+              {" "}
+              {audio.descripcion}
+              {" "}
+            </p>
+
+            <button
+              className={`ion-margin-bottom ${styles["btn-leer"]}`}
+              onClick={() => setExpandido(!expandido)}
+            >
+              {expandido ? "Leer menos" : "Leer más"}
+            </button>
+
             <IonRange
               disabled={false}
               value={progress}
@@ -272,9 +299,7 @@ export const Audio: React.FC<Props> = memo(
               <span> {duration} </span>
             </div>
 
-            <div
-              className={`ion-margin-bottom ${styles.controls}`}
-            >
+            <div className={`ion-margin-bottom ${styles.controls}`}>
               <IonIcon
                 onClick={onGoBack}
                 className={styles.previous}
@@ -308,10 +333,9 @@ export const Audio: React.FC<Props> = memo(
             </div>
 
             <div className="flex justify-end">
-
               <IonButton
                 shape="round"
-                className={`ion-margin-top ${styles['downloadBtn']}`}
+                className={`ion-margin-top ${styles["downloadBtn"]}`}
                 disabled={!network.status && !localSrc}
                 onClick={() => (localSrc ? onRemoveLocal() : onDownload())}
               >
@@ -322,7 +346,6 @@ export const Audio: React.FC<Props> = memo(
                 />
                 {localSrc ? "Eliminar Descarga" : "Descargar"}
               </IonButton>
-
             </div>
 
             <audio

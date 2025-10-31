@@ -40,7 +40,7 @@ export class Mente360DB extends Dexie {
     this.version(1).stores({
       audios: "++id",
       canales: "++id",
-      categorias: "++id",
+      categorias: "++id,categoria",
       clips: "++id,titulo",
       comunidades: "++id",
       crecimientos: "++id",

@@ -10,8 +10,7 @@ import {
   IonCardSubtitle,
   IonCardTitle,
   IonItem,
-  IonList,
-  IonText,
+  IonList
 } from "@ionic/react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useState } from "react";
@@ -56,22 +55,26 @@ export const Canales = () => {
               <IonCardSubtitle> {comunidad?.lider?.name} </IonCardSubtitle>
             </div>
           </div>
-          <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0 }}>
-            <iframe 
-                src={`https://www.youtube.com/embed/${ getYoutubeVideoId(comunidad?.video) }`}
-                title="YouTube video player"
-                allowFullScreen
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%',
-                }}
+          <div
+            style={{ position: "relative", paddingBottom: "56.25%", height: 0 }}
+          >
+            <iframe
+              src={`https://www.youtube.com/embed/${getYoutubeVideoId(
+                comunidad?.video
+              )}`}
+              title="YouTube video player"
+              allowFullScreen
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+              }}
             ></iframe>
-        </div>
+          </div>
         </IonCardHeader>
         <IonCardContent>
           <p> {comunidad?.descripcion} </p>
@@ -87,7 +90,13 @@ export const Canales = () => {
                   src={network.status ? baseURL + canal.imagen : AudioNoWifi}
                 />
               </IonAvatar>
-              <IonText> {canal.canal} </IonText>
+              <div className={styles["texto"]}>
+                <span className={styles["titulo"]}> {canal.canal} </span>
+                <span className={styles["subtitulo"]}>
+                  {" "}
+                  {canal.descripcion}{" "}
+                </span>
+              </div>
             </IonItem>
           );
         })}

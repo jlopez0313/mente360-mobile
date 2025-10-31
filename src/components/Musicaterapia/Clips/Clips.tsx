@@ -1,8 +1,8 @@
 import {
-  IonItemDivider,
   IonChip,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
+  IonItemDivider,
   IonList,
   IonSearchbar,
 } from "@ionic/react";
@@ -31,7 +31,7 @@ export const Clips = () => {
   const [search, setSearch] = useState<string>("");
   const [hasMore, setHasMore] = useState(true);
 
-  const categorias = useLiveQuery(() => db.categorias.toArray());
+  const categorias = useLiveQuery(() => db.categorias.orderBy('categoria').toArray());
 
   const clips = useLiveQuery(async () => {
     const resultados = await db.clips
