@@ -44,7 +44,7 @@ const Principal: React.FC = () => {
             </Link>
           </IonButtons>
 
-          <IonTitle className="ion-no-padding ion-padding-end ion-text-center">
+          <IonTitle className="ion-no-padding ion-padding-end">
             {" "}
             Comunidad Principal{" "}
           </IonTitle>
