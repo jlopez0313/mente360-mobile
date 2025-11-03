@@ -46,9 +46,9 @@ export const usePayment = () => {
       setStatus("free");
     } else if (user.ref_payco && user.ref_status == "failed") {
       setStatus("payment_failed");
-    } else if (hasPaid === 1) {
+    } else if (hasPaid === 1 && user.ref_payco) {
       setStatus(diasHastaVence! >= 0 ? "paid" : "expired");
-    } else if (hasPaid === 0) {
+    } else if (hasPaid === 0 && user.ref_payco) {
       setStatus(diasHastaVence! >= 0 ? "canceled" : "expired");
     } else if (fechaVencimiento) {
       setStatus(diasHastaVence! >= 0 ? "trial" : "expired");
