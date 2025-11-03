@@ -34,7 +34,11 @@ export const Configuracion = () => {
 
   const [presentToast] = useIonToast();
   const baseURL = import.meta.env.VITE_BASE_BACK;
-  const { usuario } = useSelector((state: any) => state.user);
+  const { user } = useSelector((state: any) => state.user);
+  const [usuario, setUsuario] = useState({ ...user });
+  console.log("User state:", usuario);
+
+  const username = usuario.email.split("@");
 
   const [isLoading, setIsLoading] = useState(true);
   const onLogout = async () => {
@@ -116,7 +120,7 @@ export const Configuracion = () => {
         }
 
         if (player) {
-         setTimeout(() => {
+          setTimeout(() => {
             player.style.zIndex = "-1";
           }, 150);
         }
@@ -145,15 +149,14 @@ export const Configuracion = () => {
             )}
             <IonAvatar className="menu-avatar" slot="start">
               <img
-                //src={usuario.photo ? baseURL + usuario.photo : Avatar}
-                src={Avatar}
+                src={usuario.photo ? baseURL + usuario.photo : Avatar}
                 onLoad={() => setIsLoading(false)}
               />
             </IonAvatar>
 
             <IonLabel>
-              <h2 style={{ color: "#4b4b4b", margin: 0 }}>Alejandro Mendoza</h2>
-              <h3 className="ion-left" style={{ color: "#4b4b4b", margin: 0 }}>@alejandro</h3>
+              <h2 style={{ color: "#4b4b4b", margin: 0 }}>{usuario?.name}</h2>
+              <h3 className="ion-left" style={{ color: "#4b4b4b", margin: 0 }}>@{username[0]}</h3>
             </IonLabel>
           </IonItem>
         </IonToolbar>
@@ -205,14 +208,14 @@ export const Configuracion = () => {
                     <IonLabel>Realizar Test Eneagrama</IonLabel>
                   </IonItem>
                 </Link>
-                {/*
-                <Link to="/recordatorios">
+                <Link to="/comunidades/principal">
                   <IonItem button={true}>
-                    <IonIcon slot="start" icon={timeOutline} />
-                    <IonLabel>Mis Recordatorios</IonLabel>
+                    <span slot="start" className="material-symbols-outlined">
+                      diversity_3
+                    </span>
+                    <IonLabel>Seleccionar comunidad activa</IonLabel>
                   </IonItem>
                 </Link>
-      */}
               </IonItemGroup>
 
               <IonItemDivider className={styles["line-divider"]}></IonItemDivider>
