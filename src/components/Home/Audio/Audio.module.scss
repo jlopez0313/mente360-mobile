@@ -4,6 +4,10 @@
     --background: none;
     box-shadow: none;
 
+    ion-text, span{
+        color: #f5f5f5 !important;
+    }
+
     .headerplayer {
         margin-top: 15px;
         background: var(--bg-player);
