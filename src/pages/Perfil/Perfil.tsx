@@ -10,7 +10,7 @@ import {
 
 import { Perfil as PerfilComponent } from "@/components/Perfil/Perfil";
 import { IonIcon } from "@ionic/react";
-import { arrowBack, settingsOutline, timeOutline } from "ionicons/icons";
+import { arrowBack } from "ionicons/icons";
 
 import { setShowGlobalAudio } from "@/store/slices/audioSlice";
 import { useEffect } from "react";

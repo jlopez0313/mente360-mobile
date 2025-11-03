@@ -114,8 +114,6 @@ export const Registro = () => {
         message: "Cargando ...",
       });
 
-
-      
       const updatePromise = update(usuario, user.id);
       
       const setUserPromise = updatePromise.then( ({ data }) => {

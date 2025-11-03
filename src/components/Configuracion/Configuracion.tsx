@@ -38,7 +38,7 @@ export const Configuracion = () => {
   const [usuario, setUsuario] = useState({ ...user });
   console.log("User state:", usuario);
 
-  const username = usuario.email.split("@");
+  const username = usuario.email?.split("@") ?? [];
 
   const [isLoading, setIsLoading] = useState(true);
   const onLogout = async () => {
@@ -156,7 +156,9 @@ export const Configuracion = () => {
 
             <IonLabel>
               <h2 style={{ color: "#4b4b4b", margin: 0 }}>{usuario?.name}</h2>
-              <h3 className="ion-left" style={{ color: "#4b4b4b", margin: 0 }}>@{username[0]}</h3>
+              <h3 className="ion-left" style={{ color: "#4b4b4b", margin: 0 }}>
+                @{username[0]}
+              </h3>
             </IonLabel>
           </IonItem>
         </IonToolbar>
@@ -165,7 +167,6 @@ export const Configuracion = () => {
         <IonMenuToggle autoHide={true}>
           <div className={styles["ion-content"]}>
             <IonList inset={true}>
-
               <IonItemGroup>
                 <Link to="/perfil">
                   <IonItem button={true}>
@@ -218,7 +219,9 @@ export const Configuracion = () => {
                 </Link>
               </IonItemGroup>
 
-              <IonItemDivider className={styles["line-divider"]}></IonItemDivider>
+              <IonItemDivider
+                className={styles["line-divider"]}
+              ></IonItemDivider>
 
               <IonItemGroup>
                 <IonItem
@@ -267,7 +270,9 @@ export const Configuracion = () => {
                 </IonItem>
               </IonItemGroup>
 
-              <IonItemDivider className={styles["line-divider"]}></IonItemDivider>
+              <IonItemDivider
+                className={styles["line-divider"]}
+              ></IonItemDivider>
 
               <IonItemGroup>
                 <IonItem
@@ -275,7 +280,8 @@ export const Configuracion = () => {
                   onClick={() =>
                     openWhatsApp(
                       import.meta.env.VITE_SUPPORT_PHONE,
-                      `Hola, tengo un problema con la aplicación ${import.meta.env.VITE_NAME
+                      `Hola, tengo un problema con la aplicación ${
+                        import.meta.env.VITE_NAME
                       } y necesito ayuda. Esto es lo que me sucede: `
                     )
                   }
@@ -318,7 +324,8 @@ export const Configuracion = () => {
                   onClick={() =>
                     openWhatsApp(
                       import.meta.env.VITE_CONTACT_PHONE,
-                      `¡Hola! Me gustaría obtener más información sobre su servicio en ${import.meta.env.VITE_NAME
+                      `¡Hola! Me gustaría obtener más información sobre su servicio en ${
+                        import.meta.env.VITE_NAME
                       }. ¿Podrían ayudarme?`
                     )
                   }
@@ -328,7 +335,9 @@ export const Configuracion = () => {
                 </IonItem>
               </IonItemGroup>
 
-              <IonItemDivider className={styles["line-divider"]}></IonItemDivider>
+              <IonItemDivider
+                className={styles["line-divider"]}
+              ></IonItemDivider>
 
               <IonItemGroup>
                 <IonItem lines="none" onClick={onLogout}>

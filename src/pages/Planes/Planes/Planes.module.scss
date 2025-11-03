@@ -1,11 +1,11 @@
 @import "@/styles.scss";
 
-.ion-toolbar {
-    --background: var(--bg-main-gradient);
+.ion-header {
+    --background: var(--bg-white);
 
     ion-buttons {
         ion-button {
-            font-size: 1.15rem !important;
+        font-size: 1.15rem !important;
         }
     }
 }

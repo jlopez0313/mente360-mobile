@@ -17,50 +17,47 @@ import { useEffect } from "react";
 import { useHistory } from "react-router";
 import { Link } from "react-router-dom";
 
-
 const Planes: React.FC = () => {
-    const history = useHistory();
+  const history = useHistory();
 
-    useEffect(() => {
-        const handleBackButton = (ev: Event) => {
-            ev.preventDefault();
-            ev.stopPropagation();
-            history.replace("/perfil");
-        };
+  useEffect(() => {
+    const handleBackButton = (ev: Event) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      history.replace("/perfil");
+    };
 
-        document.addEventListener("ionBackButton", handleBackButton);
+    document.addEventListener("ionBackButton", handleBackButton);
 
-        return () => {
-            document.removeEventListener("ionBackButton", handleBackButton);
-        };
-    }, [history]);
+    return () => {
+      document.removeEventListener("ionBackButton", handleBackButton);
+    };
+  }, [history]);
 
-    return (
-        <IonPage>
+  return (
+    <IonPage>
+      <IonHeader>
+        <IonToolbar className={styles["ion-header"]}>
+          <IonButtons slot="start">
+            <Link to="/home" replace={true}>
+              <IonButton fill="clear" className={styles.backButton}>
+                <IonIcon slot="start" icon={arrowBack} />
+              </IonButton>
+            </Link>
+          </IonButtons>
 
-            <IonHeader className={styles["ion-header"]}>
-                <IonToolbar className={styles["ion-toolbar"]}>
-                    <IonButtons slot="start">
-                        <Link to="/perfil" replace={true}>
-                            <IonButton fill="clear" className={styles.backButton}>
-                                <IonIcon slot="start" icon={arrowBack} />
-                            </IonButton>
-                        </Link>
-                    </IonButtons>
+          <IonTitle > Planes </IonTitle>
 
-                    <IonTitle className="ion-no-padding ion-padding-end ion-text-center"> Planes </IonTitle>
-                </IonToolbar>
-            </IonHeader>
+        </IonToolbar>
+      </IonHeader>
 
-            <IonContent className={`${styles["ion-content"]}`}>
-                <div className={`ion-padding ${styles.content}`}>
-                    <PlanesComponent />
-                </div>
-            </IonContent>
-
-
-        </IonPage >
-    );
+      <IonContent className={`${styles["ion-content"]}`}>
+        <div className={`ion-padding ${styles.content}`}>
+          <PlanesComponent />
+        </div>
+      </IonContent>
+    </IonPage>
+  );
 };
 
 export default Planes;

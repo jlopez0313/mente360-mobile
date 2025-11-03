@@ -1,24 +1,15 @@
-import {
-    IonIcon,
-    IonImg,
-    IonItem,
-    IonLabel,
-    IonList,
-    IonText
-} from "@ionic/react";
-import {
-    chatboxEllipsesOutline,
-    heartCircleOutline,
-    moonOutline,
-    peopleOutline,
-    ribbonOutline,
-} from "ionicons/icons";
-import styles from "./Premium.module.scss";
 import Logo from "@/assets/images/logo.png";
+import {
+  IonItem,
+  IonLabel,
+  IonList,
+  IonText
+} from "@ionic/react";
+import styles from "./Premium.module.scss";
 
 export const Premium = () => {
   return (
-    <div className={`${styles["content"]} ${styles["item-inner"]}`}>
+    <div className={`${styles["content"]}`}>
      
       <img alt="" className="logo-header" src={Logo} />
 
