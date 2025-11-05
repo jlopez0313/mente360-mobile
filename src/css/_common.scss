@@ -128,6 +128,8 @@
         -webkit-line-clamp: 2;
         overflow: hidden;
         text-overflow: ellipsis;
+        margin-top: 0;
+        margin-bottom: 2px;
         
         &.expandido {
             display: block;

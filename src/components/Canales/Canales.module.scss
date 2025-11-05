@@ -21,23 +21,24 @@
             text-align: justify;
         }
 
-        .texto {
-            display: flex;
-            flex-direction: column;
-
+        .content {
+            
             .titulo {
                 font-size: 14px;
                 font-weight: bold;
+                margin-top: 15px;
+                margin-bottom: 5px;
             }
 
             .subtitulo {
                 font-size: .8rem;
             }
         }
-    }
 
-    @include cardComunidad();
+    }
+    
     @include descripcion();
+    @include cardComunidad();
     
     .version {
         font-size: .8rem;

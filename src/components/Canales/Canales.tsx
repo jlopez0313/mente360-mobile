@@ -9,21 +9,17 @@ import {
   IonCardHeader,
   IonCardSubtitle,
   IonCardTitle,
-  IonItem,
   IonList
 } from "@ionic/react";
 import { useLiveQuery } from "dexie-react-hooks";
-import { useState } from "react";
-import { useHistory, useParams } from "react-router";
+import { useParams } from "react-router";
 import styles from "./Canales.module.scss";
+import { Item } from "./Item";
 
 export const Canales = () => {
   const baseURL = import.meta.env.VITE_BASE_BACK;
 
-  const [expandido, setExpandido] = useState(false);
-
   const { id } = useParams<any>();
-  const history = useHistory();
   const network = useNetwork();
 
   const comunidad = useLiveQuery(() =>
@@ -35,9 +31,6 @@ export const Canales = () => {
     [comunidad]
   );
 
-  const goToCrecimiento = (canalId: number) => {
-    history.replace(`/crecimiento/${canalId}`);
-  };
 
   return (
     <div className={styles["ion-content"]}>
@@ -83,21 +76,7 @@ export const Canales = () => {
       <IonList className="ion-padding" lines="none">
         {canales?.map((canal: any, idx: number) => {
           return (
-            <IonItem key={idx} onClick={() => goToCrecimiento(canal.id)} detail>
-              <IonAvatar slot="start">
-                <img
-                  alt={canal.canal}
-                  src={network.status ? baseURL + canal.imagen : AudioNoWifi}
-                />
-              </IonAvatar>
-              <div className={styles["texto"]}>
-                <span className={styles["titulo"]}> {canal.canal} </span>
-                <span className={styles["subtitulo"]}>
-                  {" "}
-                  {canal.descripcion}{" "}
-                </span>
-              </div>
-            </IonItem>
+            <Item key={idx} canal={canal} />
           );
         })}
       </IonList>

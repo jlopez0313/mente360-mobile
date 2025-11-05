@@ -10,7 +10,7 @@ import {
   IonList,
   IonSearchbar,
   useIonAlert,
-  useIonLoading
+  useIonLoading,
 } from "@ionic/react";
 import { shareSocialOutline } from "ionicons/icons";
 import { useEffect, useState } from "react";
@@ -59,7 +59,7 @@ export const Comunidad = () => {
       });
 
       const perm = await Contacts.checkPermissions();
-      
+
       if (perm.contacts !== "granted") {
         const res = await Contacts.requestPermissions();
         if (res.contacts !== "granted") {
@@ -84,8 +84,14 @@ export const Comunidad = () => {
           .filter((x) => x.name && x.phones)
           .map((item: any) => {
             const mainPhone = item.phones[0]?.number?.replace(/[\s~`-]/g, "");
-            const phoneNumber = parsePhoneNumber(mainPhone);
-            const phone = (!phoneNumber?.country ? "+57" : "") + mainPhone;
+            let phone = mainPhone;
+            
+            try {
+              const phoneNumber = parsePhoneNumber(mainPhone);
+              phone = (!phoneNumber?.country ? "+57" : "") + mainPhone;
+            } catch {
+              phone = "+57" + mainPhone;
+            }
 
             return {
               ...item,
@@ -109,6 +115,8 @@ export const Comunidad = () => {
         data: { data },
       } = await misContactos(body);
 
+      if (!data) throw new Error("El backend no devolvió contactos válidos.");
+      
       // Usuarios que tienen cuenta en 360
       setUserContacts(data);
       setFilteredUserContacts(data);
@@ -116,14 +124,13 @@ export const Comunidad = () => {
       // Contactos de mi teléfono
       // setAllContacts(lista);
       // setContacts(lista);
-
     } catch (error: any) {
       console.error(error);
 
       presentAlert({
         header: "Alerta!",
         subHeader: "Mensaje importante.",
-        message: error.data?.message || "Error Interno",
+        message: error.data?.message || error?.message || "Error Interno",
         buttons: ["OK"],
       });
     } finally {
@@ -173,12 +180,14 @@ export const Comunidad = () => {
 
   return (
     <div className={styles["ion-content"]}>
-
-      <IonButton className="green-solid-button" onClick={onShareLink} expand="block">
-        <IonIcon className="marginright10"
-          icon={shareSocialOutline}
-        ></IonIcon>
-        Enviar Enlace de Invitación </IonButton>
+      <IonButton
+        className="green-solid-button"
+        onClick={onShareLink}
+        expand="block"
+      >
+        <IonIcon className="marginright10" icon={shareSocialOutline}></IonIcon>
+        Enviar Enlace de Invitación{" "}
+      </IonButton>
 
       <IonList className="ion-no-padding" lines="none">
         <IonItemGroup>
@@ -192,7 +201,7 @@ export const Comunidad = () => {
             color="warning"
             onIonInput={(ev) => onSearchContacts(ev.target.value)}
           ></IonSearchbar>
-          
+
           <IonItemDivider className={styles["line-divider"]}></IonItemDivider>
 
           {filteredUserContacts.map((contact: any, idx: number) => {

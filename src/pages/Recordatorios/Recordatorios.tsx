@@ -11,19 +11,17 @@ import {
 } from "@ionic/react";
 import { arrowBack } from "ionicons/icons";
 import React from "react";
-import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import styles from "./Recordatorios.module.scss";
 
 const Recordatorios: React.FC = () => {
-  const { route } = useSelector((state: any) => state.route);
-
+  
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar className={styles["ion-header"]}>
           <IonButtons slot="start">
-            <Link to={route} replace={true}>
+            <Link to='/home' replace={true}>
               <IonButton fill="clear" className={styles.backButton}>
                 <IonIcon slot="start" icon={arrowBack} />
               </IonButton>

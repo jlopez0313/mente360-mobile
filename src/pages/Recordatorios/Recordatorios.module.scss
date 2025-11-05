@@ -29,4 +29,6 @@
 */
   --background: var(--bg-content);
   background: var(--bg-content);
+
+  --padding-bottom: var(--ion-safe-area-bottom) !important;
 }
