@@ -35,11 +35,7 @@ export const Configuracion = () => {
   const [presentToast] = useIonToast();
   const baseURL = import.meta.env.VITE_BASE_BACK;
   const { user } = useSelector((state: any) => state.user);
-  const [usuario, setUsuario] = useState({ ...user });
-  console.log("User state:", usuario);
-
-  const username = usuario.email?.split("@") ?? [];
-
+  
   const [isLoading, setIsLoading] = useState(true);
   const onLogout = async () => {
     localStorage.removeItem("home");
@@ -149,15 +145,15 @@ export const Configuracion = () => {
             )}
             <IonAvatar className="menu-avatar" slot="start">
               <img
-                src={usuario.photo ? baseURL + usuario.photo : Avatar}
+                src={user.photo ? baseURL + user.photo : Avatar}
                 onLoad={() => setIsLoading(false)}
               />
             </IonAvatar>
 
             <IonLabel>
-              <h2 style={{ color: "#4b4b4b", margin: 0 }}>{usuario?.name}</h2>
+              <h2 style={{ color: "#4b4b4b", margin: 0 }}>{user?.name}</h2>
               <h3 className="ion-left" style={{ color: "#4b4b4b", margin: 0 }}>
-                @{username[0]}
+                {user?.email}
               </h3>
             </IonLabel>
           </IonItem>

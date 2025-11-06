@@ -44,7 +44,7 @@ export const Comunidad = () => {
 
     if (word) {
       const lista = userContacts.filter((u: any) =>
-        u.name.toLowerCase().includes(word.toLowerCase())
+        u.name?.toLowerCase().includes(word.toLowerCase())
       );
       setFilteredUserContacts([...lista]);
     } else {
@@ -101,7 +101,7 @@ export const Comunidad = () => {
             };
           })
           .sort((a: any, b: any) =>
-            a.name?.display.toLowerCase() > b.name?.display.toLowerCase()
+            a.name?.display?.toLowerCase() > b.name?.display?.toLowerCase()
               ? 1
               : -1
           ) ?? [];
