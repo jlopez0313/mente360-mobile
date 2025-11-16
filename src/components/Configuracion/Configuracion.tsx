@@ -205,7 +205,7 @@ export const Configuracion = () => {
                     <IonLabel>Realizar Test Eneagrama</IonLabel>
                   </IonItem>
                 </Link>
-                <Link to="/comunidades/principal">
+                <Link to="/comunidad-principal">
                   <IonItem button={true}>
                     <span slot="start" className="material-symbols-outlined">
                       diversity_3

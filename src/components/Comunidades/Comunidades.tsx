@@ -13,8 +13,6 @@ export const Comunidades = () => {
 
   const network = useNetwork();
 
-  
-
   const comunidades = useLiveQuery(() => db.comunidades.toArray());
   
 

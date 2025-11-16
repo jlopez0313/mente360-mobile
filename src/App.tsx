@@ -121,7 +121,7 @@ const App: React.FC = () => {
 
                 <Route
                   exact={true}
-                  path="/comunidades/principal"
+                  path="/comunidad-principal"
                   component={Principal}
                 />
                 <Route
