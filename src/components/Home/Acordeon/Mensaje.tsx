@@ -1,7 +1,6 @@
 import {
   IonAccordion,
   IonButton,
-  IonIcon,
   IonItem,
   IonLabel,
   useIonAlert
@@ -11,7 +10,6 @@ import { useHistory } from "react-router";
 import styles from "./Acordeon.module.scss";
 
 import { shareSocialOutline } from "ionicons/icons";
-import mensajeIcon from "/assets/icons/mensaje.svg";
 
 import { Modal } from "@/components/Shared/Modal/Modal";
 import { db } from "@/hooks/useDexie";
@@ -80,7 +78,7 @@ export const Mensaje: React.FC<any> = ({ network }) => {
       <Modal
         trigger="modal-comentario"
         title="Mensaje del día"
-        modalHeight="25vh"
+        modalHeight="35vh"
         hideButtons={!network.status || mensaje?.done == 1 || false}
         onConfirm={() => onConfirmMensaje()}
         extraButtons=
