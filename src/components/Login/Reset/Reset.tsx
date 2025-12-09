@@ -1,16 +1,12 @@
 import {
-
   IonButton,
-  IonCard,
-  IonCardContent,
   IonCol,
   IonGrid,
   IonInput,
   IonLoading,
-  IonNote,
   IonRow,
   useIonAlert,
-  useIonLoading,
+  useIonLoading
 } from "@ionic/react";
 import styles from "../Login.module.scss";
 
@@ -97,7 +93,7 @@ export const Reset = () => {
             Enviar{" "}
           </IonButton>
 
-          <Link to="/home" replace={true}>
+          <Link to="/login" replace={true}>
             <IonButton fill="outline" className="yellow-outline-button" shape="round" expand="block">Volver</IonButton>
           </Link>
 

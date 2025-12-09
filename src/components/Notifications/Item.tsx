@@ -1,14 +1,24 @@
 import Logo from "@/assets/images/logo.png";
+import { useNetwork } from "@/hooks/useNetwork";
 import { IonAvatar, IonIcon, IonItem, IonText } from "@ionic/react";
 import { calendarOutline } from "ionicons/icons";
 import { format } from "timeago.js";
 import styles from './Notifications.module.scss';
 
 export const Item = ({ item }: any) => {
+  
+  const baseURL = import.meta.env.VITE_BASE_BACK;
+  const network = useNetwork();
+
   return (
     <IonItem lines="none" className={styles["notificacion"]}>
       <IonAvatar aria-hidden="true" slot="start">
-        <img alt="" src={Logo} />
+        <img alt="" src={
+          network.status ? 
+            item.comunidad ? 
+            baseURL + item.comunidad?.imagen
+            : Logo
+          : Logo} />
       </IonAvatar>
       <div>
         <span className={styles["time"]}>
