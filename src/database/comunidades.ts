@@ -7,4 +7,5 @@ export default interface Comunidades {
   video?: string;
   descripcion: string;
   lider: User;
+  suscritos: User[];
 }

@@ -1,54 +1,42 @@
-import {
-  IonButtons,
-  IonContent,
-  IonHeader,
-  IonMenuButton,
-  IonPage,
-  IonTitle,
-  IonToolbar
-} from "@ionic/react";
+import Logo from "@/assets/images/logo.png";
+import { db } from "@/hooks/useDexie";
+import { useLiveQuery } from "dexie-react-hooks";
 
-import { Comunidades as ComunidadesComponent } from "@/components/Comunidades/Comunidades";
-import { useEffect } from "react";
-import { useHistory } from "react-router-dom";
-import styles from "./Comunidades.module.scss";
+import { AppLayout } from "@/components/layout";
 
-const Comunidades: React.FC = () => {
-  const history = useHistory();
+import { CommunityCard } from "@/components/Comunidades/CommunityCard";
 
-  useEffect(() => {
-    const handleBackButton = (ev: Event) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      history.replace("/home");
-    };
-
-    document.addEventListener("ionBackButton", handleBackButton);
-
-    return () => {
-      document.removeEventListener("ionBackButton", handleBackButton);
-    };
-  }, [history]);
+const Comunidades = () => {
+  const comunidades = useLiveQuery(() => db.comunidades.toArray());
 
   return (
-    <IonPage>
-      <IonHeader>
-        <IonToolbar className={styles["ion-header"]}>
-          <IonButtons slot="start">
-            <IonMenuButton/>
-          </IonButtons>
-          <IonTitle className="ion-no-padding ion-padding-end">
-            {" "}
-            Comunidades{" "}
-          </IonTitle>
-        </IonToolbar>
-      </IonHeader>
+    <AppLayout>
+      <div className="px-4 py-6 space-y-6">
+        {/* Header */}
+        <div className="flex items-center gap-3">
+          <img
+            src={Logo}
+            alt="Mente 360"
+            className="w-10 h-10 rounded-xl object-cover"
+          />
+          <div>
+            <h1 className="text-xl font-heading font-bold text-foreground">
+              Comunidades
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Encuentra tu espacio de crecimiento
+            </p>
+          </div>
+        </div>
 
-      <IonContent className={styles["ion-content"]}>
-        <ComunidadesComponent />
-      </IonContent>
-
-    </IonPage>
+        {/* Communities List */}
+        <div className="space-y-4">
+          {comunidades?.map((community) => (
+            <CommunityCard key={community.id} community={community} />
+          ))}
+        </div>
+      </div>
+    </AppLayout>
   );
 };
 

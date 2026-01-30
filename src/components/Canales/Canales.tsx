@@ -12,14 +12,12 @@ import {
   IonList
 } from "@ionic/react";
 import { useLiveQuery } from "dexie-react-hooks";
-import { useParams } from "react-router";
 import styles from "./Canales.module.scss";
 import { Item } from "./Item";
 
-export const Canales = () => {
+export const Canales = ({id}) => {
   const baseURL = import.meta.env.VITE_BASE_BACK;
 
-  const { id } = useParams<any>();
   const network = useNetwork();
 
   const comunidad = useLiveQuery(() =>

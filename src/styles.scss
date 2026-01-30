@@ -1,17 +1,24 @@
 @import "./css/_common.scss";
 @import "./css/_utils.scss";
 
-
 @font-face {
-  font-family: "Roboto";
-  src: local("Roboto"),
-    url("../assets/fonts/Roboto/Roboto-Regular.ttf") format("truetype");
+  font-family: "Mente360";
+  src: local("Mente360"),
+    url("../assets/fonts/Nunito/Nunito-VariableFont_wght.ttf") format("truetype");
 }
 
 @font-face {
-  font-family: "Roboto-bold";
-  src: local("Roboto-bold"),
-    url("../assets/fonts/Roboto/Roboto-Bold.ttf") format("truetype");
+  font-family: "Mente360-bold";
+  src: local("Mente360-bold"),
+    url("../assets/fonts/Nunito/Nunito-VariableFont_wght.ttf") format("truetype");
+}
+
+
+:root {
+  ion-tab-bar {
+    
+    padding-bottom: var(--ion-safe-area-bottom);
+  }
 }
 
 :root {
@@ -29,18 +36,14 @@
 
   --color-main-gradient: linear-gradient(to left bottom, #9E9E9E, #FFC90A);
   --color-main: #FFD92D;
-  --color-secondary: #FEF17E;
 
   --color-secondary-gradient: radial-gradient(#f1c689 25%, #d3d2d2 100%);
-
-  --ion-font-family: Roboto;
 
   --bg-base: #6B768A;
   --bg-primary: #ffc547;
   --bg-secondary: #f6d17f;
   --bg-content: #F8F8F8;
 
-  --ion-color-primary: #ffc547;
   --ion-color: #78849A;
   --bg-player: #78849A;
   --txt-black: #fff;
@@ -99,7 +102,7 @@
 
 html,
 body {
-  font-family: Roboto;
+  font-family: Mente360;
 }
 
 body.dark {

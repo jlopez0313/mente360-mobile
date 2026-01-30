@@ -5,9 +5,10 @@ import App from "./App";
 import { store } from "./store/store";
 /* Theme variables */
 import "@ionic/react/css/palettes/dark.class.css";
+import "./main.css";
+/*
 import "./styles.scss";
-import "./theme/variables.css";
-
+*/
 
 
 const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
