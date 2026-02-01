@@ -1,87 +1,111 @@
-import {
-  IonAvatar,
-  IonButton,
-  IonButtons,
-  IonContent,
-  IonHeader,
-  IonItem,
-  IonList,
-  IonPage,
-  IonPopover,
-  IonSkeletonText,
-  IonTitle,
-  IonToolbar,
-} from "@ionic/react";
-import styles from "./Grupo.module.scss";
 
-import { IonIcon } from "@ionic/react";
-import { arrowBack, ellipsisVerticalOutline } from "ionicons/icons";
 
-import { Link, useHistory, useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 
-import Avatar from "@/assets/images/avatar.jpg";
-import { readData, removeData, snapshotToArray, writeData } from "@/services/realtime-db";
-import { onValue } from "firebase/database";
 import { useEffect, useState } from "react";
 
-import { Grupo as GrupoComponent } from "@/components/Chat/Grupos/Grupo/Grupo";
-import { useAppExitTracker } from "@/hooks/useAppExitTracker";
-import { useSelector } from "react-redux";
+import { AppLayout } from "@/components/layout";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { mockGroups } from "@/lib/mockData";
+import { cn } from "@/lib/utils";
+import { ArrowLeft, MoreVertical, Paperclip, Send, Smile, Users } from "lucide-react";
+
+interface GroupMessage {
+  id: string;
+  text: string;
+  senderName: string;
+  senderAvatar?: string;
+  isMe: boolean;
+  time: string;
+}
+
+const mockGroupMessages: GroupMessage[] = [
+  {
+    id: "1",
+    text: "¡Buenos días a todos! 🌅",
+    senderName: "María",
+    isMe: false,
+    time: "09:00",
+  },
+  {
+    id: "2",
+    text: "Buenos días María, ¿cómo amaneciste?",
+    senderName: "Carlos",
+    isMe: false,
+    time: "09:02",
+  },
+  {
+    id: "3",
+    text: "Muy bien, gracias. ¿Listos para el ejercicio de hoy?",
+    senderName: "María",
+    isMe: false,
+    time: "09:03",
+  },
+  {
+    id: "4",
+    text: "¡Sí! Estoy motivado",
+    senderName: "Tú",
+    isMe: true,
+    time: "09:05",
+  },
+  {
+    id: "5",
+    text: "Recuerden que hoy tenemos meditación guiada a las 7pm",
+    senderName: "Dr. García",
+    isMe: false,
+    time: "09:10",
+  },
+  {
+    id: "6",
+    text: "¡Ahí estaré! Gracias por el recordatorio 🙏",
+    senderName: "Tú",
+    isMe: true,
+    time: "09:12",
+  },
+];
 
 const Grupo: React.FC = () => {
-  const { id } = useParams<any>();
-  const { user } = useSelector( (state: any) => state.user);
-  const baseURL = import.meta.env.VITE_BASE_BACK;
-
   const history = useHistory();
 
-  const [removed, setRemoved] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isWriting, setIsWriting] = useState<any>(null);
+  const { id: groupId } = useParams<any>();
+  const [messages, setMessages] = useState<GroupMessage[]>(mockGroupMessages);
+  const [newMessage, setNewMessage] = useState("");
 
-  const [grupo, setGrupo] = useState({ grupo: "", photo: "" });
+  const group = mockGroups.find((g) => g.id === groupId);
 
-  const onGetGrupo = async (id: number) => {
-    onValue(readData(`grupos/${id}`), async (snapshot) => {
-      const data = snapshot.val();
+  if (!group) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Grupo no encontrado</p>
+      </div>
+    );
+  }
 
-      setGrupo({
-        ...data,
-        users: snapshotToArray(data.users),
-        messages: snapshotToArray(data.messages)
-      });
+  const sendMessage = () => {
+    if (!newMessage.trim()) return;
 
-      const users: any = data ? snapshotToArray(data.users) : [];
+    const message: GroupMessage = {
+      id: Date.now().toString(),
+      text: newMessage,
+      senderName: "Tú",
+      isMe: true,
+      time: new Date().toLocaleTimeString("es-ES", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    };
 
-      const isWriting = users.find(
-        (usario: any) => usario.writing && usario.id != user.id
-      );
-      setIsWriting(isWriting ?? null);
-
-    });
+    setMessages((prev) => [...prev, message]);
+    setNewMessage("");
   };
 
-  const goToDetalle = () => {
-    history.replace("/grupo/info/" + id);
-  };
-
-  const onEnter = async () => {
-    await writeData(`grupos/${id}/users/${user.id}/exit_time`, null);
-  };
-
-  const onExit = async () => {
-    await Promise.all([
-      writeData(`grupos/${id}/users/${user.id}/writing`, false),
-      writeData(
-        `grupos/${id}/users/${user.id}/exit_time`,
-        new Date().toISOString()
-      ),
-    ]);
-  };
-
-  const onExitGroup = async () => {
-    await removeData(`users/${user.id}/grupos/${id}`);
-    setRemoved(true);
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
   };
 
   useEffect(() => {
@@ -98,97 +122,134 @@ const Grupo: React.FC = () => {
     };
   }, [history]);
 
-  useEffect(() => {
-    onGetGrupo(id);
-  }, [id]);
-
-  useEffect(() => {
-    onEnter();
-
-    return () => {
-      onExit();
-    };
-  }, []);
-
-  const appExitTracker = useAppExitTracker( onExit );
-
   return (
-    <IonPage>
-      <IonHeader>
-        <IonToolbar className={styles["ion-header"]}>
-          <IonButtons slot="start">
-            <Link to="/chat" replace={true}>
-              <IonButton fill="clear" className={styles.backButton}>
-                <IonIcon slot="start" icon={arrowBack} />
-              </IonButton>
-            </Link>
-          </IonButtons>
+    <AppLayout>
+      <div className="min-h-screen bg-background flex flex-col">
+        {/* Header */}
+        <div className="sticky top-0 z-10 bg-card border-b border-border px-4 py-3 safe-top">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
 
-          <IonAvatar
-            aria-hidden="true"
-            slot="start"
-            className={styles["avatar"]}
-          >
-            {isLoading && (
-              <IonSkeletonText
-                animated
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  borderRadius: "50%",
-                }}
-              />
-            )}
-            <img
-              alt=""
-              src={grupo.photo ? baseURL + grupo.photo : Avatar}
-              style={{ display: isLoading ? "none" : "block" }}
-              onLoad={() => setIsLoading(false)}
-            />
-          </IonAvatar>
+            <Avatar className="w-10 h-10">
+              <AvatarImage src={group.avatar} />
+              <AvatarFallback className="bg-secondary text-secondary-foreground">
+                {group.name.charAt(0)}
+              </AvatarFallback>
+            </Avatar>
 
-          <div className={styles["title-container"]}>
-            <IonTitle className="title">{grupo.grupo}</IonTitle>{" "}
-            {isWriting ? (
-              <span className={styles["status"]}>{isWriting.name} Escribiendo...</span>
-            ) : null}{" "}
+            <div className="flex-1">
+              <h2 className="font-semibold text-foreground">{group.name}</h2>
+              <p className="text-xs text-muted-foreground flex items-center gap-1">
+                <Users className="w-3 h-3" />
+                {group.memberCount} miembros
+              </p>
+            </div>
+
+            <Button variant="ghost" size="icon">
+              <MoreVertical className="w-5 h-5" />
+            </Button>
           </div>
+        </div>
 
-          <IonButtons slot="end">
-            <IonButton id="popover-button">
-              <IonIcon
-                slot="icon-only"
-                icon={ellipsisVerticalOutline}
-              ></IonIcon>
-            </IonButton>
-          </IonButtons>
-        </IonToolbar>
-      </IonHeader>
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+          {messages.map((message, index) => {
+            const showSender =
+              !message.isMe &&
+              (index === 0 ||
+                messages[index - 1].senderName !== message.senderName);
 
-      <IonContent className={`ion-no-padding ${styles["ion-content"]}`}>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">Notifications</IonTitle>
-          </IonToolbar>
-        </IonHeader>
+            return (
+              <div
+                key={message.id}
+                className={cn(
+                  "flex",
+                  message.isMe ? "justify-end" : "justify-start"
+                )}
+              >
+                <div
+                  className={cn(
+                    "max-w-[80%]",
+                    !message.isMe && "pl-8 relative"
+                  )}
+                >
+                  {!message.isMe && showSender && (
+                    <Avatar className="w-6 h-6 absolute left-0 bottom-0">
+                      <AvatarImage src={message.senderAvatar} />
+                      <AvatarFallback className="text-xs bg-primary/10 text-primary">
+                        {message.senderName.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
 
-        <GrupoComponent removed={removed} grupo={grupo} grupoID={id} />
-      </IonContent>
+                  {showSender && !message.isMe && (
+                    <p className="text-xs text-primary font-medium mb-1 ml-1">
+                      {message.senderName}
+                    </p>
+                  )}
 
-      <IonPopover trigger="popover-button" dismissOnSelect={true}>
-        <IonContent>
-          <IonList lines="none">
-            <IonItem button={true} detail={false} onClick={goToDetalle}>
-              Añadir Miembros
-            </IonItem>
-            <IonItem button={true} detail={false} onClick={onExitGroup}>
-              Salir del Grupo
-            </IonItem>
-          </IonList>
-        </IonContent>
-      </IonPopover>
+                  <div
+                    className={cn(
+                      "px-4 py-2.5 rounded-2xl",
+                      message.isMe
+                        ? "bg-primary text-primary-foreground rounded-br-md"
+                        : "bg-card border border-border rounded-bl-md"
+                    )}
+                  >
+                    <p className="text-sm">{message.text}</p>
+                    <p
+                      className={cn(
+                        "text-[10px] mt-1",
+                        message.isMe
+                          ? "text-primary-foreground/70"
+                          : "text-muted-foreground"
+                      )}
+                    >
+                      {message.time}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
 
-    </IonPage>
+        {/* Input */}
+        <div className="sticky bottom-0 bg-card border-t border-border px-4 py-3 safe-bottom">
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" className="flex-shrink-0">
+              <Paperclip className="w-5 h-5" />
+            </Button>
+            <div className="flex-1 relative">
+              <Input
+                placeholder="Escribe un mensaje..."
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                className="pr-10 bg-background border-border"
+              />
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
+              >
+                <Smile className="w-4 h-4" />
+              </Button>
+            </div>
+            <Button
+              size="icon"
+              onClick={sendMessage}
+              disabled={!newMessage.trim()}
+              className="flex-shrink-0"
+            >
+              <Send className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
+    </AppLayout>
   );
 };
 

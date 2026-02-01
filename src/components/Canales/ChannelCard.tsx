@@ -1,4 +1,3 @@
-import AudioNoWifi from "@/assets/images/audio_no_wifi.jpg";
 import { Card, CardContent } from "@/components/ui/card";
 import { NetworkContext } from "@/context/NetworkContext";
 import Canales from "@/database/canales";
@@ -35,8 +34,7 @@ type Props = {
 };
 
 export const ChannelCard = ({ channel }: Props) => {
-  const baseURL = import.meta.env.VITE_BASE_BACK;
-  const { status } = useContext(NetworkContext);
+  const { AudioNoWifi, baseURL, status } = useContext(NetworkContext);
 
   return (
     <Card className="cursor-pointer border-border/50 hover:border-primary/30 hover:shadow-soft transition-all">

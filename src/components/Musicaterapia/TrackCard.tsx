@@ -1,28 +1,30 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { NetworkContext } from "@/context/NetworkContext";
+import Clips from "@/database/clips";
 import { cn } from "@/lib/utils";
-import type { Track } from "@/pages/Musicaterapia/Musicaterapia";
 import {
-    Check,
-    Download,
-    Heart,
-    ListMinus,
-    ListPlus,
-    MoreVertical,
-    Pause,
-    Play,
-    Share2
+  Check,
+  Download,
+  Heart,
+  ListMinus,
+  ListPlus,
+  MoreVertical,
+  Pause,
+  Play,
+  Share2,
 } from "lucide-react";
+import { useContext } from "react";
 import { toast } from "sonner";
 
 interface TrackCardProps {
-  track: Track;
+  track: Clips;
   isPlaying: boolean;
   onPlay: () => void;
   onToggleLike: () => void;
@@ -44,11 +46,15 @@ export const TrackCard = ({
   onTogglePlaylist,
   onDownload,
 }: TrackCardProps) => {
+  const { AudioNoWifi, baseURL, status } = useContext(NetworkContext);
+
   const handleShare = async () => {
     try {
       await navigator.share({
-        title: track.title,
-        text: `Escucha "${track.title}" de ${track.artist} en Mente 360`,
+        title: track.titulo,
+        text: `Escucha "${track.titulo}" de la categoría ${
+          track.categoria?.categoria
+        } en ${import.meta.env.VITE_NAME}`,
         url: window.location.href,
       });
     } catch {
@@ -58,18 +64,20 @@ export const TrackCard = ({
   };
 
   return (
-    <Card className={cn(
-      "overflow-hidden border-border/50 transition-all",
-      isPlaying && "border-primary/50 bg-primary/5"
-    )}>
+    <Card
+      className={cn(
+        "overflow-hidden border-border/50 transition-all",
+        isPlaying && "border-primary/50 bg-primary/5"
+      )}
+    >
       <CardContent className="p-0">
         <div className="flex items-center gap-3 p-3">
           {/* Cover & Play */}
           <div className="relative shrink-0">
             <div className="w-14 h-14 rounded-xl overflow-hidden bg-muted">
               <img
-                src={track.coverImage}
-                alt={track.title}
+                src={status ? baseURL + track.imagen : AudioNoWifi}
+                alt={track.titulo}
                 className="w-full h-full object-cover"
               />
             </div>
@@ -78,8 +86,8 @@ export const TrackCard = ({
               onClick={onPlay}
               className={cn(
                 "absolute inset-0 m-auto w-8 h-8 rounded-full shadow-medium",
-                isPlaying 
-                  ? "bg-primary/90 hover:bg-primary" 
+                isPlaying
+                  ? "bg-primary/90 hover:bg-primary"
                   : "bg-foreground/80 hover:bg-foreground"
               )}
             >
@@ -94,16 +102,16 @@ export const TrackCard = ({
           {/* Info */}
           <div className="flex-1 min-w-0">
             <h3 className="font-medium text-foreground text-sm truncate">
-              {track.title}
+              {track.titulo}
             </h3>
-            <p className="text-xs text-muted-foreground truncate">{track.artist}</p>
+            <p className="text-xs text-muted-foreground truncate">
+              {track.categoria?.categoria}
+            </p>
             <div className="flex items-center gap-2 mt-1">
               <span className="text-xs text-muted-foreground">
                 {formatDuration(track.duration)}
               </span>
-              {track.isDownloaded && (
-                <Check className="w-3 h-3 text-success" />
-              )}
+              {track.isDownloaded && <Check className="w-3 h-3 text-success" />}
             </div>
           </div>
 
@@ -115,11 +123,11 @@ export const TrackCard = ({
               onClick={onToggleLike}
               className="w-8 h-8"
             >
-              <Heart 
+              <Heart
                 className={cn(
                   "w-4 h-4 transition-colors",
                   track.isLiked ? "fill-sos text-sos" : "text-muted-foreground"
-                )} 
+                )}
               />
             </Button>
 
@@ -134,12 +142,12 @@ export const TrackCard = ({
                   {track.inMyPlaylist ? (
                     <>
                       <ListMinus className="w-4 h-4 mr-2" />
-                      Quitar de mi playlist
+                      Quitar de favoritos
                     </>
                   ) : (
                     <>
                       <ListPlus className="w-4 h-4 mr-2" />
-                      Agregar a mi playlist
+                      Agregar a favoritos
                     </>
                   )}
                 </DropdownMenuItem>

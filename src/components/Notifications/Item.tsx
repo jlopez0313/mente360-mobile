@@ -13,9 +13,7 @@ type Props = {
 }
 
 export const Item = ({ markAsRead, deleteNotification, notification }: Props) => {
-  
-  const baseURL = import.meta.env.VITE_BASE_BACK;
-  const { status, connectionType } = useContext(NetworkContext);
+  const { baseURL, status } = useContext(NetworkContext);
 
   return (
     <div

@@ -1,4 +1,3 @@
-import AudioNoWifi from "@/assets/images/audio_no_wifi.jpg";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,12 +17,10 @@ type Props = {
 };
 
 export const CommunityCard = ({ community }: Props) => {
-  const baseURL = import.meta.env.VITE_BASE_BACK;
-
   const history = useHistory();
   const { userEnabled, payment_status } = usePayment();
 
-  const { status } = useContext(NetworkContext);
+  const { AudioNoWifi, baseURL, status } = useContext(NetworkContext);
 
   const { user } = useSelector((state: any) => state.user);
 

@@ -1,4 +1,3 @@
-import AudioNoWifi from "@/assets/images/audio_no_wifi.jpg";
 import { AppLayout } from "@/components/layout";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -38,8 +37,7 @@ const formatTime = (seconds: number) => {
 };
 
 const Crecimientos: React.FC = () => {
-  const baseURL = import.meta.env.VITE_BASE_BACK;
-  const { status } = useContext(NetworkContext);
+  const { AudioNoWifi, baseURL, status } = useContext(NetworkContext);
 
   const { user } = useSelector((state: any) => state.user);
 

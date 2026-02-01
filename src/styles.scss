@@ -156,26 +156,6 @@ ion-content {
   background: none;
 }
 
-ion-header {
-
-  ion-toolbar {
-    padding-top: var(--ion-safe-area-top);
-    min-height: 64px;
-
-    color: var(--ion-color);
-  }
-
-  ion-icon {
-    color: #000;
-  }
-
-  ion-title {
-    color: var(--ion-color);
-    font-weight: bold;
-    font-size: 1.2rem;
-  }
-
-}
 
 .sc-ion-label-md-s h2 {
   font-size: 14px !important;
@@ -196,14 +176,6 @@ ion-header {
   filter: invert(.5);
 }
 
-ion-button,
-ion-fab-button {
-  --background: var(--color-main);
-  text-transform: none !important;
-  color: #1e1e1e;
-  font-size: 14px;
-}
-
 ion-datetime::part(calendar-day):focus {
   background-color: rgba(209, 192, 98, 0.2);
   box-shadow: 0px 0px 0px 4px rgba(209, 202, 98, 0.2);
@@ -221,49 +193,6 @@ ion-datetime.ios::part(calendar-day active),
 ion-datetime.ios::part(calendar-day active):focus {
   background-color: rgb(154 209 98 / 0.2);
   color: #000;
-}
-
-a {
-  text-decoration: none;
-}
-
-
-ion-label,
-ion-input,
-ion-select,
-ion-text,
-ion-icon,
-p,
-span,
-input {
-  color: var(--ion-color) !important;
-}
-
-ion-item {
-  --background: none;
-  --border-color: transparent !important;
-
-  ion-label {
-    text-align: center;
-  }
-}
-
-ion-searchbar,
-ion-input,
-ion-select,
-input {
-  background: var(--bg-white) !important;
-  border: none !important;
-  --border-color: transparent;
-  border-radius: 0px !important;
-}
-
-ion-searchbar,
-ion-select,
-.input-fill-outline {
-  --border-color: transparent !important;
-  border-bottom: 1px solid var(--ion-color) !important;
-  border-radius: 0px !important;
 }
 
 .custom-action-sheet {
@@ -306,22 +235,6 @@ ion-select,
     min-height: 50px;
     padding-top: 8px;
     padding-bottom: 8px;
-  }
-}
-
-.flex {
-  display: flex;
-
-  &.items-center {
-    align-items: center;
-  }
-
-  &.justify-center {
-    justify-content: center;
-  }
-
-  &.justify-end {
-    justify-content: end;
   }
 }
 

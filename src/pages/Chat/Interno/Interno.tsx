@@ -1,91 +1,68 @@
-import {
-  IonAvatar,
-  IonButton,
-  IonButtons,
-  IonContent,
-  IonHeader,
-  IonPage,
-  IonSkeletonText,
-  IonTitle,
-  IonToolbar,
-} from "@ionic/react";
-import styles from "./Interno.module.scss";
 
-import { IonIcon } from "@ionic/react";
-import { arrowBack } from "ionicons/icons";
 
-import { Interno as InternoComponent } from "@/components/Chat/Chat/Interno/Interno";
-import { Profile as ProfileModal } from "@/components/Chat/Profile/Profile";
-import { Link, useHistory, useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 
-import Avatar from "@/assets/images/avatar.jpg";
-import { getDisplayDate } from "@/helpers/Fechas";
-import {
-  doDisconnect,
-  getData,
-  readData,
-  writeData,
-} from "@/services/realtime-db";
-import { onValue } from "firebase/database";
+import { AppLayout } from "@/components/layout";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { mockChats } from "@/lib/mockData";
+import { cn } from "@/lib/utils";
+import { ArrowLeft, MoreVertical, Paperclip, Phone, Send, Smile, Video } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+
+interface Message {
+  id: string;
+  text: string;
+  sender: "me" | "other";
+  time: string;
+}
+
+const mockMessages: Message[] = [
+  { id: "1", text: "¡Hola! ¿Cómo estás hoy?", sender: "other", time: "10:30" },
+  { id: "2", text: "¡Hola! Muy bien, gracias. ¿Y tú?", sender: "me", time: "10:31" },
+  { id: "3", text: "También bien. ¿Pudiste hacer los ejercicios de respiración?", sender: "other", time: "10:32" },
+  { id: "4", text: "Sí, me ayudaron mucho. Me siento más tranquilo.", sender: "me", time: "10:33" },
+  { id: "5", text: "¡Qué bueno! Recuerda practicarlos todos los días.", sender: "other", time: "10:34" },
+  { id: "6", text: "Lo haré. Gracias por el apoyo 🙏", sender: "me", time: "10:35" },
+];
 
 const Interno: React.FC = () => {
   const history = useHistory();
-  const { user } = useSelector((state: any) => state.user);
-  const { room } = useParams<{ room: string }>();
-  const baseURL = import.meta.env.VITE_BASE_BACK;
+  const { room: chatId } = useParams<any>();
+  const [messages, setMessages] = useState<Message[]>(mockMessages);
+  const [newMessage, setNewMessage] = useState("");
 
-  const [otherUser, setOtherUser] = useState({
-    id: null,
-    name: "",
-    photo: null,
-  });
-  const [dataUserRoom, setDataUserRoom] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [showProfileModal, setShowProfileModal] = useState(false);
+  const chat = mockChats.find(c => c.id === chatId);
 
-  const onGetRoom = async () => {
-    onValue(readData(`rooms/${room}`), async (snapshot) => {
-      const data = snapshot.val();
-      const userInRoom = room.split("_").find((id: any) => id != user.id) ?? 0;
+  if (!chat) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Chat no encontrado</p>
+      </div>
+    );
+  }
 
-      const dataUser = await getData(`users/${userInRoom}`);
-      const otherUser = dataUser.val();
-
-      setOtherUser({ ...otherUser });
-      data.users[userInRoom] && setDataUserRoom(data.users[userInRoom]);
-    });
+  const sendMessage = () => {
+    if (!newMessage.trim()) return;
+    
+    const message: Message = {
+      id: Date.now().toString(),
+      text: newMessage,
+      sender: "me",
+      time: new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })
+    };
+    
+    setMessages(prev => [...prev, message]);
+    setNewMessage("");
   };
 
-  const onEnter = async () => {
-    await writeData(`rooms/${room}/${user.id}/exit_time`, null);
-  };
-
-  const onExit = async () => {
-    await Promise.all([
-      writeData(`rooms/${room}/users/${user.id}/writing`, false),
-      writeData(
-        `rooms/${room}/users/${user.id}/exit_time`,
-        new Date().toISOString()
-      ),
-    ]);
-  };
-
-  const onDisconnect = () => {
-    try {
-      doDisconnect(`rooms/${room}/users/${user.id}`, {
-        writing: false,
-        exit_time: new Date().toISOString(),
-      });
-    } catch (error) {
-      console.error(error);
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
     }
   };
-
-  useEffect(() => {
-    onGetRoom();
-  }, [room]);
 
   useEffect(() => {
     const handleBackButton = (ev: Event) => {
@@ -101,100 +78,116 @@ const Interno: React.FC = () => {
     };
   }, [history]);
 
-  useEffect(() => {
-    onEnter();
-    // onDisconnect();
-
-    return () => {
-      onExit();
-    };
-  }, []);
-
   return (
-    <IonPage>
-      <IonHeader>
-        <IonToolbar className={styles["ion-header"]}>
-          <IonButtons slot="start">
-            <Link to="/chat" replace={true}>
-              <IonButton fill="clear" className={styles.backButton}>
-                <IonIcon slot="start" icon={arrowBack} />
-              </IonButton>
-            </Link>
-          </IonButtons>
-
-          <IonAvatar
-            aria-hidden="true"
-            slot="start"
-            className={styles["avatar"]}
+    <AppLayout>
+      <div className="min-h-screen bg-background flex flex-col">
+      {/* Header */}
+      <div className="sticky top-0 z-10 bg-card border-b border-border px-4 py-3 safe-top">
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
           >
-            {isLoading && (
-              <IonSkeletonText
-                animated
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  borderRadius: "50%",
-                }}
-              />
-            )}
-            <img
-              alt=""
-              src={otherUser.photo ? baseURL + otherUser.photo : Avatar}
-              style={{ display: isLoading ? "none" : "block" }}
-              onLoad={() => setIsLoading(false)}
-            />
-          </IonAvatar>
-
-          <div
-            className={styles["title-container"]}
-            onClick={() => setShowProfileModal(true)}
-          >
-            <IonTitle className={styles["title"]}>{otherUser.name}</IonTitle>
-            {dataUserRoom?.writing ? (
-              <span className={styles["status"]}>Escribiendo...</span>
-            ) : (
-              <span className={styles["status"]}>
-                {dataUserRoom?.exit_time
-                  ? getDisplayDate(dataUserRoom.exit_time)
-                  : dataUserRoom
-                  ? "En línea"
-                  : ""}
-              </span>
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          
+          <div className="relative">
+            <Avatar className="w-10 h-10">
+              <AvatarImage src={chat.participant.avatar} />
+              <AvatarFallback className="bg-primary/10 text-primary">
+                {chat.participant.name.charAt(0)}
+              </AvatarFallback>
+            </Avatar>
+            {chat.participant.isOnline && (
+              <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-success rounded-full border-2 border-card" />
             )}
           </div>
+          
+          <div className="flex-1">
+            <h2 className="font-semibold text-foreground">{chat.participant.name}</h2>
+            <p className="text-xs text-muted-foreground">
+              {chat.participant.isOnline ? "En línea" : "Desconectado"}
+            </p>
+          </div>
+          
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="icon">
+              <Phone className="w-5 h-5" />
+            </Button>
+            <Button variant="ghost" size="icon">
+              <Video className="w-5 h-5" />
+            </Button>
+            <Button variant="ghost" size="icon">
+              <MoreVertical className="w-5 h-5" />
+            </Button>
+          </div>
+        </div>
+      </div>
 
-          {/*
-          <IonButtons slot="end">
-            <IonButton id="popover-button">
-              <IonIcon
-                slot="icon-only"
-                icon={ellipsisVerticalOutline}
-              ></IonIcon>
-            </IonButton>
-          </IonButtons>
-          */}
-        </IonToolbar>
-      </IonHeader>
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+        {messages.map((message) => (
+          <div
+            key={message.id}
+            className={cn(
+              "flex",
+              message.sender === "me" ? "justify-end" : "justify-start"
+            )}
+          >
+            <div
+              className={cn(
+                "max-w-[80%] px-4 py-2.5 rounded-2xl",
+                message.sender === "me"
+                  ? "bg-primary text-primary-foreground rounded-br-md"
+                  : "bg-card border border-border rounded-bl-md"
+              )}
+            >
+              <p className="text-sm">{message.text}</p>
+              <p className={cn(
+                "text-[10px] mt-1",
+                message.sender === "me" ? "text-primary-foreground/70" : "text-muted-foreground"
+              )}>
+                {message.time}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
 
-      <IonContent className={`ion-no-padding ${styles["ion-content"]}`}>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">Notifications</IonTitle>
-          </IonToolbar>
-        </IonHeader>
-
-        <InternoComponent usuario={otherUser} roomID={room} />
-      </IonContent>
-
-      {showProfileModal && (
-        <ProfileModal
-          usuario={otherUser}
-          showProfileModal={showProfileModal}
-          setShowProfileModal={setShowProfileModal}
-        />
-      )}
-      
-    </IonPage>
+      {/* Input */}
+      <div className="sticky bottom-0 bg-card border-t border-border px-4 py-3 safe-bottom">
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" className="flex-shrink-0">
+            <Paperclip className="w-5 h-5" />
+          </Button>
+          <div className="flex-1 relative">
+            <Input
+              placeholder="Escribe un mensaje..."
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyPress={handleKeyPress}
+              className="pr-10 bg-background border-border"
+            />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
+            >
+              <Smile className="w-4 h-4" />
+            </Button>
+          </div>
+          <Button
+            size="icon"
+            onClick={sendMessage}
+            disabled={!newMessage.trim()}
+            className="flex-shrink-0"
+          >
+            <Send className="w-4 h-4" />
+          </Button>
+        </div>
+      </div>
+    </div>
+    </AppLayout>
   );
 };
 

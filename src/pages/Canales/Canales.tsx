@@ -1,4 +1,3 @@
-import AudioNoWifi from "@/assets/images/audio_no_wifi.jpg";
 import { ChannelCard } from "@/components/Canales/ChannelCard";
 import { AppLayout } from "@/components/layout";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -14,12 +13,10 @@ import { useContext, useEffect, useState } from "react";
 import { Link, useHistory, useParams } from "react-router-dom";
 
 const Canales: React.FC = () => {
-  const baseURL = import.meta.env.VITE_BASE_BACK;
-
   const history = useHistory();
   const { id } = useParams<any>();
 
-  const { status } = useContext(NetworkContext);
+  const { AudioNoWifi, baseURL, status } = useContext(NetworkContext);
 
   const [expandido, setExpandido] = useState(false);
 

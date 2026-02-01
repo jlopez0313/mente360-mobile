@@ -1,7 +1,5 @@
 import Logo from "@/assets/images/logo.png";
 
-
-
 import { AppLayout } from "@/components/layout";
 import { CategorySlider } from "@/components/Musicaterapia/CategorySlider";
 import { FavoritesList } from "@/components/Musicaterapia/FavoritesList";
@@ -9,7 +7,10 @@ import { MiniPlayer } from "@/components/Musicaterapia/MiniPlayer";
 import { TrackList } from "@/components/Musicaterapia/TrackList";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { mockMusicTracks, musicCategories } from "@/lib/mockData";
+import Clips from "@/database/clips";
+import { db } from "@/hooks/useDexie";
+import { IonInfiniteScroll, IonInfiniteScrollContent } from "@ionic/react";
+import { useLiveQuery } from "dexie-react-hooks";
 import { Heart, Music, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -27,37 +28,93 @@ export interface Track {
 }
 
 const Musicaterapia: React.FC = () => {
-
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
-  const [tracks, setTracks] = useState<Track[]>(
-    mockMusicTracks.map(t => ({ ...t, isLiked: false, inMyPlaylist: false }))
+  const [selectedCategory, setSelectedCategory] = useState<number | undefined>(
+    undefined
+  );
+  const [currentTrack, setCurrentTrack] = useState<Clips | undefined>(
+    undefined
+  );
+  const [page, setPage] = useState<number>(1);
+  const [hasMore, setHasMore] = useState(true);
+
+  const categories = useLiveQuery(() =>
+    db.categorias.orderBy("categoria").toArray()
   );
 
-  const filteredTracks = tracks.filter((track) => {
-    const matchesSearch = track.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      track.artist.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = !selectedCategory || track.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const clips = useLiveQuery(async () => {
+    const resultados = await db.clips
+      .orderBy("titulo")
+      .toArray()
+      .then((resultados) =>
+        resultados.filter((c) =>
+          c.titulo.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      )
+      .then((resultados) => {
+        if (selectedCategory != undefined) {
+          return resultados.filter(
+            (r: any) => r.categoria?.id == Number(selectedCategory)
+          );
+        }
+        return resultados;
+      });
 
-  const handleToggleLike = (trackId: string) => {
+    const limit = page * 10;
+    const paginados = resultados.slice(0, limit);
+
+    setHasMore(paginados.length < resultados.length);
+
+    // dispatch(setListAudios([...paginados]));
+
+    return paginados;
+  }, [selectedCategory, page, searchQuery]);
+
+  const handlePage = (evt: any, page: any) => {
+    if (hasMore) setPage(page);
+    else evt.target.complete();
+  };
+
+  const handleCategory = (id: number | undefined) => {
+    // dispatch(clearListAudios());
+    setHasMore(true);
+    setSelectedCategory(id);
+    setSearchQuery("");
+    setPage(1);
+  };
+
+  const handleSearchChange = (value: string) => {
+    // dispatch(clearListAudios());
+    setHasMore(true);
+    setSearchQuery(value);
+
+    if (value !== "") {
+      setPage(1);
+    }
+  };
+
+  const handleToggleLike = (trackId: number | undefined) => {
+    /*
     setTracks(prev => prev.map(t => 
       t.id === trackId ? { ...t, isLiked: !t.isLiked } : t
     ));
+    */
   };
 
-  const handleTogglePlaylist = (trackId: string) => {
+  const handleTogglePlaylist = (trackId: number | undefined) => {
+    /*
     setTracks(prev => prev.map(t => 
       t.id === trackId ? { ...t, inMyPlaylist: !t.inMyPlaylist } : t
     ));
+    */
   };
 
-  const handleDownload = (trackId: string) => {
+  const handleDownload = (trackId: number | undefined) => {
+    /*
     setTracks(prev => prev.map(t => 
       t.id === trackId ? { ...t, isDownloaded: !t.isDownloaded } : t
     ));
+    */
   };
 
   useEffect(() => {
@@ -80,10 +137,18 @@ const Musicaterapia: React.FC = () => {
         {/* Header */}
         <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50 px-4 py-4 space-y-4">
           <div className="flex items-center gap-3">
-            <img src={Logo} alt="Mente 360" className="w-10 h-10 rounded-xl object-cover" />
+            <img
+              src={Logo}
+              alt="Mente 360"
+              className="w-10 h-10 rounded-xl object-cover"
+            />
             <div>
-              <h1 className="text-xl font-heading font-bold text-foreground">Musicoterapia</h1>
-              <p className="text-sm text-muted-foreground">Sonidos para tu bienestar</p>
+              <h1 className="text-xl font-heading font-bold text-foreground">
+                Musicoterapia
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                Sonidos para tu bienestar
+              </p>
             </div>
           </div>
 
@@ -93,7 +158,7 @@ const Musicaterapia: React.FC = () => {
             <Input
               placeholder="Buscar canciones o artistas..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               className="pl-10 !bg-muted/50 !border-border/50"
             />
           </div>
@@ -116,14 +181,14 @@ const Musicaterapia: React.FC = () => {
             <TabsContent value="clips" className="space-y-6 mt-0">
               {/* Categories */}
               <CategorySlider
-                categories={musicCategories}
+                categories={categories}
                 selectedCategory={selectedCategory}
-                onSelectCategory={setSelectedCategory}
+                onSelectCategory={handleCategory}
               />
 
               {/* Track List */}
               <TrackList
-                tracks={filteredTracks}
+                tracks={clips}
                 onPlay={setCurrentTrack}
                 onToggleLike={handleToggleLike}
                 onTogglePlaylist={handleTogglePlaylist}
@@ -134,7 +199,7 @@ const Musicaterapia: React.FC = () => {
 
             <TabsContent value="favorites" className="mt-0">
               <FavoritesList
-                tracks={tracks}
+                tracks={clips}
                 onPlay={setCurrentTrack}
                 onToggleLike={handleToggleLike}
                 currentTrackId={currentTrack?.id}
@@ -151,6 +216,18 @@ const Musicaterapia: React.FC = () => {
           />
         )}
       </div>
+
+      <IonInfiniteScroll
+        onIonInfinite={(ev) => {
+          handlePage(ev, page + 1);
+          setTimeout(() => ev.target.complete(), 1000);
+        }}
+      >
+        <IonInfiniteScrollContent
+          loadingText="Cargando..."
+          loadingSpinner="bubbles"
+        ></IonInfiniteScrollContent>
+      </IonInfiniteScroll>
     </AppLayout>
   );
 };

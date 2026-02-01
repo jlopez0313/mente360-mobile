@@ -39,6 +39,9 @@ import "@ionic/react/css/text-transformation.css";
 
 /* Theme variables */
 import { Toast } from "@/components/Shared/Toast/Toast";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { CapacitorUpdater } from "@capgo/capacitor-updater";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
@@ -92,96 +95,121 @@ const App: React.FC = () => {
   return (
     <>
       <IonReactRouter>
-        <NetworkProvider>
-          <DBProvider>
-            <Configuracion />
-            {globalAudio && showGlobalAudio && <Toast />}
-            <div>
-              <IonPage id="main-content">
-                <IonRouterOutlet>
-                  <Route exact path="/" component={Splash} />
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <NetworkProvider>
+            <DBProvider>
+              <Configuracion />
+              {globalAudio && showGlobalAudio && <Toast />}
+              <div>
+                <IonPage id="main-content">
+                  <IonRouterOutlet>
+                    <Route exact path="/" component={Splash} />
 
-                  {/* Tabs */}
-                  <Route exact={true} path={["/home", "/comunidades", "/notificaciones", "/musicaterapia", "/chat"]}>
-                    <TabsLayout />
-                  </Route>
+                    {/* Tabs */}
+                    <Route
+                      exact={true}
+                      path={[
+                        "/home",
+                        "/comunidades",
+                        "/notificaciones",
+                        "/musicaterapia",
+                        "/chat",
+                      ]}
+                    >
+                      <TabsLayout />
+                    </Route>
 
-                  <Route exact={true} path="/thanks" component={Thanks} />
-                  <Route exact={true} path="/welcome" component={Welcome} />
+                    <Route exact={true} path="/thanks" component={Thanks} />
+                    <Route exact={true} path="/welcome" component={Welcome} />
 
-                  <Route exact={true} path="/planes" component={Planes} />
-                  <Route
-                    exact={true}
-                    path="/planes/detalle"
-                    component={Detalle}
-                  />
+                    <Route exact={true} path="/planes" component={Planes} />
+                    <Route
+                      exact={true}
+                      path="/planes/detalle"
+                      component={Detalle}
+                    />
 
-                  <Route exact={true} path="/chat/:room" component={Interno} />
+                    <Route
+                      exact={true}
+                      path="/chat/:room"
+                      component={Interno}
+                    />
 
-                  <Route exact={true} path="/grupo/info/:id" component={Info} />
-                  <Route exact={true} path="/grupo/:id" component={Grupo} />
+                    <Route
+                      exact={true}
+                      path="/grupo/info/:id"
+                      component={Info}
+                    />
+                    <Route exact={true} path="/grupo/:id" component={Grupo} />
 
-                  <Route
-                    exact={true}
-                    path="/comunidad-principal"
-                    component={Principal}
-                  />
+                    <Route
+                      exact={true}
+                      path="/comunidad-principal"
+                      component={Principal}
+                    />
 
-                  <Route
-                    exact={true}
-                    path="/comunidades/:id/canales"
-                    component={Canales}
-                  />
+                    <Route
+                      exact={true}
+                      path="/comunidades/:id/canales"
+                      component={Canales}
+                    />
 
-                  <Route
-                    exact={true}
-                    path="/canales/:id/niveles"
-                    component={Niveles}
-                  />
+                    <Route
+                      exact={true}
+                      path="/canales/:id/niveles"
+                      component={Niveles}
+                    />
 
-                  <Route
-                    exact={true}
-                    path="/niveles/:id/crecimientos"
-                    component={Crecimientos}
-                  />
+                    <Route
+                      exact={true}
+                      path="/niveles/:id/crecimientos"
+                      component={Crecimientos}
+                    />
 
-                  <Route
-                    exact={true}
-                    path="/lider/:id/:canal"
-                    component={Lider}
-                  />
+                    <Route
+                      exact={true}
+                      path="/lider/:id/:canal"
+                      component={Lider}
+                    />
 
-                  <Route exact={true} path="/share" component={Sharing} />
+                    <Route exact={true} path="/share" component={Sharing} />
 
-                  <Route exact={true} path="/login" component={Login} />
-                  <Route exact={true} path="/register" component={Register} />
-                  <Route exact={true} path="/reset" component={Reset} />
-                  <Route exact={true} path="/registro" component={Registro} />
-                  <Route
-                    exact={true}
-                    path="/suscripcion"
-                    component={Suscripcion}
-                  />
+                    <Route exact={true} path="/login" component={Login} />
+                    <Route exact={true} path="/register" component={Register} />
+                    <Route exact={true} path="/reset" component={Reset} />
+                    <Route exact={true} path="/registro" component={Registro} />
+                    <Route
+                      exact={true}
+                      path="/suscripcion"
+                      component={Suscripcion}
+                    />
 
-                  <Route
-                    exact={true}
-                    path="/musicaterapia/clip"
-                    component={Clip}
-                  />
+                    <Route
+                      exact={true}
+                      path="/musicaterapia/clip"
+                      component={Clip}
+                    />
 
-                  <Route exact={true} path="/perfil" component={Perfil} />
-                  <Route exact={true} path="/test" component={Test} />
-                  <Route
-                    exact={true}
-                    path="/recordatorios"
-                    component={Recordatorios}
-                  />
-                  <Route exact={true} path="/recordatorios/Add" component={Add} />
-                </IonRouterOutlet>
-              </IonPage>
-            </div>
-          </DBProvider>
-        </NetworkProvider>
+                    <Route exact={true} path="/perfil" component={Perfil} />
+                    <Route exact={true} path="/test" component={Test} />
+                    <Route
+                      exact={true}
+                      path="/recordatorios"
+                      component={Recordatorios}
+                    />
+                    <Route
+                      exact={true}
+                      path="/recordatorios/Add"
+                      component={Add}
+                    />
+                  </IonRouterOutlet>
+                </IonPage>
+              </div>
+            </DBProvider>
+          </NetworkProvider>
+        </TooltipProvider>
       </IonReactRouter>
     </>
   );
