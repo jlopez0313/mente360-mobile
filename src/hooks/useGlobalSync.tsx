@@ -14,11 +14,12 @@ import {
 import { all as getAllNiveles } from "@/services/niveles";
 import { all as getAllPlaylist } from "@/services/playlist";
 
-import { useState } from "react";
-import { useNetwork } from "./useNetwork";
+import { useContext, useState } from "react";
 
+import { NetworkContext } from "@/context/NetworkContext";
 import { db } from "@/hooks/useDexie";
 import { usePreferences } from "@/hooks/usePreferences";
+import { useSelector } from "react-redux";
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -26,14 +27,15 @@ const initSync = "2024-01-01T00:00:00Z";
 
 export const useGlobalSync = () => {
   const { getPreference, setPreference, keys } = usePreferences();
-
-  const network = useNetwork();
+  const { status } = useContext(NetworkContext);
+  const { user } = useSelector((state: any) => state.user);
 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(false);
   const [mensaje, setMensaje] = useState("");
 
+  // Constantes
   const syncConstants = async () => {
     try {
       console.log("start syncConstants");
@@ -55,6 +57,7 @@ export const useGlobalSync = () => {
     }
   };
 
+  // Niveles
   const syncNiveles = async () => {
     try {
       console.log("start syncNiveles");
@@ -78,6 +81,7 @@ export const useGlobalSync = () => {
     }
   };
 
+  // Comunidades
   const syncComunidades = async () => {
     try {
       console.log("start syncComunidades");
@@ -101,6 +105,7 @@ export const useGlobalSync = () => {
     }
   };
 
+  // Canales
   const syncCanales = async () => {
     try {
       console.log("start syncCanales");
@@ -124,6 +129,7 @@ export const useGlobalSync = () => {
     }
   };
 
+  // Crecimientos
   const syncCrecimientos = async () => {
     console.log("start syncCrecimientos");
 
@@ -159,7 +165,7 @@ export const useGlobalSync = () => {
         let totalData = 0;
 
         for (const res of responses) {
-          const data = res.data?.data  ?? res.data ?? [];
+          const data = res.data?.data ?? res.data ?? [];
 
           if (!data.length) {
             if (batchBuffer.crecimientos.length > 0) {
@@ -196,6 +202,7 @@ export const useGlobalSync = () => {
     console.log("syncCrecimientos completa.");
   };
 
+  // Categorías
   const syncCategorias = async () => {
     try {
       console.log("start syncCategorias");
@@ -219,6 +226,7 @@ export const useGlobalSync = () => {
     }
   };
 
+  // Playlist
   const syncPlaylist = async () => {
     try {
       console.log("start syncPlaylist");
@@ -234,6 +242,12 @@ export const useGlobalSync = () => {
         return;
       }
 
+      await db.playlist
+        .where({
+          users_id: user?.id,
+        })
+        .delete();
+
       await db.playlist.bulkPut(
         data.map((item: any) => {
           return { id: item.id, clip: item.clip, users_id: item.user?.id };
@@ -246,6 +260,7 @@ export const useGlobalSync = () => {
     }
   };
 
+  // Clips de Musicaterapia
   const syncClips = async () => {
     console.log("start syncClips");
 
@@ -328,6 +343,7 @@ export const useGlobalSync = () => {
     console.log("syncClips completa.");
   };
 
+  // Batch Load
   async function processBatch(batch: any) {
     if (batch.clips?.length) await db.clips.bulkPut(batch.clips);
 
@@ -340,6 +356,7 @@ export const useGlobalSync = () => {
     if (batch.likes?.length) await db.likes.bulkPut(batch.likes);
   }
 
+  // Clips Eliminados
   const syncClipsTrashed = async () => {
     console.log("start syncClipsTrashed");
 
@@ -366,8 +383,9 @@ export const useGlobalSync = () => {
     console.log("syncClipsTrashed completa.");
   };
 
+  // Sync Database
   const syncAll = async () => {
-    if (network.status) {
+    if (status) {
       try {
         setLoading(true);
         setMensaje("Descargando información...");

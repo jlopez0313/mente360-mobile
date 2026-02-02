@@ -1,6 +1,7 @@
-import Avatar from "@/assets/images/avatar.jpg";
-import { Profile } from "@/components/Chat/Profile/Profile";
-import { getDisplayDate } from "@/helpers/Fechas";
+import { ContactDetailModal } from "@/components/Shared/Contact/ContactModal";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { NetworkContext } from "@/context/NetworkContext";
+import { formatDate } from "@/helpers/Fechas";
 import {
   getArrayData,
   readData,
@@ -8,16 +9,15 @@ import {
   writeData,
 } from "@/services/realtime-db";
 import { setRoom } from "@/store/slices/notificationSlice";
-import { IonAvatar, IonItem, IonNote, IonSkeletonText } from "@ionic/react";
 import { onValue } from "firebase/database";
-import React, { useEffect, useState } from "react";
+import { Badge } from "lucide-react";
+import { useContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
-import styles from "./Chat.module.scss";
 
-export const Item: React.FC<any> = ({ usuario }) => {
-  const baseURL = import.meta.env.VITE_BASE_BACK;
-  const { user } = useSelector( (state: any) => state.user);
+export const Item = ({ usuario }: any) => {
+  const { baseURL, AvatarLogo } = useContext(NetworkContext);
+  const { user } = useSelector((state: any) => state.user);
 
   const history = useHistory();
   const dispatch = useDispatch();
@@ -27,6 +27,8 @@ export const Item: React.FC<any> = ({ usuario }) => {
   const [isWriting, setIsWriting] = useState<any>(false);
   const [unreads, setUnreads] = useState<any>(0);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [selectedContact, setSelectedContact] = useState<any | null>(null);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
   const goToInterno = async () => {
     try {
@@ -43,115 +45,110 @@ export const Item: React.FC<any> = ({ usuario }) => {
     }
   };
 
-  const onCheckStatus = async () => {
-    const roomID = [Number(user.id), Number(usuario.id)]
-      .sort((a, b) => a - b)
-      .join("_");
-
-    const listaMensajes = await getArrayData(`rooms/${roomID}/messages`);
-    const lastMsg = listaMensajes.pop();
-
-    if (lastMsg) {
-      setLastMsg(lastMsg);
-    }
-
-    onValue(readData(`rooms/${roomID}`), (snapshot) => {
-      const data2 = snapshot.val();
-
-      const escribiendo = data2.users[usuario.id]?.writing;
-      setIsWriting(escribiendo);
-
-      const listaMensajes: any = data2 ? snapshotToArray(data2.messages) : [];
-
-      if (data2.users[user.id]?.exit_time) {
-        const targetDate = new Date(data2.users[user.id]?.exit_time);
-
-        const unreads: any = listaMensajes.filter((message: any) => {
-          const messageDate = new Date(`${message.date}`);
-          return messageDate > targetDate && message.user != user.id;
-        });
-
-        setUnreads(unreads.length ?? 0);
-      }
-
-      const lastMsg = listaMensajes.pop();
-
-      if (lastMsg) {
-        setLastMsg({ ...lastMsg });
-      }
-    });
-  };
-
-  const onCheckUnreads = () => {
-    if (unreads != 0) {
-      dispatch(setRoom(true));
-    }
+  const handleAvatarClick = (contact: any) => {
+    setSelectedContact(contact);
+    setIsContactModalOpen(true);
   };
 
   useEffect(() => {
-    onCheckStatus();
-  }, []);
+    const onCheckUnreads = () => {
+      if (unreads != 0) {
+        dispatch(setRoom(true));
+      }
+    };
 
-  useEffect(() => {
     onCheckUnreads();
   }, [unreads]);
 
-  return (
-    <IonItem button={true} className={`${styles["contact"]}`} detail>
-      <IonAvatar
-        aria-hidden="true"
-        slot="start"
-        onClick={() => setShowProfileModal(true)}
-      >
-        {isLoading && (
-          <IonSkeletonText
-            animated
-            style={{
-              width: "100%",
-              height: "100%",
-              borderRadius: "50%",
-            }}
-          />
-        )}
-        <img
-          alt=""
-          src={usuario.photo ? baseURL + usuario.photo : Avatar}
-          style={{ display: isLoading ? "none" : "block" }}
-          onLoad={() => setIsLoading(false)}
-        />
-      </IonAvatar>
+  useEffect(() => {
+    const onCheckStatus = async () => {
+      const roomID = [Number(user.id), Number(usuario.id)]
+        .sort((a, b) => a - b)
+        .join("_");
 
-      <div className={styles["item-content"]} onClick={() => goToInterno()}>
-        <div className={styles["item-user"]}>
-          <span className={styles["name"]}> {usuario?.name} </span>
-          <span className={styles["phone"]}>
-            {" "}
-            {isWriting
-              ? "Escribiendo..."
-              : lastMsg &&
-                (lastMsg.mensaje.length > 35
-                  ? lastMsg.mensaje.substring(0, 32) + "..."
-                  : lastMsg.mensaje)}{" "}
+      const listaMensajes = await getArrayData(`rooms/${roomID}/messages`);
+      const lastMsg = listaMensajes.pop();
+
+      if (lastMsg) {
+        setLastMsg(lastMsg);
+      }
+
+      onValue(readData(`rooms/${roomID}`), (snapshot) => {
+        const data2 = snapshot.val();
+
+        const escribiendo = data2.users[usuario.id]?.writing;
+        setIsWriting(escribiendo);
+
+        const listaMensajes: any = data2 ? snapshotToArray(data2.messages) : [];
+
+        if (data2.users[user.id]?.exit_time) {
+          const targetDate = new Date(data2.users[user.id]?.exit_time);
+
+          const unreads: any = listaMensajes.filter((message: any) => {
+            const messageDate = new Date(`${message.date}`);
+            return messageDate > targetDate && message.user != user.id;
+          });
+
+          setUnreads(unreads.length ?? 0);
+        }
+
+        const lastMsg = listaMensajes.pop();
+
+        if (lastMsg) {
+          setLastMsg({ ...lastMsg });
+        }
+      });
+    };
+
+    onCheckStatus();
+  }, []);
+
+  return (
+    <div className="flex items-center gap-3 p-3 rounded-xl bg-card border border-border hover:border-primary/30 transition-all">
+      <div
+        className="relative"
+        onClick={(e) => {
+          e.preventDefault();
+          handleAvatarClick(usuario);
+        }}
+      >
+        <Avatar className="w-12 h-12">
+          <AvatarImage
+            className="object-cover w-full h-full"
+            src={usuario?.photo ? baseURL + usuario?.photo : AvatarLogo}
+            alt={usuario?.name}
+          />
+          <AvatarFallback className="bg-primary/10 text-primary">
+            {usuario?.name.charAt(0)}
+          </AvatarFallback>
+        </Avatar>
+        {usuario?.isOnline && (
+          <div className="absolute bottom-0 right-0 w-3 h-3 bg-success rounded-full border-2 border-card" />
+        )}
+      </div>
+      <div onClick={goToInterno} className="flex-1 min-w-0">
+        <div className="flex items-center justify-between">
+          <h3 className="!m-0 font-semibold text-foreground truncate">
+            {usuario?.name}
+          </h3>
+          <span className="text-xs text-muted-foreground">
+            {lastMsg && lastMsg.date ? formatDate(lastMsg.date) : null}
           </span>
         </div>
-        <IonNote className={styles["note"]}>
-          <span className={styles["time"]}>
-            {" "}
-            {lastMsg && lastMsg.date ? getDisplayDate(lastMsg.date) : null}{" "}
-          </span>
-          {unreads ? (
-            <span className={styles["unreads"]}> {unreads} </span>
-          ) : null}
-        </IonNote>
+        <p className="text-sm text-muted-foreground truncate">
+          {usuario?.lastMessage?.isFromMe && "Tú: "}
+          {usuario?.lastMessage?.text}
+        </p>
       </div>
-
-      {showProfileModal && (
-        <Profile
-          usuario={usuario}
-          showProfileModal={showProfileModal}
-          setShowProfileModal={setShowProfileModal}
-        />
+      {unreads > 0 && (
+        <Badge className="bg-primary text-primary-foreground">{unreads}</Badge>
       )}
-    </IonItem>
+
+      <ContactDetailModal
+        contact={selectedContact}
+        open={isContactModalOpen}
+        onOpenChange={setIsContactModalOpen}
+      />
+    </div>
   );
 };

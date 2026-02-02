@@ -79,7 +79,7 @@ const Musicaterapia: React.FC = () => {
     // dispatch(clearListAudios());
     setHasMore(true);
     setSelectedCategory(id);
-    setSearchQuery("");
+    // -- setSearchQuery("");
     setPage(1);
   };
 
@@ -188,7 +188,10 @@ const Musicaterapia: React.FC = () => {
 
               {/* Track List */}
               <TrackList
-                tracks={clips}
+                selectedCategory={selectedCategory}
+                searchQuery={searchQuery}
+                page={page}
+                setHasMore={setHasMore}
                 onPlay={setCurrentTrack}
                 onToggleLike={handleToggleLike}
                 onTogglePlaylist={handleTogglePlaylist}
@@ -199,9 +202,14 @@ const Musicaterapia: React.FC = () => {
 
             <TabsContent value="favorites" className="mt-0">
               <FavoritesList
-                tracks={clips}
+                selectedCategory={selectedCategory}
+                searchQuery={searchQuery}
+                page={page}
+                setHasMore={setHasMore}
                 onPlay={setCurrentTrack}
                 onToggleLike={handleToggleLike}
+                onTogglePlaylist={handleTogglePlaylist}
+                onDownload={handleDownload}
                 currentTrackId={currentTrack?.id}
               />
             </TabsContent>

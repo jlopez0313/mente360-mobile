@@ -1,9 +1,24 @@
-import AudioNoWifi from "@/assets/images/audio_no_wifi.jpg";
+import { Button } from "@/components/ui/button";
 import { NetworkContext } from "@/context/NetworkContext";
 import Clips from "@/database/clips";
 import { cn } from "@/lib/utils";
-import { Heart } from "lucide-react";
+import {
+  Check,
+  Download,
+  Heart,
+  ListMinus,
+  ListPlus,
+  MoreVertical,
+  Share2,
+} from "lucide-react";
 import { useContext } from "react";
+import { toast } from "sonner";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 
 interface TrackCardProps {
   track: Clips;
@@ -11,10 +26,34 @@ interface TrackCardProps {
   currentTrackId: number | undefined;
   onPlay: () => void;
   onToggleLike: () => void;
+  onTogglePlaylist: () => void;
+  onDownload: () => void;
 }
 
-export const FavoriteItem = ({track, currentTrackId, onToggleLike, onPlay}: TrackCardProps) => {
-  const {baseURL, status} = useContext(NetworkContext);
+export const FavoriteItem = ({
+  track,
+  currentTrackId,
+  onToggleLike,
+  onPlay,
+  onTogglePlaylist,
+  onDownload,
+}: TrackCardProps) => {
+  const { baseURL, status, AudioNoWifi } = useContext(NetworkContext);
+
+  const handleShare = async () => {
+    try {
+      await navigator.share({
+        title: track.titulo,
+        text: `Escucha "${track.titulo}" de la categoría ${
+          track.categoria?.categoria
+        } en ${import.meta.env.VITE_NAME}`,
+        url: window.location.href,
+      });
+    } catch {
+      navigator.clipboard.writeText(window.location.href);
+      toast.success("Enlace copiado al portapapeles");
+    }
+  };
 
   return (
     <div
@@ -42,9 +81,7 @@ export const FavoriteItem = ({track, currentTrackId, onToggleLike, onPlay}: Trac
       </button>
 
       <div className="flex-1 min-w-0" onClick={onPlay}>
-        <h4 className="font-medium text-foreground truncate">
-          {track.titulo}
-        </h4>
+        <h4 className="font-medium text-foreground truncate">{track.titulo}</h4>
         <p className="text-sm text-muted-foreground truncate">
           {track.categoria?.categoria}
         </p>
@@ -54,12 +91,56 @@ export const FavoriteItem = ({track, currentTrackId, onToggleLike, onPlay}: Trac
         </p>
       </div>
 
-      <button
-        onClick={onToggleLike}
-        className="p-2 rounded-full hover:bg-muted transition-colors"
-      >
-        <Heart className="w-5 h-5 text-sos fill-sos" />
-      </button>
+      <div className="flex items-center gap-1">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onToggleLike}
+          className="w-8 h-8"
+        >
+          <Heart className="w-5 h-5 text-sos fill-sos" />
+        </Button>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="w-8 h-8">
+              <MoreVertical className="w-4 h-4 text-muted-foreground" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem onClick={onTogglePlaylist}>
+              {track.inMyPlaylist ? (
+                <>
+                  <ListMinus className="w-4 h-4 mr-2" />
+                  Quitar de favoritos
+                </>
+              ) : (
+                <>
+                  <ListPlus className="w-4 h-4 mr-2" />
+                  Agregar a favoritos
+                </>
+              )}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleShare}>
+              <Share2 className="w-4 h-4 mr-2" />
+              Compartir
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={onDownload}>
+              {track.isDownloaded ? (
+                <>
+                  <Check className="w-4 h-4 mr-2 text-success" />
+                  Descargado
+                </>
+              ) : (
+                <>
+                  <Download className="w-4 h-4 mr-2" />
+                  Descargar offline
+                </>
+              )}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </div>
   );
 };

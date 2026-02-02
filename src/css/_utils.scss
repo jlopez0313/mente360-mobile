@@ -3,3 +3,9 @@
       gap: #{$i * 4}px;
     }
 }
+
+@for $i from 1 through 100 {
+  .w-#{$i} {
+    width: calc(var(--spacing) * #{$i});
+  }
+}

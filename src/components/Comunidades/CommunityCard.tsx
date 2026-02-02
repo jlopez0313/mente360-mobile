@@ -119,6 +119,7 @@ export const CommunityCard = ({ community }: Props) => {
             <div className="flex items-center gap-2 mt-1">
               <Avatar className="w-5 h-5">
                 <AvatarImage
+                  className="object-cover w-full h-full"
                   src={baseURL + community.lider?.photo}
                   alt={community.lider?.name}
                 />

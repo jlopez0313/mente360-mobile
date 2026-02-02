@@ -1,3 +1,4 @@
+import { Modal } from "@/components/Shared/Modal/Modal";
 import { create } from "@/services/grupos";
 import {
   getArrayData,
@@ -6,16 +7,19 @@ import {
   updateData,
   writeData,
 } from "@/services/realtime-db";
+import { IonFab, IonFabButton, IonIcon, IonItemGroup, IonList } from "@ionic/react";
+import { add } from "ionicons/icons";
 import { useEffect, useState } from "react";
+import { Add } from "../Add/Add";
+import styles from "./Grupos.module.scss";
 
 import { setGrupo } from "@/store/slices/notificationSlice";
 import { onValue } from "firebase/database";
-import { Users } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { Item } from "./Item";
 
 export const Grupos = () => {
-  const { user } = useSelector((state: any) => state.user);
+  const { user } = useSelector( (state: any) => state.user);
 
   const dispatch = useDispatch();
 
@@ -54,11 +58,17 @@ export const Grupos = () => {
     }
   };
 
+  const onCheckStatus = () => {
+    onValue(readData(`users/${user.id}/grupos`), async (snapshot) => {
+      onGetAll();
+    });
+  };
+
   const onGetAll = async () => {
     dispatch(setGrupo(false));
 
     const grupos = await getArrayData(`users/${user.id}/grupos`);
-
+    
     const lista: any = [];
 
     await Promise.all(
@@ -74,23 +84,35 @@ export const Grupos = () => {
   };
 
   useEffect(() => {
-    const onCheckStatus = () => {
-      onValue(readData(`users/${user.id}/grupos`), async (snapshot) => {
-        onGetAll();
-      });
-    };
-
     onCheckStatus();
   }, []);
 
-  return grupos.length === 0 ? (
-    <div className="text-center py-12">
-      <Users className="w-12 h-12 text-muted-foreground/50 mx-auto mb-3" />
-      <p className="text-muted-foreground">No hay grupos</p>
+  return (
+    <div className={styles["ion-content"]}>
+      <IonFab horizontal="end" vertical="bottom">
+        <IonFabButton id="add" className="ion-margin-bottom">
+          <IonIcon icon={add}/>
+        </IonFabButton>
+      </IonFab>
+
+      <IonList className="ion-no-padding" lines="none">
+        <IonItemGroup>
+          {grupos.map((grupo: any, idx: number) => {
+            return <Item key={idx} grupo={grupo} />;
+          })}
+        </IonItemGroup>
+      </IonList>
+
+      <Modal
+        trigger="add"
+        hideButtons={false}
+        modalHeight="49vh"
+        validateConfirm={(data) => !!data?.photo && !!data?.grupo}
+        onConfirm={(data) => onAddGrupo(data)}
+        title="Nuevo Grupo Mente Maestra"
+      >
+        <Add />
+      </Modal>
     </div>
-  ) : (
-    grupos.map((group: any) => (
-      <Item key={group.id} grupo={group} />
-    ))
   );
 };

@@ -1,6 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { NetworkContext } from "@/context/NetworkContext";
-import { formatDate } from "@/helpers/Fechas";
+import { getDisplayDate } from "@/helpers/Fechas";
 import {
   getArrayData,
   getData,
@@ -9,17 +7,24 @@ import {
   writeData,
 } from "@/services/realtime-db";
 import { setGrupo } from "@/store/slices/notificationSlice";
+import {
+  IonAvatar,
+  IonItem,
+  IonNote,
+  IonSkeletonText
+} from "@ionic/react";
 import { onValue } from "firebase/database";
-import { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
+import styles from "./Grupos.module.scss";
 
-export const Item = ({ grupo }: any) => {
-  const { baseURL } = useContext(NetworkContext);
+export const Item: React.FC<any> = ({ grupo }) => {
+  const baseURL = import.meta.env.VITE_BASE_BACK;
 
   const history = useHistory();
   const dispatch = useDispatch();
-  const { user } = useSelector((state: any) => state.user);
+  const { user } = useSelector( (state: any) => state.user);
 
   const [isLoading, setIsLoading] = useState(true);
   const [lastMsg, setLastMsg] = useState<any>(null);
@@ -93,38 +98,64 @@ export const Item = ({ grupo }: any) => {
   }, [unreads]);
 
   return (
-    <div
-      onClick={goToGrupo}
-      className="flex items-center gap-3 p-3 rounded-xl bg-card border border-border hover:border-primary/30 transition-all"
+    <IonItem
+      button={true}
+      className={`${styles["grupo"]}`}
+      onClick={() => goToGrupo()}
+      detail
     >
-      <Avatar className="w-12 h-12">
-        <AvatarImage
-          className="object-cover w-full h-full"
+      <IonAvatar aria-hidden="true" slot="start">
+        {isLoading && (
+          <IonSkeletonText
+            animated
+            style={{
+              width: "100%",
+              height: "100%",
+              borderRadius: "50%",
+            }}
+          />
+        )}
+        <img
+          alt=""
           src={baseURL + grupo.photo}
-          alt={grupo.grupo}
+          style={{ display: isLoading ? "none" : "block" }}
+          onLoad={() => setIsLoading(false)}
         />
-        <AvatarFallback className="bg-secondary text-secondary-foreground">
-          {grupo.grupo.charAt(0)}
-        </AvatarFallback>
-      </Avatar>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center justify-between">
-          <h3 className="!m-0 font-semibold text-foreground truncate">
-            {grupo.grupo}
-          </h3>
-          <span className="text-xs text-muted-foreground">
-            {lastMsg ? formatDate(lastMsg.date) : null}
+      </IonAvatar>
+
+      <div className={styles["item-content"]}>
+        <div className={styles["item-user"]}>
+          <span className={styles["name"]}> {grupo.grupo} </span>
+          <span className={styles["phone"]}>
+            {isWriting
+              ? " Escribiendo..."
+              : lastMsg && (
+                  <>
+                    {lastMsg.user == user.id ? "tu" : lastMsg.from.name}:{" "}
+                    {lastMsg.user == user.id
+                      ? ("tu: " + lastMsg.mensaje).length > 30 // Mensaje Mio
+                        ? lastMsg?.mensaje.substring(0, 27) + "..."
+                        : lastMsg?.mensaje
+                      : (lastMsg.from.name + ": " + lastMsg.mensaje).length > 30 // Mensaje de otra persona
+                      ? lastMsg.mensaje.substring(
+                          0,
+                          Math.abs(27 - (lastMsg.from.name + ": ").length)
+                        ) + "..."
+                      : lastMsg.mensaje}{" "}
+                  </>
+                )}{" "}
           </span>
         </div>
-        <p className="text-sm text-muted-foreground truncate">
-          {lastMsg?.from?.name}: {lastMsg?.mensaje}
-        </p>
+        <IonNote className={styles["note"]}>
+          <span className={styles["time"]}>
+            {" "}
+            {lastMsg ? getDisplayDate(lastMsg.date) : null}{" "}
+          </span>
+          {unreads ? (
+            <span className={styles["unreads"]}> {unreads} </span>
+          ) : null}
+        </IonNote>
       </div>
-      <div className="flex flex-col items-end gap-1">
-        <span className="text-xs text-muted-foreground">
-          {(snapshotToArray(grupo.users) ?? []).length} miembros
-        </span>
-      </div>
-    </div>
+    </IonItem>
   );
 };

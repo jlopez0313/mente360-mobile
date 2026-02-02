@@ -169,6 +169,7 @@ const Crecimientos: React.FC = () => {
 
           <Avatar className="w-10 h-10">
             <AvatarImage
+              className="object-cover w-full h-full"
               src={baseURL + community?.lider?.photo}
               alt={community?.lider?.name}
             />
@@ -194,7 +195,7 @@ const Crecimientos: React.FC = () => {
             <h1 className="text-xl font-heading font-bold text-foreground !m-0">
               {crecimientos[0]?.titulo}
             </h1>
-            <span className="text-xs font-heading font-bold text-foreground">
+            <span className="text-xs font-heading text-foreground">
               {nivel?.nivel}
             </span>
             <p className="text-sm text-muted-foreground line-clamp-2">

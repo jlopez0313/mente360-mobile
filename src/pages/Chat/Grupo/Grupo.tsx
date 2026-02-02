@@ -1,16 +1,24 @@
-
-
 import { useHistory, useParams } from "react-router-dom";
 
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { AppLayout } from "@/components/layout";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { mockGroups } from "@/lib/mockData";
+import { NetworkContext } from "@/context/NetworkContext";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, MoreVertical, Paperclip, Send, Smile, Users } from "lucide-react";
+import { readData, snapshotToArray } from "@/services/realtime-db";
+import { onValue } from "firebase/database";
+import {
+  ArrowLeft,
+  MoreVertical,
+  Paperclip,
+  Send,
+  Smile,
+  Users,
+} from "lucide-react";
+import { useSelector } from "react-redux";
 
 interface GroupMessage {
   id: string;
@@ -68,20 +76,15 @@ const mockGroupMessages: GroupMessage[] = [
 
 const Grupo: React.FC = () => {
   const history = useHistory();
-
+  const { baseURL, AvatarLogo} = useContext(NetworkContext);
+  const { user } = useSelector( (state: any) => state.user);
+  
   const { id: groupId } = useParams<any>();
+
   const [messages, setMessages] = useState<GroupMessage[]>(mockGroupMessages);
   const [newMessage, setNewMessage] = useState("");
 
-  const group = mockGroups.find((g) => g.id === groupId);
-
-  if (!group) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Grupo no encontrado</p>
-      </div>
-    );
-  }
+  const [grupo, setGrupo] = useState({ grupo: "", photo: "", users: [], messages: [] });
 
   const sendMessage = () => {
     if (!newMessage.trim()) return;
@@ -122,6 +125,30 @@ const Grupo: React.FC = () => {
     };
   }, [history]);
 
+  useEffect(() => {
+    const onGetGrupo = async (id: number) => {
+      onValue(readData(`grupos/${id}`), async (snapshot: any) => {
+        const data = snapshot.val();
+  
+        setGrupo({
+          ...data,
+          users: snapshotToArray(data.users),
+          messages: snapshotToArray(data.messages)
+        });
+  
+        const users: any = data ? snapshotToArray(data.users) : [];
+  
+        const isWriting = users.find(
+          (usario: any) => usario.writing && usario.id != user.id
+        );
+        // setIsWriting(isWriting ?? null);
+  
+      });
+    };
+
+    onGetGrupo(groupId);
+  }, [groupId]);
+
   return (
     <AppLayout>
       <div className="min-h-screen bg-background flex flex-col">
@@ -133,17 +160,21 @@ const Grupo: React.FC = () => {
             </Button>
 
             <Avatar className="w-10 h-10">
-              <AvatarImage src={group.avatar} />
+              <AvatarImage
+                className="object-cover w-full h-full"
+                src={grupo.photo ? baseURL + grupo.photo : AvatarLogo}
+                alt={grupo.grupo}
+              />
               <AvatarFallback className="bg-secondary text-secondary-foreground">
-                {group.name.charAt(0)}
+                {grupo.grupo.charAt(0)}
               </AvatarFallback>
             </Avatar>
 
             <div className="flex-1">
-              <h2 className="font-semibold text-foreground">{group.name}</h2>
+              <h2 className="font-semibold text-foreground">{grupo.grupo}</h2>
               <p className="text-xs text-muted-foreground flex items-center gap-1">
                 <Users className="w-3 h-3" />
-                {group.memberCount} miembros
+                {grupo.users.length} miembros
               </p>
             </div>
 
@@ -177,7 +208,11 @@ const Grupo: React.FC = () => {
                 >
                   {!message.isMe && showSender && (
                     <Avatar className="w-6 h-6 absolute left-0 bottom-0">
-                      <AvatarImage src={message.senderAvatar} />
+                      <AvatarImage
+                        className="object-cover w-full h-full"
+                        src={message.senderAvatar}
+                        alt={grupo.grupo}
+                      />
                       <AvatarFallback className="text-xs bg-primary/10 text-primary">
                         {message.senderName.charAt(0)}
                       </AvatarFallback>

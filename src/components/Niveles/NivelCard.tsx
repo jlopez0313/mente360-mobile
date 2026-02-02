@@ -1,14 +1,16 @@
-import AudioNoWifi from "@/assets/images/audio_no_wifi.jpg";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { NetworkContext } from "@/context/NetworkContext";
 import Crecimientos from "@/database/crecimientos";
 import Niveles from "@/database/niveles";
 import { db } from "@/hooks/useDexie";
 import { useLiveQuery } from "dexie-react-hooks";
-import { MoreVertical, Play } from "lucide-react";
+import { BookmarkCheck, Check, Download, Play } from "lucide-react";
+import { useContext } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { Progress } from "../ui/progress";
 
 interface Props {
   nivel: Niveles;
@@ -21,9 +23,8 @@ const formatDuration = (seconds: number) => {
 };
 
 export const NivelCard = ({ nivel }: Props) => {
+  const { baseURL, AudioNoWifi, status } = useContext(NetworkContext);
 
-  const baseURL = import.meta.env.VITE_BASE_BACK;
-  
   const { user } = useSelector((state: any) => state.user);
 
   const isCompleted = nivel.progress >= 1;
@@ -56,7 +57,9 @@ export const NivelCard = ({ nivel }: Props) => {
     [nivel]
   );
 
-  if(crecimientos?.length) {
+  if (crecimientos?.length) {
+    const podcast = crecimientos[0];
+
     return (
       <Card className="overflow-hidden border-border/50 hover:shadow-soft transition-shadow">
         <CardContent className="p-0">
@@ -65,8 +68,8 @@ export const NivelCard = ({ nivel }: Props) => {
             <div className="relative shrink-0">
               <div className="w-20 h-20 rounded-xl overflow-hidden bg-muted">
                 <img
-                  src={status ? baseURL + crecimientos[0].imagen : AudioNoWifi}
-                  alt={crecimientos[0].titulo}
+                  src={status ? baseURL + podcast.imagen : AudioNoWifi}
+                  alt={podcast.titulo}
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -79,55 +82,48 @@ export const NivelCard = ({ nivel }: Props) => {
                 </Button>
               </Link>
             </div>
-  
+
             {/* Content */}
             <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
               <div>
                 <div className="flex items-start justify-between gap-2">
-                  <h3 className="font-medium text-foreground text-sm line-clamp-1 !m-0">
-                    {crecimientos[0].titulo}
+                  <h3 className="font-medium text-foreground !text-sm line-clamp-1 !m-0">
+                    {podcast.titulo}
                   </h3>
-                  <Button variant="ghost" size="icon" className="shrink-0 w-6 h-6">
-                    <MoreVertical className="w-4 h-4 text-muted-foreground" />
-                  </Button>
+                  <BookmarkCheck className="w-4 h-4 text-success" />
                 </div>
                 <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
-                  {crecimientos[0].descripcion}
+                  {podcast.descripcion}
                 </p>
               </div>
-  
+
               <div className="flex items-center gap-2 mt-2">
-                <Badge variant="outline" className="text-xs px-2 py-0">
-                  {nivel?.nivel}
+                <Badge variant="outline" className="text-xs px-2 py-0 w-40">
+                  <span className="block truncate">{nivel?.nivel}</span>
                 </Badge>
                 <span className="text-xs text-muted-foreground">
                   {
-                  // formatDuration(podcast.duration)
+                    // formatDuration(podcast.duration)
                   }
                 </span>
                 <div className="flex-1" />
-                {/*podcast.isDownloaded ? (
+                {podcast.isDownloaded ? (
                   <Check className="w-4 h-4 text-success" />
                 ) : (
                   <Download className="w-4 h-4 text-muted-foreground" />
-                )*/}
+                )}
               </div>
             </div>
           </div>
-  
+
           {/* Progress bar */}
-          {/*podcast.progress > 0 && (
-            <div className="px-3 pb-3">
-              <Progress 
-                value={podcast.progress * 100} 
-                className="h-1"
-              />
-            </div>
-          )*/}
+          <div className="px-3 pb-3">
+            <Progress value={(nivel.progress ?? 0.5) * 100} className="h-1" />
+          </div>
         </CardContent>
       </Card>
     );
   } else {
-    return <></>
+    return <></>;
   }
 };
