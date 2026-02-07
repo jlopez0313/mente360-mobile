@@ -7,6 +7,7 @@ import Canales from "@/database/canales";
 import Comunidades from "@/database/comunidades";
 import Niveles from "@/database/niveles";
 import { destroy } from "@/helpers/musicControls";
+import { useBackButton } from "@/hooks/useBackButton";
 import { db } from "@/hooks/useDexie";
 import { mockPodcasts } from "@/lib/mockData";
 import { setShowGlobalAudio } from "@/store/slices/audioSlice";
@@ -22,7 +23,7 @@ import {
 } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useHistory, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 type Props = {
   nivel: Niveles | undefined;
@@ -43,7 +44,6 @@ const Crecimientos: React.FC = () => {
 
   const { id } = useParams<any>();
   const dispatch = useDispatch();
-  const history = useHistory();
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -112,26 +112,14 @@ const Crecimientos: React.FC = () => {
   };
 
   useEffect(() => {
-    const handleBackButton = (ev: Event) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      // history.replace(`/comunidades/${channel?.comunidad?.id}/canales`);
-    };
-
-    document.addEventListener("ionBackButton", handleBackButton);
-
-    return () => {
-      document.removeEventListener("ionBackButton", handleBackButton);
-    };
-  }, [history]);
-
-  useEffect(() => {
     dispatch(setShowGlobalAudio(true));
 
     return () => {
       destroy();
     };
   }, []);
+
+  useBackButton(`/niveles/${id}/crecimientos`);
 
   if (!nivel) {
     return (

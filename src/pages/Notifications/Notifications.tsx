@@ -45,37 +45,40 @@ const Notifications = () => {
 
   return (
     <AppLayout>
-      <div className="px-4 py-6 pb-24">
+      <div className="min-h-full pb-24">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <Bell className="w-5 h-5 text-primary" />
+
+        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50 px-4 py-4 space-y-4">
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <Bell className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-foreground">
+                  Notificaciones
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  {unreadCount} sin leer
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-xl font-bold text-foreground">
-                Notificaciones
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                {unreadCount} sin leer
-              </p>
-            </div>
+            {unreadCount > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={markAllAsRead}
+                className="text-primary"
+              >
+                <Check className="w-4 h-4 mr-1" />
+                Marcar todas
+              </Button>
+            )}
           </div>
-          {unreadCount > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={markAllAsRead}
-              className="text-primary"
-            >
-              <Check className="w-4 h-4 mr-1" />
-              Marcar todas
-            </Button>
-          )}
         </div>
 
         {/* Notifications List */}
-        <div className="space-y-3">
+        <div className="space-y-3 px-4 py-6">
           {notificaciones.length === 0 ? (
             <div className="text-center py-12">
               <Bell className="w-12 h-12 text-muted-foreground/50 mx-auto mb-3" />

@@ -1,16 +1,16 @@
 import { ContactDetailModal } from "@/components/Shared/Contact/ContactModal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { NetworkContext } from "@/context/NetworkContext";
 import { formatDate } from "@/helpers/Fechas";
 import {
-  getArrayData,
+  queryTo,
   readData,
   snapshotToArray,
-  writeData,
+  writeData
 } from "@/services/realtime-db";
 import { setRoom } from "@/store/slices/notificationSlice";
 import { onValue } from "firebase/database";
-import { Badge } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
@@ -61,46 +61,51 @@ export const Item = ({ usuario }: any) => {
   }, [unreads]);
 
   useEffect(() => {
+    let unsubLastMsg: any;
+    let unsubTyping: any;
+    let unsubUnreads: any;
+
     const onCheckStatus = async () => {
       const roomID = [Number(user.id), Number(usuario.id)]
         .sort((a, b) => a - b)
         .join("_");
 
-      const listaMensajes = await getArrayData(`rooms/${roomID}/messages`);
-      const lastMsg = listaMensajes.pop();
-
-      if (lastMsg) {
-        setLastMsg(lastMsg);
-      }
-
-      onValue(readData(`rooms/${roomID}`), (snapshot) => {
-        const data2 = snapshot.val();
-
-        const escribiendo = data2.users[usuario.id]?.writing;
-        setIsWriting(escribiendo);
-
-        const listaMensajes: any = data2 ? snapshotToArray(data2.messages) : [];
-
-        if (data2.users[user.id]?.exit_time) {
-          const targetDate = new Date(data2.users[user.id]?.exit_time);
-
-          const unreads: any = listaMensajes.filter((message: any) => {
-            const messageDate = new Date(`${message.date}`);
-            return messageDate > targetDate && message.user != user.id;
-          });
-
-          setUnreads(unreads.length ?? 0);
+      unsubLastMsg = onValue(
+        queryTo(`rooms/${roomID}/messages`, {
+          limit: 1,
+          direction: "last",
+        }),
+        (snap) => {
+          const lastMsg = snapshotToArray(snap.val());
+          if (lastMsg.length) {
+            setLastMsg({ ...lastMsg[0] });
+          }
         }
+      );
 
-        const lastMsg = listaMensajes.pop();
-
-        if (lastMsg) {
-          setLastMsg({ ...lastMsg });
+      unsubTyping = onValue(
+        readData(`rooms/${roomID}/users/${usuario.id}/writing`),
+        (snap) => {
+          console.log(!!snap.val());
+          return setIsWriting(!!snap.val());
         }
-      });
+      );
+
+      unsubUnreads = onValue(
+        readData(`rooms/${roomID}/users/${user.id}/unreads`),
+        (snap) => {
+          return setUnreads(snap.val());
+        }
+      );
     };
 
     onCheckStatus();
+
+    return () => {
+      unsubLastMsg();
+      unsubTyping();
+      unsubUnreads();
+    };
   }, []);
 
   return (
@@ -128,16 +133,16 @@ export const Item = ({ usuario }: any) => {
       </div>
       <div onClick={goToInterno} className="flex-1 min-w-0">
         <div className="flex items-center justify-between">
-          <h3 className="!m-0 font-semibold text-foreground truncate">
+          <h6 className="!m-0 font-semibold text-foreground truncate">
             {usuario?.name}
-          </h3>
+          </h6>
           <span className="text-xs text-muted-foreground">
             {lastMsg && lastMsg.date ? formatDate(lastMsg.date) : null}
           </span>
         </div>
         <p className="text-sm text-muted-foreground truncate">
           {usuario?.lastMessage?.isFromMe && "Tú: "}
-          {usuario?.lastMessage?.text}
+          {isWriting ? <i>Escribiendo...</i> : lastMsg?.mensaje}
         </p>
       </div>
       {unreads > 0 && (

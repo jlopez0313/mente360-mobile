@@ -8,11 +8,12 @@ import { TrackList } from "@/components/Musicaterapia/TrackList";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Clips from "@/database/clips";
+import { useBackButton } from "@/hooks/useBackButton";
 import { db } from "@/hooks/useDexie";
 import { IonInfiniteScroll, IonInfiniteScrollContent } from "@ionic/react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { Heart, Music, Search } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export interface Track {
   id: string;
@@ -117,19 +118,7 @@ const Musicaterapia: React.FC = () => {
     */
   };
 
-  useEffect(() => {
-    const handleBackButton = (ev: Event) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      // history.replace("/home");
-    };
-
-    document.addEventListener("ionBackButton", handleBackButton);
-
-    return () => {
-      document.removeEventListener("ionBackButton", handleBackButton);
-    };
-  }, [history]);
+  useBackButton(`/home`);
 
   return (
     <AppLayout>
@@ -140,7 +129,7 @@ const Musicaterapia: React.FC = () => {
             <img
               src={Logo}
               alt="Mente 360"
-              className="w-10 h-10 rounded-xl object-cover"
+              className="w-10 rounded-xl object-cover"
             />
             <div>
               <h1 className="text-xl font-heading font-bold text-foreground">

@@ -5,6 +5,7 @@ import { NivelCard } from "@/components/Niveles/NivelCard";
 import { AppLayout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { destroy } from "@/helpers/musicControls";
+import { useBackButton } from "@/hooks/useBackButton";
 import { db } from "@/hooks/useDexie";
 import { setShowGlobalAudio } from "@/store/slices/audioSlice";
 import { useLiveQuery } from "dexie-react-hooks";
@@ -38,26 +39,14 @@ const Niveles: React.FC = () => {
   };
 
   useEffect(() => {
-    const handleBackButton = (ev: Event) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      history.replace(`/comunidades/${channel?.comunidad?.id}/canales`);
-    };
-
-    document.addEventListener("ionBackButton", handleBackButton);
-
-    return () => {
-      document.removeEventListener("ionBackButton", handleBackButton);
-    };
-  }, [history]);
-
-  useEffect(() => {
     dispatch(setShowGlobalAudio(true));
 
     return () => {
       destroy();
     };
   }, []);
+
+  useBackButton(`/comunidades/${channel?.comunidad?.id}/canales`);
 
   if (!channel) {
     return (

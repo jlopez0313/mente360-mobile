@@ -1,11 +1,20 @@
-import { useHistory, useParams } from "react-router-dom";
-
+import { Interno as InternoComponent } from "@/components/Chat/Chat/Interno/Interno";
 import { AppLayout } from "@/components/layout";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { mockChats } from "@/lib/mockData";
+import { NetworkContext } from "@/context/NetworkContext";
+import { formatDate } from "@/helpers/Fechas";
+import { useBackButton } from "@/hooks/useBackButton";
 import { cn } from "@/lib/utils";
+import { sendPush } from "@/services/push";
+import {
+  addData,
+  doDisconnect,
+  readData,
+  writeData,
+} from "@/services/realtime-db";
+import { onValue } from "firebase/database";
 import {
   ArrowLeft,
   MoreVertical,
@@ -14,81 +23,68 @@ import {
   Send,
   Smile,
   Video,
+  X,
 } from "lucide-react";
-import { useEffect, useState } from "react";
-
-interface Message {
-  id: string;
-  text: string;
-  sender: "me" | "other";
-  time: string;
-}
-
-const mockMessages: Message[] = [
-  { id: "1", text: "¡Hola! ¿Cómo estás hoy?", sender: "other", time: "10:30" },
-  {
-    id: "2",
-    text: "¡Hola! Muy bien, gracias. ¿Y tú?",
-    sender: "me",
-    time: "10:31",
-  },
-  {
-    id: "3",
-    text: "También bien. ¿Pudiste hacer los ejercicios de respiración?",
-    sender: "other",
-    time: "10:32",
-  },
-  {
-    id: "4",
-    text: "Sí, me ayudaron mucho. Me siento más tranquilo.",
-    sender: "me",
-    time: "10:33",
-  },
-  {
-    id: "5",
-    text: "¡Qué bueno! Recuerda practicarlos todos los días.",
-    sender: "other",
-    time: "10:34",
-  },
-  {
-    id: "6",
-    text: "Lo haré. Gracias por el apoyo 🙏",
-    sender: "me",
-    time: "10:35",
-  },
-];
+import { useContext, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { Link, useParams } from "react-router-dom";
 
 const Interno: React.FC = () => {
-  const history = useHistory();
-  const { room: chatId } = useParams<any>();
-  const [messages, setMessages] = useState<Message[]>(mockMessages);
-  const [newMessage, setNewMessage] = useState("");
+  const { room } = useParams<any>();
+  const { user } = useSelector((state: any) => state.user);
+  const { status, baseURL, AvatarLogo } = useContext(NetworkContext);
 
-  const chat = mockChats.find((c) => c.id === chatId);
+  const [otherUser, setOtherUser] = useState<any>(null);
+  const [dataUserRoom, setDataUserRoom] = useState<any>(null);
+  const [isWriting, setIsWriting] = useState<any>(false);
+  const [newMessage, setNewMessage] = useState<any>("");
+  const [replyTo, setReplyTo] = useState<any>(null);
 
-  if (!chat) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Chat no encontrado</p>
-      </div>
-    );
-  }
-
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (!newMessage.trim()) return;
 
-    const message: Message = {
-      id: Date.now().toString(),
-      text: newMessage,
-      sender: "me",
-      time: new Date().toLocaleTimeString("es-ES", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-    };
+    try {
+      const fecha = new Date();
 
-    setMessages((prev) => [...prev, message]);
-    setNewMessage("");
+      const message = {
+        user: user.id,
+        fecha: fecha.toLocaleDateString(),
+        hora: fecha.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        date: fecha.toISOString(),
+        mensaje: newMessage,
+        reply: {
+          id: replyTo?.id ?? null,
+          from: replyTo?.user ?? null,
+          mensaje: replyTo?.mensaje ?? null,
+        },
+      };
+
+      setNewMessage("");
+      setReplyTo(null);
+
+      const sendPushPromise = sendPush({
+        users_id: [otherUser.id],
+        title: user.name,
+        description:
+          message.mensaje.length > 25
+            ? message.mensaje.substring(0, 22) + "..."
+            : message.mensaje,
+        room,
+      });
+
+      await Promise.all([
+        await addData(`rooms/${room}/messages`, message),
+        await writeData(`rooms/${room}/users/${user.id}/writing`, false),
+        sendPushPromise,
+      ]);
+
+      // requestAnimationFrame(() => scrollToBottom());
+    } catch (error) {
+      console.error("Error enviando mensaje:", error);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -99,51 +95,119 @@ const Interno: React.FC = () => {
   };
 
   useEffect(() => {
-    const handleBackButton = (ev: Event) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      history.replace("/chat");
+    let unsubRoom: any;
+    let unsubTyping: any;
+    let unsubUsers: any;
+
+    const onGetRoom = async () => {
+      const otherUser = room.split("_").find((id: any) => id != user.id) ?? 0;
+
+      unsubRoom = onValue(
+        readData(`rooms/${room}/users/${otherUser}`),
+        async (snapshot) => {
+          setDataUserRoom(snapshot.val());
+        }
+      );
+
+      unsubTyping = onValue(
+        readData(`rooms/${room}/users/${otherUser}/writing`),
+        (snap) => {
+          return setIsWriting(!!snap.val());
+        }
+      );
+
+      unsubUsers = onValue(readData(`users/${otherUser}`), async (snapshot) => {
+        setOtherUser({ ...snapshot.val() });
+      });
     };
 
-    document.addEventListener("ionBackButton", handleBackButton);
+    onGetRoom();
 
     return () => {
-      document.removeEventListener("ionBackButton", handleBackButton);
+      unsubRoom();
+      unsubUsers();
+      unsubTyping();
     };
-  }, [history]);
+  }, [room]);
+
+  // Al entrar al chat
+  useEffect(() => {
+    const onEnter = async () => {
+      if (!room || !user) return;
+
+      await writeData(`rooms/${room}/users/${user.id}/exit_time`, null);
+      await writeData(`rooms/${room}/users/${user.id}/unreads`, 0);
+    };
+    onEnter();
+
+    const onDisconnect = () => {
+      try {
+        doDisconnect(`rooms/${room}/users/${user.id}`, {
+          writing: false,
+          exit_time: new Date().toISOString(),
+          unreads: 0,
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    onDisconnect();
+
+    return () => {
+      const onExit = async () => {
+        await writeData(`rooms/${room}/users/${user.id}/writing`, false);
+        await writeData(
+          `rooms/${room}/users/${user.id}/exit_time`,
+          new Date().toISOString()
+        );
+      };
+
+      onExit();
+    };
+  }, [user, room]);
+
+  useBackButton("/chat");
 
   return (
-    <AppLayout>
+    <AppLayout hideNav>
       <div className="min-h-screen bg-background flex flex-col">
         {/* Header */}
         <div className="sticky top-0 z-10 bg-card border-b border-border px-4 py-3 safe-top">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
+            <Link to={`/chat`} replace={true}>
+              <Button variant="ghost" size="icon">
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+            </Link>
 
             <div className="relative">
               <Avatar className="w-10 h-10">
                 <AvatarImage
                   className="object-cover w-full h-full"
-                  src={chat.participant.avatar}
-                  alt={chat.participant.name}
+                  src={status ? baseURL + otherUser?.photo : AvatarLogo}
+                  alt={otherUser?.name}
                 />
                 <AvatarFallback className="bg-primary/10 text-primary">
-                  {chat.participant.name.charAt(0)}
+                  {otherUser?.name.charAt(0)}
                 </AvatarFallback>
               </Avatar>
-              {chat.participant.isOnline && (
+              {dataUserRoom?.exit_time ? null : (
                 <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-success rounded-full border-2 border-card" />
               )}
             </div>
 
             <div className="flex-1">
-              <h2 className="font-semibold text-foreground">
-                {chat.participant.name}
+              <h2 className="font-semibold text-foreground !mb-0 line-clamp-1">
+                {otherUser?.name}
               </h2>
               <p className="text-xs text-muted-foreground">
-                {chat.participant.isOnline ? "En línea" : "Desconectado"}
+                {isWriting ? (
+                  <i> Escribiendo... </i>
+                ) : dataUserRoom?.exit_time ? (
+                  formatDate(dataUserRoom?.exit_time)
+                ) : (
+                  "En línea"
+                )}
               </p>
             </div>
 
@@ -162,41 +226,37 @@ const Interno: React.FC = () => {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={cn(
-                "flex",
-                message.sender === "me" ? "justify-end" : "justify-start"
-              )}
-            >
-              <div
-                className={cn(
-                  "max-w-[80%] px-4 py-2.5 rounded-2xl",
-                  message.sender === "me"
-                    ? "bg-primary text-primary-foreground rounded-br-md"
-                    : "bg-card border border-border rounded-bl-md"
-                )}
-              >
-                <p className="text-sm">{message.text}</p>
-                <p
-                  className={cn(
-                    "text-[10px] mt-1",
-                    message.sender === "me"
-                      ? "text-primary-foreground/70"
-                      : "text-muted-foreground"
-                  )}
-                >
-                  {message.time}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+        <InternoComponent
+          usuario={otherUser}
+          roomID={room}
+          replyTo={replyTo}
+          setReplyTo={setReplyTo}
+        />
 
         {/* Input */}
-        <div className="sticky bottom-0 bg-card border-t border-border px-4 py-3 safe-bottom">
+        <div className="sticky bottom-0 z-10 bg-card border-t border-border px-4 py-3 safe-bottom">
+          {replyTo?.id && (
+            <div
+              className={cn(
+                "border-l border-l-4 border-primary",
+                "text-xs relative mb-2",
+                "px-1.5 py-1.5 rounded-sm italic",
+                "bg-primary-foreground text-primary"
+              )}
+            >
+              <div className="flex flex-col">
+                <span className="font-bold text-muted-foreground">
+                  {
+                    replyTo?.reply?.from == user.id ? "Tú" : otherUser?.name
+                  }
+                </span>
+                <span className="text-muted-foreground">
+                  {replyTo?.mensaje}
+                </span>
+              </div>
+                <X className=" w-4 h-4 absolute top-1 right-1 cursor-pointer" onClick={() => setReplyTo(null)} />
+            </div>
+          )}
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" className="flex-shrink-0">
               <Paperclip className="w-5 h-5" />

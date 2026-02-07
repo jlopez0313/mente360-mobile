@@ -1,22 +1,24 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { NetworkContext } from "@/context/NetworkContext";
-import { enneagramTypes, mockCommunities } from "@/lib/mockData";
+import { db } from "@/hooks/useDexie";
+import { mockCommunities } from "@/lib/mockData";
+import { useLiveQuery } from "dexie-react-hooks";
 import {
-    Calendar,
-    ChevronRight,
-    Mail,
-    Phone,
-    Sparkles,
-    User,
-    Users,
+  Calendar,
+  ChevronRight,
+  Mail,
+  Phone,
+  Sparkles,
+  User,
+  Users,
 } from "lucide-react";
 import { useContext } from "react";
 
@@ -43,17 +45,19 @@ export function ContactDetailModal({
   open,
   onOpenChange,
 }: ContactDetailModalProps) {
-  const { status, baseURL, AvatarLogo } = useContext(NetworkContext);
+  const { status, baseURL, AvatarLogo, AudioNoWifi } =
+    useContext(NetworkContext);
+
+  const leaderCommunities = useLiveQuery(() => {
+    if (!contact) return [];
+    return db.comunidades.filter((c) => c.lider?.id === contact.id).toArray();
+  }, [contact]);
 
   if (!contact) return null;
 
   const contactCommunities = contact.communityIds
     ? mockCommunities.filter((c) => contact.communityIds?.includes(c.id))
     : [];
-
-  const enneagramLabel = contact.enneagramType
-    ? enneagramTypes.find((t) => t.value === contact.enneagramType)?.label
-    : null;
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("es-ES", {
@@ -63,7 +67,7 @@ export function ContactDetailModal({
     });
   };
 
-  const handleCommunityClick = (communityId: string) => {
+  const handleCommunityClick = (communityId: number) => {
     onOpenChange(false);
     // navigate(`/comunidades/${communityId}`);
   };
@@ -141,30 +145,30 @@ export function ContactDetailModal({
               </div>
             )}
 
-            {enneagramLabel && (
+            {contact.eneatipo && (
               <div className="flex items-center gap-3 text-sm">
                 <div className="w-8 h-8 rounded-full bg-accent/30 flex items-center justify-center">
                   <Sparkles className="w-4 h-4 text-accent-foreground" />
                 </div>
                 <div>
-                  <p className="text-muted-foreground text-xs">Eneagrama</p>
-                  <p className="text-foreground">{enneagramLabel}</p>
+                  <p className="text-muted-foreground text-xs">Eneatipo</p>
+                  <p className="text-foreground">{contact.eneatipo}</p>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Communities */}
-          {contactCommunities.length > 0 && (
+          {/* Communities from Leader */}
+          {leaderCommunities?.length > 0 && (
             <>
               <Separator />
               <div>
                 <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
                   <Users className="w-4 h-4" />
-                  Comunidades ({contactCommunities.length})
+                  Comunidades ({leaderCommunities?.length})
                 </h4>
                 <div className="space-y-2">
-                  {contactCommunities.map((community) => (
+                  {leaderCommunities?.map((community) => (
                     <Button
                       key={community.id}
                       variant="ghost"
@@ -173,18 +177,23 @@ export function ContactDetailModal({
                     >
                       <div className="flex items-center gap-3">
                         <Avatar className="w-10 h-10">
-                          <AvatarImage src={community.logo} />
+                          <AvatarImage
+                            src={
+                              status ? baseURL + community.imagen : AudioNoWifi
+                            }
+                            className="object-cover w-full h-full"
+                          />
                           <AvatarFallback className="bg-secondary text-secondary-foreground">
-                            {community.name.charAt(0)}
+                            {community.comunidad.charAt(0)}
                           </AvatarFallback>
                         </Avatar>
                         <div className="text-left">
                           <p className="font-medium text-foreground">
-                            {community.name}
+                            {community.comunidad}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            {community.channels.length} canales •{" "}
-                            {community.memberCount} miembros
+                            {community.channels?.length} canales •{" "}
+                            {community.suscritos.length} miembros
                           </p>
                         </div>
                       </div>
@@ -196,6 +205,7 @@ export function ContactDetailModal({
             </>
           )}
 
+          {/* User with Communities */}
           {contactCommunities.length === 0 && (
             <>
               <Separator />

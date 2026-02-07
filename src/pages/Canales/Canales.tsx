@@ -5,15 +5,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { NetworkContext } from "@/context/NetworkContext";
 import { getYoutubeLink, goToYoutube } from "@/helpers/Video";
+import { useBackButton } from "@/hooks/useBackButton";
 import { db } from "@/hooks/useDexie";
 import { cn } from "@/lib/utils";
 import { useLiveQuery } from "dexie-react-hooks";
 import { ArrowLeft, Play, Users } from "lucide-react";
-import { useContext, useEffect, useState } from "react";
-import { Link, useHistory, useParams } from "react-router-dom";
+import { useContext, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 
 const Canales: React.FC = () => {
-  const history = useHistory();
   const { id } = useParams<any>();
 
   const { AudioNoWifi, baseURL, status } = useContext(NetworkContext);
@@ -29,19 +29,7 @@ const Canales: React.FC = () => {
     [community]
   );
 
-  useEffect(() => {
-    const handleBackButton = (ev: Event) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      history.replace("/comunidades");
-    };
-
-    document.addEventListener("ionBackButton", handleBackButton);
-
-    return () => {
-      document.removeEventListener("ionBackButton", handleBackButton);
-    };
-  }, [history]);
+  useBackButton("/comunidades");
 
   return (
     <AppLayout>
@@ -65,7 +53,7 @@ const Canales: React.FC = () => {
           ></iframe>
 
           {/* Back button */}
-          <Link to='/comunidades' replace={true}>
+          <Link to="/comunidades" replace={true}>
             <Button
               variant="ghost"
               size="icon"
@@ -116,14 +104,17 @@ const Canales: React.FC = () => {
               <Users className="w-3 h-3" />
               {community?.suscritos?.length.toLocaleString()} miembros
             </Badge>
-            
-            <a href={goToYoutube(community?.video)} target="_blank" rel="noopener noreferrer">
+
+            <a
+              href={goToYoutube(community?.video)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <Button variant="outline" size="sm" className="gap-1">
                 <Play className="w-3 h-3" />
                 Ver presentación
               </Button>
             </a>
-            
           </div>
 
           {/* Description */}
@@ -156,12 +147,8 @@ const Canales: React.FC = () => {
 
             <div className="space-y-2">
               {canales?.map((channel, idx) => (
-                  <ChannelCard
-                    key={idx}
-                    channel={channel}
-                  />
-                )
-              )}
+                <ChannelCard key={idx} channel={channel} />
+              ))}
             </div>
           </div>
         </div>

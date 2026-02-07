@@ -1,101 +1,58 @@
-import { sendPush } from "@/services/push";
+import { cn } from "@/lib/utils";
 import {
-  addData,
-  readData,
+  childAdded,
+  getQuery,
+  queryTo,
   snapshotToArray,
   writeData,
 } from "@/services/realtime-db";
 import {
-  IonButton,
-  IonCol,
-  IonIcon,
   IonItem,
-  IonItemGroup,
-  IonList,
-  IonRow,
-  IonText,
-  IonTextarea,
+  IonItemOption,
+  IonItemOptions,
+  IonItemSliding,
 } from "@ionic/react";
-import { onValue } from "firebase/database";
-import { close } from "ionicons/icons";
+import { Undo2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import styles from "./Interno.module.scss";
-import { Item } from "./Item";
 
-export const Interno: React.FC<any> = ({ usuario, roomID }) => {
+const PAGINATION_LIMIT = 20;
+export const Interno: React.FC<any> = ({
+  usuario,
+  roomID,
+  replyTo,
+  setReplyTo,
+}) => {
   const { user } = useSelector((state: any) => state.user);
   const [mensaje, setMensaje] = useState("");
 
-  const chatListRef = useRef<HTMLIonListElement>(null);
+  const chatListRef = useRef<any>(null);
+  const hasScrolledInitially = useRef(false);
 
   const [isScrolledUp, setIsScrolledUp] = useState(false);
-  const [replyTo, setReplyTo] = useState<any>(null);
-  const [messagesList, setMessagesList] = useState<any>([]);
+  const [messages, setMessages] = useState<any>([]);
   const [otherUser, setOtherUser] = useState<any>({});
+  const [pendingScrollId, setPendingScrollId] = useState<string | null>(null);
 
-  const onGetOtherUser = () => {
-    setOtherUser(
-      replyTo?.reply?.from == user.id ? { name: "Tu" } : { ...usuario }
-    );
-  };
+  const onScrollToMessage = async (msg: any) => {
+    const replyId = msg.reply.id;
 
-  const onGetChat = async () => {
-    onValue(readData("rooms/" + roomID + "/messages"), (snapshot) => {
-      const messagesList = snapshotToArray(snapshot.val());
-      setMessagesList(messagesList);
-    });
-  };
+    if (!messages.find((m: any) => m.id === replyId)) {
+      const baseQuery = await queryTo("rooms/" + roomID + "/messages", {
+        orderBy: "key",
+        startAt: replyId,
+        endAt: messages[0].id,
+        direction: "last",
+      });
 
-  const onSendMessage = async () => {
-    try {
-      const fecha = new Date();
+      const snapshot = await getQuery(baseQuery);
+      const oldMessages = snapshotToArray(snapshot.val());
+      oldMessages.pop();
 
-      const message = {
-        user: user.id,
-        fecha: fecha.toLocaleDateString(),
-        hora: fecha.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-        date: fecha.toISOString(),
-        mensaje,
-        reply: {
-          from: replyTo?.user ?? null,
-          mensaje: replyTo?.mensaje ?? null,
-          index: replyTo?.index ?? null,
-        },
-      };
-
-      setMensaje("");
-      setReplyTo(null);
-
-      const otherUsers =
-        roomID.split("_").filter((x: any) => x != String(user.id)) || [];
-
-      const sendPushPromise =
-        otherUsers.length > 0
-          ? sendPush({
-              users_id: otherUsers,
-              title: user.name,
-              description:
-                message.mensaje.length > 25
-                  ? message.mensaje.substring(0, 22) + "..."
-                  : message.mensaje,
-              room: roomID,
-            })
-          : Promise.resolve();
-
-      await Promise.all([
-        addData(`rooms/${roomID}/messages`, message),
-        writeData(`rooms/${roomID}/users/${user.id}/writing`, false),
-        sendPushPromise,
-      ]);
-
-      requestAnimationFrame(() => scrollToBottom());
-    } catch (error) {
-      console.error("Error enviando mensaje:", error);
+      setMessages((prev) => [...oldMessages, ...prev]);
     }
+
+    setPendingScrollId(replyId);
   };
 
   const onCheckInput = async (e: any) => {
@@ -107,10 +64,9 @@ export const Interno: React.FC<any> = ({ usuario, roomID }) => {
 
   const scrollToBottom = () => {
     if (chatListRef.current) {
-      const scrollContainer = chatListRef.current;
-      scrollContainer.scrollTo({
-        top: scrollContainer.scrollHeight,
-        behavior: "auto",
+      chatListRef.current.scrollTo({
+        top: chatListRef.current.scrollHeight,
+        behavior: "smooth",
       });
     }
   };
@@ -124,79 +80,154 @@ export const Interno: React.FC<any> = ({ usuario, roomID }) => {
 
   useEffect(() => {
     if (!isScrolledUp) {
-      requestAnimationFrame(() => {
-        scrollToBottom();
-      });
+      setTimeout(() => {
+        requestAnimationFrame(() => {
+          scrollToBottom();
+        });
+      }, 0);
     }
-  }, [messagesList, isScrolledUp]);
+  }, [messages]);
 
   useEffect(() => {
-    onGetOtherUser();
-  }, [replyTo]);
+    if (!pendingScrollId) return;
+
+    const el = document.getElementById(`msg-${pendingScrollId}`);
+    if (!el) return;
+
+    el.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+
+    el.classList.add(
+      "bg-yellow-200/60",
+      "!text-primary",
+      "transition-colors",
+      "duration-400"
+    );
+
+    const t = setTimeout(() => {
+      el.classList.remove("bg-yellow-200/60", "!text-primary");
+    }, 800);
+
+    setPendingScrollId(null);
+  }, [messages, pendingScrollId]);
 
   useEffect(() => {
+    if (!roomID) return;
+
+    const onGetChat = async () => {
+      const baseQuery = await queryTo("rooms/" + roomID + "/messages", {
+        orderBy: "date",
+        limit: PAGINATION_LIMIT,
+        direction: "last",
+      });
+
+      const snapshot = await getQuery(baseQuery);
+      const messages = snapshotToArray(snapshot.val());
+      setMessages(messages);
+    };
+
     onGetChat();
-  }, []);
+
+    const unsubscribe = childAdded(
+      `rooms/${roomID}/messages`,
+      (snapshot: any) => {
+        const newMsg = {
+          id: snapshot.key,
+          ...snapshot.val(),
+        };
+
+        setMessages((prev: any) => {
+          if (prev.some((m: any) => m.id === newMsg.id)) return prev;
+          return [...prev, newMsg];
+        });
+      }
+    );
+
+    return () => unsubscribe();
+  }, [roomID]);
 
   return (
-    <div className={`${styles["ion-content"]}`}>
-
-      <IonList
-        ref={chatListRef}
-        className={`ion-padding`}
-        lines="none"
-        onScroll={handleScroll}
-      >
-        <IonItemGroup>
-          {messagesList.map((msg: any, idx: number) => {
-            return (
-              <Item
-                key={idx}
-                idx={idx}
-                setReplyTo={setReplyTo}
-                msg={msg}
-                roomID={roomID}
-                usuario={usuario}
-              />
-            );
-          })}
-        </IonItemGroup>
-      </IonList>
-
-      <IonRow className={styles["chatbox"]}>
-        <IonCol size="10" className={styles["border-radius-left"]} >
-          <IonItem lines="none" className={styles['reply']}>
-            <div className={styles["wrapper"]}>
-              {replyTo && (
-                <div className={styles["reply-bar"]}>
-                  <IonText
-                    color="medium"
-                    className={`ion-text-truncate ${styles["name"]}`}
+    <div
+      className="flex-1 overflow-y-auto px-4 py-4 space-y-3"
+      ref={chatListRef}
+      onScroll={handleScroll}
+    >
+      {messages.map((message: any, idx: number) => (
+        <IonItemSliding
+          key={message.id}
+          onIonDrag={(e) => {
+            const detail = (e as CustomEvent).detail;
+            if (detail.ratio < -1.75) {
+              (e.target as HTMLIonItemSlidingElement).close();
+              setReplyTo({ ...message, reply: { from: message.user } });
+            }
+          }}
+        >
+          <IonItem id={`msg-${message.id}`} className="ion-no-bg" lines="none">
+            <div
+              slot={message.user == user.id ? "end" : ""}
+              className={cn(
+                "max-w-[80%] px-4 py-2.5 rounded-2xl",
+                message.user == user.id
+                  ? "bg-primary text-primary-foreground rounded-br-md"
+                  : "bg-card border border-border rounded-bl-md"
+              )}
+            >
+              {message.reply && (
+                <div
+                  className={cn(
+                    "px-1.5 py-1.5 rounded-sm italic",
+                    message.user == user.id
+                      ? "bg-primary-foreground text-primary"
+                      : "bg-primary border border-border"
+                  )}
+                  onClick={() => onScrollToMessage(message)}
+                >
+                  <span
+                    className={cn(
+                      "text-xs font-bold",
+                      message.user == user.id
+                        ? "text-muted-foreground"
+                        : "text-primary-foreground"
+                    )}
                   >
-                    {otherUser.name}
-                  </IonText>
-                  <IonText color="medium" className="ion-text-truncate">
-                    {replyTo.mensaje}
-                  </IonText>
-                  <IonIcon icon={close} onClick={() => setReplyTo(null)} />
+                    {message.reply.from == user.id ? "Tu" : usuario?.name}
+                  </span>
+                  <p
+                    className={cn(
+                      "text-xs line-clamp-2",
+                      message.user == user.id
+                        ? "text-muted-foreground"
+                        : "text-primary-foreground"
+                    )}
+                  >
+                    {message.reply.mensaje}
+                  </p>
                 </div>
               )}
-              <IonTextarea
-                rows={1}
-                placeholder="Mensaje..."
-                onIonInput={onCheckInput}
-                value={mensaje}
-                autoGrow={true}
-              />
+
+              <p className="text-sm">{message.mensaje}</p>
+              <p
+                className={cn(
+                  "text-[10px] mt-1",
+                  message.user == user.id
+                    ? "text-primary-foreground/70"
+                    : "text-muted-foreground"
+                )}
+              >
+                {message.hora}
+              </p>
             </div>
           </IonItem>
-        </IonCol >
-        <IonCol size="2" className={styles["border-radius-right"]} >
-          <IonButton disabled={!mensaje} onClick={onSendMessage}>
-            <span className="material-symbols-outlined">send</span>
-          </IonButton>
-        </IonCol>
-      </IonRow>
+          <IonItemOptions side="start">
+            <IonItemOption color="light">
+              <Undo2 className="w-4 h-4" />
+            </IonItemOption>
+          </IonItemOptions>
+        </IonItemSliding>
+      ))}
     </div>
   );
 };

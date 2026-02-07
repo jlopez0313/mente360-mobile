@@ -3,11 +3,11 @@ import { createSlice } from "@reduxjs/toolkit";
 export const chatSlice = createSlice({
     name: 'chat',
     initialState: {
-        tab: 'chat',
+        activeTab: 'chats',
     },
     reducers: {
         setTab: (state, action) => {
-            state.tab = action.payload
+            state.activeTab = action.payload
         },
     }
 });

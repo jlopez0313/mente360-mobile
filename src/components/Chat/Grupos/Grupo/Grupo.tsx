@@ -1,3 +1,6 @@
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { NetworkContext } from "@/context/NetworkContext";
+import { cn } from "@/lib/utils";
 import { sendPush } from "@/services/push";
 import {
   addData,
@@ -5,25 +8,15 @@ import {
   snapshotToArray,
   writeData,
 } from "@/services/realtime-db";
-import {
-  IonButton,
-  IonCol,
-  IonIcon,
-  IonItem,
-  IonItemGroup,
-  IonList,
-  IonRow,
-  IonText,
-  IonTextarea,
-} from "@ionic/react";
+import { IonItem, IonItemOption, IonItemOptions, IonItemSliding } from "@ionic/react";
 import { onValue } from "firebase/database";
-import { close } from "ionicons/icons";
-import React, { useEffect, useRef, useState } from "react";
+import { Undo2 } from "lucide-react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import styles from "./Grupo.module.scss";
-import { Item } from "./Item";
 
 export const Grupo: React.FC<any> = ({ grupoID, grupo, removed }) => {
+  const { status, baseURL, AvatarLogo } = useContext(NetworkContext);
+
   const { user } = useSelector((state: any) => state.user);
   const [mensaje, setMensaje] = useState("");
   const [replyTo, setReplyTo] = useState<any>(null);
@@ -31,28 +24,14 @@ export const Grupo: React.FC<any> = ({ grupoID, grupo, removed }) => {
   const chatListRef = useRef<HTMLIonListElement>(null);
 
   const [isScrolledUp, setIsScrolledUp] = useState(false);
-  const [messagesList, setMessagesList] = useState<any>([]);
+  const [messages, setMessages] = useState<any[]>([]);
+
   const [usuarios, setUsuarios] = useState<any>([]);
   const [otherUser, setOtherUser] = useState<any>({});
+  const [sender, setSender] = useState<any>({});
 
-  const onGetOtherUser = () => {
-    setOtherUser(
-      replyTo?.reply?.from == user.id
-        ? { name: "Tu" }
-        : usuarios.find((u: any) => u.id == replyTo?.reply?.from) ?? {}
-    );
-  };
-
-  const onGetChat = async () => {
-    onValue(readData("users"), (snapshot) => {
-      const lista = snapshotToArray(snapshot.val());
-      setUsuarios(lista);
-    });
-
-    onValue(readData("grupos/" + grupoID + "/messages"), (snapshot) => {
-      const messagesList = snapshotToArray(snapshot.val());
-      setMessagesList(messagesList);
-    });
+  const onGetSender = (userId: any) => {
+    return usuarios.find((u: any) => u.id == userId);
   };
 
   const onSendMessage = async () => {
@@ -115,6 +94,25 @@ export const Grupo: React.FC<any> = ({ grupoID, grupo, removed }) => {
     );
   };
 
+  const onScrollToMessage = (msg: any) => {
+    const original = document.getElementById(`msg-${msg.reply.index}`);
+    if (original) {
+      original.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+      original.classList.add(
+        "bg-yellow-200/60",
+        "!text-primary",
+        "transition-colors",
+        "duration-700"
+      );
+      setTimeout(() => {
+        original.classList.remove("bg-yellow-200/60", "!text-primary");
+      }, 800);
+    }
+  };
+
   const scrollToBottom = () => {
     if (chatListRef.current) {
       const scrollContainer = chatListRef.current;
@@ -134,87 +132,168 @@ export const Grupo: React.FC<any> = ({ grupoID, grupo, removed }) => {
 
   useEffect(() => {
     if (!isScrolledUp) {
+      setTimeout(() => {
       requestAnimationFrame(() => {
         scrollToBottom();
       });
+    }, 0);
     }
-  }, [messagesList, isScrolledUp]);
+  }, [messages, isScrolledUp]);
 
   useEffect(() => {
+    const onGetOtherUser = () => {
+      setOtherUser(
+        replyTo?.reply?.from == user.id
+          ? { name: "Tu" }
+          : usuarios.find((u: any) => u.id == replyTo?.reply?.from) ?? {}
+      );
+    };
+
     onGetOtherUser();
   }, [replyTo]);
 
   useEffect(() => {
+    const onGetChat = async () => {
+      onValue(readData("users"), (snapshot) => {
+        const lista = snapshotToArray(snapshot.val());
+        setUsuarios(lista);
+      });
+
+      onValue(readData("grupos/" + grupoID + "/messages"), (snapshot) => {
+        const messagesList = snapshotToArray(snapshot.val());
+
+        console.log("messagesList", messagesList);
+        setMessages(messagesList);
+      });
+    };
+
     onGetChat();
   }, []);
 
   return (
-    <div className={`${styles["ion-content"]}`}>
-      
-      <IonList
-        ref={chatListRef}
-        className={`ion-padding ${styles["chat"]}`}
-        lines="none"
-        onScroll={handleScroll}
-      >
-        <IonItemGroup>
-          {messagesList.map((msg: any, idx: number) => {
-            return (
-              <Item
-                key={idx}
-                idx={idx}
-                msg={msg}
-                usuarios={usuarios}
-                grupoID={grupoID}
-                setReplyTo={setReplyTo}
-              />
-            );
-          })}
-        </IonItemGroup>
-      </IonList>
+    <div
+      className="flex-1 overflow-y-auto px-4 py-4 space-y-3"
+      ref={chatListRef}
+      onScroll={handleScroll}
+    >
+      {messages.map((message, index) => {
+        const showSender = message.user != user.id;
 
-      {removed ? (
-        <IonRow>
-          <IonCol size="12" className="ion-text-center">
-            <i style={{ margin: "0 auto" }}> Saliste del grupo </i>
-          </IonCol>
-        </IonRow>
-      ) : (
-        <IonRow className={styles["chatbox"]}>
-          <IonCol className={styles["border-radius-left"]} size="10">
-            <IonItem lines="none">
-              <div className={styles["wrapper"]}>
-                {replyTo && (
-                  <div className={styles["reply-bar"]}>
-                    <IonText
-                      color="medium"
-                      className={`ion-text-truncate ${styles["name"]}`}
-                    >
-                      {otherUser.name}
-                    </IonText>
-                    <IonText color="medium" className="ion-text-truncate">
-                      {replyTo.mensaje}
-                    </IonText>
-                    <IonIcon icon={close} onClick={() => setReplyTo(null)} />
-                  </div>
+        return (
+          <IonItemSliding
+          key={message.id}
+          onIonDrag={(e) => {
+            const detail = (e as CustomEvent).detail;
+            if (detail.ratio < -1.75) {
+              (e.target as HTMLIonItemSlidingElement).close();
+              setReplyTo({ ...message, reply: { from: message.user } });
+            }
+          }}
+        >
+          <IonItem id={`msg-${message.id}`} className="ion-no-bg" lines="none">
+            <div
+              slot={message.user == user.id ? "end" : ""}
+              className={cn(
+                "flex",
+                message.user == user.id ? "justify-end" : "justify-start"
+              )}
+            >
+              <div
+                className={cn(
+                  "max-w-[80%]",
+                  message.user != user.id && "pl-8 relative"
                 )}
-                <IonTextarea
-                  rows={1}
-                  placeholder="Mensaje..."
-                  onIonInput={onCheckInput}
-                  value={mensaje}
-                  autoGrow={true}
-                />
+              >
+                {message.user != user.id && showSender && (
+                  <Avatar className="w-6 h-6 absolute left-0 bottom-0">
+                    <AvatarImage
+                      className="object-cover w-full h-full"
+                      src={
+                        status
+                          ? baseURL + onGetSender(message.user)?.photo
+                          : AvatarLogo
+                      }
+                      alt={onGetSender(message.user)?.name}
+                    />
+                    <AvatarFallback className="text-xs bg-primary/10 text-primary">
+                      {onGetSender(message.user)?.name?.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                )}
+
+                {showSender && message.user != user.id && (
+                  <p className="text-xs text-primary font-medium mb-1 ml-1">
+                    {onGetSender(message.user)?.name}
+                  </p>
+                )}
+
+                <div
+                  id={`msg-${index}`}
+                  className={cn(
+                    "px-4 py-2.5 rounded-2xl",
+                    message.user == user.id
+                      ? "bg-primary text-primary-foreground rounded-br-md"
+                      : "bg-card border border-border rounded-bl-md"
+                  )}
+                >
+                  {message.reply && (
+                    <div
+                      className={cn(
+                        "px-1.5 py-1.5 rounded-sm italic",
+                        message.user == user.id
+                          ? "bg-primary-foreground text-primary"
+                          : "bg-primary border border-border"
+                      )}
+                      onClick={() => onScrollToMessage(message)}
+                    >
+                      <span
+                        className={cn(
+                          "text-xs font-bold",
+                          message.user == user.id
+                            ? "text-muted-foreground"
+                            : "text-primary-foreground"
+                        )}
+                      >
+                        {message.reply.from == user.id
+                          ? "Tu"
+                          : onGetSender(message.reply.from)?.name}
+                      </span>
+                      <p
+                        className={cn(
+                          "text-xs line-clamp-2",
+                          message.user == user.id
+                            ? "text-muted-foreground"
+                            : "text-primary-foreground"
+                        )}
+                      >
+                        {message.reply.mensaje}
+                      </p>
+                    </div>
+                  )}
+
+                  <p className="text-sm">{message.mensaje}</p>
+                  <p
+                    className={cn(
+                      "text-[10px] mt-1",
+                      message.user == user.id
+                        ? "text-primary-foreground/70"
+                        : "text-muted-foreground"
+                    )}
+                  >
+                    {message.hora}
+                  </p>
+                </div>
               </div>
-            </IonItem>
-          </IonCol>
-          <IonCol className={styles["border-radius-right"]}  size="2">
-            <IonButton disabled={!mensaje} onClick={onSendMessage}>
-              <span className="material-symbols-outlined">send</span>
-            </IonButton>
-          </IonCol>
-        </IonRow>
-      )}
+            </div>
+          </IonItem>
+          <IonItemOptions side="start">
+            <IonItemOption color="light">
+              <Undo2 className="w-4 h-4" />
+            </IonItemOption>
+          </IonItemOptions>
+        </IonItemSliding>
+        );
+      })}
     </div>
   );
 };

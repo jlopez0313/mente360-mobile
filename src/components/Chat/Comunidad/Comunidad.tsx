@@ -252,9 +252,9 @@ export const Comunidad = ({ searchQuery }: any) => {
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <h4 className="!m-0 font-semibold text-foreground truncate">
+                  <h5 className="!m-0 font-semibold text-foreground truncate">
                     {contact.name}
-                  </h4>
+                  </h5>
                   <p className="text-sm text-muted-foreground">
                     {contact.phone}
                   </p>

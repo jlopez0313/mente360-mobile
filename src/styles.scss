@@ -27,13 +27,6 @@
 }
 
 :root {
-  ion-tab-bar {
-    
-    padding-bottom: var(--ion-safe-area-bottom);
-  }
-}
-
-:root {
   --ion-safe-area-top: env(safe-area-inset-top);
   --ion-safe-area-bottom: env(safe-area-inset-bottom);
 }
@@ -41,4 +34,8 @@
 html,
 body {
   font-family: Mente360;
+}
+
+ion-item.ion-no-bg::part(native) {
+  background: transparent;
 }

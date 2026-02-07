@@ -11,13 +11,14 @@ const Comunidades = () => {
 
   return (
     <AppLayout>
-      <div className="px-4 py-6 space-y-6">
+      <div className="min-h-full pb-24">
         {/* Header */}
+        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50 px-4 py-4 space-y-4">
         <div className="flex items-center gap-3">
           <img
             src={Logo}
             alt="Mente 360"
-            className="w-10 h-10 rounded-xl object-cover"
+            className="w-10 rounded-xl object-cover"
           />
           <div>
             <h1 className="text-xl font-heading font-bold text-foreground">
@@ -28,9 +29,10 @@ const Comunidades = () => {
             </p>
           </div>
         </div>
+        </div>
 
         {/* Communities List */}
-        <div className="space-y-4">
+        <div className="space-y-4 px-4 py-6">
           {comunidades?.map((community) => (
             <CommunityCard key={community.id} community={community} />
           ))}

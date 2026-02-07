@@ -24,7 +24,6 @@ export const Item: React.FC<any> = ({
   idx,
   setReplyTo,
   usuarios,
-  closeFromParent
 }) => {
   const baseURL = import.meta.env.VITE_BASE_BACK;
   const { user } = useSelector((state: any) => state.user);
@@ -142,15 +141,13 @@ export const Item: React.FC<any> = ({
 
   return (
     <IonItemSliding
-      key={idx}
       onIonDrag={(e) => {
         const detail = (e as CustomEvent).detail;
         if (detail.ratio < -1.75) {
           (e.target as HTMLIonItemSlidingElement).close();
-          setReplyTo({ ...msg, reply: { from: msg.user }, index: idx });
+          setReplyTo({ ...msg, index: idx, reply: { from: msg.user } });
         }
       }}
-      onClick={closeFromParent}
     >
       <IonItem
         id={`msg-${idx}`}

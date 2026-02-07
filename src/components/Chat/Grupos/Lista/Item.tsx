@@ -1,9 +1,10 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { NetworkContext } from "@/context/NetworkContext";
 import { formatDate } from "@/helpers/Fechas";
 import {
-  getArrayData,
   getData,
+  queryTo,
   readData,
   snapshotToArray,
   writeData,
@@ -25,6 +26,7 @@ export const Item = ({ grupo }: any) => {
   const [lastMsg, setLastMsg] = useState<any>(null);
   const [unreads, setUnreads] = useState<any>(0);
   const [isWriting, setIsWriting] = useState<any>(null);
+  const [lastUser, setLastUser] = useState<any>(null);
 
   const goToGrupo = async () => {
     try {
@@ -35,60 +37,63 @@ export const Item = ({ grupo }: any) => {
     }
   };
 
-  const onCheckStatus = async () => {
-    const listaMensajes = await getArrayData(`grupos/${grupo.id}/messages`);
-    const lastMsg = listaMensajes.pop();
+  useEffect(() => {
+    let unsubLastMsg: any;
+    let unsubTyping: any;
+    let unsubUnreads: any;
 
-    if (lastMsg) {
-      const data = await getData(`users/${lastMsg.user.id}`);
-      const userData = data.val();
-      setLastMsg({ ...lastMsg, from: { ...userData } });
-    }
+    const onCheckStatus = async () => {
+      unsubLastMsg = onValue(
+        queryTo(`grupos/${grupo.id}/messages`, {
+          limit: 1,
+          direction: "last",
+        }),
+        async (snap) => {
+          const lastMsg = snapshotToArray(snap.val());
+          if (lastMsg.length) {
+            setLastMsg({ ...lastMsg[0] });
 
-    onValue(readData(`grupos/${grupo.id}`), async (snapshot) => {
-      const data = snapshot.val();
-
-      const listaMensajes = data ? snapshotToArray(data.messages) : [];
-
-      const users: any = data ? snapshotToArray(data.users) : [];
-
-      const isWriting = users.find(
-        (usario: any) => usario.writing && usario.id != user.id
+            const data = await getData(`users/${lastMsg[0].user}`);
+            setLastUser(data.val());
+          }
+        }
       );
 
-      setIsWriting(isWriting ?? false);
+      unsubTyping = onValue(readData(`grupos/${grupo.id}/users`), async(snap) => {
+        const usuarios = snapshotToArray(snap.val());
+        const userWriting = usuarios.find((usuario: any) => usuario.writing);
 
-      if (data.users[user.id]?.exit_time) {
-        const targetDate = new Date(data.users[user.id]?.exit_time);
+        if( userWriting ) {
+          const data = await getData(`users/${userWriting.id}`);
+          setLastUser(data.val());
+        }
 
-        const unreads: any = listaMensajes.filter((message: any) => {
-          const messageDate = new Date(`${message.date}`);
-          return messageDate > targetDate && message.user != user.id;
-        });
+        return setIsWriting(userWriting);
+      });
 
-        setUnreads(unreads.length ?? 0);
-      }
+      unsubUnreads = onValue(
+        readData(`grupos/${grupo.id}/users/${user.id}/unreads`),
+        (snap) => {
+          return setUnreads(snap.val());
+        }
+      );
+    };
 
-      const lastMsg = listaMensajes.pop();
-      if (lastMsg) {
-        const data = await getData(`users/${lastMsg.user}`);
-        const userData = data.val();
-        setLastMsg({ ...lastMsg, from: { ...userData } });
-      }
-    });
-  };
-
-  const onCheckUnreads = () => {
-    if (unreads != 0) {
-      dispatch(setGrupo(true));
-    }
-  };
-
-  useEffect(() => {
     onCheckStatus();
+
+    return () => {
+      unsubLastMsg();
+      unsubTyping();
+      unsubUnreads();
+    };
   }, []);
 
   useEffect(() => {
+    const onCheckUnreads = () => {
+      if (unreads != 0) {
+        dispatch(setGrupo(true));
+      }
+    };
     onCheckUnreads();
   }, [unreads]);
 
@@ -109,18 +114,23 @@ export const Item = ({ grupo }: any) => {
       </Avatar>
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between">
-          <h3 className="!m-0 font-semibold text-foreground truncate">
+          <h6 className="!m-0 font-semibold text-foreground truncate">
             {grupo.grupo}
-          </h3>
+          </h6>
           <span className="text-xs text-muted-foreground">
             {lastMsg ? formatDate(lastMsg.date) : null}
           </span>
         </div>
         <p className="text-sm text-muted-foreground truncate">
-          {lastMsg?.from?.name}: {lastMsg?.mensaje}
+          {lastUser?.name}: {isWriting ? <i>Escribiendo...</i> : lastMsg?.mensaje}
         </p>
       </div>
       <div className="flex flex-col items-end gap-1">
+        {unreads > 0 && (
+          <Badge className="bg-primary text-primary-foreground">
+            {unreads}
+          </Badge>
+        )}
         <span className="text-xs text-muted-foreground">
           {(snapshotToArray(grupo.users) ?? []).length} miembros
         </span>
