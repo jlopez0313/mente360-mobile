@@ -40,6 +40,20 @@ const Interno: React.FC = () => {
   const [newMessage, setNewMessage] = useState<any>("");
   const [replyTo, setReplyTo] = useState<any>(null);
 
+  const onCheckInput = async (e: any) => {
+    setNewMessage(e.target.value);
+
+    const writingStatus = e.target.value ? true : false;
+    await writeData(`rooms/${room}/users/${user.id}/writing`, writingStatus);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
+
   const sendMessage = async () => {
     if (!newMessage.trim()) return;
 
@@ -84,13 +98,6 @@ const Interno: React.FC = () => {
       // requestAnimationFrame(() => scrollToBottom());
     } catch (error) {
       console.error("Error enviando mensaje:", error);
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
     }
   };
 
@@ -246,17 +253,19 @@ const Interno: React.FC = () => {
             >
               <div className="flex flex-col">
                 <span className="font-bold text-muted-foreground">
-                  {
-                    replyTo?.reply?.from == user.id ? "Tú" : otherUser?.name
-                  }
+                  {replyTo?.reply?.from == user.id ? "Tú" : otherUser?.name}
                 </span>
                 <span className="text-muted-foreground">
                   {replyTo?.mensaje}
                 </span>
               </div>
-                <X className=" w-4 h-4 absolute top-1 right-1 cursor-pointer" onClick={() => setReplyTo(null)} />
+              <X
+                className=" w-4 h-4 absolute top-1 right-1 cursor-pointer"
+                onClick={() => setReplyTo(null)}
+              />
             </div>
           )}
+
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" className="flex-shrink-0">
               <Paperclip className="w-5 h-5" />
@@ -265,7 +274,7 @@ const Interno: React.FC = () => {
               <Input
                 placeholder="Escribe un mensaje..."
                 value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
+                onChange={onCheckInput}
                 onKeyPress={handleKeyPress}
                 className="pr-10 bg-background border-border"
               />

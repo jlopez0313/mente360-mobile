@@ -1,69 +1,52 @@
-import Avatar from "@/assets/images/avatar.jpg";
-import { getData, removeData, writeData } from "@/services/realtime-db";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { NetworkContext } from "@/context/NetworkContext";
+import { cn } from "@/lib/utils";
 import {
-  IonAvatar,
-  IonIcon,
   IonItem,
   IonItemOption,
   IonItemOptions,
   IonItemSliding,
-  IonModal,
-  IonPopover,
-  IonSkeletonText,
-  IonText,
 } from "@ionic/react";
-import EmojiPicker, { SkinTonePickerLocation } from "emoji-picker-react";
-import { returnUpBack } from "ionicons/icons";
-import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import styles from "./Grupo.module.scss";
+import { Undo2 } from "lucide-react";
+import React, { useContext, useState } from "react";
 
 export const Item: React.FC<any> = ({
-  msg,
-  grupoID,
-  idx,
-  setReplyTo,
+  index,
+  message,
   usuarios,
-  closeFromParent
-}) => {
-  const baseURL = import.meta.env.VITE_BASE_BACK;
-  const { user } = useSelector((state: any) => state.user);
-
-  const [isLoading, setIsLoading] = useState(true);
-  const [usuario, setUsuario] = useState<any>({});
-  const [otherUser, setOtherUser] = useState<any>({});
+  setReplyTo,
+  user,
+  onScrollToMessage,
+  setPopoverEvent,
+  setSelectedMessage,
+}: any) => {
+  const showSender = message.user != user.id;
+  const { status, baseURL, AvatarLogo } = useContext(NetworkContext);
 
   const [touchStartY, setTouchStartY] = useState<number | null>(null);
-  const [showEmojiModal, setShowEmojiModal] = useState(false);
-  const [currentBreakpoint, setCurrentBreakpoint] = useState(0.75);
-
-  const [popoverEvent, setPopoverEvent] = useState<{
-    top: number;
-    left: number;
-  } | null>(null);
-
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(
     null
   );
-  const [selectedMessageId, setSelectedMessageId] = useState<string | null>(
-    null
-  );
 
-  const onScrollToMessage = (msg: any) => {
-    const original = document.getElementById(`msg-${msg.reply.index}`);
-    if (original) {
-      original.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-      original.classList.add(styles["highlight"]);
-      setTimeout(() => {
-        original.classList.remove(styles["highlight"]);
-      }, 1000);
-    }
+  const groupReactions = (reactions: Record<string, string>) => {
+    const grouped: Record<string, number> = {};
+
+    Object.values(reactions).forEach((emoji) => {
+      if (grouped[emoji]) {
+        grouped[emoji] += 1;
+      } else {
+        grouped[emoji] = 1;
+      }
+    });
+
+    return grouped;
   };
 
-  const handleTouchStart = (e: any, msgId: string) => {
+  const onGetSender = (userId: any) => {
+    return usuarios.find((u: any) => u.id == userId);
+  };
+
+  const handleTouchStart = (e: any, msg: any) => {
     const touchY = e.touches[0].clientY;
     setTouchStartY(touchY);
 
@@ -74,7 +57,7 @@ export const Item: React.FC<any> = ({
     });
 
     const timer = setTimeout(() => {
-      setSelectedMessageId(msgId);
+      setSelectedMessage(msg);
     }, 500);
     setLongPressTimer(timer);
   };
@@ -100,196 +83,133 @@ export const Item: React.FC<any> = ({
     }
   };
 
-  const reactToMessage = async (messageId: string | null, emoji: string) => {
-    const reactionPath = `grupos/${grupoID}/messages/${messageId}/reactions/${user.id}`;
-
-    const snapshot = await getData(reactionPath);
-    const currentReaction = snapshot.exists() ? snapshot.val() : null;
-
-    if (currentReaction === emoji) {
-      await removeData(reactionPath);
-    } else {
-      await writeData(reactionPath, emoji);
-    }
-  };
-
-  const groupReactions = (reactions: Record<string, string>) => {
-    const grouped: Record<string, number> = {};
-
-    Object.values(reactions).forEach((emoji) => {
-      if (grouped[emoji]) {
-        grouped[emoji] += 1;
-      } else {
-        grouped[emoji] = 1;
-      }
-    });
-
-    return grouped;
-  };
-
-  useEffect(() => {
-    const onGetUser = () => {
-      setUsuario(usuarios.find((u: any) => u.id == msg.user));
-    };
-
-    const onGetOtherUser = () => {
-      setOtherUser(usuarios.find((u: any) => u.id == msg.reply?.from) ?? {});
-    };
-
-    onGetUser();
-    onGetOtherUser();
-  }, [usuarios]);
-
   return (
     <IonItemSliding
-      key={idx}
+      key={message.id}
       onIonDrag={(e) => {
         const detail = (e as CustomEvent).detail;
         if (detail.ratio < -1.75) {
           (e.target as HTMLIonItemSlidingElement).close();
-          setReplyTo({ ...msg, reply: { from: msg.user }, index: idx });
+          setReplyTo({ ...message, reply: { from: message.user } });
         }
       }}
-      onClick={closeFromParent}
     >
       <IonItem
-        id={`msg-${idx}`}
-        button={true}
-        className={`${styles["message"]} ${
-          msg.user === user.id ? styles["sender"] : styles["receiver"]
-        } `}
-        onTouchStart={(e) => handleTouchStart(e, msg.id)}
+        id={`msg-${message.id}`}
+        className="ion-no-bg"
+        lines="none"
+        onTouchStart={(e) => handleTouchStart(e, message)}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        {msg.user !== user.id && (
-          <IonAvatar aria-hidden="true" slot="start">
-            {isLoading && (
-              <IonSkeletonText
-                animated
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  borderRadius: "50%",
-                }}
-              />
+        <div
+          slot={message.user == user.id ? "end" : ""}
+          className={cn(
+            "flex",
+            message.user == user.id ? "justify-end" : "justify-start"
+          )}
+        >
+          <div
+            className={cn(
+              "max-w-[80%]",
+              message.user != user.id && "pl-8 relative"
             )}
-            <img
-              alt=""
-              src={usuario?.photo ? baseURL + usuario.photo : Avatar}
-              style={{ display: isLoading ? "none" : "block" }}
-              onLoad={() => setIsLoading(false)}
-            />
-          </IonAvatar>
-        )}
-        <div>
-          {msg.reply && (
-            <div
-              className={styles["reply-preview"]}
-              onClick={() => onScrollToMessage(msg)}
-            >
-              <IonText color="medium" className={styles["reply-name"]}>
-                {msg.reply.from == user.id ? "Tu" : otherUser.name}
-              </IonText>
-              <IonText color="medium" className={styles["reply-text"]}>
-                {msg.reply.mensaje}
-              </IonText>
-            </div>
-          )}
+          >
+            {message.user != user.id && showSender && (
+              <Avatar className="w-6 h-6 absolute left-0 bottom-0">
+                <AvatarImage
+                  className="object-cover w-full h-full"
+                  src={
+                    status
+                      ? baseURL + onGetSender(message.user)?.photo
+                      : AvatarLogo
+                  }
+                  alt={onGetSender(message.user)?.name}
+                />
+                <AvatarFallback className="text-xs bg-primary/10 text-primary">
+                  {onGetSender(message.user)?.name?.charAt(0)}
+                </AvatarFallback>
+              </Avatar>
+            )}
 
-          {msg.user !== user.id && (
-            <span className={styles["name"]}> {usuario?.name} </span>
-          )}
-          <IonText className={styles["message"]}> {msg.mensaje} </IonText>
-          <span className={styles["time"]}> {msg.hora} </span>
+            {showSender && message.user != user.id && (
+              <p className="text-xs text-primary font-medium mb-1 ml-1">
+                {onGetSender(message.user)?.name}
+              </p>
+            )}
+
+            <div
+              id={`msg-${index}`}
+              className={cn(
+                "px-4 py-2.5 rounded-2xl",
+                message.user == user.id
+                  ? "bg-primary text-primary-foreground rounded-br-md"
+                  : "bg-card border border-border rounded-bl-md"
+              )}
+            >
+              {message.reply && (
+                <div
+                  className={cn(
+                    "px-1.5 py-1.5 rounded-sm italic",
+                    message.user == user.id
+                      ? "bg-primary-foreground text-primary"
+                      : "bg-primary border border-border"
+                  )}
+                  onClick={() => onScrollToMessage(message)}
+                >
+                  <span
+                    className={cn(
+                      "text-xs font-bold",
+                      message.user == user.id
+                        ? "text-muted-foreground"
+                        : "text-primary-foreground"
+                    )}
+                  >
+                    {message.reply.from == user.id
+                      ? "Tu"
+                      : onGetSender(message.reply.from)?.name}
+                  </span>
+                  <p
+                    className={cn(
+                      "text-xs line-clamp-2",
+                      message.user == user.id
+                        ? "text-muted-foreground"
+                        : "text-primary-foreground"
+                    )}
+                  >
+                    {message.reply.mensaje}
+                  </p>
+                </div>
+              )}
+
+              <p className="text-sm">{message.mensaje}</p>
+              <p
+                className={cn(
+                  "text-[10px] mt-1",
+                  message.user == user.id
+                    ? "text-primary-foreground/70"
+                    : "text-muted-foreground"
+                )}
+              >
+                {message.hora}
+              </p>
+            </div>
+          </div>
         </div>
       </IonItem>
 
-      <IonPopover
-        showBackdrop={false}
-        isOpen={selectedMessageId ? true : false}
-        className={styles["popover"]}
-        style={{
-          position: "fixed",
-          top: (popoverEvent?.top ?? 0) - 390,
-          transform: "none",
-          zIndex: 9999,
-        }}
-        onDidDismiss={() => setSelectedMessageId(null)}
-      >
-        <div className={styles["quick-reactions"]}>
-          {["👍", "❤️", "😂", "😮", "😢", "🙏"].map((emoji) => (
-            <span
-              key={emoji}
-              className={styles["reaction-button"]}
-              onClick={() => {
-                reactToMessage(selectedMessageId, emoji);
-                setSelectedMessageId(null);
-              }}
-            >
-              {emoji}
-            </span>
-          ))}
-          <span
-            className={styles["add-reaction-button"]}
-            onClick={() => {
-              setShowEmojiModal(true);
-            }}
-          >
-            +
-          </span>
-        </div>
-      </IonPopover>
-
-      <IonModal
-        isOpen={showEmojiModal}
-        className={styles["emoji-modal"]}
-        initialBreakpoint={0.75}
-        onDidDismiss={() => {
-          setSelectedMessageId(null);
-          setShowEmojiModal(false);
-        }}
-        onIonBreakpointDidChange={(e) => {
-          const newBp = (e as CustomEvent).detail.breakpoint;
-          setCurrentBreakpoint(newBp);
-        }}
-      >
+      {message.reactions && (
         <div
-          className={styles["emoji-content"]}
-          style={{ height: "100%", padding: 16, touchAction: "none" }}
+          className={cn(
+            "relative flex w-fit items-center gap-2 -mt-[18px] p-2 z-10",
+            message.user == user.id ? "float-right" : ""
+          )}
         >
-          <EmojiPicker
-            width={"100%"}
-            height={window.innerHeight * currentBreakpoint - 30 + "px"}
-            skinTonePickerLocation={SkinTonePickerLocation.PREVIEW}
-            previewConfig={{ showPreview: false }}
-            onEmojiClick={(emoji) => {
-              reactToMessage(selectedMessageId!, emoji.emoji);
-              setSelectedMessageId(null);
-              setShowEmojiModal(false);
-            }}
-            onReactionClick={(emoji) => {
-              reactToMessage(selectedMessageId!, emoji.emoji);
-              setSelectedMessageId(null);
-              setShowEmojiModal(false);
-            }}
-          />
-        </div>
-      </IonModal>
-
-      {msg.reactions && (
-        <div
-          className={`${styles["reactions"]} ${
-            msg.user === user.id ? styles["sender"] : styles["receiver"]
-          }`}
-        >
-          {Object.entries(groupReactions(msg.reactions || {})).map(
+          {Object.entries(groupReactions(message.reactions || {})).map(
             ([emoji, count]) => (
               <div key={emoji}>
-                <span className={styles["emoji"]}>{emoji}</span>
-                {count > 1 && (
-                  <span className={styles["count"]}>{`x${count}`}</span>
-                )}
+                <span>{emoji}</span>
+                {count > 1 && <span>{`x${count}`}</span>}
               </div>
             )
           )}
@@ -298,7 +218,7 @@ export const Item: React.FC<any> = ({
 
       <IonItemOptions side="start">
         <IonItemOption color="light">
-          <IonIcon slot="icon-only" icon={returnUpBack} />
+          <Undo2 className="w-4 h-4" />
         </IonItemOption>
       </IonItemOptions>
     </IonItemSliding>

@@ -4,6 +4,7 @@ import {
   limitToFirst,
   limitToLast,
   onChildAdded,
+  onChildChanged,
   onDisconnect,
   orderByChild,
   orderByKey,
@@ -28,6 +29,12 @@ type QueryOptions = {
   startAfter?: string;
   startAt?: string;
   endAt?: string;
+};
+
+export const childChanged = (querySent: string | Query, callback: any) => {
+  const query = typeof querySent === "string" ? ref(rtDatabase, querySent) : queryTo(querySent);
+
+  return onChildChanged(query, callback);
 };
 
 export const childAdded = (querySent: string | Query, callback: any) => {

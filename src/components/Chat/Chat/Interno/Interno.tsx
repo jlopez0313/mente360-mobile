@@ -1,28 +1,20 @@
-import { cn } from "@/lib/utils";
 import {
   childAdded,
+  childChanged,
   getQuery,
   queryTo,
+  removeData,
   snapshotToArray,
   writeData,
 } from "@/services/realtime-db";
-import {
-  IonItem,
-  IonItemOption,
-  IonItemOptions,
-  IonItemSliding,
-} from "@ionic/react";
-import { Undo2 } from "lucide-react";
+import { IonModal, IonPopover } from "@ionic/react";
+import EmojiPicker, { SkinTonePickerLocation } from "emoji-picker-react";
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
+import { Item } from "./Item";
 
 const PAGINATION_LIMIT = 20;
-export const Interno: React.FC<any> = ({
-  usuario,
-  roomID,
-  replyTo,
-  setReplyTo,
-}) => {
+export const Interno: React.FC<any> = ({ usuario, roomID, setReplyTo }) => {
   const { user } = useSelector((state: any) => state.user);
   const [mensaje, setMensaje] = useState("");
 
@@ -33,6 +25,30 @@ export const Interno: React.FC<any> = ({
   const [messages, setMessages] = useState<any>([]);
   const [otherUser, setOtherUser] = useState<any>({});
   const [pendingScrollId, setPendingScrollId] = useState<string | null>(null);
+
+  const [showEmojiModal, setShowEmojiModal] = useState(false);
+  const [currentBreakpoint, setCurrentBreakpoint] = useState(0.75);
+
+  const [popoverEvent, setPopoverEvent] = useState<{
+    top: number;
+    left: number;
+  } | null>(null);
+
+  const [selectedMessage, setSelectedMessage] = useState<string | null>(null);
+
+  const reactToMessage = async (message: any | null, emoji: string) => {
+    const reactionPath = `rooms/${roomID}/messages/${message?.id}/reactions/${user.id}`;
+
+    if (!message.reactions?.[user.id]) {
+      await writeData(reactionPath, emoji);
+    } else {
+      if (message.reactions?.[user.id] != emoji) {
+        await writeData(reactionPath, emoji);
+      } else {
+        await removeData(reactionPath);
+      }
+    }
+  };
 
   const onScrollToMessage = async (msg: any) => {
     const replyId = msg.reply.id;
@@ -55,20 +71,16 @@ export const Interno: React.FC<any> = ({
     setPendingScrollId(replyId);
   };
 
-  const onCheckInput = async (e: any) => {
-    setMensaje(e.target.value);
-
-    const writingStatus = e.target.value ? true : false;
-    await writeData(`rooms/${roomID}/users/${user.id}/writing`, writingStatus);
-  };
-
   const scrollToBottom = () => {
-    if (chatListRef.current) {
-      chatListRef.current.scrollTo({
-        top: chatListRef.current.scrollHeight,
-        behavior: "smooth",
-      });
-    }
+    const last = messages.slice(-1)[0];
+    if (!last) return;
+    const el = document.getElementById(`msg-${last.id}`);
+    if (!el) return;
+
+    el.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
   };
 
   const handleScroll = (e: any) => {
@@ -130,7 +142,20 @@ export const Interno: React.FC<any> = ({
 
     onGetChat();
 
-    const unsubscribe = childAdded(
+    const unsubChanged = childChanged(
+      "rooms/" + roomID + "/messages",
+      (snap: any) => {
+        const updated = snap.val();
+
+        setMessages((prev: any) =>
+          prev.map((m: any) =>
+            m.id === snap.key ? { id: snap.key, ...updated } : m
+          )
+        );
+      }
+    );
+
+    const unsubAdded = childAdded(
       `rooms/${roomID}/messages`,
       (snapshot: any) => {
         const newMsg = {
@@ -145,7 +170,10 @@ export const Interno: React.FC<any> = ({
       }
     );
 
-    return () => unsubscribe();
+    return () => {
+      unsubChanged();
+      unsubAdded();
+    };
   }, [roomID]);
 
   return (
@@ -155,79 +183,86 @@ export const Interno: React.FC<any> = ({
       onScroll={handleScroll}
     >
       {messages.map((message: any, idx: number) => (
-        <IonItemSliding
-          key={message.id}
-          onIonDrag={(e) => {
-            const detail = (e as CustomEvent).detail;
-            if (detail.ratio < -1.75) {
-              (e.target as HTMLIonItemSlidingElement).close();
-              setReplyTo({ ...message, reply: { from: message.user } });
-            }
-          }}
-        >
-          <IonItem id={`msg-${message.id}`} className="ion-no-bg" lines="none">
-            <div
-              slot={message.user == user.id ? "end" : ""}
-              className={cn(
-                "max-w-[80%] px-4 py-2.5 rounded-2xl",
-                message.user == user.id
-                  ? "bg-primary text-primary-foreground rounded-br-md"
-                  : "bg-card border border-border rounded-bl-md"
-              )}
-            >
-              {message.reply && (
-                <div
-                  className={cn(
-                    "px-1.5 py-1.5 rounded-sm italic",
-                    message.user == user.id
-                      ? "bg-primary-foreground text-primary"
-                      : "bg-primary border border-border"
-                  )}
-                  onClick={() => onScrollToMessage(message)}
-                >
-                  <span
-                    className={cn(
-                      "text-xs font-bold",
-                      message.user == user.id
-                        ? "text-muted-foreground"
-                        : "text-primary-foreground"
-                    )}
-                  >
-                    {message.reply.from == user.id ? "Tu" : usuario?.name}
-                  </span>
-                  <p
-                    className={cn(
-                      "text-xs line-clamp-2",
-                      message.user == user.id
-                        ? "text-muted-foreground"
-                        : "text-primary-foreground"
-                    )}
-                  >
-                    {message.reply.mensaje}
-                  </p>
-                </div>
-              )}
-
-              <p className="text-sm">{message.mensaje}</p>
-              <p
-                className={cn(
-                  "text-[10px] mt-1",
-                  message.user == user.id
-                    ? "text-primary-foreground/70"
-                    : "text-muted-foreground"
-                )}
-              >
-                {message.hora}
-              </p>
-            </div>
-          </IonItem>
-          <IonItemOptions side="start">
-            <IonItemOption color="light">
-              <Undo2 className="w-4 h-4" />
-            </IonItemOption>
-          </IonItemOptions>
-        </IonItemSliding>
+        <Item
+          key={idx}
+          message={message}
+          user={user}
+          setReplyTo={setReplyTo}
+          setPopoverEvent={setPopoverEvent}
+          onScrollToMessage={onScrollToMessage}
+          setSelectedMessage={setSelectedMessage}
+        />
       ))}
+
+      <IonPopover
+        showBackdrop={false}
+        isOpen={selectedMessage ? true : false}
+        className="fixed z-10"
+        style={{
+          "--background": "transparent",
+          "--box-shadow": "none",
+          top: (popoverEvent?.top ?? 0) - 390,
+          transform: "none",
+        }}
+        onDidDismiss={() => setSelectedMessage(null)}
+      >
+        <div className="flex border bg-white gap-2 h-full rounded-full p-2">
+          {["👍", "❤️", "😂", "😮", "😢", "🙏"].map((emoji) => (
+            <span
+              className="text-lg"
+              key={emoji}
+              onClick={() => {
+                reactToMessage(selectedMessage, emoji);
+                setSelectedMessage(null);
+              }}
+            >
+              {emoji}
+            </span>
+          ))}
+          <span
+            className="text-lg border border-muted rounded-full w-7 h-7 flex items-center justify-center"
+            onClick={() => {
+              setShowEmojiModal(true);
+            }}
+          >
+            +
+          </span>
+        </div>
+      </IonPopover>
+
+      <IonModal
+        handleBehavior="cycle"
+        canDismiss={true}
+        isOpen={showEmojiModal}
+        initialBreakpoint={0.75}
+        onDidDismiss={() => {
+          setSelectedMessage(null);
+          setShowEmojiModal(false);
+        }}
+        onIonBreakpointDidChange={(e) => {
+          const newBp = (e as CustomEvent).detail.breakpoint;
+          setCurrentBreakpoint(newBp);
+        }}
+      >
+        <div style={{ height: "100%", padding: 16, touchAction: "none" }}>
+          <EmojiPicker
+            width={"100%"}
+            height={window.innerHeight * currentBreakpoint - 30 + "px"}
+            skinTonePickerLocation={SkinTonePickerLocation.PREVIEW}
+            previewConfig={{ showPreview: false }}
+            onEmojiClick={(emoji) => {
+              reactToMessage(selectedMessage!, emoji.emoji);
+              setSelectedMessage(null);
+              setShowEmojiModal(false);
+            }}
+            onReactionClick={(emoji) => {
+              reactToMessage(selectedMessage!, emoji.emoji);
+              setSelectedMessage(null);
+              setShowEmojiModal(false);
+            }}
+          />
+        </div>
+      </IonModal>
     </div>
   );
 };

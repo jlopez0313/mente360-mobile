@@ -9,7 +9,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { NetworkContext } from "@/context/NetworkContext";
 import { useBackButton } from "@/hooks/useBackButton";
+import { cn } from "@/lib/utils";
+import { sendPush } from "@/services/push";
 import {
+  addData,
   doDisconnect,
   getData,
   readData,
@@ -24,6 +27,7 @@ import {
   Send,
   Smile,
   Users,
+  X,
 } from "lucide-react";
 import { useSelector } from "react-redux";
 
@@ -37,29 +41,75 @@ const Grupo: React.FC = () => {
   const [grupo, setGrupo] = useState<any>(null);
   const [lastUser, setLastUser] = useState<any>(null);
   const [isWriting, setIsWriting] = useState<any>(null);
+  const [replyTo, setReplyTo] = useState<any>(null);
+  const [otherUser, setOtherUser] = useState<any>({});
 
-  const sendMessage = () => {
-    if (!newMessage.trim()) return;
+  const onCheckInput = async (e: any) => {
+    setNewMessage(e.target.value);
 
-    const message: GroupMessage = {
-      id: Date.now().toString(),
-      text: newMessage,
-      senderName: "Tú",
-      isMe: true,
-      time: new Date().toLocaleTimeString("es-ES", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-    };
-
-    // setMessages((prev) => [...prev, message]);
-    setNewMessage("");
+    const writingStatus = e.target.value ? true : false;
+    await writeData(
+      `grupos/${groupId}/users/${user.id}/writing`,
+      writingStatus
+    );
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
+    }
+  };
+
+  const sendMessage = async () => {
+    if (!newMessage.trim()) return;
+
+    try {
+      const fecha = new Date();
+
+      const message = {
+        user: user.id,
+        fecha: fecha.toLocaleDateString(),
+        hora: fecha.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        date: fecha.toISOString(),
+        mensaje: newMessage,
+        reply: {
+          id: replyTo?.id ?? null,
+          from: replyTo?.user ?? null,
+          mensaje: replyTo?.mensaje ?? null,
+        },
+      };
+
+      setNewMessage("");
+      setReplyTo(null);
+
+      const otherUsers = grupo.users.filter((x: any) => x.id != user.id) || [];
+
+      const sendPushPromise =
+        otherUsers.length > 0
+          ? sendPush({
+              users_id: otherUsers.map((u: any) => u.id),
+              title: grupo.grupo,
+              description:
+                (user.name + ": " + message.mensaje).length > 25
+                  ? `${user.name}: ${message.mensaje.substring(0, 22)}...`
+                  : `${user.name}: ${message.mensaje}`,
+              grupo: groupId,
+            })
+          : Promise.resolve();
+
+      await Promise.all([
+        addData(`grupos/${groupId}/messages`, message),
+        writeData(`grupos/${groupId}/users/${user.id}/writing`, false),
+        sendPushPromise,
+      ]);
+
+      // requestAnimationFrame(() => scrollToBottom());
+    } catch (error) {
+      console.error("Error enviando mensaje al grupo:", error);
     }
   };
 
@@ -136,6 +186,25 @@ const Grupo: React.FC = () => {
     };
   }, [user, groupId]);
 
+  useEffect(() => {
+    let unsubUsers: any;
+
+    const onGetOtherUser = () => {
+      unsubUsers = onValue(
+        readData(`users/${replyTo?.reply?.from}`),
+        async (snapshot) => {
+          setOtherUser({ ...snapshot.val() });
+        }
+      );
+    };
+
+    onGetOtherUser();
+
+    return () => {
+      unsubUsers();
+    };
+  }, [replyTo]);
+
   useBackButton("/chat");
 
   return (
@@ -162,7 +231,9 @@ const Grupo: React.FC = () => {
             </Avatar>
 
             <div className="flex-1">
-              <h2 className="font-semibold text-foreground !mb-0 line-clamp-1">{grupo?.grupo}</h2>
+              <h2 className="font-semibold text-foreground !mb-0 line-clamp-1">
+                {grupo?.grupo}
+              </h2>
               <p className="text-xs text-muted-foreground flex items-center gap-1">
                 {isWriting && lastUser?.name ? (
                   <>
@@ -185,10 +256,39 @@ const Grupo: React.FC = () => {
         </div>
 
         {/* Messages */}
-        <GrupoComponent grupoID={groupId} grupo={grupo} />
+        <GrupoComponent
+          grupoID={groupId}
+          grupo={grupo}
+          replyTo={replyTo}
+          setReplyTo={setReplyTo}
+        />
 
         {/* Input */}
-        <div className="sticky bottom-0 bg-card border-t border-border px-4 py-3 safe-bottom">
+        <div className="sticky bottom-0 z-10 bg-card border-t border-border px-4 py-3 safe-bottom">
+          {replyTo?.id && (
+            <div
+              className={cn(
+                "border-l border-l-4 border-primary",
+                "text-xs relative mb-2",
+                "px-1.5 py-1.5 rounded-sm italic",
+                "bg-primary-foreground text-primary"
+              )}
+            >
+              <div className="flex flex-col">
+                <span className="font-bold text-muted-foreground">
+                  {replyTo?.reply?.from == user.id ? "Tú" : otherUser?.name}
+                </span>
+                <span className="text-muted-foreground">
+                  {replyTo?.mensaje}
+                </span>
+              </div>
+              <X
+                className=" w-4 h-4 absolute top-1 right-1 cursor-pointer"
+                onClick={() => setReplyTo(null)}
+              />
+            </div>
+          )}
+
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" className="flex-shrink-0">
               <Paperclip className="w-5 h-5" />
@@ -197,7 +297,7 @@ const Grupo: React.FC = () => {
               <Input
                 placeholder="Escribe un mensaje..."
                 value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
+                onChange={onCheckInput}
                 onKeyPress={handleKeyPress}
                 className="pr-10 bg-background border-border"
               />

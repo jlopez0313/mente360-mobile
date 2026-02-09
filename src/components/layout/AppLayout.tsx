@@ -9,8 +9,8 @@ interface AppLayoutProps {
 export function AppLayout({ children, hideNav = false }: AppLayoutProps) {
   return (
     <IonPage>
-      <IonContent fullscreen  className="space-y-4">
-        <div className="px-4 py-4 bg-background">
+      <IonContent fullscreen className="space-y-4">
+        <div className="min-h-screen bg-background">
           <main className={hideNav ? "" : "pb-20"}>
             {children}
           </main>
