@@ -1,10 +1,12 @@
 import {
+  childAdded,
+  childChanged,
   getQuery,
   queryTo,
   readData,
   removeData,
   snapshotToArray,
-  writeData
+  writeData,
 } from "@/services/realtime-db";
 import { IonModal, IonPopover } from "@ionic/react";
 import EmojiPicker, { SkinTonePickerLocation } from "emoji-picker-react";
@@ -13,12 +15,9 @@ import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { Item } from "./Item";
 
-export const Grupo: React.FC<any> = ({
-  grupoID,
-  grupo,
-  setReplyTo,
-  removed,
-}) => {
+const PAGINATION_LIMIT = 20;
+
+export const Grupo: React.FC<any> = ({ grupoID, setReplyTo, removed }) => {
   const { user } = useSelector((state: any) => state.user);
   const [mensaje, setMensaje] = useState("");
 
@@ -132,20 +131,67 @@ export const Grupo: React.FC<any> = ({
   }, [messages, pendingScrollId]);
 
   useEffect(() => {
+    if (!grupoID) return;
+
     const onGetChat = async () => {
-      onValue(readData("users"), (snapshot) => {
-        const lista = snapshotToArray(snapshot.val());
-        setUsuarios(lista);
+      const baseQuery = await queryTo("grupos/" + grupoID + "/messages", {
+        orderBy: "date",
+        limit: PAGINATION_LIMIT,
+        direction: "last",
       });
 
-      onValue(readData("grupos/" + grupoID + "/messages"), (snapshot) => {
-        const messagesList = snapshotToArray(snapshot.val());
-        setMessages(messagesList);
-      });
+      const snapshot = await getQuery(baseQuery);
+      const messages = snapshotToArray(snapshot.val());
+      setMessages(messages);
     };
 
     onGetChat();
-  }, []);
+
+    const unsubUsuarios = onValue(readData("users"), (snapshot) => {
+      const lista = snapshotToArray(snapshot.val());
+      setUsuarios(lista);
+    });
+
+    const unsubChanged = childChanged(
+      "grupos/" + grupoID + "/messages",
+      (snap: any) => {
+        const updated = snap.val();
+
+        setMessages((prev: any) =>
+          prev.map((m: any) =>
+            m.id === snap.key ? { id: snap.key, ...updated } : m
+          )
+        );
+      }
+    );
+
+    const unsubAdded = childAdded(
+      `grupos/${grupoID}/messages`,
+      (snapshot: any) => {
+        const newMsg = {
+          id: snapshot.key,
+          ...snapshot.val(),
+        };
+
+        setMessages((prev: any) => {
+          if (prev.some((m: any) => m.id === newMsg.id)) return prev;
+          return [...prev, newMsg];
+        });
+      }
+    );
+
+    if( removed ) {
+      unsubChanged();
+      unsubAdded();
+      unsubUsuarios();
+    }
+
+    return () => {
+      unsubChanged();
+      unsubAdded();
+      unsubUsuarios();
+    };
+  }, [grupoID, removed]);
 
   return (
     <div

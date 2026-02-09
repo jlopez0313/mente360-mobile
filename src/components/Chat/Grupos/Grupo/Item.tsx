@@ -105,13 +105,13 @@ export const Item: React.FC<any> = ({
         <div
           slot={message.user == user.id ? "end" : ""}
           className={cn(
+            "max-w-[80%]",
             "flex",
             message.user == user.id ? "justify-end" : "justify-start"
           )}
         >
           <div
             className={cn(
-              "max-w-[80%]",
               message.user != user.id && "pl-8 relative"
             )}
           >

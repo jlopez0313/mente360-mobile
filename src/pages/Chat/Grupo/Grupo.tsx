@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useHistory, useParams } from "react-router-dom";
 
 import { useContext, useEffect, useState } from "react";
 
@@ -6,6 +6,12 @@ import { Grupo as GrupoComponent } from "@/components/Chat/Grupos/Grupo/Grupo";
 import { AppLayout } from "@/components/layout";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { NetworkContext } from "@/context/NetworkContext";
 import { useBackButton } from "@/hooks/useBackButton";
@@ -16,14 +22,17 @@ import {
   doDisconnect,
   getData,
   readData,
+  removeData,
   snapshotToArray,
   writeData,
 } from "@/services/realtime-db";
 import { onValue } from "firebase/database";
 import {
   ArrowLeft,
+  LogOut,
   MoreVertical,
   Paperclip,
+  Plus,
   Send,
   Smile,
   Users,
@@ -35,14 +44,21 @@ const Grupo: React.FC = () => {
   const { baseURL, AvatarLogo } = useContext(NetworkContext);
   const { user } = useSelector((state: any) => state.user);
 
+  const history = useHistory();
+
   const { id: groupId } = useParams<any>();
   const [newMessage, setNewMessage] = useState("");
 
+  const [removed, setRemoved] = useState(false);
   const [grupo, setGrupo] = useState<any>(null);
   const [lastUser, setLastUser] = useState<any>(null);
   const [isWriting, setIsWriting] = useState<any>(null);
   const [replyTo, setReplyTo] = useState<any>(null);
   const [otherUser, setOtherUser] = useState<any>({});
+
+  const goToDetalle = () => {
+    history.replace("/grupo/info/" + groupId);
+  };
 
   const onCheckInput = async (e: any) => {
     setNewMessage(e.target.value);
@@ -111,6 +127,11 @@ const Grupo: React.FC = () => {
     } catch (error) {
       console.error("Error enviando mensaje al grupo:", error);
     }
+  };
+
+  const onExitGroup = async () => {
+    await removeData(`users/${user.id}/grupos/${groupId}`);
+    setRemoved(true);
   };
 
   useEffect(() => {
@@ -249,9 +270,25 @@ const Grupo: React.FC = () => {
               </p>
             </div>
 
-            <Button variant="ghost" size="icon">
-              <MoreVertical className="w-5 h-5" />
-            </Button>
+            <div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="w-8 h-8">
+                    <MoreVertical className="w-4 h-4 text-muted-foreground" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={goToDetalle}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Agregar miembros
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={onExitGroup}>
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Salir del grupo
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </div>
 
@@ -261,63 +298,72 @@ const Grupo: React.FC = () => {
           grupo={grupo}
           replyTo={replyTo}
           setReplyTo={setReplyTo}
+          removed={removed}
         />
 
         {/* Input */}
         <div className="sticky bottom-0 z-10 bg-card border-t border-border px-4 py-3 safe-bottom">
-          {replyTo?.id && (
-            <div
-              className={cn(
-                "border-l border-l-4 border-primary",
-                "text-xs relative mb-2",
-                "px-1.5 py-1.5 rounded-sm italic",
-                "bg-primary-foreground text-primary"
+          {removed ? (
+            <div className="flex justify-center items-center gap-2">
+                <i> Saliste del grupo </i>              
+            </div>              
+          ) : (
+            <>
+              {replyTo?.id && (
+                <div
+                  className={cn(
+                    "border-l border-l-4 border-primary",
+                    "text-xs relative mb-2",
+                    "px-1.5 py-1.5 rounded-sm italic",
+                    "bg-primary-foreground text-primary"
+                  )}
+                >
+                  <div className="flex flex-col">
+                    <span className="font-bold text-muted-foreground">
+                      {replyTo?.reply?.from == user.id ? "Tú" : otherUser?.name}
+                    </span>
+                    <span className="text-muted-foreground">
+                      {replyTo?.mensaje}
+                    </span>
+                  </div>
+                  <X
+                    className=" w-4 h-4 absolute top-1 right-1 cursor-pointer"
+                    onClick={() => setReplyTo(null)}
+                  />
+                </div>
               )}
-            >
-              <div className="flex flex-col">
-                <span className="font-bold text-muted-foreground">
-                  {replyTo?.reply?.from == user.id ? "Tú" : otherUser?.name}
-                </span>
-                <span className="text-muted-foreground">
-                  {replyTo?.mensaje}
-                </span>
-              </div>
-              <X
-                className=" w-4 h-4 absolute top-1 right-1 cursor-pointer"
-                onClick={() => setReplyTo(null)}
-              />
-            </div>
-          )}
 
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="flex-shrink-0">
-              <Paperclip className="w-5 h-5" />
-            </Button>
-            <div className="flex-1 relative">
-              <Input
-                placeholder="Escribe un mensaje..."
-                value={newMessage}
-                onChange={onCheckInput}
-                onKeyPress={handleKeyPress}
-                className="pr-10 bg-background border-border"
-              />
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
-              >
-                <Smile className="w-4 h-4" />
-              </Button>
-            </div>
-            <Button
-              size="icon"
-              onClick={sendMessage}
-              disabled={!newMessage.trim()}
-              className="flex-shrink-0"
-            >
-              <Send className="w-4 h-4" />
-            </Button>
-          </div>
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" size="icon" className="flex-shrink-0">
+                  <Paperclip className="w-5 h-5" />
+                </Button>
+                <div className="flex-1 relative">
+                  <Input
+                    placeholder="Escribe un mensaje..."
+                    value={newMessage}
+                    onChange={onCheckInput}
+                    onKeyPress={handleKeyPress}
+                    className="pr-10 bg-background border-border"
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
+                  >
+                    <Smile className="w-4 h-4" />
+                  </Button>
+                </div>
+                <Button
+                  size="icon"
+                  onClick={sendMessage}
+                  disabled={!newMessage.trim()}
+                  className="flex-shrink-0"
+                >
+                  <Send className="w-4 h-4" />
+                </Button>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </AppLayout>
