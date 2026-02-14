@@ -3,7 +3,9 @@ import Playlist from "@/database/playlist";
 import { db } from "@/hooks/useDexie";
 import { useLiveQuery } from "dexie-react-hooks";
 import { Heart } from "lucide-react";
+import { forwardRef } from "react";
 import { useSelector } from "react-redux";
+import { Virtuoso } from "react-virtuoso";
 import { FavoriteItem } from "./FavoriteItem";
 
 interface FavoritesListProps {
@@ -22,8 +24,6 @@ interface FavoritesListProps {
 export function FavoritesList({
   selectedCategory,
   searchQuery,
-  page,
-  setHasMore,
   onPlay,
   onToggleLike,
   onTogglePlaylist,
@@ -33,38 +33,18 @@ export function FavoritesList({
   const { user } = useSelector((state: any) => state.user);
 
   const playlist = useLiveQuery(async () => {
-    const resultados = await db.playlist
-      .where("users_id")
-      .equals(user.id)
-      .toArray()
-      .then((resultados: Playlist[]) =>
-        resultados.filter(
-          (c) =>
-            c?.clip &&
-            c.clip.titulo.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      )
-      .then((lista: Playlist[]) => {
-        const results = lista
-          .filter((item) => item?.clip)
-          .map((item: any) => {
-            return item.clip;
-          })
-          .sort((a, b) => a?.titulo.localeCompare(b?.titulo));
-        return results;
-      });
+    let collection = db.playlist.where("users_id").equals(user.id);
 
-    const limit = page * 10;
-    const paginados = resultados.slice(0, limit);
+    if (searchQuery) {
+      collection = collection.filter((c: Playlist) =>
+        c.clip.titulo.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
 
-    setHasMore(paginados.length < resultados.length);
+    return await collection.toArray();
+  }, [user?.id, searchQuery]);
 
-    // dispatch(setListAudios([...paginados]));
-
-    return paginados;
-  }, [selectedCategory, page, searchQuery]);
-
-  if (playlist?.length === 0) {
+  if (!playlist || playlist?.length === 0) {
     return (
       <div className="text-center py-12">
         <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
@@ -80,25 +60,40 @@ export function FavoritesList({
     );
   }
 
+  console.log( playlist )
+
   return (
-    <div className="space-y-2">
+    <div className="h-[calc(100vh-370px)] space-y-3">
       <p className="text-sm text-muted-foreground mb-4">
         {playlist?.length} {playlist?.length === 1 ? "audio" : "audios"} en
         favoritos
       </p>
 
-      {playlist?.map((track) => (
-        <FavoriteItem
-          key={track.id}
-          track={track}
-          currentTrackId={currentTrackId}
-          isPlaying={track.id === currentTrackId}
-          onPlay={() => onPlay(track)}
-          onToggleLike={() => onToggleLike(track.id)}
-          onTogglePlaylist={() => onTogglePlaylist(track.id)}
-          onDownload={() => onDownload(track.id)}
-        />
-      ))}
+      <Virtuoso
+        key={`${searchQuery}`}
+        components={{
+          List: forwardRef((props, ref) => (
+            <div {...props} ref={ref} className="space-y-3 p-1" />
+          )),
+        }}
+        style={{ height: "100%" }}
+        totalCount={playlist.length}
+        itemContent={(index) => {
+          const track = playlist[index].clip;
+          return (
+            <FavoriteItem
+              key={track.id}
+              track={track}
+              currentTrackId={currentTrackId}
+              isPlaying={track.id === currentTrackId}
+              onPlay={() => onPlay(track)}
+              onToggleLike={() => onToggleLike(track.id)}
+              onTogglePlaylist={() => onTogglePlaylist(track.id)}
+              onDownload={() => onDownload(track.id)}
+            />
+          );
+        }}
+      />
     </div>
   );
 }

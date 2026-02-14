@@ -8,7 +8,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { NetworkContext } from "@/context/NetworkContext";
 import Clips from "@/database/clips";
+import Likes from "@/database/likes";
+import { formatCount } from "@/helpers/Format";
+import { useAudio } from "@/hooks/useAudio";
+import { db } from "@/hooks/useDexie";
 import { cn } from "@/lib/utils";
+import { dislike, like } from "@/services/likes";
+import { useLiveQuery } from "dexie-react-hooks";
 import {
   Check,
   Download,
@@ -20,33 +26,56 @@ import {
   Play,
   Share2,
 } from "lucide-react";
-import { useContext } from "react";
+import { useContext, useRef, useState } from "react";
+import { useSelector } from "react-redux";
 import { toast } from "sonner";
 
 interface TrackCardProps {
   track: Clips;
   isPlaying: boolean;
   onPlay: () => void;
-  onToggleLike: () => void;
   onTogglePlaylist: () => void;
   onDownload: () => void;
 }
 
-const formatDuration = (seconds: number) => {
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  return `${mins}:${secs.toString().padStart(2, "0")}`;
-};
-
 export const TrackCard = ({
   track,
-  isPlaying,
   onPlay,
-  onToggleLike,
   onTogglePlaylist,
   onDownload,
 }: TrackCardProps) => {
   const { AudioNoWifi, baseURL, status } = useContext(NetworkContext);
+  const { user } = useSelector((state: any) => state.user);
+
+  const audioRef: any = useRef({
+    currentTime: 0,
+    duration: 0,
+    pause: () => {},
+    play: () => {},
+    fastSeek: (time: number) => {},
+  });
+
+  const { duration, isPlaying, onLoadedMetadata, onTimeUpdate, onUpdateBuffer } = useAudio(
+    audioRef,
+    () => {}
+  );
+
+  const [localSrc, setLocalSrc] = useState<any>(null);
+
+  const likes = useLiveQuery(
+    () => db.likes.where("clips_id").equals(track.id).toArray(),
+    [track.id]
+  );
+
+  const my_like = useLiveQuery(
+    () =>
+      db.likes
+        .where("users_id")
+        .equals(user.id)
+        .and((like: Likes) => like.clips_id === track.id)
+        .first(),
+    [user?.id, track.id]
+  );
 
   const handleShare = async () => {
     try {
@@ -60,6 +89,46 @@ export const TrackCard = ({
     } catch {
       navigator.clipboard.writeText(window.location.href);
       toast.success("Enlace copiado al portapapeles");
+    }
+  };
+
+  const onToggleLike = async () => {
+    if (my_like) {
+      await onDislike();
+    } else {
+      await onLike();
+    }
+  };
+
+  const onLike = async () => {
+    try {
+      const data = {
+        clips_id: track.id,
+        users_id: user.id,
+      };
+
+      const {
+        data: { data: added },
+      } = await like(data);
+
+      await db.likes.add({
+        ...data,
+        id: added.id,
+      });
+    } catch (error: any) {
+      console.log(error);
+    }
+  };
+
+  const onDislike = async () => {
+    try {
+      await dislike(my_like?.id ?? 0);
+      await db.likes
+        .where("id")
+        .equals(my_like?.id ?? 0)
+        .delete();
+    } catch (error: any) {
+      console.log(error);
     }
   };
 
@@ -101,16 +170,14 @@ export const TrackCard = ({
 
           {/* Info */}
           <div className="flex-1 min-w-0">
-            <h3 className="font-medium text-foreground text-sm truncate">
+            <h6 className="!m-1 font-semibold text-foreground truncate">
               {track.titulo}
-            </h3>
+            </h6>
             <p className="text-xs text-muted-foreground truncate">
               {track.categoria?.categoria}
             </p>
             <div className="flex items-center gap-2 mt-1">
-              <span className="text-xs text-muted-foreground">
-                {formatDuration(track.duration)}
-              </span>
+              <span className="text-xs text-muted-foreground">{duration}</span>
               {track.isDownloaded && <Check className="w-3 h-3 text-success" />}
             </div>
           </div>
@@ -121,14 +188,15 @@ export const TrackCard = ({
               variant="ghost"
               size="icon"
               onClick={onToggleLike}
-              className="w-8 h-8"
+              className="w-8 h-8 gap-1"
             >
               <Heart
                 className={cn(
                   "w-4 h-4 transition-colors",
-                  track.isLiked ? "fill-sos text-sos" : "text-muted-foreground"
+                  my_like ? "fill-sos text-sos" : "text-muted-foreground"
                 )}
               />
+              {likes?.length > 0 && formatCount(likes?.length)}
             </Button>
 
             <DropdownMenu>
@@ -172,6 +240,15 @@ export const TrackCard = ({
             </DropdownMenu>
           </div>
         </div>
+
+        <audio
+          ref={audioRef}
+          src={localSrc ? localSrc : baseURL + track?.audio}
+          onLoadedMetadata={onLoadedMetadata}
+          onTimeUpdate={onTimeUpdate}
+          onProgress={onUpdateBuffer}
+          // onEnded={() => onSaveNext(activeIndex)}
+        />
       </CardContent>
     </Card>
   );

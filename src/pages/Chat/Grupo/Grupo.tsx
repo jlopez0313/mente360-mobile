@@ -32,13 +32,21 @@ import {
   LogOut,
   MoreVertical,
   Paperclip,
-  Plus,
   Send,
   Smile,
+  UserPlus,
   Users,
   X,
 } from "lucide-react";
 import { useSelector } from "react-redux";
+
+import { ContactDetailModal } from "@/components/Chat/Grupos/Grupo/Info";
+import {
+  AddMemberSheet,
+  GroupMembersSheet,
+  LeaveGroupDialog,
+} from "@/components/Chat/Grupos/Grupo/modals";
+import { toast } from "sonner";
 
 const Grupo: React.FC = () => {
   const { baseURL, AvatarLogo } = useContext(NetworkContext);
@@ -55,6 +63,12 @@ const Grupo: React.FC = () => {
   const [isWriting, setIsWriting] = useState<any>(null);
   const [replyTo, setReplyTo] = useState<any>(null);
   const [otherUser, setOtherUser] = useState<any>({});
+
+  const [selectedContact, setSelectedContact] = useState<any>(null);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [showMembers, setShowMembers] = useState(false);
+  const [showAddMember, setShowAddMember] = useState(false);
+  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
 
   const goToDetalle = () => {
     history.replace("/grupo/info/" + groupId);
@@ -131,7 +145,10 @@ const Grupo: React.FC = () => {
 
   const onExitGroup = async () => {
     await removeData(`users/${user.id}/grupos/${groupId}`);
+    toast.success(`Has salido del grupo ${grupo.grupo}`);
     setRemoved(true);
+
+    history.replace("/chat");
   };
 
   useEffect(() => {
@@ -278,11 +295,15 @@ const Grupo: React.FC = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem onClick={goToDetalle}>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Agregar miembros
+                  <DropdownMenuItem onClick={() => setShowMembers(true)}>
+                    <Users className="w-4 h-4 mr-2" />
+                    Ver miembros
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={onExitGroup}>
+                  <DropdownMenuItem onClick={() => setShowAddMember(true)}>
+                    <UserPlus className="w-4 h-4 mr-2" />
+                    Agregar miembro
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setShowLeaveDialog(true)}>
                     <LogOut className="w-4 h-4 mr-2" />
                     Salir del grupo
                   </DropdownMenuItem>
@@ -295,18 +316,15 @@ const Grupo: React.FC = () => {
         {/* Messages */}
         <GrupoComponent
           grupoID={groupId}
-          grupo={grupo}
-          replyTo={replyTo}
           setReplyTo={setReplyTo}
-          removed={removed}
         />
 
         {/* Input */}
         <div className="sticky bottom-0 z-10 bg-card border-t border-border px-4 py-3 safe-bottom">
           {removed ? (
             <div className="flex justify-center items-center gap-2">
-                <i> Saliste del grupo </i>              
-            </div>              
+              <i> Saliste del grupo </i>
+            </div>
           ) : (
             <>
               {replyTo?.id && (
@@ -366,6 +384,33 @@ const Grupo: React.FC = () => {
           )}
         </div>
       </div>
+
+      <ContactDetailModal
+        contact={selectedContact}
+        open={isContactModalOpen}
+        onOpenChange={setIsContactModalOpen}
+      />
+
+      <GroupMembersSheet
+        open={showMembers}
+        onOpenChange={setShowMembers}
+        memberIds={grupo?.users || []}
+        groupName={grupo?.grupo}
+      />
+
+      <AddMemberSheet
+        open={showAddMember}
+        onOpenChange={setShowAddMember}
+        currentMemberIds={grupo?.users || []}
+        groupName={grupo?.grupo}
+      />
+
+      <LeaveGroupDialog
+        open={showLeaveDialog}
+        onOpenChange={setShowLeaveDialog}
+        groupName={grupo?.grupo}
+        onConfirm={onExitGroup}
+      />
     </AppLayout>
   );
 };

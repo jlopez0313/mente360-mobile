@@ -21,6 +21,7 @@ import {
   Users,
 } from "lucide-react";
 import { useContext } from "react";
+import { useHistory } from "react-router";
 
 export interface ContactInfo {
   id: string;
@@ -45,6 +46,8 @@ export function ContactDetailModal({
   open,
   onOpenChange,
 }: ContactDetailModalProps) {
+  const history = useHistory();
+
   const { status, baseURL, AvatarLogo, AudioNoWifi } =
     useContext(NetworkContext);
 
@@ -69,7 +72,7 @@ export function ContactDetailModal({
 
   const handleCommunityClick = (communityId: number) => {
     onOpenChange(false);
-    // navigate(`/comunidades/${communityId}`);
+    history.replace(`/comunidades/${communityId}/canales`);
   };
 
   return (
@@ -165,7 +168,7 @@ export function ContactDetailModal({
               <div>
                 <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
                   <Users className="w-4 h-4" />
-                  Comunidades ({leaderCommunities?.length})
+                  Comunidades lideradas ({leaderCommunities?.length})
                 </h4>
                 <div className="space-y-2">
                   {leaderCommunities?.map((community) => (
@@ -212,7 +215,7 @@ export function ContactDetailModal({
               <div className="text-center py-4">
                 <Users className="w-10 h-10 text-muted-foreground/50 mx-auto mb-2" />
                 <p className="text-sm text-muted-foreground">
-                  Este contacto no está en ninguna comunidad
+                  Este contacto no está suscrito en ninguna comunidad
                 </p>
               </div>
             </>

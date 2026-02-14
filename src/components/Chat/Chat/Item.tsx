@@ -86,7 +86,6 @@ export const Item = ({ usuario }: any) => {
       unsubTyping = onValue(
         readData(`rooms/${roomID}/users/${usuario.id}/writing`),
         (snap) => {
-          console.log(!!snap.val());
           return setIsWriting(!!snap.val());
         }
       );

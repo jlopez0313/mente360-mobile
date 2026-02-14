@@ -1,15 +1,18 @@
 import { AppLayout } from "@/components/layout";
+import { ContactDetailModal } from "@/components/Shared/Contact/ContactModal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { NetworkContext } from "@/context/NetworkContext";
 import Canales from "@/database/canales";
 import Comunidades from "@/database/comunidades";
+import Crecimiento from "@/database/crecimientos";
 import Niveles from "@/database/niveles";
+import User from "@/database/user";
 import { destroy } from "@/helpers/musicControls";
+import { useAudio } from "@/hooks/useAudio";
 import { useBackButton } from "@/hooks/useBackButton";
 import { db } from "@/hooks/useDexie";
-import { mockPodcasts } from "@/lib/mockData";
 import { setShowGlobalAudio } from "@/store/slices/audioSlice";
 import { useLiveQuery } from "dexie-react-hooks";
 import {
@@ -21,7 +24,7 @@ import {
   SkipForward,
   Trash2,
 } from "lucide-react";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 
@@ -45,24 +48,52 @@ const Crecimientos: React.FC = () => {
   const { id } = useParams<any>();
   const dispatch = useDispatch();
 
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
+  const audioRef: any = useRef({
+    currentTime: 0,
+    duration: 0,
+    pause: () => {},
+    play: () => {},
+    fastSeek: (time: number) => {},
+  });
+
+  const {
+    progress,
+    buffer,
+    duration,
+    real_duration,
+    currentTime,
+    isPlaying,
+    onLoadedMetadata,
+    onTimeUpdate,
+    onUpdateBuffer,
+    onStart,
+    onEnd,
+    onPause,
+    onPlay,
+    onLoad,
+    downloadAudio,
+    deleteAudio,
+    getDownloadedAudio,
+  } = useAudio(audioRef, () => {});
+
+  const [localSrc, setLocalSrc] = useState<any>(null);
+  const [selectedContact, setSelectedContact] = useState<User | null>(null);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentAudio, setCurrentAudio] = useState<Crecimiento | null>(null);
 
   const nivel = useLiveQuery(
     () => db.niveles.where("id").equals(Number(id)).first(),
     [id]
   );
 
-  const community = useLiveQuery(
-    () => {
-      if(!nivel) return;
-      return db.comunidades
-        .where("id")
-        .equals(Number(nivel?.canal?.comunidades_id))
-        .first()
-    },
-    [nivel]
-  );
+  const community = useLiveQuery(() => {
+    if (!nivel) return;
+    return db.comunidades
+      .where("id")
+      .equals(Number(nivel?.canal?.comunidades_id))
+      .first();
+  }, [nivel]);
 
   const crecimientos = useLiveQuery(
     () =>
@@ -92,24 +123,32 @@ const Crecimientos: React.FC = () => {
     [id]
   );
 
-  const communityPodcasts = mockPodcasts.filter(
-    (p) => p.communityId === community?.id
-  );
-  const currentIndex = communityPodcasts.findIndex((p) => p.id === 1);
-
-  const progress = (currentTime / 1) * 100;
+  const handleAvatarClick = (contact: any) => {
+    setSelectedContact(contact);
+    setIsContactModalOpen(true);
+  };
 
   const handlePrevious = () => {
-    if (currentIndex > 0) {
+    if (crecimientos?.length && currentIndex > 0) {
+      setCurrentAudio(crecimientos[currentIndex - 1]);
+      setCurrentIndex(currentIndex - 1);
       // navigate(`/comunidades/${comunidad?.id}/podcasts/${communityPodcasts[currentIndex - 1].id}`);
     }
   };
 
   const handleNext = () => {
-    if (currentIndex < communityPodcasts.length - 1) {
+    if (crecimientos?.length && currentIndex < crecimientos.length - 1) {
+      setCurrentAudio(crecimientos[currentIndex + 1]);
+      setCurrentIndex(currentIndex + 1);
+      onPause();
       // navigate(`/comunidades/${communityId}/podcasts/${communityPodcasts[currentIndex + 1].id}`);
     }
   };
+
+  useEffect(() => {
+    if (!crecimientos?.length) return;
+    setCurrentAudio(crecimientos[0]);
+  }, [crecimientos]);
 
   useEffect(() => {
     dispatch(setShowGlobalAudio(true));
@@ -155,7 +194,13 @@ const Crecimientos: React.FC = () => {
             {community?.comunidad}
           </span>
 
-          <Avatar className="w-10 h-10">
+          <Avatar
+            className="w-10 h-10"
+            onClick={(e) => {
+              e.preventDefault();
+              handleAvatarClick(community?.lider);
+            }}
+          >
             <AvatarImage
               className="object-cover w-full h-full"
               src={baseURL + community?.lider?.photo}
@@ -166,11 +211,11 @@ const Crecimientos: React.FC = () => {
         </div>
 
         {/* Cover Image */}
-        <div className="flex-1 flex items-center justify-center px-8 py-6">
+        <div className="flex-1 flex items-center justify-center px-8">
           <div className="w-full max-w-[480px] aspect-square rounded-3xl overflow-hidden shadow-glow">
             <img
-              src={status ? baseURL + crecimientos[0]?.imagen : AudioNoWifi}
-              alt={crecimientos[0]?.titulo}
+              src={status ? baseURL + currentAudio?.imagen : AudioNoWifi}
+              alt={currentAudio?.titulo}
               className="w-full h-full object-cover"
             />
           </div>
@@ -181,28 +226,27 @@ const Crecimientos: React.FC = () => {
           {/* Title & Level */}
           <div className="text-center space-y-2">
             <h1 className="text-xl font-heading font-bold text-foreground !m-0">
-              {crecimientos[0]?.titulo}
+              {currentAudio?.titulo}
             </h1>
             <span className="text-xs font-heading text-foreground">
               {nivel?.nivel}
             </span>
             <p className="text-sm text-muted-foreground line-clamp-2">
-              {crecimientos[0]?.descripcion}
+              {currentAudio?.descripcion}
             </p>
 
             {/* Level Selector */}
             <div className="flex justify-center pt-2">
               <Button size="sm" className="gap-1" variant="outline">
-                {community?.isDownloaded ? (
-                  <>
-                    {" "}
-                    <Trash2 className="w-5 h-5 text-success" /> Eliminar
-                    Descarga{" "}
-                  </>
-                ) : (
+                {!currentAudio?.audio_local ? (
                   <>
                     {" "}
                     <Download className="w-5 h-5" /> Descargar{" "}
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-5 h-5 text-success" /> Eliminar
+                    Descarga{" "}
                   </>
                 )}
               </Button>
@@ -215,12 +259,13 @@ const Crecimientos: React.FC = () => {
               value={[progress]}
               max={100}
               step={0.1}
-              onValueChange={(value) => setCurrentTime((value[0] / 100) * 1)}
+              buffer={buffer * 100}
+              onValueChange={(value) => onLoad(value)}
               className="w-full"
             />
             <div className="flex justify-between text-xs text-muted-foreground">
-              <span>{formatTime(currentTime)}</span>
-              <span>{formatTime(1)}</span>
+              <span>{currentTime}</span>
+              <span>{duration}</span>
             </div>
           </div>
 
@@ -238,7 +283,7 @@ const Crecimientos: React.FC = () => {
 
             <Button
               size="icon"
-              onClick={() => setIsPlaying(!isPlaying)}
+              onClick={() => (isPlaying ? onPause() : onPlay())}
               className="w-16 h-16 !rounded-full bg-primary hover:bg-primary/90 shadow-glow"
             >
               {isPlaying ? (
@@ -252,7 +297,7 @@ const Crecimientos: React.FC = () => {
               variant="ghost"
               size="icon"
               onClick={handleNext}
-              disabled={currentIndex === communityPodcasts.length - 1}
+              disabled={currentIndex === crecimientos.length - 1}
               className="w-12 h-12"
             >
               <SkipForward className="w-6 h-6" />
@@ -260,6 +305,21 @@ const Crecimientos: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <audio
+        ref={audioRef}
+        src={localSrc ? localSrc : baseURL + currentAudio?.audio}
+        onLoadedMetadata={onLoadedMetadata}
+        onTimeUpdate={onTimeUpdate}
+        onProgress={onUpdateBuffer}
+        // onEnded={() => onSaveNext(activeIndex)}
+      />
+
+      <ContactDetailModal
+        contact={selectedContact}
+        open={isContactModalOpen}
+        onOpenChange={setIsContactModalOpen}
+      />
     </AppLayout>
   );
 };

@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { IonContent, IonPage } from "@ionic/react";
 import { ReactNode } from "react";
 
@@ -9,9 +10,12 @@ interface AppLayoutProps {
 export function AppLayout({ children, hideNav = false }: AppLayoutProps) {
   return (
     <IonPage>
-      <IonContent fullscreen className="space-y-4">
-        <div className="min-h-screen bg-background">
-          <main className={hideNav ? "" : "pb-20"}>
+      <IonContent fullscreen scrollY={false} className="space-y-4">
+        <div className="h-full flex flex-col bg-background">
+          <main className={cn(
+              "flex-1 flex flex-col",
+              hideNav ? "" : "pb-20"
+            )}>
             {children}
           </main>
         </div>

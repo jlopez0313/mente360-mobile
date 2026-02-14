@@ -1,4 +1,4 @@
-import { Lista as ChatComponent } from "@/components/Chat/Chat/Lista/Lista";
+import { Lista as ChatComponent } from "@/components/Chat/Chat/Lista";
 import { Comunidad as ComunidadComponent } from "@/components/Chat/Comunidad/Comunidad";
 import { Lista as GruposComponent } from "@/components/Chat/Grupos/Lista/Lista";
 import { AppLayout } from "@/components/layout";
@@ -12,7 +12,7 @@ import { MessageCircle, Search, UserPlus, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-const Chat: React.FC = () => {
+const Lista: React.FC = () => {
   const dispatch = useDispatch();
   
   const { isRoom, isGrupo } = useSelector((state: any) => state.notifications);
@@ -101,4 +101,4 @@ const Chat: React.FC = () => {
   );
 };
 
-export default Chat;
+export default Lista;

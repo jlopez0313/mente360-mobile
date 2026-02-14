@@ -10,7 +10,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Clips from "@/database/clips";
 import { useBackButton } from "@/hooks/useBackButton";
 import { db } from "@/hooks/useDexie";
-import { IonInfiniteScroll, IonInfiniteScrollContent } from "@ionic/react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { Heart, Music, Search } from "lucide-react";
 import { useState } from "react";
@@ -36,62 +35,20 @@ const Musicaterapia: React.FC = () => {
   const [currentTrack, setCurrentTrack] = useState<Clips | undefined>(
     undefined
   );
-  const [page, setPage] = useState<number>(1);
-  const [hasMore, setHasMore] = useState(true);
 
   const categories = useLiveQuery(() =>
     db.categorias.orderBy("categoria").toArray()
   );
 
-  const clips = useLiveQuery(async () => {
-    const resultados = await db.clips
-      .orderBy("titulo")
-      .toArray()
-      .then((resultados) =>
-        resultados.filter((c) =>
-          c.titulo.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      )
-      .then((resultados) => {
-        if (selectedCategory != undefined) {
-          return resultados.filter(
-            (r: any) => r.categoria?.id == Number(selectedCategory)
-          );
-        }
-        return resultados;
-      });
-
-    const limit = page * 10;
-    const paginados = resultados.slice(0, limit);
-
-    setHasMore(paginados.length < resultados.length);
-
-    // dispatch(setListAudios([...paginados]));
-
-    return paginados;
-  }, [selectedCategory, page, searchQuery]);
-
-  const handlePage = (evt: any, page: any) => {
-    if (hasMore) setPage(page);
-    else evt.target.complete();
-  };
-
   const handleCategory = (id: number | undefined) => {
     // dispatch(clearListAudios());
-    setHasMore(true);
     setSelectedCategory(id);
     // -- setSearchQuery("");
-    setPage(1);
   };
 
   const handleSearchChange = (value: string) => {
     // dispatch(clearListAudios());
-    setHasMore(true);
     setSearchQuery(value);
-
-    if (value !== "") {
-      setPage(1);
-    }
   };
 
   const handleToggleLike = (trackId: number | undefined) => {
@@ -122,7 +79,7 @@ const Musicaterapia: React.FC = () => {
 
   return (
     <AppLayout>
-      <div className="min-h-full pb-24">
+      <div className="h-full pb-24">
         {/* Header */}
         <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50 px-4 py-4 space-y-4">
           <div className="flex items-center gap-3">
@@ -155,7 +112,7 @@ const Musicaterapia: React.FC = () => {
 
         {/* Content */}
         <div className="px-4 py-6">
-          <Tabs defaultValue="clips" className="space-y-6">
+          <Tabs defaultValue="clips" className="space-y-4">
             <TabsList className="w-full grid grid-cols-2 bg-muted/50">
               <TabsTrigger value="clips" className="gap-2">
                 <Music className="w-4 h-4" />
@@ -167,7 +124,7 @@ const Musicaterapia: React.FC = () => {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="clips" className="space-y-6 mt-0">
+            <TabsContent value="clips" className="space-y-2 mt-0">
               {/* Categories */}
               <CategorySlider
                 categories={categories}
@@ -179,8 +136,6 @@ const Musicaterapia: React.FC = () => {
               <TrackList
                 selectedCategory={selectedCategory}
                 searchQuery={searchQuery}
-                page={page}
-                setHasMore={setHasMore}
                 onPlay={setCurrentTrack}
                 onToggleLike={handleToggleLike}
                 onTogglePlaylist={handleTogglePlaylist}
@@ -193,8 +148,6 @@ const Musicaterapia: React.FC = () => {
               <FavoritesList
                 selectedCategory={selectedCategory}
                 searchQuery={searchQuery}
-                page={page}
-                setHasMore={setHasMore}
                 onPlay={setCurrentTrack}
                 onToggleLike={handleToggleLike}
                 onTogglePlaylist={handleTogglePlaylist}
@@ -213,18 +166,6 @@ const Musicaterapia: React.FC = () => {
           />
         )}
       </div>
-
-      <IonInfiniteScroll
-        onIonInfinite={(ev) => {
-          handlePage(ev, page + 1);
-          setTimeout(() => ev.target.complete(), 1000);
-        }}
-      >
-        <IonInfiniteScrollContent
-          loadingText="Cargando..."
-          loadingSpinner="bubbles"
-        ></IonInfiniteScrollContent>
-      </IonInfiniteScroll>
     </AppLayout>
   );
 };

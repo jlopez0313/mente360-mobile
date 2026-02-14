@@ -1,18 +1,27 @@
 import { Button } from "@/components/ui/button";
 import { NetworkContext } from "@/context/NetworkContext";
 import Clips from "@/database/clips";
+import Likes from "@/database/likes";
+import { formatCount } from "@/helpers/Format";
+import { useAudio } from "@/hooks/useAudio";
+import { db } from "@/hooks/useDexie";
 import { cn } from "@/lib/utils";
+import { dislike, like } from "@/services/likes";
+import { useLiveQuery } from "dexie-react-hooks";
 import {
   Check,
   Download,
   Heart,
   ListMinus,
-  ListPlus,
   MoreVertical,
-  Share2,
+  Pause,
+  Play,
+  Share2
 } from "lucide-react";
-import { useContext } from "react";
+import { useContext, useRef, useState } from "react";
+import { useSelector } from "react-redux";
 import { toast } from "sonner";
+import { Card, CardContent } from "../ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,7 +31,6 @@ import {
 
 interface TrackCardProps {
   track: Clips;
-  isPlaying: boolean;
   currentTrackId: number | undefined;
   onPlay: () => void;
   onToggleLike: () => void;
@@ -33,12 +41,42 @@ interface TrackCardProps {
 export const FavoriteItem = ({
   track,
   currentTrackId,
-  onToggleLike,
   onPlay,
   onTogglePlaylist,
   onDownload,
 }: TrackCardProps) => {
   const { baseURL, status, AudioNoWifi } = useContext(NetworkContext);
+  const { user } = useSelector((state: any) => state.user);
+
+  const audioRef: any = useRef({
+    currentTime: 0,
+    duration: 0,
+    pause: () => {},
+    play: () => {},
+    fastSeek: (time: number) => {},
+  });
+
+  const { duration, isPlaying, onLoadedMetadata, onTimeUpdate, onUpdateBuffer } = useAudio(
+    audioRef,
+    () => {}
+  );
+
+  const [localSrc, setLocalSrc] = useState<any>(null);
+
+  const likes = useLiveQuery(
+    () => db.likes.where("clips_id").equals(track.id).toArray(),
+    [track.id]
+  );
+
+  const my_like = useLiveQuery(
+    () =>
+      db.likes
+        .where("users_id")
+        .equals(user.id)
+        .and((like: Likes) => like.clips_id === track.id)
+        .first(),
+    [user?.id, track.id]
+  );
 
   const handleShare = async () => {
     try {
@@ -55,92 +93,155 @@ export const FavoriteItem = ({
     }
   };
 
+  const onToggleLike = async () => {
+    if (my_like) {
+      await onDislike();
+    } else {
+      await onLike();
+    }
+  };
+
+  const onLike = async () => {
+    try {
+      const data = {
+        clips_id: track.id,
+        users_id: user.id,
+      };
+
+      const {
+        data: { data: added },
+      } = await like(data);
+
+      await db.likes.add({
+        ...data,
+        id: added.id,
+      });
+    } catch (error: any) {
+      console.log(error);
+    }
+  };
+
+  const onDislike = async () => {
+    try {
+      await dislike(my_like?.id ?? 0);
+      await db.likes
+        .where("id")
+        .equals(my_like?.id ?? 0)
+        .delete();
+    } catch (error: any) {
+      console.log(error);
+    }
+  };
+
   return (
-    <div
-      key={track.id}
+    <Card
       className={cn(
-        "flex items-center gap-3 p-3 rounded-xl transition-all",
-        "bg-card border border-border hover:border-primary/30",
+        "overflow-hidden border-border/50 transition-all",
         currentTrackId === track.id && "border-primary bg-primary/5"
       )}
     >
-      <button
-        onClick={onPlay}
-        className="relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0"
-      >
-        <img
-          src={status ? baseURL + track.imagen : AudioNoWifi}
-          alt={track.titulo}
-          className="w-full h-full object-cover"
-        />
-        {currentTrackId === track.id && (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-            <div className="w-3 h-3 bg-white rounded-full animate-pulse" />
-          </div>
-        )}
-      </button>
-
-      <div className="flex-1 min-w-0" onClick={onPlay}>
-        <h4 className="font-medium text-foreground truncate">{track.titulo}</h4>
-        <p className="text-sm text-muted-foreground truncate">
-          {track.categoria?.categoria}
-        </p>
-        <p className="text-xs text-muted-foreground">
-          {Math.floor(track.duration / 60)}:
-          {String(track.duration % 60).padStart(2, "0")}
-        </p>
-      </div>
-
-      <div className="flex items-center gap-1">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onToggleLike}
-          className="w-8 h-8"
-        >
-          <Heart className="w-5 h-5 text-sos fill-sos" />
-        </Button>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="w-8 h-8">
-              <MoreVertical className="w-4 h-4 text-muted-foreground" />
+      <CardContent className="p-0">
+        <div className="flex items-center gap-3 p-3">
+          {/* Cover & Play */}
+          <div className="relative shrink-0">
+            <div className="w-14 h-14 rounded-xl overflow-hidden bg-muted">
+              <img
+                src={status ? baseURL + track.imagen : AudioNoWifi}
+                alt={track.titulo}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <Button
+              size="icon"
+              onClick={onPlay}
+              className={cn(
+                "absolute inset-0 m-auto w-8 h-8 rounded-full shadow-medium",
+                isPlaying
+                  ? "bg-primary/90 hover:bg-primary"
+                  : "bg-foreground/80 hover:bg-foreground"
+              )}
+            >
+              {isPlaying ? (
+                <Pause className="w-3.5 h-3.5 text-primary-foreground" />
+              ) : (
+                <Play className="w-3.5 h-3.5 text-background ml-0.5" />
+              )}
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem onClick={onTogglePlaylist}>
-              {track.inMyPlaylist ? (
-                <>
+          </div>
+
+          {/* Info */}
+          <div className="flex-1 min-w-0">
+            <h6 className="!m-1 font-semibold text-foreground truncate">
+              {track.titulo}
+            </h6>
+            <p className="text-xs text-muted-foreground truncate">
+              {track.categoria?.categoria}
+            </p>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-xs text-muted-foreground">{duration}</span>
+              {track.isDownloaded && <Check className="w-3 h-3 text-success" />}
+            </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onToggleLike}
+              className="w-8 h-8 gap-1"
+            >
+              <Heart
+                className={cn(
+                  "w-4 h-4 transition-colors",
+                  my_like ? "fill-sos text-sos" : "text-muted-foreground"
+                )}
+              />
+              {likes?.length > 0 && formatCount(likes?.length)}
+            </Button>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="w-8 h-8">
+                  <MoreVertical className="w-4 h-4 text-muted-foreground" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={onTogglePlaylist}>
                   <ListMinus className="w-4 h-4 mr-2" />
                   Quitar de favoritos
-                </>
-              ) : (
-                <>
-                  <ListPlus className="w-4 h-4 mr-2" />
-                  Agregar a favoritos
-                </>
-              )}
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleShare}>
-              <Share2 className="w-4 h-4 mr-2" />
-              Compartir
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={onDownload}>
-              {track.isDownloaded ? (
-                <>
-                  <Check className="w-4 h-4 mr-2 text-success" />
-                  Descargado
-                </>
-              ) : (
-                <>
-                  <Download className="w-4 h-4 mr-2" />
-                  Descargar offline
-                </>
-              )}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-    </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleShare}>
+                  <Share2 className="w-4 h-4 mr-2" />
+                  Compartir
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={onDownload}>
+                  {track.isDownloaded ? (
+                    <>
+                      <Check className="w-4 h-4 mr-2 text-success" />
+                      Descargado
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-4 h-4 mr-2" />
+                      Descargar offline
+                    </>
+                  )}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+
+        <audio
+          ref={audioRef}
+          src={localSrc ? localSrc : baseURL + track?.audio}
+          onLoadedMetadata={onLoadedMetadata}
+          onTimeUpdate={onTimeUpdate}
+          onProgress={onUpdateBuffer}
+          // onEnded={() => onSaveNext(activeIndex)}
+        />
+      </CardContent>
+    </Card>
   );
 };

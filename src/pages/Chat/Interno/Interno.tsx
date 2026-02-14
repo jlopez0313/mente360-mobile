@@ -15,16 +15,7 @@ import {
   writeData,
 } from "@/services/realtime-db";
 import { onValue } from "firebase/database";
-import {
-  ArrowLeft,
-  MoreVertical,
-  Paperclip,
-  Phone,
-  Send,
-  Smile,
-  Video,
-  X,
-} from "lucide-react";
+import { ArrowLeft, Send, Smile, X } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
@@ -177,7 +168,7 @@ const Interno: React.FC = () => {
 
   return (
     <AppLayout hideNav>
-      <div className="min-h-screen bg-background flex flex-col">
+      <div className="h-full bg-background flex flex-col">
         {/* Header */}
         <div className="sticky top-0 z-10 bg-card border-b border-border px-4 py-3 safe-top">
           <div className="flex items-center gap-3">
@@ -218,25 +209,25 @@ const Interno: React.FC = () => {
               </p>
             </div>
 
-            <div className="flex items-center gap-1">
-              <Button variant="ghost" size="icon">
-                <Phone className="w-5 h-5" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <Video className="w-5 h-5" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <MoreVertical className="w-5 h-5" />
-              </Button>
-            </div>
+            {/*
+              <div className="flex items-center gap-1">
+                <Button variant="ghost" size="icon">
+                  <Phone className="w-5 h-5" />
+                </Button>
+                <Button variant="ghost" size="icon">
+                  <Video className="w-5 h-5" />
+                </Button>
+                <Button variant="ghost" size="icon">
+                  <MoreVertical className="w-5 h-5" />
+                </Button>
+              </div>
+            */}
           </div>
         </div>
 
         {/* Messages */}
         <InternoComponent
-          usuario={otherUser}
           roomID={room}
-          replyTo={replyTo}
           setReplyTo={setReplyTo}
         />
 
@@ -267,9 +258,11 @@ const Interno: React.FC = () => {
           )}
 
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="flex-shrink-0">
-              <Paperclip className="w-5 h-5" />
-            </Button>
+            {/* 
+              <Button variant="ghost" size="icon" className="flex-shrink-0">
+                <Paperclip className="w-5 h-5" />
+              </Button>
+            */}
             <div className="flex-1 relative">
               <Input
                 placeholder="Escribe un mensaje..."

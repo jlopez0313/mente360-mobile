@@ -1,13 +1,13 @@
 import Clips from "@/database/clips";
 import { db } from "@/hooks/useDexie";
 import { useLiveQuery } from "dexie-react-hooks";
+import { forwardRef } from "react";
+import { Virtuoso } from 'react-virtuoso';
 import { TrackCard } from "./TrackCard";
 
 interface TrackListProps {
   selectedCategory: number | undefined;
   searchQuery: string;
-  page: number;
-  setHasMore: (value: boolean) => void;
   onPlay: (track: Clips | undefined) => void;
   onToggleLike: (trackId: number | undefined) => void;
   onTogglePlaylist: (trackId: number | undefined) => void;
@@ -18,43 +18,32 @@ interface TrackListProps {
 export const TrackList = ({
   selectedCategory,
   searchQuery,
-  page,
-  setHasMore,
   onPlay,
   onToggleLike,
   onTogglePlaylist,
   onDownload,
   currentTrackId,
 }: TrackListProps) => {
+
   const tracks = useLiveQuery(async () => {
-    const resultados = await db.clips
-      .orderBy("titulo")
-      .toArray()
-      .then((resultados: Clips[]) =>
-        resultados.filter((c) =>
-          c.titulo.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      )
-      .then((resultados: Clips[]) => {
-        if (selectedCategory != undefined) {
-          return resultados.filter(
-            (r: any) => r.categoria?.id == Number(selectedCategory)
-          );
-        }
-        return resultados;
-      });
+    let collection = db.clips.orderBy("titulo");
 
-    const limit = page * 10;
-    const paginados = resultados.slice(0, limit);
+    if (selectedCategory !== undefined) {
+      collection = collection.filter(
+        (c: any) => c.categoria?.id === Number(selectedCategory)
+      );
+    }
 
-    setHasMore(paginados.length < resultados.length);
+    if (searchQuery) {
+      collection = collection.filter((c: any) =>
+        c.titulo.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
 
-    // dispatch(setListAudios([...paginados]));
+    return await collection.toArray();
+  }, [selectedCategory, searchQuery]);
 
-    return paginados;
-  }, [selectedCategory, page, searchQuery]);
-
-  if (tracks?.length === 0) {
+  if (!tracks || tracks?.length === 0) {
     return (
       <div className="text-center py-12">
         <p className="text-muted-foreground">No se encontraron canciones</p>
@@ -63,18 +52,36 @@ export const TrackList = ({
   }
 
   return (
-    <div className="space-y-3">
-      {tracks?.map((track) => (
-        <TrackCard
-          key={track.id}
-          track={track}
-          isPlaying={track.id === currentTrackId}
-          onPlay={() => onPlay(track)}
-          onToggleLike={() => onToggleLike(track.id)}
-          onTogglePlaylist={() => onTogglePlaylist(track.id)}
-          onDownload={() => onDownload(track.id)}
-        />
-      ))}
+    <div className="h-[calc(100vh-370px)] space-y-3">
+      <Virtuoso
+        key={`${selectedCategory}-${searchQuery}`}
+        components={{
+          List: forwardRef((props, ref) => (
+            <div
+              {...props}
+              ref={ref}
+              className="space-y-3 p-1"
+            />
+          )),
+        }}
+        style={{ height: "100%" }}
+        totalCount={tracks.length}
+        itemContent={(index) => {
+          const track = tracks[index];
+
+          return (
+            <TrackCard
+              key={track.id}
+              track={track}
+              isPlaying={track.id === currentTrackId}
+              onPlay={() => onPlay(track)}
+              onToggleLike={() => onToggleLike(track.id)}
+              onTogglePlaylist={() => onTogglePlaylist(track.id)}
+              onDownload={() => onDownload(track.id)}
+            />
+          );
+        }}
+      />
     </div>
   );
 };

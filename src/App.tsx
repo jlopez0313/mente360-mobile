@@ -3,7 +3,6 @@ import { IonReactRouter } from "@ionic/react-router";
 import { Route } from "react-router-dom";
 
 import Grupo from "./pages/Chat/Grupo/Grupo";
-import Info from "./pages/Chat/Grupo/Info/Info";
 import Interno from "./pages/Chat/Interno/Interno";
 import Configuracion from "./pages/Configuracion/Configuracion";
 import Crecimientos from "./pages/Crecimientos/Crecimientos";
@@ -137,11 +136,6 @@ const App: React.FC = () => {
                       component={Interno}
                     />
 
-                    <Route
-                      exact={true}
-                      path="/grupo/info/:id"
-                      component={Info}
-                    />
                     <Route exact={true} path="/grupo/:id" component={Grupo} />
 
                     <Route

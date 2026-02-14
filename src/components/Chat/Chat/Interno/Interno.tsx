@@ -7,48 +7,37 @@ import {
   snapshotToArray,
   writeData,
 } from "@/services/realtime-db";
+
 import { IonModal, IonPopover } from "@ionic/react";
 import EmojiPicker, { SkinTonePickerLocation } from "emoji-picker-react";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { Item } from "./Item";
 
 const PAGINATION_LIMIT = 20;
-export const Interno: React.FC<any> = ({ usuario, roomID, setReplyTo }) => {
+
+export const Interno: React.FC<any> = ({ roomID, setReplyTo }) => {
   const { user } = useSelector((state: any) => state.user);
-  const [mensaje, setMensaje] = useState("");
 
-  const chatListRef = useRef<any>(null);
-  const hasScrolledInitially = useRef(false);
+  const chatListRef = useRef<HTMLDivElement | null>(null);
+  const topSentinelRef = useRef<HTMLDivElement | null>(null);
 
-  const [isScrolledUp, setIsScrolledUp] = useState(false);
-  const [messages, setMessages] = useState<any>([]);
-  const [otherUser, setOtherUser] = useState<any>({});
+  const loadingMore = useRef(false);
+  const hasMore = useRef(true);
+  const firstLoad = useRef(true);
+
+  const [messages, setMessages] = useState<any[]>([]);
+
+  const [selectedMessage, setSelectedMessage] = useState<any | null>(null);
+  const [showEmojiModal, setShowEmojiModal] = useState(false);
   const [pendingScrollId, setPendingScrollId] = useState<string | null>(null);
 
-  const [showEmojiModal, setShowEmojiModal] = useState(false);
   const [currentBreakpoint, setCurrentBreakpoint] = useState(0.75);
 
   const [popoverEvent, setPopoverEvent] = useState<{
     top: number;
     left: number;
   } | null>(null);
-
-  const [selectedMessage, setSelectedMessage] = useState<string | null>(null);
-
-  const reactToMessage = async (message: any | null, emoji: string) => {
-    const reactionPath = `rooms/${roomID}/messages/${message?.id}/reactions/${user.id}`;
-
-    if (!message.reactions?.[user.id]) {
-      await writeData(reactionPath, emoji);
-    } else {
-      if (message.reactions?.[user.id] != emoji) {
-        await writeData(reactionPath, emoji);
-      } else {
-        await removeData(reactionPath);
-      }
-    }
-  };
 
   const onScrollToMessage = async (msg: any) => {
     const replyId = msg.reply.id;
@@ -71,89 +60,54 @@ export const Interno: React.FC<any> = ({ usuario, roomID, setReplyTo }) => {
     setPendingScrollId(replyId);
   };
 
+  /* =====================================================
+     SCROLL AL FINAL
+  ====================================================== */
   const scrollToBottom = () => {
-    const last = messages.slice(-1)[0];
-    if (!last) return;
-    const el = document.getElementById(`msg-${last.id}`);
-    if (!el) return;
+    const container = chatListRef.current;
+    if (!container) return;
 
-    el.scrollIntoView({
-      behavior: "smooth",
-      block: "center",
-    });
+    container.scrollTop = container.scrollHeight;
   };
 
-  const handleScroll = (e: any) => {
-    const element = e.target;
-    const isAtBottom =
-      element.scrollHeight - element.scrollTop - element.clientHeight < 50;
-    setIsScrolledUp(!isAtBottom);
-  };
+  /* =====================================================
+     CARGA INICIAL (ÚLTIMOS 20)
+  ====================================================== */
 
   useEffect(() => {
-    if (!isScrolledUp) {
-      setTimeout(() => {
-        requestAnimationFrame(() => {
-          scrollToBottom();
-        });
-      }, 0);
-    }
-  }, [messages]);
 
-  useEffect(() => {
-    if (!pendingScrollId) return;
-
-    const el = document.getElementById(`msg-${pendingScrollId}`);
-    if (!el) return;
-
-    el.scrollIntoView({
-      behavior: "smooth",
-      block: "center",
-    });
-
-    el.classList.add(
-      "bg-yellow-200/60",
-      "!text-primary",
-      "transition-colors",
-      "duration-400"
-    );
-
-    const t = setTimeout(() => {
-      el.classList.remove("bg-yellow-200/60", "!text-primary");
-    }, 800);
-
-    setPendingScrollId(null);
-  }, [messages, pendingScrollId]);
+  }, [messages])
 
   useEffect(() => {
     if (!roomID) return;
 
-    const onGetChat = async () => {
-      const baseQuery = await queryTo("rooms/" + roomID + "/messages", {
+    const loadInitial = async () => {
+      const baseQuery = await queryTo(`rooms/${roomID}/messages`, {
         orderBy: "date",
         limit: PAGINATION_LIMIT,
         direction: "last",
       });
 
       const snapshot = await getQuery(baseQuery);
-      const messages = snapshotToArray(snapshot.val());
-      setMessages(messages);
+      const initialMessages = snapshotToArray(snapshot.val());
+
+      setMessages(initialMessages);
+
+      requestAnimationFrame(() => {
+        scrollToBottom();
+      });
+
+      firstLoad.current = false;
     };
 
-    onGetChat();
+    loadInitial();
+  }, [roomID]);
 
-    const unsubChanged = childChanged(
-      "rooms/" + roomID + "/messages",
-      (snap: any) => {
-        const updated = snap.val();
-
-        setMessages((prev: any) =>
-          prev.map((m: any) =>
-            m.id === snap.key ? { id: snap.key, ...updated } : m
-          )
-        );
-      }
-    );
+  /* =====================================================
+     ESCUCHAR MENSAJES NUEVOS EN TIEMPO REAL
+  ====================================================== */
+  useEffect(() => {
+    if (!roomID) return;
 
     const unsubAdded = childAdded(
       `rooms/${roomID}/messages`,
@@ -163,40 +117,187 @@ export const Interno: React.FC<any> = ({ usuario, roomID, setReplyTo }) => {
           ...snapshot.val(),
         };
 
-        setMessages((prev: any) => {
-          if (prev.some((m: any) => m.id === newMsg.id)) return prev;
+        setMessages((prev) => {
+          if (prev.some((m) => m.id === newMsg.id)) return prev;
           return [...prev, newMsg];
         });
+
+        // solo baja si ya estamos abajo
+        const container = chatListRef.current;
+        if (!container) return;
+
+        const isAtBottom =
+          container.scrollHeight -
+            container.scrollTop -
+            container.clientHeight <
+          50;
+
+        if (isAtBottom) {
+          requestAnimationFrame(() => {
+            scrollToBottom();
+          });
+        }
+      }
+    );
+
+    const unsubChanged = childChanged(
+      `rooms/${roomID}/messages`,
+      (snap: any) => {
+        const updated = snap.val();
+
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === snap.key ? { id: snap.key, ...updated } : m
+          )
+        );
       }
     );
 
     return () => {
-      unsubChanged();
       unsubAdded();
+      unsubChanged();
     };
   }, [roomID]);
 
+  /* =====================================================
+     CARGAR MENSAJES ANTERIORES
+  ====================================================== */
+  const loadOlderMessages = async () => {
+    if (loadingMore.current) return;
+    if (!messages.length) return;
+    if (!hasMore.current) return;
+
+    loadingMore.current = true;
+
+    const container = chatListRef.current;
+    if (!container) return;
+
+    const previousHeight = container.scrollHeight;
+    const oldestMessage = messages[0];
+
+    const baseQuery = await queryTo(`rooms/${roomID}/messages`, {
+      orderBy: "date",
+      endAt: oldestMessage.date,
+      limit: PAGINATION_LIMIT + 1,
+      direction: "last",
+    });
+
+    const snapshot = await getQuery(baseQuery);
+    let olderMessages = snapshotToArray(snapshot.val());
+
+    olderMessages = olderMessages.filter((m: any) => m.id !== oldestMessage.id);
+
+    if (!olderMessages.length) {
+      hasMore.current = false;
+      loadingMore.current = false;
+      return;
+    }
+
+    setMessages((prev) => [...olderMessages, ...prev]);
+
+    requestAnimationFrame(() => {
+      const newHeight = container.scrollHeight;
+      container.scrollTop = newHeight - previousHeight;
+    });
+
+    loadingMore.current = false;
+  };
+
+  /* =====================================================
+     INTERSECTION OBSERVER (INFINITE SCROLL HACIA ARRIBA)
+  ====================================================== */
+  useEffect(() => {
+    const container = chatListRef.current;
+    const sentinel = topSentinelRef.current;
+
+    if (!container || !sentinel) return;
+
+    const observer = new IntersectionObserver(
+      async (entries) => {
+        const entry = entries[0];
+
+        if (entry.isIntersecting) {
+          await loadOlderMessages();
+        }
+      },
+      {
+        root: container,
+        threshold: 0.1,
+      }
+    );
+
+    observer.observe(sentinel);
+
+    return () => observer.disconnect();
+  }, [messages]);
+
+  /* =====================================================
+     SCROLL A MENSAJE (reply)
+  ====================================================== */
+
+  useEffect(() => {
+    if (!pendingScrollId) return;
+
+    const el = document.getElementById(`msg-${pendingScrollId}`);
+    if (!el) return;
+
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    el.classList.add("bg-yellow-200/60");
+
+    setTimeout(() => {
+      el.classList.remove("bg-yellow-200/60");
+    }, 800);
+
+    setPendingScrollId(null);
+  }, [messages, pendingScrollId]);
+
+  /* =====================================================
+     REACCIONES
+  ====================================================== */
+
+  const reactToMessage = async (message: any, emoji: string) => {
+    const reactionPath = `rooms/${roomID}/messages/${message?.id}/reactions/${user.id}`;
+
+    if (!message.reactions?.[user.id]) {
+      await writeData(reactionPath, emoji);
+    } else {
+      if (message.reactions[user.id] !== emoji) {
+        await writeData(reactionPath, emoji);
+      } else {
+        await removeData(reactionPath);
+      }
+    }
+  };
+
+  /* =====================================================
+     RENDER
+  ====================================================== */
+
   return (
     <div
-      className="flex-1 overflow-y-auto px-4 py-4 space-y-3"
       ref={chatListRef}
-      onScroll={handleScroll}
+      className="flex-1 overflow-y-auto px-4 py-4 space-y-3"
     >
-      {messages.map((message: any, idx: number) => (
+      {/* Sentinel invisible arriba */}
+      <div ref={topSentinelRef} className="h-2" />
+
+      {messages.map((message: any) => (
         <Item
-          key={idx}
+          key={message.id}
           message={message}
           user={user}
           setReplyTo={setReplyTo}
           setPopoverEvent={setPopoverEvent}
           onScrollToMessage={onScrollToMessage}
+          setPendingScrollId={setPendingScrollId}
           setSelectedMessage={setSelectedMessage}
         />
       ))}
 
       <IonPopover
         showBackdrop={false}
-        isOpen={selectedMessage ? true : false}
+        isOpen={!!selectedMessage}
         className="fixed z-10"
         style={{
           "--background": "transparent",
@@ -209,8 +310,8 @@ export const Interno: React.FC<any> = ({ usuario, roomID, setReplyTo }) => {
         <div className="flex border bg-white gap-2 h-full rounded-full p-2">
           {["👍", "❤️", "😂", "😮", "😢", "🙏"].map((emoji) => (
             <span
-              className="text-lg"
               key={emoji}
+              className="text-lg"
               onClick={() => {
                 reactToMessage(selectedMessage, emoji);
                 setSelectedMessage(null);
@@ -244,7 +345,7 @@ export const Interno: React.FC<any> = ({ usuario, roomID, setReplyTo }) => {
           setCurrentBreakpoint(newBp);
         }}
       >
-        <div style={{ height: "100%", padding: 16, touchAction: "none" }}>
+       <div style={{ height: "100%", padding: 16, touchAction: "none" }}>
           <EmojiPicker
             width={"100%"}
             height={window.innerHeight * currentBreakpoint - 30 + "px"}
