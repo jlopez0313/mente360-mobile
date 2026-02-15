@@ -5,7 +5,7 @@ import { useNetwork } from "@/hooks/useNetwork";
 import { usePayment } from "@/hooks/usePayment";
 import Chat from "@/pages/Chat/Chat";
 import Comunidades from "@/pages/Comunidades/Comunidades";
-import Home from "@/pages/Home/Home";
+
 import Musicaterapia from "@/pages/Musicaterapia/Musicaterapia";
 import Notifications from "@/pages/Notifications/Notifications";
 import {
@@ -18,6 +18,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Route, useLocation } from "react-router";
 import styles from "./TabLayout.module.scss";
+import { Home } from "@/components/Home/Home";
 
 export const TabLayout = () => {
   const location = useLocation();

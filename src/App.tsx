@@ -7,7 +7,7 @@ import Interno from "./pages/Chat/Interno/Interno";
 import Configuracion from "./pages/Configuracion/Configuracion";
 import Crecimientos from "./pages/Crecimientos/Crecimientos";
 import Sharing from "./pages/Home/Share/Sharing";
-import Login from "./pages/Login/Login/Login";
+import Login from "./pages/Login/Login/Login copy";
 import Register from "./pages/Login/Register/Register";
 import Clip from "./pages/Musicaterapia/Clip/Clip";
 import Perfil from "./pages/Perfil/Perfil";
@@ -19,6 +19,8 @@ import Test from "./pages/Test/Test";
 import Thanks from "./pages/Thanks/Thanks";
 
 import { DBProvider } from "./context/DBContext";
+import { AuthProvider } from "@/context/AuthContext";
+
 
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
@@ -97,6 +99,7 @@ const App: React.FC = () => {
         <TooltipProvider>
           <Toaster />
           <Sonner />
+          <AuthProvider>
           <NetworkProvider>
             <DBProvider>
               <Configuracion />
@@ -187,6 +190,8 @@ const App: React.FC = () => {
                     />
 
                     <Route exact={true} path="/perfil" component={Perfil} />
+
+                    <Route exact={true} path="/configuracion" component={Configuracion} />
                     <Route exact={true} path="/test" component={Test} />
                     <Route
                       exact={true}
@@ -203,6 +208,7 @@ const App: React.FC = () => {
               </div>
             </DBProvider>
           </NetworkProvider>
+          </AuthProvider>
         </TooltipProvider>
       </IonReactRouter>
     </>
