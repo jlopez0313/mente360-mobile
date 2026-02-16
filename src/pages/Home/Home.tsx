@@ -1,89 +1,134 @@
-import {
-  IonAvatar,
-  IonButtons,
-  IonContent,
-  IonHeader,
-  IonMenuButton,
-  IonPage,
-  IonToolbar
-} from "@ionic/react";
+import Avatar from "@/assets/images/load-avatar.png";
+import { useState } from "react";
+import { AppLayout } from "@/components/layout";
+import { WeeklyCalendar } from "@/components/Home/WeeklyCalendar";
+import { DailyContentGrid } from "@/components/Home/DailyContentGrid";
+import { DailyAudioCard } from "@/components/Home/DailyAudioCard";
+import { NightAudioModal } from "@/components/Home/NightAudioModal";
+import { SOSModal } from "@/components/Home/SOSModal";
+import { DailyMessageModal } from "@/components/Home/DailyMessageModal";
 
-import styles from "./Home.module.scss";
+import { mockUser } from "@/lib/mockData";
+import { Trophy, Settings } from "lucide-react";
+import { Link } from "react-router-dom";
+import { WeeklyTaskModal } from "@/components/Home/WeeklyTaskModal";
+import { useCompletedItems } from "@/hooks/useCompletedItems";
 
-import { Home as HomeComponent } from "@/components/Home/Home";
-
-import { destroy } from "@/helpers/musicControls";
-import { setShowGlobalAudio } from "@/store/slices/audioSlice";
-import { getNotifications } from "@/store/thunks/notifications";
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-
-import Logo from "@/assets/images/logo.png";
-import { Sync } from "@/components/Shared/Animations/Sync/Sync";
-import { diferenciaEnDias } from "@/helpers/Fechas";
-import { useGlobalSync } from "@/hooks/useGlobalSync";
-import { usePreferences } from "@/hooks/usePreferences";
+import { useSelector } from "react-redux";
+import { Acordeon } from "@/components/Home/Acordeon/Acordeon";
 
 const Home: React.FC = () => {
-  const { getPreference, setPreference, keys } = usePreferences();
+    const [selectedDay, setSelectedDay] = useState(new Date().getDay());
+    const { completed, markComplete } = useCompletedItems();
+    const baseURL = import.meta.env.VITE_BASE_BACK;
+    // Modal states
+    const [nightAudioOpen, setNightAudioOpen] = useState(false);
+    const [sosOpen, setSosOpen] = useState(false);
+    const [dailyMessageOpen, setDailyMessageOpen] = useState(false);
+    const [weeklyTaskOpen, setWeeklyTaskOpen] = useState(false);
 
-  const dispatch = useDispatch();
-  const { loading, error, success, mensaje, syncAll } = useGlobalSync();
+    const { user } = useSelector((state: any) => state.user);
 
-  const { isGeneral } = useSelector((state: any) => state.notifications);
-
-  const onGetNotifications = async () => {
-    dispatch(getNotifications());
-  };
-
-  useEffect(() => {
-    dispatch(setShowGlobalAudio(true));
-    onGetNotifications();
-    destroy();
-  }, []);
-
-  useEffect(() => {
-    const onGlobalSync = async () => {
-      const lastDateStr =
-        (await getPreference(keys.SYNC_KEY)) ?? "2024-01-01T00:00:00Z";
-      const lastDate = new Date(lastDateStr);
-      const now = new Date();
-      now.setHours(0, 0, 0, 0);
-      if (diferenciaEnDias(now, lastDate) > 0) {
-        syncAll();
-      }
+    const handleOpenModal = (modal: "nightAudio" | "sosEmotional" | "dailyMessage" | "weeklyTask") => {
+        switch (modal) {
+            case "nightAudio":
+                setNightAudioOpen(true);
+                break;
+            case "sosEmotional":
+                setSosOpen(true);
+                break;
+            case "dailyMessage":
+                setDailyMessageOpen(true);
+                break;
+            case "weeklyTask":
+                setWeeklyTaskOpen(true);
+                break;
+        }
     };
 
-    onGlobalSync();
-  }, []);
+    return (
+        <AppLayout>
+            <div className="safe-top">
+                {/* Header */}
+                <header className="px-4 pt-4 pb-2 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <Link to="/perfil">
+                            <img
+                                src={user.photo ? baseURL + user.photo : Avatar}
+                                alt={user?.name}
+                                className="w-12 h-12 rounded-full object-cover border-2 border-primary/20"
+                            />
+                        </Link>
+                        <div>
+                            <p className="text-sm text-muted-foreground">Hola,</p>
+                            <h1 className="font-display font-semibold text-lg text-foreground">
+                                {user?.name}
+                            </h1>
+                        </div>
+                    </div>
 
-  return (
-    <IonPage>
-      <IonHeader>
-        <IonToolbar className={styles["ion-header"]}>
-          <IonButtons slot="start">
-            <IonMenuButton/>
-          </IonButtons>
-          <div className="flex justify-center">
-            <IonAvatar className="marginleftneg45 flex items-center justify-center " aria-hidden="true" slot="start">
-            <img alt="" className="logo-header" src={Logo} />
-            </IonAvatar>
-          </div>
-        </IonToolbar>
-      </IonHeader>
+                    <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1 bg-accent/20 px-3 py-1.5 rounded-full">
+                            <Trophy className="w-4 h-4 text-accent" />
+                            <span className="text-sm font-semibold text-accent-foreground">
+                                {mockUser.stats.daysActive}
+                            </span>
+                        </div>
+                        <Link
+                            to="/configuracion"
+                            className="p-2 hover:bg-muted rounded-full transition-colors"
+                        >
+                            <Settings className="w-5 h-5 text-muted-foreground" />
+                        </Link>
+                    </div>
+                </header>
 
-      <IonContent className={styles["ion-content"]}>
-        <Sync
-          loading={loading}
-          success={success}
-          error={error}
-          mensaje={mensaje}
-        />
-        <HomeComponent />
-      </IonContent>
+                {/* Weekly Calendar */}
+                <WeeklyCalendar
+                    selectedDay={selectedDay}
+                    onSelectDay={setSelectedDay}
+                />
+                
+                {/* Daily Content Grid */}
+                <DailyContentGrid
+                    completed={completed}
+                    onOpenModal={handleOpenModal}
+                />
 
-    </IonPage>
-  );
-};
+                {/* Daily Audio */}
+                <DailyAudioCard />
+            </div>
+
+            {/* Modals */}
+            <NightAudioModal
+                open={nightAudioOpen}
+                onOpenChange={setNightAudioOpen}
+                isCompleted={completed.nightAudio}
+                onComplete={() => markComplete("nightAudio")}
+            />
+
+            <SOSModal
+                open={sosOpen}
+                onOpenChange={setSosOpen}
+                isCompleted={completed.sosEmotional}
+                onComplete={() => markComplete("sosEmotional")}
+            />
+
+            <DailyMessageModal
+                open={dailyMessageOpen}
+                onOpenChange={setDailyMessageOpen}
+                isCompleted={completed.dailyMessage}
+                onComplete={() => markComplete("dailyMessage")}
+            />
+
+            <WeeklyTaskModal
+                open={weeklyTaskOpen}
+                onOpenChange={setWeeklyTaskOpen}
+                isCompleted={completed.weeklyTask}
+                onComplete={() => markComplete("weeklyTask")}
+            />
+        </AppLayout>
+    );
+}
 
 export default Home;

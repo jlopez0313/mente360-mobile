@@ -56,7 +56,7 @@ export const Recordatorios = () => {
         />
       )}
 
-      <div className="ion-text-center ion-padding">
+      <div style={{display:"inline"}} className="ion-text-center ion-padding">
         <IonFab horizontal="end" vertical="bottom">
           <IonFabButton disabled={!network.status} onClick={goToAdd} id="add" className="ion-margin-bottom">
             <IonIcon icon={add} />

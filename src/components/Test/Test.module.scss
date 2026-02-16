@@ -23,7 +23,8 @@
 
     .selected {
         background: var(--color-secondary);
-        border-color: var(--color-secondary);
+        border: 2px solid;
+        border-color: #3a9189;
 
         p {
             color: #000000 !important;
@@ -37,10 +38,10 @@
     }
 
     .selected .opcionLetra {
-        color: #0286B6 !important;
+        color: #3a9189 !important;
     }
 }
 
-.backButton {
-    text-decoration: none;
+ion-item[button] {
+    --background: transparent;
 }

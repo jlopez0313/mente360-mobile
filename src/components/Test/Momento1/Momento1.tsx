@@ -34,10 +34,7 @@ const Momento1: React.FC<any> = memo(
           Por favor, realiza el test de eneagrama para conocer tu Eneatipo
         </IonText>
 
-        <br></br> <br></br>
-
-        <IonItemDivider className="line-divider"></IonItemDivider>
-
+        <br></br>         
 
         <IonText>
           <h6> <strong> Momento 1 </strong> </h6>
@@ -46,7 +43,7 @@ const Momento1: React.FC<any> = memo(
         <IonText className="font12">
           <p>Marca la opción con la que más te sientas identificado(a)</p>
         </IonText>
-
+        <br></br>
         <div>
           <IonRadioGroup onIonChange={(e) => setMomento(e.detail.value)}>
             <IonList lines="full" className={`ion-no-padding ${styles.momentos}`}>

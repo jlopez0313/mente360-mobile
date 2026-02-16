@@ -121,7 +121,7 @@ const Momento2: React.FC<any> = memo(({ momentos, onSetMomento }) => {
       <IonText className="font12">
         <p>Marca la opción con la que más te sientas identificado(a)</p>
       </IonText>
-
+      <br></br>
       <div>
         <IonRadioGroup onIonChange={(e) => onSetMomento("dos", e.detail.value)}>
           <IonList lines="full" className={`ion-no-padding ${styles.momentos}`}>

@@ -49,6 +49,7 @@ export const Perfil = () => {
   const { userEnabled, payment_status } = usePayment();
 
   const { user } = useSelector((state: any) => state.user);
+
   const history = useHistory();
   const network = useNetwork();
 
