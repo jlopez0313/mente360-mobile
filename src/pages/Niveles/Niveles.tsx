@@ -60,7 +60,7 @@ const Niveles: React.FC = () => {
 
   return (
     <AppLayout>
-      <div className="min-h-full">
+      <div className="h-full bg-background flex flex-col">
         {/* Header */}
         <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50 px-4 py-4">
           <div className="flex items-center gap-3">
@@ -83,7 +83,7 @@ const Niveles: React.FC = () => {
         </div>
 
         {/* Podcasts List */}
-        <div className="px-4 py-6 space-y-4">
+        <div className="px-4 py-6 space-y-4 overflow-y-auto">
           {niveles?.length ? (
             niveles?.map((nivel, idx) => (
               <NivelCard

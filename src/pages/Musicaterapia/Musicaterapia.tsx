@@ -3,7 +3,6 @@ import Logo from "@/assets/images/logo.png";
 import { AppLayout } from "@/components/layout";
 import { CategorySlider } from "@/components/Musicaterapia/CategorySlider";
 import { FavoritesList } from "@/components/Musicaterapia/FavoritesList";
-import { MiniPlayer } from "@/components/Musicaterapia/MiniPlayer";
 import { TrackList } from "@/components/Musicaterapia/TrackList";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,21 +10,8 @@ import Clips from "@/database/clips";
 import { useBackButton } from "@/hooks/useBackButton";
 import { db } from "@/hooks/useDexie";
 import { useLiveQuery } from "dexie-react-hooks";
-import { Heart, Music, Search } from "lucide-react";
+import { Music, Search, Star } from "lucide-react";
 import { useState } from "react";
-
-export interface Track {
-  id: string;
-  title: string;
-  artist: string;
-  category: string;
-  duration: number;
-  coverImage: string;
-  audioUrl: string;
-  isDownloaded: boolean;
-  isLiked?: boolean;
-  inMyPlaylist?: boolean;
-}
 
 const Musicaterapia: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -50,30 +36,7 @@ const Musicaterapia: React.FC = () => {
     // dispatch(clearListAudios());
     setSearchQuery(value);
   };
-
-  const handleToggleLike = (trackId: number | undefined) => {
-    /*
-    setTracks(prev => prev.map(t => 
-      t.id === trackId ? { ...t, isLiked: !t.isLiked } : t
-    ));
-    */
-  };
-
-  const handleTogglePlaylist = (trackId: number | undefined) => {
-    /*
-    setTracks(prev => prev.map(t => 
-      t.id === trackId ? { ...t, inMyPlaylist: !t.inMyPlaylist } : t
-    ));
-    */
-  };
-
-  const handleDownload = (trackId: number | undefined) => {
-    /*
-    setTracks(prev => prev.map(t => 
-      t.id === trackId ? { ...t, isDownloaded: !t.isDownloaded } : t
-    ));
-    */
-  };
+  
 
   useBackButton(`/home`);
 
@@ -119,7 +82,7 @@ const Musicaterapia: React.FC = () => {
                 Clips
               </TabsTrigger>
               <TabsTrigger value="favorites" className="gap-2">
-                <Heart className="w-4 h-4" />
+                <Star className="w-4 h-4" />
                 Favoritos
               </TabsTrigger>
             </TabsList>
@@ -136,35 +99,18 @@ const Musicaterapia: React.FC = () => {
               <TrackList
                 selectedCategory={selectedCategory}
                 searchQuery={searchQuery}
-                onPlay={setCurrentTrack}
-                onToggleLike={handleToggleLike}
-                onTogglePlaylist={handleTogglePlaylist}
-                onDownload={handleDownload}
                 currentTrackId={currentTrack?.id}
               />
             </TabsContent>
 
             <TabsContent value="favorites" className="mt-0">
               <FavoritesList
-                selectedCategory={selectedCategory}
                 searchQuery={searchQuery}
-                onPlay={setCurrentTrack}
-                onToggleLike={handleToggleLike}
-                onTogglePlaylist={handleTogglePlaylist}
-                onDownload={handleDownload}
                 currentTrackId={currentTrack?.id}
               />
             </TabsContent>
           </Tabs>
         </div>
-
-        {/* Mini Player */}
-        {currentTrack && (
-          <MiniPlayer
-            track={currentTrack}
-            onClose={() => setCurrentTrack(null)}
-          />
-        )}
       </div>
     </AppLayout>
   );

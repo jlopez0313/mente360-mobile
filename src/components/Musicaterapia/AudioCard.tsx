@@ -14,38 +14,43 @@ import { useAudio } from "@/hooks/useAudio";
 import { db } from "@/hooks/useDexie";
 import { cn } from "@/lib/utils";
 import { dislike, like } from "@/services/likes";
+import {
+  setAudioSrc,
+  setGlobalAudio,
+  setGlobalPos,
+  setIsGlobalPlaying,
+} from "@/store/slices/audioSlice";
 import { useLiveQuery } from "dexie-react-hooks";
 import {
   Check,
   Download,
   Heart,
-  ListMinus,
-  ListPlus,
   MoreVertical,
   Pause,
   Play,
   Share2,
+  Star,
 } from "lucide-react";
-import { useContext, useRef, useState } from "react";
-import { useSelector } from "react-redux";
-import { toast } from "sonner";
+import { useContext, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import MusicBar from "../Shared/MusicBar/MusicBar";
 
-interface TrackCardProps {
+interface AudioCardProps {
+  idx: number;
   track: Clips;
   isPlaying: boolean;
-  onPlay: () => void;
-  onTogglePlaylist: () => void;
-  onDownload: () => void;
 }
 
-export const TrackCard = ({
-  track,
-  onPlay,
-  onTogglePlaylist,
-  onDownload,
-}: TrackCardProps) => {
+export const AudioCard = ({ idx, track }: AudioCardProps) => {
   const { AudioNoWifi, baseURL, status } = useContext(NetworkContext);
   const { user } = useSelector((state: any) => state.user);
+  const dispatch = useDispatch();
+
+  const { globalAudio, isGlobalPlaying } = useSelector(
+    (state: any) => state.audio
+  );
+
+  const isPlaying = globalAudio?.id === track.id && isGlobalPlaying;
 
   const audioRef: any = useRef({
     currentTime: 0,
@@ -55,12 +60,17 @@ export const TrackCard = ({
     fastSeek: (time: number) => {},
   });
 
-  const { duration, isPlaying, onLoadedMetadata, onTimeUpdate, onUpdateBuffer } = useAudio(
-    audioRef,
-    () => {}
-  );
-
-  const [localSrc, setLocalSrc] = useState<any>(null);
+  const {
+    duration,
+    onShareLink,
+    onLoadedMetadata,
+    onTimeUpdate,
+    onUpdateBuffer,
+    downloadAudio,
+    deleteAudio,
+    getDownloadedAudio,
+    onTogglePlaylist,
+  } = useAudio(audioRef, () => {});
 
   const likes = useLiveQuery(
     () => db.likes.where("clips_id").equals(track.id).toArray(),
@@ -77,21 +87,61 @@ export const TrackCard = ({
     [user?.id, track.id]
   );
 
-  const handleShare = async () => {
-    try {
-      await navigator.share({
-        title: track.titulo,
-        text: `Escucha "${track.titulo}" de la categoría ${
-          track.categoria?.categoria
-        } en ${import.meta.env.VITE_NAME}`,
-        url: window.location.href,
-      });
-    } catch {
-      navigator.clipboard.writeText(window.location.href);
-      toast.success("Enlace copiado al portapapeles");
+  const inMyPlaylist = useLiveQuery(() =>
+    db.playlist
+      .where("users_id")
+      .equals(user.id)
+      .and((playlist: any) => playlist?.clip?.id === track.id)
+      .first()
+  );
+
+  // Download Management
+  const onToggleDownload = () => {
+    if (track.audio_local) {
+      onRemoveLocal();
+    } else {
+      onDownload();
     }
   };
 
+  const onDownload = async () => {
+    try {
+      const ruta = await downloadAudio(
+        baseURL + track.audio,
+        "audio_" + track.id,
+        async (p: any) => {
+          /// setPercent(p);
+        }
+      );
+
+      if (!ruta) {
+        throw new Error("No se pudo descargar el audio");
+      }
+
+      console.log("Ruta es ", ruta);
+      // setPercent(0);
+
+      await db.clips.update(track.id, {
+        imagen_local: track.imagen,
+        audio_local: ruta,
+        downloaded: 1,
+      });
+    } catch (error) {
+      console.log(" error ondownload", error);
+    }
+  };
+
+  const onRemoveLocal = async () => {
+    await deleteAudio(track.audio_local);
+
+    await db.crecimientos.update(track.id, {
+      imagen_local: "",
+      audio_local: "",
+      downloaded: 0,
+    });
+  };
+
+  // Likes Management
   const onToggleLike = async () => {
     if (my_like) {
       await onDislike();
@@ -132,17 +182,50 @@ export const TrackCard = ({
     }
   };
 
+  // Playlist Management
+  const handleTogglePlaylist = async () => {
+    const playlistToggled = await onTogglePlaylist(track, inMyPlaylist);
+    if (playlistToggled) {
+      dispatch(setGlobalAudio({ ...track, inMyPlaylist: playlistToggled }));
+    } else {
+      dispatch(setGlobalAudio({ ...track, inMyPlaylist: null }));
+    }
+  };
+
+  // Playback Management
+  const onTooglePlay = async () => {
+    if (isPlaying) {
+      dispatch(setIsGlobalPlaying(false));
+    } else {
+      if (track.audio_local) {
+        const audioBlob = await getDownloadedAudio(track.audio_local);
+        dispatch(setAudioSrc(audioBlob));
+      } else {
+        dispatch(setAudioSrc(baseURL + track.audio));
+      }
+
+      dispatch(setGlobalPos(idx));
+      dispatch(
+        setGlobalAudio({
+          ...track,
+          inMyPlaylist,
+        })
+      );
+      dispatch(setIsGlobalPlaying(true));
+    }
+  };
+
   return (
     <Card
       className={cn(
         "overflow-hidden border-border/50 transition-all",
-        isPlaying && "border-primary/50 bg-primary/5"
+        globalAudio?.id == track.id && "border-primary/50 bg-primary/5"
       )}
     >
       <CardContent className="p-0">
         <div className="flex items-center gap-3 p-3">
           {/* Cover & Play */}
-          <div className="relative shrink-0">
+          <div className="relative shrink-0" onClick={onTooglePlay}>
             <div className="w-14 h-14 rounded-xl overflow-hidden bg-muted">
               <img
                 src={status ? baseURL + track.imagen : AudioNoWifi}
@@ -152,7 +235,6 @@ export const TrackCard = ({
             </div>
             <Button
               size="icon"
-              onClick={onPlay}
               className={cn(
                 "absolute inset-0 m-auto w-8 h-8 rounded-full shadow-medium",
                 isPlaying
@@ -169,16 +251,21 @@ export const TrackCard = ({
           </div>
 
           {/* Info */}
-          <div className="flex-1 min-w-0">
-            <h6 className="!m-1 font-semibold text-foreground truncate">
-              {track.titulo}
-            </h6>
+          <div className="flex-1 min-w-0" onClick={onTooglePlay}>
+            <div className="flex gap-1 items-end">
+              {globalAudio?.id == track.id && (
+                <MusicBar paused={!isGlobalPlaying} />
+              )}{" "}
+              <h6 className="!m-0 font-semibold text-foreground truncate">
+                {track.titulo}
+              </h6>
+            </div>
             <p className="text-xs text-muted-foreground truncate">
               {track.categoria?.categoria}
             </p>
             <div className="flex items-center gap-2 mt-1">
               <span className="text-xs text-muted-foreground">{duration}</span>
-              {track.isDownloaded && <Check className="w-3 h-3 text-success" />}
+              {track.audio_local && <Check className="w-3 h-3 text-success" />}
             </div>
           </div>
 
@@ -206,28 +293,28 @@ export const TrackCard = ({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem onClick={onTogglePlaylist}>
-                  {track.inMyPlaylist ? (
+                <DropdownMenuItem onClick={handleTogglePlaylist}>
+                  {inMyPlaylist ? (
                     <>
-                      <ListMinus className="w-4 h-4 mr-2" />
+                      <Star className="w-4 h-4 mr-2 fill-yellow-500 text-yellow-500" />
                       Quitar de favoritos
                     </>
                   ) : (
                     <>
-                      <ListPlus className="w-4 h-4 mr-2" />
+                      <Star className="w-4 h-4 mr-2" />
                       Agregar a favoritos
                     </>
                   )}
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleShare}>
+                <DropdownMenuItem onClick={() => onShareLink(track.id)}>
                   <Share2 className="w-4 h-4 mr-2" />
                   Compartir
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={onDownload}>
-                  {track.isDownloaded ? (
+                <DropdownMenuItem onClick={onToggleDownload}>
+                  {track.audio_local ? (
                     <>
                       <Check className="w-4 h-4 mr-2 text-success" />
-                      Descargado
+                      Eliminar Descarga
                     </>
                   ) : (
                     <>
@@ -243,7 +330,7 @@ export const TrackCard = ({
 
         <audio
           ref={audioRef}
-          src={localSrc ? localSrc : baseURL + track?.audio}
+          src={track?.audio_local ? track.audio_local : baseURL + track?.audio}
           onLoadedMetadata={onLoadedMetadata}
           onTimeUpdate={onTimeUpdate}
           onProgress={onUpdateBuffer}

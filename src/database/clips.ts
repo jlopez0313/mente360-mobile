@@ -9,4 +9,5 @@ export default interface Clips {
     downloaded ?: number;
     imagen_local: string;
     audio_local: string;
+    inMyPlaylist?: boolean;
 }

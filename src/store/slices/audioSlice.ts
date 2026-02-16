@@ -1,3 +1,4 @@
+import Clips from "@/database/clips";
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
@@ -5,8 +6,8 @@ const initialState = {
     baseURL: import.meta.env.VITE_BASE_BACK,
     audioSrc: '', // El src del Audio
     isGlobalPlaying: false,
-    globalAudio: '',
-    listAudios: [] as any[],
+    globalAudio: null as Clips | null,
+    listAudios: [] as Clips[],
     globalPos: 0,
     showGlobalAudio: true,
     myCurrentTime: 0,

@@ -13,8 +13,8 @@ export function AppLayout({ children, hideNav = false }: AppLayoutProps) {
       <IonContent fullscreen scrollY={false} className="space-y-4">
         <div className="h-full flex flex-col bg-background">
           <main className={cn(
-              "flex-1 flex flex-col",
-              hideNav ? "" : "pb-20"
+              "flex-1 flex flex-col min-h-0",
+              hideNav ? "" : ""
             )}>
             {children}
           </main>

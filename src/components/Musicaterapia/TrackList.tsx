@@ -1,29 +1,24 @@
-import Clips from "@/database/clips";
 import { db } from "@/hooks/useDexie";
+import { setListAudios } from "@/store/slices/audioSlice";
 import { useLiveQuery } from "dexie-react-hooks";
 import { forwardRef } from "react";
+import { useDispatch } from "react-redux";
 import { Virtuoso } from 'react-virtuoso';
-import { TrackCard } from "./TrackCard";
+import { AudioCard } from "./AudioCard";
 
 interface TrackListProps {
   selectedCategory: number | undefined;
   searchQuery: string;
-  onPlay: (track: Clips | undefined) => void;
-  onToggleLike: (trackId: number | undefined) => void;
-  onTogglePlaylist: (trackId: number | undefined) => void;
-  onDownload: (trackId: number | undefined) => void;
   currentTrackId?: number;
 }
 
 export const TrackList = ({
   selectedCategory,
   searchQuery,
-  onPlay,
-  onToggleLike,
-  onTogglePlaylist,
-  onDownload,
   currentTrackId,
 }: TrackListProps) => {
+
+  const dispatch = useDispatch();
 
   const tracks = useLiveQuery(async () => {
     let collection = db.clips.orderBy("titulo");
@@ -40,8 +35,12 @@ export const TrackList = ({
       );
     }
 
-    return await collection.toArray();
+    const lista = await collection.toArray();
+    dispatch(setListAudios([...lista]));
+
+    return lista;
   }, [selectedCategory, searchQuery]);
+  
 
   if (!tracks || tracks?.length === 0) {
     return (
@@ -70,14 +69,11 @@ export const TrackList = ({
           const track = tracks[index];
 
           return (
-            <TrackCard
+            <AudioCard
+              idx={index}
               key={track.id}
               track={track}
               isPlaying={track.id === currentTrackId}
-              onPlay={() => onPlay(track)}
-              onToggleLike={() => onToggleLike(track.id)}
-              onTogglePlaylist={() => onTogglePlaylist(track.id)}
-              onDownload={() => onDownload(track.id)}
             />
           );
         }}

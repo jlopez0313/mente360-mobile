@@ -1,10 +1,16 @@
+import Clips from "@/database/clips";
+import Playlist from "@/database/playlist";
+import { add, trash } from "@/services/playlist";
 import { updateCurrentTime } from "@/store/slices/audioSlice";
 import { Directory, Filesystem } from "@capacitor/filesystem";
 import { Share } from "@capacitor/share";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { db } from "./useDexie";
 
 export const useAudio: any = (audio: any, onConfirm: any = () => {}) => {
+  const { user } = useSelector((state: any) => state.user);
+
   const dispatch = useDispatch();
   const { baseURL, audioRef, myCurrentTime } = useSelector(
     (state: any) => state.audio
@@ -53,7 +59,7 @@ export const useAudio: any = (audio: any, onConfirm: any = () => {}) => {
       console.log("Archivo eliminado correctamente");
     } catch (error) {
       console.error("Error eliminando archivo:", filePath, ": ", error);
-      throw new Error('Error....');
+      throw new Error("Error....");
     }
   };
 
@@ -140,11 +146,12 @@ export const useAudio: any = (audio: any, onConfirm: any = () => {}) => {
 
   const onShareLink = async (id: any) => {
     await Share.share({
-      title: "¡Tienes que escuchar esto en Mente360!",
-      text: "Esta canción en Mente360 está transformando mi día. Escúchalo también. ¡Se que te va a encantar!",
+      title: `¡Tienes que escuchar esto en ${import.meta.env.VITE_NAME}!`,
+      text: "Esta canción está transformando mi día. Escúchalo también. ¡Se que te va a encantar!",
       url: baseURL + "audios/" + btoa(id),
-      dialogTitle:
-        "Invita a tus amigos a escuchar esta canción y descubrir Mente360.",
+      dialogTitle: `Invita a tus amigos a escuchar esta canción y descubrir ${
+        import.meta.env.VITE_NAME
+      }.`,
     });
   };
 
@@ -236,6 +243,52 @@ export const useAudio: any = (audio: any, onConfirm: any = () => {}) => {
     }
   };
 
+  // Playlist Management
+  const onTogglePlaylist = (track: Clips, inMyPlaylist: Playlist) => {
+    if (inMyPlaylist?.id) {
+      return onTrashFromPlaylist(inMyPlaylist);
+    } else {
+      return onAddToPlaylist(track);
+    }
+  };
+
+  const onTrashFromPlaylist = async (inMyPlaylist: Playlist) => {
+    try {
+      await trash(inMyPlaylist?.id ?? 0);
+      await db.playlist
+        .where("id")
+        .equals(inMyPlaylist?.id ?? 0)
+        .delete();
+
+      return;
+    } catch (error: any) {
+      console.log(error);
+    }
+  };
+
+  const onAddToPlaylist = async (track: Clips) => {
+    try {
+      const data = {
+        clips_id: track.id,
+        users_id: user.id,
+      };
+
+      const {
+        data: { data: added },
+      } = await add(data);
+
+      await db.playlist.add({
+        id: added.id,
+        clip: track,
+        users_id: user.id,
+      });
+
+      return added;
+    } catch (error: any) {
+      console.log(error);
+    }
+  };
+
   return {
     baseURL,
     progress,
@@ -244,6 +297,7 @@ export const useAudio: any = (audio: any, onConfirm: any = () => {}) => {
     real_duration,
     currentTime,
     isPlaying,
+    onTogglePlaylist,
     onShareLink,
     onLoadedMetadata,
     onUpdateBuffer,

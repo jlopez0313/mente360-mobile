@@ -7,7 +7,7 @@ import Niveles from "@/database/niveles";
 import { db } from "@/hooks/useDexie";
 import { useLiveQuery } from "dexie-react-hooks";
 import { BookmarkCheck, Check, Download, Play } from "lucide-react";
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { Progress } from "../ui/progress";
@@ -27,7 +27,9 @@ export const NivelCard = ({ nivel }: Props) => {
 
   const { user } = useSelector((state: any) => state.user);
 
-  const isCompleted = nivel.progress >= 1;
+  const myCrecimiento = user.crecimientos[0];
+
+  const isCompleted = myCrecimiento?.nivel.id > nivel.id;
 
   const crecimientos: Crecimientos[] = useLiveQuery(
     () =>
@@ -56,6 +58,18 @@ export const NivelCard = ({ nivel }: Props) => {
         }),
     [nivel]
   );
+
+  const progress = useMemo(() => {
+    if ( !crecimientos ) return null;
+
+    const index = crecimientos.findIndex((c) => c.id == myCrecimiento?.id);
+    if ( index === -1) return null;
+
+    console.log( 'index', crecimientos, myCrecimiento?.id )
+
+    const progress = index/(crecimientos.length - 1) * 100;
+    return progress;
+  }, [crecimientos])
 
   if (crecimientos?.length) {
     const podcast = crecimientos[0];
@@ -90,7 +104,9 @@ export const NivelCard = ({ nivel }: Props) => {
                   <h3 className="font-medium text-foreground !text-sm line-clamp-1 !m-0">
                     {podcast.titulo}
                   </h3>
-                  <BookmarkCheck className="w-4 h-4 text-success" />
+                  {isCompleted && (
+                    <BookmarkCheck className="w-4 h-4 text-success" />
+                  )}
                 </div>
                 <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
                   {podcast.descripcion}
@@ -107,7 +123,7 @@ export const NivelCard = ({ nivel }: Props) => {
                   }
                 </span>
                 <div className="flex-1" />
-                {podcast.isDownloaded ? (
+                {podcast.audio_local ? (
                   <Check className="w-4 h-4 text-success" />
                 ) : (
                   <Download className="w-4 h-4 text-muted-foreground" />
@@ -118,7 +134,7 @@ export const NivelCard = ({ nivel }: Props) => {
 
           {/* Progress bar */}
           <div className="px-3 pb-3">
-            <Progress value={(nivel.progress ?? 0.5) * 100} className="h-1" />
+            <Progress value={(progress ?? isCompleted) * 100} className="h-1" />
           </div>
         </CardContent>
       </Card>
