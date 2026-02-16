@@ -7,7 +7,7 @@ interface Props {
 
 export const Texto: React.FC<Props> = ({ descripcion, children = null }) => {
   return (
-    <div className={styles.texto}>
+    <div className="text-foreground texto">
       <p style={{ whiteSpace: 'pre-wrap' }}>
        {descripcion}
       </p>

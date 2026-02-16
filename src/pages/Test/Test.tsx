@@ -19,9 +19,10 @@ import styles from "./Test.module.scss";
 import { setShowGlobalAudio } from "@/store/slices/audioSlice";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { ArrowLeft } from "lucide-react";
 
 const Test: React.FC = () => {
-  
+
   const history = useHistory();
   const dispatch = useDispatch();
 
@@ -48,23 +49,17 @@ const Test: React.FC = () => {
 
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar className={styles["ion-header"]}>
-          <IonButtons slot="start">
-            <Link to={route} replace={true}>
-              <IonButton fill="clear" className={styles.backButton}>
-                <IonIcon slot="start" icon={arrowBack} />
-              </IonButton>
-            </Link>
-          </IonButtons>
-
-          <div className={`ion-padding ${styles.title}`}>
-            <IonTitle >
-              Realizar Test Eneagrama
-            </IonTitle>
-          </div>
+        <IonToolbar>
+          <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg border-b border-border/50">
+            <div className="flex items-center justify-between px-4 py-3">
+              <Link to="/" className="p-2 -ml-2 hover:bg-muted rounded-full">
+                <ArrowLeft className="w-5 h-5 text-foreground" />
+              </Link>
+              <h1 className="font-display font-semibold text-lg">Realizar Test Eneagrama</h1>
+              <div className="w-9" />
+            </div>
+          </header>
         </IonToolbar>
-      </IonHeader>
 
       <IonContent className={`ion-padding ${styles["ion-content"]}`}>
         <TestComponent />

@@ -202,7 +202,7 @@ export const Configuracion = () => {
                     <span slot="start" className="material-symbols-outlined">
                       stars
                     </span>
-                    <IonLabel>Realizar Test Eneagrama</IonLabel>
+                    <IonLabel>Realizar Test Eneagrama </IonLabel>
                   </IonItem>
                 </Link>
                 <Link to="/comunidad-principal">

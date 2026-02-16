@@ -101,7 +101,7 @@ export const Modal: React.FC<Props> = memo(
               })
             : cloneElement(children, { doChild })}
 
-          <div className="flex space-around">
+          <div  className="header-container">
             {showButtons ? (
               !hideButtons ? (
                 <IonButton shape="round" className="accept-button"

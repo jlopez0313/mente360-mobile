@@ -4,10 +4,8 @@ import { Provider } from "react-redux";
 import App from "./App";
 import { store } from "./store/store";
 /* Theme variables */
-import "@ionic/react/css/palettes/dark.class.css";
 import "./main.css";
 import "./styles.scss";
-
 
 
 const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
