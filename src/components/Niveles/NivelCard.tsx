@@ -7,14 +7,13 @@ import Niveles from "@/database/niveles";
 import { db } from "@/hooks/useDexie";
 import { useLiveQuery } from "dexie-react-hooks";
 import { BookmarkCheck, Check, Download, Play } from "lucide-react";
-import { useContext, useMemo } from "react";
+import { useContext, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { Progress } from "../ui/progress";
 
 interface Props {
   nivel: Niveles;
-  onPlay: () => void;
 }
 
 const formatDuration = (seconds: number) => {
@@ -26,8 +25,11 @@ export const NivelCard = ({ nivel }: Props) => {
   const { baseURL, AudioNoWifi, status } = useContext(NetworkContext);
 
   const { user } = useSelector((state: any) => state.user);
+  const [podcast, setPodcast] = useState<Crecimientos | null>(null);
 
-  const myCrecimiento = user.crecimientos[0];
+  const myCrecimiento = useMemo(() => {
+    return user.crecimientos[0];
+  }, [user]);
 
   const isCompleted = myCrecimiento?.nivel.id > nivel.id;
 
@@ -60,20 +62,21 @@ export const NivelCard = ({ nivel }: Props) => {
   );
 
   const progress = useMemo(() => {
-    if ( !crecimientos ) return null;
-
+    if (!crecimientos) return null;
+    
     const index = crecimientos.findIndex((c) => c.id == myCrecimiento?.id);
-    if ( index === -1) return null;
+    if (index === -1) {
+      setPodcast(crecimientos[0]);
+      return null;
+    }
 
-    console.log( 'index', crecimientos, myCrecimiento?.id )
+    setPodcast(crecimientos[index]);
 
-    const progress = index/(crecimientos.length - 1) * 100;
+    const progress = index / (crecimientos.length - 1);
     return progress;
-  }, [crecimientos])
+  }, [crecimientos, myCrecimiento]);
 
   if (crecimientos?.length) {
-    const podcast = crecimientos[0];
-
     return (
       <Card className="overflow-hidden border-border/50 hover:shadow-soft transition-shadow">
         <CardContent className="p-0">
@@ -82,19 +85,21 @@ export const NivelCard = ({ nivel }: Props) => {
             <div className="relative shrink-0">
               <div className="w-20 h-20 rounded-xl overflow-hidden bg-muted">
                 <img
-                  src={status ? baseURL + podcast.imagen : AudioNoWifi}
-                  alt={podcast.titulo}
+                  src={status ? baseURL + podcast?.imagen : AudioNoWifi}
+                  alt={podcast?.titulo}
                   className="w-full h-full object-cover"
                 />
               </div>
-              <Link to={`/niveles/${nivel.id}/crecimientos`}>
-                <Button
-                  size="icon"
-                  className="absolute inset-0 m-auto w-10 h-10 !rounded-full bg-primary/90 hover:bg-primary shadow-medium"
-                >
-                  <Play className="w-4 h-4 text-primary-foreground fill-current" />
-                </Button>
-              </Link>
+              {(nivel.id == myCrecimiento?.nivel.id || isCompleted) && (
+                <Link to={`/niveles/${nivel.id}/crecimientos`}>
+                  <Button
+                    size="icon"
+                    className="absolute inset-0 m-auto w-10 h-10 !rounded-full bg-primary/90 hover:bg-primary shadow-medium"
+                  >
+                    <Play className="w-4 h-4 text-primary-foreground fill-current" />
+                  </Button>
+                </Link>
+              )}
             </div>
 
             {/* Content */}
@@ -102,14 +107,14 @@ export const NivelCard = ({ nivel }: Props) => {
               <div>
                 <div className="flex items-start justify-between gap-2">
                   <h3 className="font-medium text-foreground !text-sm line-clamp-1 !m-0">
-                    {podcast.titulo}
+                    {podcast?.titulo}
                   </h3>
                   {isCompleted && (
                     <BookmarkCheck className="w-4 h-4 text-success" />
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
-                  {podcast.descripcion}
+                  {podcast?.descripcion}
                 </p>
               </div>
 
@@ -119,22 +124,27 @@ export const NivelCard = ({ nivel }: Props) => {
                 </Badge>
                 <span className="text-xs text-muted-foreground">
                   {
-                    // formatDuration(podcast.duration)
+                    // formatDuration(podcast?.duration)
                   }
                 </span>
                 <div className="flex-1" />
-                {podcast.audio_local ? (
-                  <Check className="w-4 h-4 text-success" />
-                ) : (
-                  <Download className="w-4 h-4 text-muted-foreground" />
-                )}
+                {nivel.id == myCrecimiento?.nivel.id || progress ? (
+                  podcast?.audio_local ? (
+                    <Check className="w-4 h-4 text-success" />
+                  ) : (
+                    <Download className="w-4 h-4 text-muted-foreground" />
+                  )
+                ) : null}
               </div>
             </div>
           </div>
 
           {/* Progress bar */}
           <div className="px-3 pb-3">
-            <Progress value={(progress ?? isCompleted) * 100} className="h-1" />
+            <Progress
+              value={(progress ?? (isCompleted ? 1 : 0)) * 100}
+              className="h-1"
+            />
           </div>
         </CardContent>
       </Card>

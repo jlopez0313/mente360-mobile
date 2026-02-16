@@ -92,6 +92,7 @@
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^6.2.0",
+    "@rollup/rollup-win32-x64-msvc": "^4.57.1",
     "@tailwindcss/postcss": "^4.1.18",
     "@tailwindcss/vite": "^4.1.18",
     "@testing-library/dom": ">=7.21.4",

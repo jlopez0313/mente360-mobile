@@ -1,8 +1,8 @@
+import { Crecimiento as CrecimientoComponent } from "@/components/Crecimiento/Crecimiento";
 import { AppLayout } from "@/components/layout";
 import { ContactDetailModal } from "@/components/Shared/Contact/ContactModal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
 import { NetworkContext } from "@/context/NetworkContext";
 import Canales from "@/database/canales";
 import Comunidades from "@/database/comunidades";
@@ -10,23 +10,16 @@ import Crecimiento from "@/database/crecimientos";
 import Niveles from "@/database/niveles";
 import User from "@/database/user";
 import { destroy } from "@/helpers/musicControls";
-import { useAudio } from "@/hooks/useAudio";
 import { useBackButton } from "@/hooks/useBackButton";
 import { db } from "@/hooks/useDexie";
+import { nextCrecimiento } from "@/services/user";
 import { setShowGlobalAudio } from "@/store/slices/audioSlice";
+import { setUser } from "@/store/slices/userSlice";
 import { useLiveQuery } from "dexie-react-hooks";
-import {
-  ArrowLeft,
-  Download,
-  Pause,
-  Play,
-  SkipBack,
-  SkipForward,
-  Trash2,
-} from "lucide-react";
-import { useContext, useEffect, useRef, useState } from "react";
+import { ArrowLeft } from "lucide-react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useParams } from "react-router-dom";
+import { Link, useHistory, useParams } from "react-router-dom";
 
 type Props = {
   nivel: Niveles | undefined;
@@ -43,48 +36,33 @@ const formatTime = (seconds: number) => {
 const Crecimientos: React.FC = () => {
   const { AudioNoWifi, baseURL, status } = useContext(NetworkContext);
 
+  const history = useHistory();
   const { user } = useSelector((state: any) => state.user);
 
   const { id } = useParams<any>();
   const dispatch = useDispatch();
 
-  const audioRef: any = useRef({
-    currentTime: 0,
-    duration: 0,
-    pause: () => {},
-    play: () => {},
-    fastSeek: (time: number) => {},
-  });
-
-  const {
-    progress,
-    buffer,
-    duration,
-    real_duration,
-    currentTime,
-    isPlaying,
-    onLoadedMetadata,
-    onTimeUpdate,
-    onUpdateBuffer,
-    onStart,
-    onEnd,
-    onPause,
-    onPlay,
-    onLoad,
-    downloadAudio,
-    deleteAudio,
-    getDownloadedAudio,
-  } = useAudio(audioRef, () => {});
-
-  const [localSrc, setLocalSrc] = useState<any>(null);
   const [selectedContact, setSelectedContact] = useState<User | null>(null);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [currentAudio, setCurrentAudio] = useState<Crecimiento | null>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const myCrecimiento = useMemo(() => {
+    return user.crecimientos[0];
+  }, [user]);
 
   const nivel = useLiveQuery(
     () => db.niveles.where("id").equals(Number(id)).first(),
     [id]
+  );
+
+  const niveles = useLiveQuery(
+    () =>
+      db.niveles
+        .orderBy("orden")
+        .filter((n: any) => n?.canal?.id == nivel?.canal?.id)
+        .toArray(),
+    [nivel]
   );
 
   const community = useLiveQuery(() => {
@@ -128,27 +106,57 @@ const Crecimientos: React.FC = () => {
     setIsContactModalOpen(true);
   };
 
-  const handlePrevious = () => {
-    if (crecimientos?.length && currentIndex > 0) {
-      setCurrentAudio(crecimientos[currentIndex - 1]);
-      setCurrentIndex(currentIndex - 1);
-      // navigate(`/comunidades/${comunidad?.id}/podcasts/${communityPodcasts[currentIndex - 1].id}`);
-    }
-  };
+  const onSaveNext = async (nextIdx: number) => {
+    if (crecimientos && crecimientos[nextIdx]) {
+      const updatePromise = nextCrecimiento(
+        {
+          crecimientos_id: crecimientos[nextIdx].id,
+        },
+        user.id
+      );
 
-  const handleNext = () => {
-    if (crecimientos?.length && currentIndex < crecimientos.length - 1) {
-      setCurrentAudio(crecimientos[currentIndex + 1]);
-      setCurrentIndex(currentIndex + 1);
-      onPause();
-      // navigate(`/comunidades/${communityId}/podcasts/${communityPodcasts[currentIndex + 1].id}`);
+      const setUserPromise = updatePromise.then(({ data }) => {
+        return dispatch(setUser(data.data));
+      });
+
+      await Promise.all([updatePromise, setUserPromise]);
+    } else if (nextIdx == crecimientos?.length) {
+      const nextNivelIdx = niveles?.findIndex((n) => n.id == Number(id)) ?? -1;
+
+      if (niveles && niveles[nextNivelIdx + 1]) {
+        const updatePromise = nextCrecimiento(
+          {
+            niveles_id: niveles[nextNivelIdx + 1]?.id,
+          },
+          user.id
+        );
+
+        const setUserPromise = updatePromise.then(({ data }) => {
+          return dispatch(setUser(data.data));
+        });
+
+        await Promise.all([updatePromise, setUserPromise]);
+        history.replace(
+          `/niveles/${niveles[nextNivelIdx + 1]?.id}/crecimientos`
+        );
+      }
     }
+
+    // await dispatch(setPodcast({ done: 1 }));
   };
 
   useEffect(() => {
     if (!crecimientos?.length) return;
-    setCurrentAudio(crecimientos[0]);
-  }, [crecimientos]);
+
+    const index = crecimientos.findIndex((c) => c.id == myCrecimiento?.id);
+    if (index === -1) {
+      setCurrentAudio(crecimientos[0]);
+      setCurrentIndex(0);
+    } else {
+      setCurrentAudio(crecimientos[index]);
+      setCurrentIndex(index);
+    }
+  }, [crecimientos, myCrecimiento]);
 
   useEffect(() => {
     dispatch(setShowGlobalAudio(true));
@@ -210,110 +218,16 @@ const Crecimientos: React.FC = () => {
           </Avatar>
         </div>
 
-        {/* Cover Image */}
-        <div className="flex-1 flex items-center justify-center px-8">
-          <div className="w-full max-w-[480px] aspect-square rounded-3xl overflow-hidden shadow-glow">
-            <img
-              src={status ? baseURL + currentAudio?.imagen : AudioNoWifi}
-              alt={currentAudio?.titulo}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        </div>
-
-        {/* Info & Controls */}
-        <div className="px-6 pb-8 space-y-6">
-          {/* Title & Level */}
-          <div className="text-center space-y-2">
-            <h1 className="text-xl font-heading font-bold text-foreground !m-0">
-              {currentAudio?.titulo}
-            </h1>
-            <span className="text-xs font-heading text-foreground">
-              {nivel?.nivel}
-            </span>
-            <p className="text-sm text-muted-foreground line-clamp-2">
-              {currentAudio?.descripcion}
-            </p>
-
-            {/* Level Selector */}
-            <div className="flex justify-center pt-2">
-              <Button size="sm" className="gap-1" variant="outline">
-                {!currentAudio?.audio_local ? (
-                  <>
-                    {" "}
-                    <Download className="w-5 h-5" /> Descargar{" "}
-                  </>
-                ) : (
-                  <>
-                    <Trash2 className="w-5 h-5 text-success" /> Eliminar
-                    Descarga{" "}
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
-
-          {/* Progress Bar */}
-          <div className="space-y-2">
-            <Slider
-              value={[progress]}
-              max={100}
-              step={0.1}
-              buffer={buffer * 100}
-              onValueChange={(value) => onLoad(value)}
-              className="w-full"
-            />
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>{currentTime}</span>
-              <span>{duration}</span>
-            </div>
-          </div>
-
-          {/* Controls */}
-          <div className="flex items-center justify-center gap-6">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handlePrevious}
-              disabled={currentIndex === 0}
-              className="w-12 h-12"
-            >
-              <SkipBack className="w-6 h-6" />
-            </Button>
-
-            <Button
-              size="icon"
-              onClick={() => (isPlaying ? onPause() : onPlay())}
-              className="w-16 h-16 !rounded-full bg-primary hover:bg-primary/90 shadow-glow"
-            >
-              {isPlaying ? (
-                <Pause className="w-7 h-7 text-primary-foreground" />
-              ) : (
-                <Play className="w-7 h-7 text-primary-foreground ml-1" />
-              )}
-            </Button>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleNext}
-              disabled={currentIndex === crecimientos.length - 1}
-              className="w-12 h-12"
-            >
-              <SkipForward className="w-6 h-6" />
-            </Button>
-          </div>
-        </div>
+        <CrecimientoComponent
+          currentIndex={currentIndex}
+          crecimientos={crecimientos}
+          currentAudio={currentAudio}
+          nivel={nivel}
+          onSaveNext={onSaveNext}
+          setCurrentIndex={setCurrentIndex}
+          setCurrentAudio={setCurrentAudio}
+        />
       </div>
-
-      <audio
-        ref={audioRef}
-        src={localSrc ? localSrc : baseURL + currentAudio?.audio}
-        onLoadedMetadata={onLoadedMetadata}
-        onTimeUpdate={onTimeUpdate}
-        onProgress={onUpdateBuffer}
-        // onEnded={() => onSaveNext(activeIndex)}
-      />
 
       <ContactDetailModal
         contact={selectedContact}
