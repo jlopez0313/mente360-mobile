@@ -10,7 +10,7 @@ export function TaskProgress({ daysRemaining }: TaskProgressProps) {
     <div className="px-4 pb-4">
       <Link 
         to="/comunidades/1/tareas"
-        className="block bg-gradient-to-r from-primary to-primary/80 rounded-2xl p-4 shadow-soft"
+        className="block bg-gradient-to-r from-primary to-primary/80 rounded-2xl p-4 shadow"
       >
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">

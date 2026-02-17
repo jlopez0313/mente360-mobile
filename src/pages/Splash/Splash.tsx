@@ -1,3 +1,4 @@
+import { AppLayout } from "@/components/layout";
 import { diferenciaEnDias } from "@/helpers/Fechas";
 import { usePayment } from "@/hooks/usePayment";
 import { usePreferences } from "@/hooks/usePreferences";
@@ -10,7 +11,6 @@ import { getNotifications } from "@/store/thunks/notifications";
 import { LocalNotifications } from "@capacitor/local-notifications";
 import { PushNotifications } from "@capacitor/push-notifications";
 import { SplashScreen } from "@capacitor/splash-screen";
-import { IonContent, IonPage } from "@ionic/react";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
@@ -19,6 +19,7 @@ let pendingNotificationData: any = null;
 
 const Splash = () => {
   const history = useHistory();
+
   const dispatch = useDispatch();
 
   const { payment_status } = usePayment();
@@ -127,60 +128,68 @@ const Splash = () => {
   };
 
   useEffect(() => {
+    let initialized = false;
+
     const prepareApp = async () => {
-      const token = await getPreference(keys.TOKEN);
+      if (initialized) return;
+      initialized = true;
 
       try {
-        await initializeFCM();
-        await initializeLocalNotifications();
-        await new Promise((res) => setTimeout(res, 1500));
-      } finally {
+        await new Promise((res) => setTimeout(res, 400));
+
+        const token = await getPreference(keys.TOKEN);
         await SplashScreen.hide();
 
-        if (token) {
-          const lastDateStr =
-            (await getPreference(keys.HOME_SYNC_KEY)) ?? "2024-01-01T00:00:00Z";
+        if (!token) {
+          history.replace("/login");
+          return;
+        }
 
-          const lastDate = new Date(lastDateStr);
-          const now = new Date();
-          now.setHours(0, 0, 0, 0);
+        const lastDateStr =
+          (await getPreference(keys.HOME_SYNC_KEY)) ?? "2024-01-01T00:00:00Z";
 
-          if (payment_status == "free" && diferenciaEnDias(now, lastDate) > 0) {
-            history.replace("/welcome");
-          } else {
-            if (pendingNotificationData) {
-              const data = pendingNotificationData;
-    
-              if (data.is_general) {
-                history.replace("/notificaciones");
-              } else if (data.room) {
-                history.replace("/chat/" + data.room);
-              } else if (data.grupo) {
-                history.replace("/grupo/" + data.grupo);
-              }
-    
-              pendingNotificationData = null;
-              
-              dispatch(getNotifications());
-              return;
-            } else {
-              history.replace("/home");
+        const lastDate = new Date(lastDateStr);
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+
+        if (payment_status === "free" && diferenciaEnDias(now, lastDate) > 0) {
+          history.replace("/welcome");
+        } else {
+          if (pendingNotificationData) {
+            const data = pendingNotificationData;
+
+            if (data.is_general) {
+              history.replace("/notificaciones");
+            } else if (data.room) {
+              history.replace("/chat/" + data.room);
+            } else if (data.grupo) {
+              history.replace("/grupo/" + data.grupo);
             }
 
+            pendingNotificationData = null;
+            dispatch(getNotifications());
+          } else {
+            history.replace("/home");
           }
-        } else {
-          history.replace("/login");
         }
+
+        setTimeout(async () => {
+          console.log("Initializing FCM...");
+          await initializeFCM();
+
+          console.log("Initializing Local Notifications...");
+          await initializeLocalNotifications();
+        }, 600);
+      } catch (error) {
+        console.log("Splash Error", error);
       }
     };
 
     prepareApp();
-  }, [history]);
+  }, []);
 
   return (
-    <IonPage>
-      <IonContent className="ion-text-center ion-padding"></IonContent>
-    </IonPage>
+    <AppLayout> </AppLayout>
   );
 };
 

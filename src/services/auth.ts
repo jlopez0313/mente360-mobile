@@ -20,7 +20,7 @@ export const login = async (formData: {}): Promise<any> => {
   });
 };
 
-export const register = async (formData: {}) => {
+export const register = async (formData: {}): Promise<any> => {
   return new Promise(async (resolve, reject) => {
     const { post } = baseApi();
 
@@ -42,7 +42,7 @@ export const register = async (formData: {}) => {
   });
 };
 
-export const reset = async (formData: {}) => {
+export const reset = async (formData: {}): Promise<any> => {
   return new Promise(async (resolve, reject) => {
     const { post } = baseApi();
 

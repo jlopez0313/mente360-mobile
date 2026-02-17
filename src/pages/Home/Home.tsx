@@ -60,7 +60,7 @@ const Home: React.FC = () => {
                         </Link>
                         <div>
                             <p className="text-sm text-muted-foreground">Hola,</p>
-                            <h1 className="font-display font-semibold text-lg text-foreground">
+                            <h1 className="!m-0 font-display font-semibold text-lg text-foreground">
                                 {user?.name}
                             </h1>
                         </div>

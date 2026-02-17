@@ -27,14 +27,13 @@ export const DBProvider = ({ children }: any) => {
 
         onValue(readData("subscriptions/" + user.id), (snapshot) => {
           const objData = snapshot.val();
-          const data = snapshotToArray(objData)
+          const data = snapshotToArray(objData);
 
-          
           const suscripciones = data
             ?.filter((item: any) => item)
             .map((item: any) => {
               return {
-                comunidad: '',
+                comunidad: "",
                 created_at: null,
                 deleted_at: null,
                 id: item.comunidades_id,
@@ -49,10 +48,8 @@ export const DBProvider = ({ children }: any) => {
               };
             });
 
-            console.log('suscriptions changed', data, suscripciones);
-
-
-            suscripciones && dispatch(setUser({ ...user, suscripciones: [...suscripciones] }));
+          suscripciones &&
+            dispatch(setUser({ ...user, suscripciones: [...suscripciones] }));
         });
       }
     };

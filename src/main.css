@@ -44,6 +44,12 @@
     
     --color-warning: hsl(38 92% 50%);
     --color-info: hsl(200 80% 50%);
+
+    --color-night: hsl(var(--night));
+    --color-night-foreground: hsl(var(--night-foreground));
+
+    --color-morning: hsl(var(--morning));
+    --color-morning-foreground: hsl(var(--morning-foreground));
 }
 
 /* ===============================

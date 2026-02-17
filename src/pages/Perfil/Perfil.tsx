@@ -174,7 +174,7 @@ const Perfil: React.FC = () => {
         {/* Header */}
         <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg border-b border-border/50">
           <div className="flex items-center justify-between px-4 py-3">
-            <Link to="/" className="p-2 -ml-2 hover:bg-muted rounded-full">
+            <Link to="/home" className="p-2 -ml-2 hover:bg-muted rounded-full">
               <ArrowLeft className="w-5 h-5 text-foreground" />
             </Link>
             <h1 className="font-display font-semibold text-lg">Mi Perfil</h1>

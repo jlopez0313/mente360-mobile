@@ -1,48 +1,49 @@
 import { AppLayout } from "@/components/layout";
-import { ArrowLeft, Moon, Sun, Bell, LogOut, ChevronRight, ExternalLink, FileText, Shield, HelpCircle, Mail, Users, CreditCard } from "lucide-react";
-import { Link } from "react-router-dom";
-import { Switch } from "@/components/ui/switch";
-import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-//import { useAuth } from "@/contexts/AuthContext";
+import {
+  ArrowLeft,
+  Bell,
+  ChevronRight,
+  CreditCard,
+  ExternalLink,
+  FileText,
+  HelpCircle,
+  LogOut,
+  Mail,
+  Moon,
+  Shield,
+  Sun,
+  Users
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 import { usePreferences } from "@/hooks/usePreferences";
+import { useTheme } from "next-themes";
 import { useHistory } from "react-router";
 
 const Configuracion: React.FC = () => {
   const history = useHistory();
-  
+  const { theme, setTheme } = useTheme();
+
   const { toast } = useToast();
-  //const { logout } = useAuth();
-  
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    if (typeof window !== "undefined") {
-      return document.documentElement.classList.contains("dark");
-    }
-    return false;
-  });
-  
+
   const [pushNotifications, setPushNotifications] = useState(() => {
     const saved = localStorage.getItem("pushNotifications");
     return saved ? JSON.parse(saved) : true;
   });
 
   useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-    localStorage.setItem("theme", isDarkMode ? "dark" : "light");
-  }, [isDarkMode]);
-
-  useEffect(() => {
-    localStorage.setItem("pushNotifications", JSON.stringify(pushNotifications));
+    localStorage.setItem(
+      "pushNotifications",
+      JSON.stringify(pushNotifications)
+    );
   }, [pushNotifications]);
 
   const { removePreference, keys } = usePreferences();
-  
+
   const handleLogout = async () => {
     localStorage.removeItem("home");
     localStorage.removeItem("onboarding");
@@ -50,8 +51,8 @@ const Configuracion: React.FC = () => {
     await removePreference(keys.TOKEN);
     await removePreference(keys.HOME_SYNC_KEY);
 
-    history.replace("/login",{replace: true});
-  
+    history.replace("/login", { replace: true });
+
     toast({
       title: "Sesión cerrada",
       description: "Has cerrado sesión exitosamente",
@@ -60,21 +61,21 @@ const Configuracion: React.FC = () => {
 
   return (
     <AppLayout>
-      <div className="px-4 py-6 pb-24">
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-6">
-          <button
-            onClick={() => history.go(-1)}
-            className="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center hover:bg-muted transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5 text-foreground" />
-          </button>
-          <h1 className="text-xl font-bold text-foreground">Configuración</h1>
+      <div className="h-full bg-background flex flex-col px-4 py-6">
+        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50">
+          {/* Header */}
+          <div className="flex items-center gap-3 mb-6">
+            <button
+              onClick={() => history.go(-1)}
+              className="w-10 h-10 !rounded-full !bg-card !border !border-border flex items-center justify-center hover:bg-muted transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5 text-foreground" />
+            </button>
+            <h1 className="text-xl font-bold text-foreground">Configuración</h1>
+          </div>
         </div>
 
-
-        <div className="space-y-6">
-
+        <div className="flex-1 overflow-y-auto px-1 py-4 space-y-6">
           {/* Profile Section */}
           <div className="bg-card rounded-2xl border border-border overflow-hidden">
             <div className="px-4 py-3 bg-muted/50">
@@ -82,10 +83,10 @@ const Configuracion: React.FC = () => {
                 Perfil
               </h2>
             </div>
-            
+
             <div className="divide-y divide-border">
-              <a 
-                href="/perfil" 
+              <Link
+                to="/perfil"
                 rel="noopener noreferrer"
                 className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
               >
@@ -94,10 +95,10 @@ const Configuracion: React.FC = () => {
                   <span className="text-foreground">Editar perfil</span>
                 </div>
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
-              </a>
-              
-              <a 
-                href="/recordatorios" 
+              </Link>
+
+              <Link
+                to="/recordatorios"
                 rel="noopener noreferrer"
                 className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
               >
@@ -106,19 +107,21 @@ const Configuracion: React.FC = () => {
                   <span className="text-foreground">Mis recordatorios</span>
                 </div>
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
-              </a>
-              
-              <a 
-                href="/test" 
+              </Link>
+
+              <Link
+                to="/test"
                 rel="noopener noreferrer"
                 className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
               >
                 <div className="flex items-center gap-3">
                   <Shield className="w-5 h-5 text-primary" />
-                  <span className="text-foreground">Realizar test eneagrama</span>
+                  <span className="text-foreground">
+                    Realizar test eneagrama
+                  </span>
                 </div>
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
-              </a>
+              </Link>
             </div>
           </div>
 
@@ -129,12 +132,12 @@ const Configuracion: React.FC = () => {
                 Apariencia
               </h2>
             </div>
-            
+
             <div className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-night/10 flex items-center justify-center">
-                    {isDarkMode ? (
+                <div className="w-10 h-10 rounded-full bg-night/10 flex items-center justify-center">
+                    {theme == 'dark' ? (
                       <Moon className="w-5 h-5 text-night" />
                     ) : (
                       <Sun className="w-5 h-5 text-morning" />
@@ -143,14 +146,11 @@ const Configuracion: React.FC = () => {
                   <div>
                     <p className="font-medium text-foreground">Tema oscuro</p>
                     <p className="text-sm text-muted-foreground">
-                      {isDarkMode ? "Activado" : "Desactivado"}
+                      {theme == 'dark' ? "Activado" : "Desactivado"}
                     </p>
                   </div>
                 </div>
-                <Switch
-                  checked={isDarkMode}
-                  onCheckedChange={setIsDarkMode}
-                />
+                <Switch checked={theme == 'dark'} onCheckedChange={() => setTheme(theme === "dark" ? "light" : "dark")} />
               </div>
             </div>
           </div>
@@ -162,7 +162,7 @@ const Configuracion: React.FC = () => {
                 Notificaciones
               </h2>
             </div>
-            
+
             <div className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -170,7 +170,9 @@ const Configuracion: React.FC = () => {
                     <Bell className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <p className="font-medium text-foreground">Notificaciones push</p>
+                    <p className="font-medium text-foreground">
+                      Notificaciones push
+                    </p>
                     <p className="text-sm text-muted-foreground">
                       Recibe recordatorios y actualizaciones
                     </p>
@@ -191,7 +193,7 @@ const Configuracion: React.FC = () => {
                 Suscripción
               </h2>
             </div>
-            
+
             <div className="p-4">
               <Link to="/planes">
                 <Button
@@ -215,7 +217,7 @@ const Configuracion: React.FC = () => {
                 Comunidad
               </h2>
             </div>
-            
+
             <div className="p-4">
               <Link to="/seleccionar-comunidad">
                 <Button
@@ -239,11 +241,11 @@ const Configuracion: React.FC = () => {
                 Información
               </h2>
             </div>
-            
+
             <div className="divide-y divide-border">
-              <a 
-                href="https://mente360.com/nosotros" 
-                target="_blank" 
+              <a
+                href="https://mente360.com/nosotros"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
               >
@@ -253,36 +255,40 @@ const Configuracion: React.FC = () => {
                 </div>
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
               </a>
-              
-              <a 
-                href="https://mente360.com/terminos" 
-                target="_blank" 
+
+              <a
+                href="https://mente360.com/terminos"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
               >
                 <div className="flex items-center gap-3">
                   <FileText className="w-5 h-5 text-primary" />
-                  <span className="text-foreground">Términos y condiciones</span>
+                  <span className="text-foreground">
+                    Términos y condiciones
+                  </span>
                 </div>
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
               </a>
-              
-              <a 
-                href="https://mente360.com/privacidad" 
-                target="_blank" 
+
+              <a
+                href="https://mente360.com/privacidad"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
               >
                 <div className="flex items-center gap-3">
                   <Shield className="w-5 h-5 text-primary" />
-                  <span className="text-foreground">Política de privacidad</span>
+                  <span className="text-foreground">
+                    Política de privacidad
+                  </span>
                 </div>
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
               </a>
-              
-              <a 
-                href="https://mente360.com/soporte" 
-                target="_blank" 
+
+              <a
+                href="https://mente360.com/soporte"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
               >
@@ -292,9 +298,9 @@ const Configuracion: React.FC = () => {
                 </div>
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
               </a>
-              
-              <a 
-                href="mailto:hola@mente360.com" 
+
+              <a
+                href="mailto:hola@mente360.com"
                 className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
               >
                 <div className="flex items-center gap-3">
@@ -304,7 +310,6 @@ const Configuracion: React.FC = () => {
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
               </a>
             </div>
-          
           </div>
 
           {/* Account Section */}
@@ -314,7 +319,7 @@ const Configuracion: React.FC = () => {
                 Cuenta
               </h2>
             </div>
-            
+
             <div className="p-4">
               <Button
                 variant="ghost"
@@ -333,7 +338,6 @@ const Configuracion: React.FC = () => {
       </div>
     </AppLayout>
   );
-}
-
+};
 
 export default Configuracion;
