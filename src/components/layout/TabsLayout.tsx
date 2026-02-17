@@ -17,12 +17,14 @@ import { Route } from "react-router-dom";
 import Chat from "@/pages/Chat/Chat";
 import Comunidades from "@/pages/Comunidades/Comunidades";
 
+import { usePayment } from "@/hooks/usePayment";
 import Home from "@/pages/Home/Home";
 import Musicaterapia from "@/pages/Musicaterapia/Musicaterapia";
 import Notifications from "@/pages/Notifications/Notifications";
 import { useSelector } from "react-redux";
 
 const navItems: {
+  isEnabled: boolean;
   path: string;
   tab: string;
   label: string;
@@ -30,6 +32,7 @@ const navItems: {
   icon: any;
 }[] = [
   {
+    isEnabled: true,
     path: "/home",
     tab: "home",
     label: "Inicio",
@@ -37,6 +40,7 @@ const navItems: {
     icon: HomeIcon,
   },
   {
+    isEnabled: false,
     path: "/comunidades",
     tab: "comunidades",
     label: "Comunidades",
@@ -44,6 +48,7 @@ const navItems: {
     icon: Users,
   },
   {
+    isEnabled: false,
     path: "/musicaterapia",
     tab: "musicaterapia",
     label: "Música",
@@ -51,6 +56,7 @@ const navItems: {
     icon: Music,
   },
   {
+    isEnabled: true,
     path: "/notificaciones",
     tab: "notificaciones",
     label: "Alertas",
@@ -58,6 +64,7 @@ const navItems: {
     icon: Bell,
   },
   {
+    isEnabled: false,
     path: "/chat",
     tab: "chat",
     label: "Chat",
@@ -67,6 +74,8 @@ const navItems: {
 ];
 
 export const TabsLayout = () => {
+  const { userEnabled, payment_status } = usePayment();
+
   const { isGeneral, isRoom, isGrupo } = useSelector(
     (state: any) => state.notifications
   );
@@ -83,7 +92,14 @@ export const TabsLayout = () => {
 
       <IonTabBar className="border-t border-border safe-bottom" slot="bottom">
         {navItems.map((item, index) => (
-          <IonTabButton tab={item.tab} href={item.path} key={index}>
+          <IonTabButton
+            tab={item.tab}
+            href={item.path}
+            key={index}
+            disabled={
+              !item.isEnabled && (!userEnabled || payment_status == "free")
+            }
+          >
             <item.icon size={22} strokeWidth={2} />
             <IonLabel>{item.label}</IonLabel>
             {item.tab == "chat" && (isRoom || isGrupo) ? (

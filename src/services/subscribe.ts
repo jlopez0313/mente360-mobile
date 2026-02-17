@@ -18,3 +18,22 @@ export const find = async(payload: {}): Promise<any> => {
         }    
     })
 }
+
+export const getEpaycoLink = async(payload: {}): Promise<any> => {
+
+    return new Promise( async (resolve, reject) => {
+        const { post } = baseApi();
+    
+        try {
+            resolve ( await post(`/suscripciones/epayco`, payload, {"Accept": "application/json", "Content-type": "application/json" } ) )
+        } catch( error: any ) {
+            if (error.response) {
+                reject(error.response)
+            } else if (error.request) {
+                reject(error.request)
+            } else {
+                reject(error)
+            }
+        }    
+    })
+}

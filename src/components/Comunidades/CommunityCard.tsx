@@ -4,13 +4,19 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { NetworkContext } from "@/context/NetworkContext";
 import Comunidades from "@/database/comunidades";
+import { valorPlan } from "@/database/planes";
+import { formatCurrency } from "@/helpers/Format";
 import { getYoutubeLink } from "@/helpers/Video";
+import { db } from "@/hooks/useDexie";
 import { usePayment } from "@/hooks/usePayment";
 import { cn } from "@/lib/utils";
+import { getEpaycoLink } from "@/services/subscribe";
+import { useLiveQuery } from "dexie-react-hooks";
 import { ChevronRight, Crown, Users } from "lucide-react";
 import { useContext, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router";
+import { CommunityPlanModal } from "./CommunityPlanModal";
 
 type Props = {
   community: Comunidades;
@@ -24,12 +30,19 @@ export const CommunityCard = ({ community }: Props) => {
 
   const { user } = useSelector((state: any) => state.user);
 
+  const [showPlanModal, setShowPlanModal] = useState(false);
   const [expandido, setExpandido] = useState(false);
+
+  const plan = useLiveQuery(() =>
+    db.planes.where("key").equals("COMUNIDAD").first()
+  );
+
+  const planMensual = plan?.valor.find((v: valorPlan) => v.key === "MES");
 
   const handleAccess = () => {
     if (hasSuscription) {
       if (!userEnabled || payment_status == "free") {
-        // setIsPremiumOpen(true);
+        setShowPlanModal(true);
       } else {
         if (user.suscripciones.some((s: any) => s.id == community.id)) {
           history.replace(`/comunidades/${community.id}/canales`);
@@ -37,6 +50,8 @@ export const CommunityCard = ({ community }: Props) => {
           return;
         }
       }
+    } else {
+      setShowPlanModal(true);
     }
   };
 
@@ -65,7 +80,56 @@ export const CommunityCard = ({ community }: Props) => {
       return false;
     }
     return true;
-  }, [community]);
+  }, [community, user]);
+
+  const handlePayment = (v: valorPlan, open: boolean) => {
+    setShowPlanModal(open);
+
+    onSubscribe({
+      precio: v.valor,
+      periodicidad: v.key,
+      titulo: v.descripcion ?? "Plan mensual",
+      comunidad: community?.id,
+    });
+  };
+
+  const onSubscribe = async (item: any) => {
+    try {
+      const { data } = await getEpaycoLink(item);
+
+      const handler = window.ePayco.checkout.configure({
+        // key: data.epayco.public_key,
+        key: import.meta.env.VITE_EPAYCO_PUBLIC_KEY,
+        test: data.epayco.test,
+      });
+
+      handler.open({
+        name: import.meta.env.VITE_NAME,
+        description: data.epayco.description,
+        invoice: data.epayco.invoice,
+        currency: data.epayco.currency,
+        amount: Number(item.precio).toFixed(2),
+        tax_base: "0",
+        tax: "0",
+        country: data.epayco.country,
+        lang: "es",
+        external: "false",
+        confirmation: import.meta.env.VITE_BASE_API + "/confirmation",
+        response: import.meta.env.VITE_BASE_BACK + "confirmation",
+        extra_1: data.epayco.extra_1,
+        extra_2: data.epayco.extra_2,
+        extra_3: data.epayco.extra_3,
+      });
+
+      /*
+      console.log(data.payment_link)
+      await Browser.open({ url: data.payment_link });
+      */
+      // window.open(data.url, "_blank");
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <Card className="overflow-hidden border-border/50 shadow-soft hover:shadow-medium transition-shadow">
@@ -89,14 +153,12 @@ export const CommunityCard = ({ community }: Props) => {
           ></iframe>
 
           {/* Premium Badge */}
-          {
-            !hasSuscription && (
-              <Badge className="absolute top-2 right-2 bg-premium text-premium-foreground gap-1">
-                <Crown className="w-3 h-3" />
-                Premium
-              </Badge>
-            )
-          }
+          {!hasSuscription && (
+            <Badge className="absolute top-2 right-2 bg-premium text-premium-foreground gap-1">
+              <Crown className="w-3 h-3" />
+              Premium
+            </Badge>
+          )}
 
           {/* Community Logo */}
           <div className="absolute -bottom-6 left-4">
@@ -131,14 +193,19 @@ export const CommunityCard = ({ community }: Props) => {
             </div>
           </div>
 
-          <p className={cn(
-            "text-sm text-muted-foreground mb-0",
-            expandido ? "line-clamp-none" : "line-clamp-2"
-          )}>
+          <p
+            className={cn(
+              "text-sm text-muted-foreground mb-0",
+              expandido ? "line-clamp-none" : "line-clamp-2"
+            )}
+          >
             {community.descripcion}
           </p>
 
-          <button className="text-sm text-primary underline hover:opacity-80 transition" onClick={() => setExpandido(!expandido)}>
+          <button
+            className="text-sm text-primary underline hover:opacity-80 transition"
+            onClick={() => setExpandido(!expandido)}
+          >
             {expandido ? "Leer menos" : "Leer más"}
           </button>
 
@@ -163,14 +230,23 @@ export const CommunityCard = ({ community }: Props) => {
               <Button
                 size="sm"
                 variant="outline"
+                onClick={handleAccess}
                 className="border-accent text-accent hover:bg-accent hover:text-accent-foreground"
               >
-                ${community.price}/mes
+                {formatCurrency(Number(planMensual?.valor || "0"))}/mes
               </Button>
             )}
           </div>
         </div>
       </CardContent>
+
+      <CommunityPlanModal
+        plan={plan}
+        open={showPlanModal}
+        onOpenChange={handlePayment}
+        communityName={community.comunidad}
+        communityLogo={community?.imagen ?? ""}
+      />
     </Card>
   );
 };
