@@ -1,28 +1,12 @@
 
 
 
-import { useEffect, useState } from "react";
 import { AppLayout } from "@/components/layout";
-import { mockUser, enneagramTypes, genderOptions, mockReminders } from "@/lib/mockData";
+import { enneagramTypes, mockUser } from "@/lib/mockData";
+import { useEffect, useState } from "react";
 
-import { 
-  ArrowLeft, 
-  Camera, 
-  User, 
-  Mail, 
-  Phone, 
-  Calendar,
-  Crown,
-  Edit2,
-  Bell,
-  Plus,
-  Trash2,
-  ChevronRight
-} from "lucide-react";
-import { Link, useHistory } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { 
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -31,17 +15,18 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
-import { useIonLoading } from "@ionic/react";
 import { all, create, remove, toggle } from "@/services/alarmas";
+import { useIonLoading } from "@ionic/react";
+import {
+  ArrowLeft,
+  Bell,
+  Plus,
+  Trash2
+} from "lucide-react";
+import { Link, useHistory } from "react-router-dom";
+import { toast } from "sonner";
 
 const weekDayLabels = ["D", "L", "M", "M", "J", "V", "S"];
 
@@ -197,7 +182,7 @@ const addReminder = async () => {
   };
 
   return (
-    <AppLayout hideNav>
+    <AppLayout>
       <div className="min-h-screen bg-background">
         {/* Header */}
         <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg border-b border-border/50">

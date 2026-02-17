@@ -1,25 +1,6 @@
 import Avatar from "@/assets/images/load-avatar.png";
-import { useRef, useState } from "react";
 import { AppLayout } from "@/components/layout";
-import { mockUser, enneagramTypes, genderOptions, mockReminders } from "@/lib/mockData";
-import {
-  ArrowLeft,
-  Camera,
-  User,
-  Mail,
-  Phone,
-  Calendar,
-  Crown,
-  Edit2,
-  Bell,
-  Plus,
-  Trash2,
-  ChevronRight,
-  TestTubes
-} from "lucide-react";
-import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import {
   Dialog,
   DialogContent,
@@ -36,17 +17,29 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+import { enneagramTypes, genderOptions, mockUser } from "@/lib/mockData";
+import {
+  ArrowLeft,
+  Calendar,
+  Camera,
+  ChevronRight,
+  Crown,
+  Edit2,
+  Mail,
+  Phone,
+  User
+} from "lucide-react";
+import { useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
+import { usePayment } from "@/hooks/usePayment";
+import { updateData } from "@/services/realtime-db";
+import { update } from "@/services/user";
+import { useIonAlert, useIonLoading } from "@ionic/react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
-import { usePayment } from "@/hooks/usePayment";
 import styles from "./Perfil.module.scss";
-import { updateData } from "@/services/realtime-db";
-import { useIonAlert, useIonLoading } from "@ionic/react";
-import { update } from "@/services/user";
-import { setUser } from "@/store/slices/userSlice";
 
 import { toastController } from "@ionic/core";
 const weekDayLabels = ["D", "L", "M", "M", "J", "V", "S"];
@@ -176,7 +169,7 @@ const Perfil: React.FC = () => {
     };
 
   return (
-    <AppLayout hideNav>
+    <AppLayout>
       <div className="min-h-screen bg-background">
         {/* Header */}
         <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg border-b border-border/50">

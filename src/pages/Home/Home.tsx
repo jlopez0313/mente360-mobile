@@ -1,21 +1,20 @@
 import Avatar from "@/assets/images/load-avatar.png";
-import { useState } from "react";
-import { AppLayout } from "@/components/layout";
-import { WeeklyCalendar } from "@/components/Home/WeeklyCalendar";
-import { DailyContentGrid } from "@/components/Home/DailyContentGrid";
 import { DailyAudioCard } from "@/components/Home/DailyAudioCard";
+import { DailyContentGrid } from "@/components/Home/DailyContentGrid";
+import { DailyMessageModal } from "@/components/Home/DailyMessageModal";
 import { NightAudioModal } from "@/components/Home/NightAudioModal";
 import { SOSModal } from "@/components/Home/SOSModal";
-import { DailyMessageModal } from "@/components/Home/DailyMessageModal";
+import { WeeklyCalendar } from "@/components/Home/WeeklyCalendar";
+import { AppLayout } from "@/components/layout";
+import { useState } from "react";
 
-import { mockUser } from "@/lib/mockData";
-import { Trophy, Settings } from "lucide-react";
-import { Link } from "react-router-dom";
 import { WeeklyTaskModal } from "@/components/Home/WeeklyTaskModal";
 import { useCompletedItems } from "@/hooks/useCompletedItems";
+import { mockUser } from "@/lib/mockData";
+import { Settings, Trophy } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import { useSelector } from "react-redux";
-import { Acordeon } from "@/components/Home/Acordeon/Acordeon";
 
 const Home: React.FC = () => {
     const [selectedDay, setSelectedDay] = useState(new Date().getDay());

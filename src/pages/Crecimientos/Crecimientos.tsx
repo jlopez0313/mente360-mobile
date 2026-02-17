@@ -189,7 +189,7 @@ const Crecimientos: React.FC = () => {
   }
 
   return (
-    <AppLayout hideNav>
+    <AppLayout>
       <div className="min-h-screen bg-gradient-to-b from-primary/5 to-background flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-4">

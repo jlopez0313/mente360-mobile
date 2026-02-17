@@ -99,7 +99,7 @@ export const Item = memo(
               "max-w-[80%] px-4 py-2.5 rounded-2xl",
               message.user == user.id
                 ? "bg-primary text-primary-foreground rounded-br-md"
-                : "bg-card border border-border rounded-bl-md"
+                : "bg-card border text-muted-foreground border-border rounded-bl-md"
             )}
           >
             {message.reply && (

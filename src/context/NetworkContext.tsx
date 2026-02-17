@@ -4,6 +4,7 @@ import { useNetwork } from "@/hooks/useNetwork";
 import { createContext, ReactNode } from "react";
 
 interface NetworkContextType {
+  AvatarLogo: string;
   AudioNoWifi: string;
   baseURL: string;
   status: boolean;
@@ -11,6 +12,7 @@ interface NetworkContextType {
 }
 
 export const NetworkContext = createContext<NetworkContextType>({
+  AvatarLogo: "",
   AudioNoWifi: "",
   baseURL: "",
   status: true,
@@ -27,7 +29,7 @@ export function NetworkProvider({ children }: Props): JSX.Element {
 
   return (
     <NetworkContext.Provider
-      value={{ ...network, AudioNoWifi, baseURL }}
+      value={{ ...network, AvatarLogo, AudioNoWifi, baseURL }}
     >
       {children}
     </NetworkContext.Provider>

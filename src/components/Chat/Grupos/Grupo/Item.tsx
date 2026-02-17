@@ -107,7 +107,7 @@ export const Item: React.FC<any> = ({
           className={cn(
             "max-w-[80%]",
             "flex",
-            message.user == user.id ? "justify-end" : "justify-start"
+            message.user == user.id ? "justify-end" : "justify-start text-muted-foreground"
           )}
         >
           <div
@@ -139,7 +139,6 @@ export const Item: React.FC<any> = ({
             )}
 
             <div
-              id={`msg-${index}`}
               className={cn(
                 "px-4 py-2.5 rounded-2xl",
                 message.user == user.id

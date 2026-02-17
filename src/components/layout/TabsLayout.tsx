@@ -17,10 +17,10 @@ import { Route } from "react-router-dom";
 import Chat from "@/pages/Chat/Chat";
 import Comunidades from "@/pages/Comunidades/Comunidades";
 
+import Home from "@/pages/Home/Home";
 import Musicaterapia from "@/pages/Musicaterapia/Musicaterapia";
 import Notifications from "@/pages/Notifications/Notifications";
 import { useSelector } from "react-redux";
-import Home from "@/pages/Home/Home";
 
 const navItems: {
   path: string;

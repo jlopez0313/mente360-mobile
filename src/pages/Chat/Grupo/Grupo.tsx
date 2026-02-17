@@ -31,7 +31,6 @@ import {
   ArrowLeft,
   LogOut,
   MoreVertical,
-  Paperclip,
   Send,
   Smile,
   UserPlus,
@@ -40,6 +39,7 @@ import {
 } from "lucide-react";
 import { useSelector } from "react-redux";
 
+import { Emojis } from "@/components/Chat/Emojis";
 import { ContactDetailModal } from "@/components/Chat/Grupos/Grupo/Info";
 import {
   AddMemberSheet,
@@ -63,6 +63,7 @@ const Grupo: React.FC = () => {
   const [isWriting, setIsWriting] = useState<any>(null);
   const [replyTo, setReplyTo] = useState<any>(null);
   const [otherUser, setOtherUser] = useState<any>({});
+  const [showEmojiModal, setShowEmojiModal] = useState(false);
 
   const [selectedContact, setSelectedContact] = useState<any>(null);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
@@ -246,8 +247,8 @@ const Grupo: React.FC = () => {
   useBackButton("/chat");
 
   return (
-    <AppLayout hideNav>
-      <div className="min-h-screen bg-background flex flex-col">
+    <AppLayout>
+      <div className="h-full bg-background flex flex-col">
         {/* Header */}
         <div className="sticky top-0 z-10 bg-card border-b border-border px-4 py-3 safe-top">
           <div className="flex items-center gap-3">
@@ -314,10 +315,7 @@ const Grupo: React.FC = () => {
         </div>
 
         {/* Messages */}
-        <GrupoComponent
-          grupoID={groupId}
-          setReplyTo={setReplyTo}
-        />
+        <GrupoComponent grupoID={groupId} setReplyTo={setReplyTo} />
 
         {/* Input */}
         <div className="sticky bottom-0 z-10 bg-card border-t border-border px-4 py-3 safe-bottom">
@@ -352,9 +350,11 @@ const Grupo: React.FC = () => {
               )}
 
               <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" className="flex-shrink-0">
-                  <Paperclip className="w-5 h-5" />
-                </Button>
+                {/*
+                  <Button variant="ghost" size="icon" className="flex-shrink-0">
+                    <Paperclip className="w-5 h-5" />
+                  </Button>
+                */}
                 <div className="flex-1 relative">
                   <Input
                     placeholder="Escribe un mensaje..."
@@ -367,6 +367,7 @@ const Grupo: React.FC = () => {
                     variant="ghost"
                     size="icon"
                     className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
+                    onClick={() => setShowEmojiModal(true)}
                   >
                     <Smile className="w-4 h-4" />
                   </Button>
@@ -385,6 +386,16 @@ const Grupo: React.FC = () => {
         </div>
       </div>
 
+      <Emojis
+        reactToMessage={(_, emoji) => {
+          onCheckInput({ target: { value: newMessage + emoji } });
+        }}
+        selectedMessage={null}
+        setSelectedMessage={() => {}}
+        showEmojiModal={showEmojiModal}
+        setShowEmojiModal={setShowEmojiModal}
+      />
+
       <ContactDetailModal
         contact={selectedContact}
         open={isContactModalOpen}
@@ -399,10 +410,10 @@ const Grupo: React.FC = () => {
       />
 
       <AddMemberSheet
+        grupoID={groupId}
         open={showAddMember}
         onOpenChange={setShowAddMember}
         currentMemberIds={grupo?.users || []}
-        groupName={grupo?.grupo}
       />
 
       <LeaveGroupDialog

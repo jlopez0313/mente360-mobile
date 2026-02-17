@@ -1,4 +1,5 @@
 import { Interno as InternoComponent } from "@/components/Chat/Chat/Interno/Interno";
+import { Emojis } from "@/components/Chat/Emojis";
 import { AppLayout } from "@/components/layout";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -30,6 +31,7 @@ const Interno: React.FC = () => {
   const [isWriting, setIsWriting] = useState<any>(false);
   const [newMessage, setNewMessage] = useState<any>("");
   const [replyTo, setReplyTo] = useState<any>(null);
+  const [showEmojiModal, setShowEmojiModal] = useState(false);
 
   const onCheckInput = async (e: any) => {
     setNewMessage(e.target.value);
@@ -167,7 +169,7 @@ const Interno: React.FC = () => {
   useBackButton("/chat");
 
   return (
-    <AppLayout hideNav>
+    <AppLayout>
       <div className="h-full bg-background flex flex-col">
         {/* Header */}
         <div className="sticky top-0 z-10 bg-card border-b border-border px-4 py-3 safe-top">
@@ -226,10 +228,7 @@ const Interno: React.FC = () => {
         </div>
 
         {/* Messages */}
-        <InternoComponent
-          roomID={room}
-          setReplyTo={setReplyTo}
-        />
+        <InternoComponent roomID={room} setReplyTo={setReplyTo} />
 
         {/* Input */}
         <div className="sticky bottom-0 z-10 bg-card border-t border-border px-4 py-3 safe-bottom">
@@ -275,6 +274,7 @@ const Interno: React.FC = () => {
                 variant="ghost"
                 size="icon"
                 className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
+                onClick={() => setShowEmojiModal(true)}
               >
                 <Smile className="w-4 h-4" />
               </Button>
@@ -290,6 +290,16 @@ const Interno: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <Emojis
+        reactToMessage={(_, emoji) => {
+          onCheckInput({ target: { value: newMessage + emoji } });
+        }}
+        selectedMessage={null}
+        setSelectedMessage={() => {}}
+        showEmojiModal={showEmojiModal}
+        setShowEmojiModal={setShowEmojiModal}
+      />
     </AppLayout>
   );
 };

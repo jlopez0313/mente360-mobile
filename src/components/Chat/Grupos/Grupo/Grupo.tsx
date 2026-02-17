@@ -4,15 +4,12 @@ import {
   getQuery,
   queryTo,
   readData,
-  removeData,
   snapshotToArray,
-  writeData,
 } from "@/services/realtime-db";
-import { IonModal, IonPopover } from "@ionic/react";
-import EmojiPicker, { SkinTonePickerLocation } from "emoji-picker-react";
 import { onValue } from "firebase/database";
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
+import { Interacciones } from "../../Interacciones";
 import { Item } from "./Item";
 
 const PAGINATION_LIMIT = 20;
@@ -30,9 +27,7 @@ export const Grupo: React.FC<any> = ({ grupoID, setReplyTo }) => {
   const [messages, setMessages] = useState<any[]>([]);
   const [usuarios, setUsuarios] = useState<any[]>([]);
   const [selectedMessage, setSelectedMessage] = useState<any | null>(null);
-  const [showEmojiModal, setShowEmojiModal] = useState(false);
   const [pendingScrollId, setPendingScrollId] = useState<string | null>(null);
-  const [currentBreakpoint, setCurrentBreakpoint] = useState(0.75);
 
   const [popoverEvent, setPopoverEvent] = useState<{
     top: number;
@@ -43,7 +38,7 @@ export const Grupo: React.FC<any> = ({ grupoID, setReplyTo }) => {
     const replyId = msg.reply.id;
 
     if (!messages.find((m: any) => m.id === replyId)) {
-      const baseQuery = await queryTo("rooms/" + roomID + "/messages", {
+      const baseQuery = await queryTo("rooms/" + grupoID + "/messages", {
         orderBy: "key",
         startAt: replyId,
         endAt: messages[0].id,
@@ -67,7 +62,7 @@ export const Grupo: React.FC<any> = ({ grupoID, setReplyTo }) => {
   const scrollToBottom = () => {
     const container = chatListRef.current;
     if (!container) return;
-
+    
     container.scrollTop = container.scrollHeight;
   };
 
@@ -79,14 +74,11 @@ export const Grupo: React.FC<any> = ({ grupoID, setReplyTo }) => {
     if (!grupoID) return;
 
     const loadInitial = async () => {
-      const baseQuery = await queryTo(
-        `grupos/${grupoID}/messages`,
-        {
-          orderBy: "date",
-          limit: PAGINATION_LIMIT,
-          direction: "last",
-        }
-      );
+      const baseQuery = await queryTo(`grupos/${grupoID}/messages`, {
+        orderBy: "date",
+        limit: PAGINATION_LIMIT,
+        direction: "last",
+      });
 
       const snapshot = await getQuery(baseQuery);
       const initialMessages = snapshotToArray(snapshot.val());
@@ -180,22 +172,17 @@ export const Grupo: React.FC<any> = ({ grupoID, setReplyTo }) => {
     const previousHeight = container.scrollHeight;
     const oldestMessage = messages[0];
 
-    const baseQuery = await queryTo(
-      `grupos/${grupoID}/messages`,
-      {
-        orderBy: "date",
-        endAt: oldestMessage.date,
-        limit: PAGINATION_LIMIT + 1,
-        direction: "last",
-      }
-    );
+    const baseQuery = await queryTo(`grupos/${grupoID}/messages`, {
+      orderBy: "date",
+      endAt: oldestMessage.date,
+      limit: PAGINATION_LIMIT + 1,
+      direction: "last",
+    });
 
     const snapshot = await getQuery(baseQuery);
     let olderMessages = snapshotToArray(snapshot.val());
 
-    olderMessages = olderMessages.filter(
-      (m: any) => m.id !== oldestMessage.id
-    );
+    olderMessages = olderMessages.filter((m: any) => m.id !== oldestMessage.id);
 
     if (!olderMessages.length) {
       hasMore.current = false;
@@ -216,7 +203,6 @@ export const Grupo: React.FC<any> = ({ grupoID, setReplyTo }) => {
   /* =====================================================
      INTERSECTION OBSERVER
   ====================================================== */
-
   useEffect(() => {
     const container = chatListRef.current;
     const sentinel = topSentinelRef.current;
@@ -264,24 +250,6 @@ export const Grupo: React.FC<any> = ({ grupoID, setReplyTo }) => {
   }, [messages, pendingScrollId]);
 
   /* =====================================================
-     REACCIONES
-  ====================================================== */
-
-  const reactToMessage = async (message: any, emoji: string) => {
-    const reactionPath = `grupos/${grupoID}/messages/${message?.id}/reactions/${user.id}`;
-
-    if (!message.reactions?.[user.id]) {
-      await writeData(reactionPath, emoji);
-    } else {
-      if (message.reactions[user.id] !== emoji) {
-        await writeData(reactionPath, emoji);
-      } else {
-        await removeData(reactionPath);
-      }
-    }
-  };
-
-  /* =====================================================
      RENDER
   ====================================================== */
 
@@ -306,75 +274,12 @@ export const Grupo: React.FC<any> = ({ grupoID, setReplyTo }) => {
         />
       ))}
 
-      <IonPopover
-        showBackdrop={false}
-        isOpen={!!selectedMessage}
-        className="fixed z-10"
-        style={{
-          "--background": "transparent",
-          "--box-shadow": "none",
-          top: (popoverEvent?.top ?? 0) - 390,
-          transform: "none",
-        }}
-        onDidDismiss={() => setSelectedMessage(null)}
-      >
-        <div className="flex border bg-white gap-2 h-full rounded-full p-2">
-          {["👍", "❤️", "😂", "😮", "😢", "🙏"].map((emoji) => (
-            <span
-              key={emoji}
-              className="text-lg"
-              onClick={() => {
-                reactToMessage(selectedMessage, emoji);
-                setSelectedMessage(null);
-              }}
-            >
-              {emoji}
-            </span>
-          ))}
-          <span
-            className="text-lg border border-muted rounded-full w-7 h-7 flex items-center justify-center"
-            onClick={() => {
-              setShowEmojiModal(true);
-            }}
-          >
-            +
-          </span>
-        </div>
-      </IonPopover>
-
-      <IonModal
-         handleBehavior="cycle"
-         canDismiss={true}
-         isOpen={showEmojiModal}
-         initialBreakpoint={0.75}
-         onDidDismiss={() => {
-           setSelectedMessage(null);
-           setShowEmojiModal(false);
-         }}
-         onIonBreakpointDidChange={(e) => {
-           const newBp = (e as CustomEvent).detail.breakpoint;
-           setCurrentBreakpoint(newBp);
-         }}
-      >
-        <div style={{ height: "100%", padding: 16, touchAction: "none" }}>
-        <EmojiPicker
-            width={"100%"}
-            height={window.innerHeight * currentBreakpoint - 30 + "px"}
-            skinTonePickerLocation={SkinTonePickerLocation.PREVIEW}
-            previewConfig={{ showPreview: false }}
-            onEmojiClick={(emoji) => {
-              reactToMessage(selectedMessage!, emoji.emoji);
-              setSelectedMessage(null);
-              setShowEmojiModal(false);
-            }}
-            onReactionClick={(emoji) => {
-              reactToMessage(selectedMessage!, emoji.emoji);
-              setSelectedMessage(null);
-              setShowEmojiModal(false);
-            }}
-          />
-        </div>
-      </IonModal>
+      <Interacciones
+        route={`grupos/${grupoID}/messages/${selectedMessage?.id}/reactions/${user.id}`}
+        selectedMessage={selectedMessage}
+        setSelectedMessage={setSelectedMessage}
+        popoverEvent={popoverEvent}
+      />
     </div>
   );
 };

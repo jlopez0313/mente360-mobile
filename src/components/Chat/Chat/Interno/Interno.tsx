@@ -3,15 +3,12 @@ import {
   childChanged,
   getQuery,
   queryTo,
-  removeData,
   snapshotToArray,
-  writeData,
 } from "@/services/realtime-db";
 
-import { IonModal, IonPopover } from "@ionic/react";
-import EmojiPicker, { SkinTonePickerLocation } from "emoji-picker-react";
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
+import { Interacciones } from "../../Interacciones";
 import { Item } from "./Item";
 
 const PAGINATION_LIMIT = 20;
@@ -29,10 +26,7 @@ export const Interno: React.FC<any> = ({ roomID, setReplyTo }) => {
   const [messages, setMessages] = useState<any[]>([]);
 
   const [selectedMessage, setSelectedMessage] = useState<any | null>(null);
-  const [showEmojiModal, setShowEmojiModal] = useState(false);
   const [pendingScrollId, setPendingScrollId] = useState<string | null>(null);
-
-  const [currentBreakpoint, setCurrentBreakpoint] = useState(0.75);
 
   const [popoverEvent, setPopoverEvent] = useState<{
     top: number;
@@ -75,10 +69,6 @@ export const Interno: React.FC<any> = ({ roomID, setReplyTo }) => {
   ====================================================== */
 
   useEffect(() => {
-
-  }, [messages])
-
-  useEffect(() => {
     if (!roomID) return;
 
     const loadInitial = async () => {
@@ -106,8 +96,22 @@ export const Interno: React.FC<any> = ({ roomID, setReplyTo }) => {
   /* =====================================================
      ESCUCHAR MENSAJES NUEVOS EN TIEMPO REAL
   ====================================================== */
+
   useEffect(() => {
     if (!roomID) return;
+
+    const unsubChanged = childChanged(
+      `rooms/${roomID}/messages`,
+      (snap: any) => {
+        const updated = snap.val();
+
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === snap.key ? { id: snap.key, ...updated } : m
+          )
+        );
+      }
+    );
 
     const unsubAdded = childAdded(
       `rooms/${roomID}/messages`,
@@ -122,7 +126,6 @@ export const Interno: React.FC<any> = ({ roomID, setReplyTo }) => {
           return [...prev, newMsg];
         });
 
-        // solo baja si ya estamos abajo
         const container = chatListRef.current;
         if (!container) return;
 
@@ -137,19 +140,6 @@ export const Interno: React.FC<any> = ({ roomID, setReplyTo }) => {
             scrollToBottom();
           });
         }
-      }
-    );
-
-    const unsubChanged = childChanged(
-      `rooms/${roomID}/messages`,
-      (snap: any) => {
-        const updated = snap.val();
-
-        setMessages((prev) =>
-          prev.map((m) =>
-            m.id === snap.key ? { id: snap.key, ...updated } : m
-          )
-        );
       }
     );
 
@@ -253,24 +243,6 @@ export const Interno: React.FC<any> = ({ roomID, setReplyTo }) => {
   }, [messages, pendingScrollId]);
 
   /* =====================================================
-     REACCIONES
-  ====================================================== */
-
-  const reactToMessage = async (message: any, emoji: string) => {
-    const reactionPath = `rooms/${roomID}/messages/${message?.id}/reactions/${user.id}`;
-
-    if (!message.reactions?.[user.id]) {
-      await writeData(reactionPath, emoji);
-    } else {
-      if (message.reactions[user.id] !== emoji) {
-        await writeData(reactionPath, emoji);
-      } else {
-        await removeData(reactionPath);
-      }
-    }
-  };
-
-  /* =====================================================
      RENDER
   ====================================================== */
 
@@ -279,7 +251,6 @@ export const Interno: React.FC<any> = ({ roomID, setReplyTo }) => {
       ref={chatListRef}
       className="flex-1 overflow-y-auto px-4 py-4 space-y-3"
     >
-      {/* Sentinel invisible arriba */}
       <div ref={topSentinelRef} className="h-2" />
 
       {messages.map((message: any) => (
@@ -295,75 +266,12 @@ export const Interno: React.FC<any> = ({ roomID, setReplyTo }) => {
         />
       ))}
 
-      <IonPopover
-        showBackdrop={false}
-        isOpen={!!selectedMessage}
-        className="fixed z-10"
-        style={{
-          "--background": "transparent",
-          "--box-shadow": "none",
-          top: (popoverEvent?.top ?? 0) - 390,
-          transform: "none",
-        }}
-        onDidDismiss={() => setSelectedMessage(null)}
-      >
-        <div className="flex border bg-white gap-2 h-full rounded-full p-2">
-          {["👍", "❤️", "😂", "😮", "😢", "🙏"].map((emoji) => (
-            <span
-              key={emoji}
-              className="text-lg"
-              onClick={() => {
-                reactToMessage(selectedMessage, emoji);
-                setSelectedMessage(null);
-              }}
-            >
-              {emoji}
-            </span>
-          ))}
-          <span
-            className="text-lg border border-muted rounded-full w-7 h-7 flex items-center justify-center"
-            onClick={() => {
-              setShowEmojiModal(true);
-            }}
-          >
-            +
-          </span>
-        </div>
-      </IonPopover>
-
-      <IonModal
-        handleBehavior="cycle"
-        canDismiss={true}
-        isOpen={showEmojiModal}
-        initialBreakpoint={0.75}
-        onDidDismiss={() => {
-          setSelectedMessage(null);
-          setShowEmojiModal(false);
-        }}
-        onIonBreakpointDidChange={(e) => {
-          const newBp = (e as CustomEvent).detail.breakpoint;
-          setCurrentBreakpoint(newBp);
-        }}
-      >
-       <div style={{ height: "100%", padding: 16, touchAction: "none" }}>
-          <EmojiPicker
-            width={"100%"}
-            height={window.innerHeight * currentBreakpoint - 30 + "px"}
-            skinTonePickerLocation={SkinTonePickerLocation.PREVIEW}
-            previewConfig={{ showPreview: false }}
-            onEmojiClick={(emoji) => {
-              reactToMessage(selectedMessage!, emoji.emoji);
-              setSelectedMessage(null);
-              setShowEmojiModal(false);
-            }}
-            onReactionClick={(emoji) => {
-              reactToMessage(selectedMessage!, emoji.emoji);
-              setSelectedMessage(null);
-              setShowEmojiModal(false);
-            }}
-          />
-        </div>
-      </IonModal>
+      <Interacciones
+        route={`rooms/${roomID}/messages/${selectedMessage?.id}/reactions/${user.id}`}
+        selectedMessage={selectedMessage}
+        setSelectedMessage={setSelectedMessage}
+        popoverEvent={popoverEvent}
+      />
     </div>
   );
 };

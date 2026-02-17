@@ -50,7 +50,7 @@ export const CategorySlider = ({
               onClick={() => onSelectCategory(category.id)}
               className={cn(
                 "shrink-0 !rounded-full gap-1.5",
-                isSelected && "bg-primary text-primary-foreground"
+                isSelected ? "bg-primary text-primary-foreground" : "text-muted-foreground"
               )}
             >
               {category.categoria}
