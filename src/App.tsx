@@ -47,7 +47,6 @@ import { TabsLayout } from "./components/layout/TabsLayout";
 import { NetworkProvider } from "./context/NetworkContext";
 import Canales from "./pages/Canales/Canales";
 import Principal from "./pages/Comunidades/Principal/Principal";
-import Lider from "./pages/Lider/Lider";
 import Niveles from "./pages/Niveles/Niveles";
 import Detalle from "./pages/Planes/Detalle/Detalle";
 import Planes from "./pages/Planes/Planes/Planes";
@@ -164,10 +163,6 @@ const App: React.FC = () => {
                   <Crecimientos />
                 </Route>
 
-                <Route exact path="/lider/:id/:canal">
-                  <Lider />
-                </Route>
-
                 <Route exact path="/share">
                   <Sharing />{" "}
                 </Route>
@@ -175,9 +170,11 @@ const App: React.FC = () => {
                 <Route exact path="/login">
                   <Login />{" "}
                 </Route>
+
                 <Route exact path="/registro">
                   <Registro />{" "}
                 </Route>
+                
                 <Route exact path="/suscripcion">
                   <Suscripcion />{" "}
                 </Route>

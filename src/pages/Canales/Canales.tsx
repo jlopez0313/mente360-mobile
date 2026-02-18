@@ -20,8 +20,9 @@ const Canales: React.FC = () => {
 
   const [expandido, setExpandido] = useState(false);
 
-  const community = useLiveQuery(() =>
-    db.comunidades.filter((c) => c.id == id).first()
+  const community = useLiveQuery(
+    () => db.comunidades.filter((c) => c.id == id).first(),
+    [id]
   );
 
   const canales = useLiveQuery(
@@ -147,7 +148,11 @@ const Canales: React.FC = () => {
 
             <div className="space-y-2">
               {canales?.map((channel, idx) => (
-                <ChannelCard key={idx} channel={channel} />
+                <ChannelCard
+                  communityId={id}
+                  key={idx}
+                  channel={channel}
+                />
               ))}
             </div>
           </div>

@@ -1,61 +1,29 @@
-import {
-  IonButton,
-  IonButtons,
-  IonContent,
-  IonHeader,
-  IonIcon,
-  IonPage,
-  IonTitle,
-  IonToolbar,
-} from "@ionic/react";
+import { AppLayout } from "@/components/layout";
+import { ArrowLeft } from "lucide-react";
 
-import { Suscripcion as SuscripcionComponent } from "@/components/Suscripcion/Suscripcion";
-import { arrowBack } from "ionicons/icons";
-import { useEffect } from "react";
-import { Link, useHistory } from "react-router-dom";
-import styles from "./Suscripcion.module.scss";
 
-const Suscripcion: React.FC = () => {
-  const history = useHistory();
-
-  useEffect(() => {
-    const handleBackButton = (ev: Event) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      history.replace("/perfil");
-    };
-
-    document.addEventListener("ionBackButton", handleBackButton);
-
-    return () => {
-      document.removeEventListener("ionBackButton", handleBackButton);
-    };
-  }, [history]);
-
+const Suscripcion = () => {
   return (
-    <IonPage>
-      <IonHeader>
-        <IonToolbar className={styles["ion-header"]}>
-          <IonButtons slot="start">
-            <Link to="/perfil" replace={true}>
-              <IonButton fill="clear" className={styles.backButton}>
-                <IonIcon slot="start" icon={arrowBack} />
-              </IonButton>
-            </Link>
-          </IonButtons>
+    <AppLayout>
+      <div className="h-full bg-background flex flex-col px-4 py-6">
+        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50">
+          {/* Header */}
+          <div className="flex items-center gap-3 mb-6">
+            <button
+              onClick={() => history.go(-1)}
+              className="w-10 h-10 !rounded-full !bg-card !border !border-border flex items-center justify-center hover:bg-muted transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5 text-foreground" />
+            </button>
+            <h1 className="text-xl font-bold text-foreground">Mu suscripción</h1>
+          </div>
+        </div>
 
-          <IonTitle className="ion-no-padding ion-padding-end ion-text-center">
-            {" "}
-            Mi Suscripción{" "}
-          </IonTitle>
-        </IonToolbar>
-      </IonHeader>
-
-      <IonContent className={`ion-padding ${styles["ion-content"]}`}>
-        <SuscripcionComponent />
-      </IonContent>
-      
-    </IonPage>
+        <div className="flex-1 overflow-y-auto px-1 py-4 space-y-6">
+          
+        </div>
+      </div>
+    </AppLayout>
   );
 };
 

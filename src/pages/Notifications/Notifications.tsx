@@ -36,7 +36,7 @@ const Notifications = () => {
     toast({ title: "Notificación eliminada" });
   };
 
-  const unreadCount = notificaciones.filter((n) => !n.isRead).length;
+  const unreadCount = notificaciones.filter((n: any) => !n.isRead).length;
 
   useEffect(() => {
     dispatch(setShowGlobalAudio(false));
