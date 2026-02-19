@@ -19,7 +19,6 @@ import {
 import { useLiveQuery } from "dexie-react-hooks";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
-import styles from "./Home.module.scss";
 
 interface WeeklyTaskModalProps {
   open: boolean;
@@ -97,7 +96,7 @@ export function WeeklyTaskModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={`${styles["weeklytaskmodal"]} max-w-sm mx-auto rounded-3xl border-0 bg-gradient-to-b from-primary/10 to-background p-6 overflow-hidden max-h-[85vh]"`}>
+      <DialogContent className="max-w-sm mx-auto rounded-3xl border-0 bg-gradient-to-b from-primary/10 to-background p-6 overflow-hidden max-h-[85vh]">
         <DialogHeader className="text-left mb-4">
           <div className="flex items-center gap-2 text-primary mb-1">
             <ClipboardList className="w-4 h-4" />
@@ -111,7 +110,7 @@ export function WeeklyTaskModal({
         {/* Task Content */}
         <ScrollArea className="max-h-[45vh]">
           <div className="bg-card rounded-2xl p-5 shadow-card mb-6 border border-border/50">
-            <p className={`${styles["textp"]} text-muted-foreground text-sm leading-relaxed mb-4"`}>
+            <p className="text-muted-foreground text-sm leading-relaxed mb-4">
               {currentTask.description}
             </p>
           </div>

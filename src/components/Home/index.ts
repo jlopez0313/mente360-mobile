@@ -1,9 +1,10 @@
-export { WeeklyCalendar } from "./WeeklyCalendar";
-export { TaskProgress } from "./TaskProgress";
-export { QuickAccess } from "./QuickAccess";
-export { DailyContentGrid } from "./DailyContentGrid";
 export { DailyAudioCard } from "./DailyAudioCard";
+export { DailyContentGrid } from "./DailyContentGrid";
+export { DailyMessageModal } from "./modals/DailyMessageModal";
+export { EneatipoModal } from "./modals/EneatipoModal";
+export { SOSModal } from "./modals/SOSModal";
+export { WeeklyTaskModal } from "./modals/WeeklyTaskModal";
 export { NightAudioModal } from "./NightAudioModal";
-export { SOSModal } from "./SOSModal";
-export { DailyMessageModal } from "./DailyMessageModal";
-export { WeeklyTaskModal } from "./WeeklyTaskModal";
+export { TaskProgress } from "./TaskProgress";
+export { WeeklyCalendar } from "./WeeklyCalendar";
+

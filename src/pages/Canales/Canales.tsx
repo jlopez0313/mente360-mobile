@@ -33,7 +33,7 @@ const Canales: React.FC = () => {
   useBackButton("/comunidades");
 
   return (
-    <AppLayout>
+    <AppLayout hideNav>
       <div className="h-full flex flex-col">
         {/* Header Image */}
         <div className="relative h-50 bg-gradient-primary">

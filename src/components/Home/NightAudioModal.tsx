@@ -13,7 +13,6 @@ import { CheckCircle2, Moon, Pause, Play } from "lucide-react";
 import { usePayment } from "@/hooks/usePayment";
 import { Buttons } from "../Shared/Premium/Buttons/Buttons";
 import { Premium } from "../Shared/Premium/Premium";
-import styles from "./Home.module.scss";
 
 import { db } from "@/hooks/useDexie";
 import { useIonAlert } from "@ionic/react";
@@ -61,7 +60,7 @@ export function NightAudioModal({
 
   const onDoPause = () => {
     onPause();
-    // onConfirm();
+    onConfirmAudio();
     destroy();
 
     dispatch(setIsGlobalPlaying(true));
@@ -83,15 +82,6 @@ export function NightAudioModal({
       await db.audios.update(audio?.id ?? 1, { done: 1 });
     } catch (error: any) {
       console.error(error);
-
-      presentAlert({
-        header: "Alerta!",
-        subHeader: "Mensaje importante.",
-        message:
-          error.data?.message ||
-          "Tu audio ha finalizado. Cuando estés listo, presiona 'Finalizar'.",
-        buttons: ["OK"],
-      });
     }
   };
 
@@ -125,7 +115,7 @@ export function NightAudioModal({
           <DialogContent className="max-w-sm mx-auto rounded-xl border-0 bg-gradient-to-b from-night/10 to-background p-0 overflow-hidden">
             <div className="relative">
               {/* Cover Image */}
-              <div className="relative aspect-square w-full">
+              <div className="relative aspect-video w-full">
                 <img
                   src={status ? baseURL + audio?.imagen : AudioNoWifi}
                   alt={status ? baseURL + audio?.titulo : AudioNoWifi}
@@ -202,20 +192,21 @@ export function NightAudioModal({
                 </Button>
               </div>
             </div>
+
+            <audio
+              ref={audioRef}
+              src={baseURL + audio?.audio}
+              onLoadedMetadata={onLoadedMetadata}
+              onTimeUpdate={onTimeUpdate}
+              onProgress={onUpdateBuffer}
+              onEnded={onDoPause}
+            />
           </DialogContent>
-          <audio
-            ref={audioRef}
-            src={baseURL + audio?.audio}
-            onLoadedMetadata={onLoadedMetadata}
-            onTimeUpdate={onTimeUpdate}
-            onProgress={onUpdateBuffer}
-            onEnded={onDoPause}
-          />
         </Dialog>
       ) : (
         <Dialog open={open} onOpenChange={onOpenChange}>
           <DialogContent
-            className={`${styles["sosmodal"]} max-w-sm mx-auto rounded-3xl border-0 bg-gradient-to-b from-sos/10 to-background p-0 overflow-hidden"`}
+            className="max-w-sm mx-auto rounded-3xl border-0 bg-gradient-to-b from-sos/10 to-background p-0 overflow-hidden"
           >
             <div className="ion-padding">
               <Premium />

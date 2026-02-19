@@ -59,7 +59,7 @@ const Niveles: React.FC = () => {
   }
 
   return (
-    <AppLayout>
+    <AppLayout hideNav>
       <div className="h-full bg-background flex flex-col">
         {/* Header */}
         <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50 px-4 py-4">

@@ -64,9 +64,9 @@ export function DailyContentGrid({ completed, onOpenModal }: DailyContentGridPro
 
   return (
     <div className="px-4 pb-4">
-      <h2 className="font-display font-semibold text-lg mb-3">
+      <h3 className="font-display font-semibold text-lg mb-3">
         Tu contenido diario
-      </h2>
+      </h3>
       
       <div className="grid grid-cols-2 gap-3">
         {items.map((item) => {
