@@ -1,26 +1,25 @@
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { mockTasks } from "@/lib/mockData";
-import { ClipboardList, CheckCircle2 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
+import { CheckCircle2, ClipboardList } from "lucide-react";
 
-import styles from "./Home.module.scss";
 import { db } from "@/hooks/useDexie";
-import { useLiveQuery } from "dexie-react-hooks";
-import { useDispatch, useSelector } from "react-redux";
+import { usePayment } from "@/hooks/usePayment";
 import { confirmTarea } from "@/services/home";
 import { setTab } from "@/store/slices/chatSlice";
-import { useHistory } from "react-router";
 import {
   useIonAlert
 } from "@ionic/react";
-import { usePayment } from "@/hooks/usePayment";
+import { useLiveQuery } from "dexie-react-hooks";
+import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router";
+import styles from "./Home.module.scss";
 
 interface WeeklyTaskModalProps {
   open: boolean;

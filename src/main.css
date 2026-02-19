@@ -199,6 +199,22 @@
     font-family: "Quicksand", sans-serif;
     @apply font-semibold tracking-tight;
   }
+
+  .bg-background {
+    background-color: hsl(180 20% 99%) !important;
+  }
+
+  .shadow-soft {
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--shadow-soft);
+  }
+
+  .shadow-card {
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--shadow-card);
+  }
+
+  .shadow-elevated {
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--shadow-elevated);
+  }
 }
 
 @layer utilities {

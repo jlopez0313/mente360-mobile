@@ -5,6 +5,7 @@ import Clips from "@/database/clips";
 import Comunidades from "@/database/comunidades";
 import Crecimientos from "@/database/crecimientos";
 import Eneatipos from "@/database/eneatipos";
+import Enlaces from "@/database/enlaces";
 import Generos from "@/database/generos";
 import Likes from "@/database/likes";
 import Mensajes from "@/database/mensajes";
@@ -24,6 +25,7 @@ export class Mente360DB extends Dexie {
   clips!: Table<Clips, number>;
   comunidades!: Table<Comunidades, number>;
   crecimientos!: Table<Crecimientos, number>;
+  enlaces!: Table<Enlaces, number>;
   eneatipos!: Table<Eneatipos, number>;
   generos!: Table<Generos, number>;
   likes!: Table<Likes, number>;
@@ -44,6 +46,7 @@ export class Mente360DB extends Dexie {
       clips: "++id,titulo",
       comunidades: "++id",
       crecimientos: "++id",
+      enlaces: "++id,&key",
       eneatipos: "++id,&key",
       generos: "++id,&key",
       likes: "++id,users_id,clips_id",

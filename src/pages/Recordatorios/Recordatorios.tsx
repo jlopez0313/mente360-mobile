@@ -183,7 +183,7 @@ const addReminder = async () => {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-background">
+      <div className="h-full flex flex-col bg-background">
         {/* Header */}
         <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg border-b border-border/50">
           <div className="flex items-center justify-between px-4 py-3">
@@ -227,7 +227,7 @@ const addReminder = async () => {
                             key={index}
                             onClick={() => toggleReminderDay(index)}
                             className={cn(
-                              "w-9 h-9 rounded-full text-sm font-semibold transition-all",
+                              "w-9 h-9 !rounded-full text-sm font-semibold transition-all",
                               newReminder.dias_semana.includes(index)
                                 ? "gradient-primary text-primary-foreground"
                                 : "bg-muted text-muted-foreground"
@@ -247,7 +247,7 @@ const addReminder = async () => {
           </div>
         </header>
 
-        <div className="pb-8">
+        <div className="flex-1 overflow-y-auto pb-8">
           
           {/* Reminders Section */}
           <div className="px-4 mt-6">
@@ -308,7 +308,7 @@ const addReminder = async () => {
                     ))}
                   </div>
                 </div>
-              ))}
+              ))}              
             </div>
           </div>
         </div>

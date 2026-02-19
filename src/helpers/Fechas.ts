@@ -8,6 +8,15 @@ export const formatDate = (dateString: string) => {
   });
 };
 
+export const formatCompleteDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString("es-ES", { 
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+};
+
 export function diferenciaRealEnDias(fecha1: Date, fecha2: Date) {
   const unDia = 1000 * 60 * 60 * 24;
   const diferencia = fecha2.getTime() - fecha1.getTime();

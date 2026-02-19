@@ -2,6 +2,11 @@ import { AppLayout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
+import { db } from "@/hooks/useDexie";
+import { usePreferences } from "@/hooks/usePreferences";
+import { Browser } from "@capacitor/browser";
+import { useLiveQuery } from "dexie-react-hooks";
+import * as LucideIcons from "lucide-react";
 import {
   ArrowLeft,
   Bell,
@@ -9,26 +14,26 @@ import {
   CreditCard,
   ExternalLink,
   FileText,
-  HelpCircle,
   LogOut,
-  Mail,
   Moon,
   Shield,
   Sun,
   Users
 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-
-import { usePreferences } from "@/hooks/usePreferences";
 import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 import { useHistory } from "react-router";
+import { Link } from "react-router-dom";
 
 const Configuracion: React.FC = () => {
   const history = useHistory();
   const { theme, setTheme } = useTheme();
 
   const { toast } = useToast();
+
+  const enlaces = useLiveQuery(async () => {
+    return await db.enlaces.toArray();
+  }, []);
 
   const [pushNotifications, setPushNotifications] = useState(() => {
     const saved = localStorage.getItem("pushNotifications");
@@ -136,8 +141,8 @@ const Configuracion: React.FC = () => {
             <div className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-night/10 flex items-center justify-center">
-                    {theme == 'dark' ? (
+                  <div className="w-10 h-10 rounded-full bg-night/10 flex items-center justify-center">
+                    {theme == "dark" ? (
                       <Moon className="w-5 h-5 text-night" />
                     ) : (
                       <Sun className="w-5 h-5 text-morning" />
@@ -146,11 +151,16 @@ const Configuracion: React.FC = () => {
                   <div>
                     <p className="font-medium text-foreground">Tema oscuro</p>
                     <p className="text-sm text-muted-foreground">
-                      {theme == 'dark' ? "Activado" : "Desactivado"}
+                      {theme == "dark" ? "Activado" : "Desactivado"}
                     </p>
                   </div>
                 </div>
-                <Switch checked={theme == 'dark'} onCheckedChange={() => setTheme(theme === "dark" ? "light" : "dark")} />
+                <Switch
+                  checked={theme == "dark"}
+                  onCheckedChange={() =>
+                    setTheme(theme === "dark" ? "light" : "dark")
+                  }
+                />
               </div>
             </div>
           </div>
@@ -243,72 +253,26 @@ const Configuracion: React.FC = () => {
             </div>
 
             <div className="divide-y divide-border">
-              <a
-                href="https://mente360.com/nosotros"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <ExternalLink className="w-5 h-5 text-primary" />
-                  <span className="text-foreground">Sobre nosotros</span>
-                </div>
-                <ChevronRight className="w-5 h-5 text-muted-foreground" />
-              </a>
-
-              <a
-                href="https://mente360.com/terminos"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <FileText className="w-5 h-5 text-primary" />
-                  <span className="text-foreground">
-                    Términos y condiciones
-                  </span>
-                </div>
-                <ChevronRight className="w-5 h-5 text-muted-foreground" />
-              </a>
-
-              <a
-                href="https://mente360.com/privacidad"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <Shield className="w-5 h-5 text-primary" />
-                  <span className="text-foreground">
-                    Política de privacidad
-                  </span>
-                </div>
-                <ChevronRight className="w-5 h-5 text-muted-foreground" />
-              </a>
-
-              <a
-                href="https://mente360.com/soporte"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <HelpCircle className="w-5 h-5 text-primary" />
-                  <span className="text-foreground">Soporte</span>
-                </div>
-                <ChevronRight className="w-5 h-5 text-muted-foreground" />
-              </a>
-
-              <a
-                href="mailto:hola@mente360.com"
-                className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <Mail className="w-5 h-5 text-primary" />
-                  <span className="text-foreground">Escríbenos</span>
-                </div>
-                <ChevronRight className="w-5 h-5 text-muted-foreground" />
-              </a>
+              {enlaces?.map((enlace, index) => {
+                const Icon =
+                  (LucideIcons as any)[enlace.icon] || LucideIcons.Link;
+                return (
+                  <div
+                    key={enlace.key}
+                    onClick={async (e) => {
+                      e.preventDefault();
+                      await Browser.open({ url: enlace.link });
+                    }}
+                    className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Icon className="w-5 h-5 text-primary" />
+                      <span className="text-foreground">{enlace.valor}</span>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                  </div>
+                );
+              })}
             </div>
           </div>
 

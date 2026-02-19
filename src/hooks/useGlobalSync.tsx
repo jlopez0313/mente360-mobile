@@ -42,6 +42,9 @@ export const useGlobalSync = () => {
 
       const { data } = await getAllConstants();
 
+      await db.enlaces.clear();
+      await db.enlaces.bulkPut(data.enlaces);
+
       await db.generos.clear();
       await db.generos.bulkPut(data.generos);
 

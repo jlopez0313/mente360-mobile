@@ -34,7 +34,7 @@ const Canales: React.FC = () => {
 
   return (
     <AppLayout>
-      <div className="min-h-full">
+      <div className="h-full flex flex-col">
         {/* Header Image */}
         <div className="relative h-50 bg-gradient-primary">
           <iframe
@@ -79,7 +79,7 @@ const Canales: React.FC = () => {
         </div>
 
         {/* Content */}
-        <div className="px-4 py-4 space-y-2">
+        <div className="px-4 py-4 space-y-2 flex-1 overflow-y-auto">
           <div className="flex-1">
             <h1 className="text-xl font-heading font-bold text-foreground">
               {community?.comunidad}

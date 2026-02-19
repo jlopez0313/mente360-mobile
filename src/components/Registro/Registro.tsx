@@ -234,6 +234,7 @@ const Registro = () => {
               onChange={(e) => handleSetUser("phone", e)}
               onCountryChange={(e) => handleSetUser("country", e)}
               initialValueFormat="national"
+              inputFormat="NATIONAL"
             />
           </div>
         </div>

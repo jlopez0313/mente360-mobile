@@ -3,20 +3,26 @@ import { IonApp, setupIonicReact } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import { Route } from "react-router-dom";
 
+import Canales from "./pages/Canales/Canales";
 import Grupo from "./pages/Chat/Grupo/Grupo";
 import Interno from "./pages/Chat/Interno/Interno";
+import Principal from "./pages/Comunidades/Principal/Principal";
 import Configuracion from "./pages/Configuracion/Configuracion";
 import Crecimientos from "./pages/Crecimientos/Crecimientos";
 import Sharing from "./pages/Home/Share/Sharing";
 import Login from "./pages/Login/Login";
 import Clip from "./pages/Musicaterapia/Clip/Clip";
+import Niveles from "./pages/Niveles/Niveles";
 import Onboarding from "./pages/Onboarding/Onboarding";
 import Perfil from "./pages/Perfil/Perfil";
-import Add from "./pages/Recordatorios/Add/Add";
+import Planes from "./pages/Planes/Planes";
 import Recordatorios from "./pages/Recordatorios/Recordatorios";
 import Registro from "./pages/Registro/Registro";
+import Splash from "./pages/Splash/Splash";
+import Suscripcion from "./pages/Suscripcion/Suscripcion";
 import Test from "./pages/Test/Test";
 import Thanks from "./pages/Thanks/Thanks";
+import Welcome from "./pages/Welcome/Wecome";
 
 import { DBProvider } from "./context/DBContext";
 
@@ -36,7 +42,6 @@ import "@ionic/react/css/padding.css";
 import "@ionic/react/css/text-alignment.css";
 import "@ionic/react/css/text-transformation.css";
 
-/* Theme variables */
 import { Toast } from "@/components/Shared/Toast/Toast";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
@@ -45,14 +50,6 @@ import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { TabsLayout } from "./components/layout/TabsLayout";
 import { NetworkProvider } from "./context/NetworkContext";
-import Canales from "./pages/Canales/Canales";
-import Principal from "./pages/Comunidades/Principal/Principal";
-import Niveles from "./pages/Niveles/Niveles";
-import Detalle from "./pages/Planes/Detalle/Detalle";
-import Planes from "./pages/Planes/Planes/Planes";
-import Splash from "./pages/Splash/Splash";
-import Suscripcion from "./pages/Suscripcion/Suscripcion";
-import Welcome from "./pages/Welcome/Wecome";
 
 setupIonicReact({
   innerHTMLTemplatesEnabled: true,
@@ -122,7 +119,7 @@ const App: React.FC = () => {
                 <Route exact path="/seleccionar-comunidad">
                   <Principal />
                 </Route>
-                
+
                 <Route exact path="/thanks">
                   <Thanks />
                 </Route>
@@ -137,10 +134,6 @@ const App: React.FC = () => {
 
                 <Route exact path="/planes">
                   <Planes />
-                </Route>
-
-                <Route exact path="/planes/detalle">
-                  <Detalle />
                 </Route>
 
                 <Route exact path="/chat/:room">
@@ -174,7 +167,7 @@ const App: React.FC = () => {
                 <Route exact path="/registro">
                   <Registro />{" "}
                 </Route>
-                
+
                 <Route exact path="/suscripcion">
                   <Suscripcion />{" "}
                 </Route>
@@ -201,9 +194,6 @@ const App: React.FC = () => {
                   <Recordatorios />
                 </Route>
 
-                <Route exact path="/recordatorios/Add">
-                  <Add />{" "}
-                </Route>
               </IonReactRouter>
             </DBProvider>
           </NetworkProvider>

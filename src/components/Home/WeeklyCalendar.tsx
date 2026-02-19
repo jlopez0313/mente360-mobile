@@ -28,7 +28,7 @@ export function WeeklyCalendar({ selectedDay, onSelectDay }: WeeklyCalendarProps
 
   return (
     <div className="px-4 py-4">
-      <div className="bg-card rounded-2xl p-4 shadow">
+      <div className="bg-card rounded-2xl p-4 shadow-card">
         <div className="flex items-center justify-between">
           {weekDays.map((day, index) => {
             const date = weekDates[index];

@@ -1,28 +1,24 @@
 
 import { Button } from "@/components/ui/button";
-import { dailyMessage } from "@/lib/mockData";
-import { MessageCircle, Share2, CheckCircle2 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
+import { CheckCircle2, MessageCircle, Share2 } from "lucide-react";
+import { toast } from "sonner";
 
-import styles from "./Home.module.scss";
 
 import { db } from "@/hooks/useDexie";
-import { useLiveQuery } from "dexie-react-hooks";
-import { useDispatch, useSelector } from "react-redux";
-import { confirmTarea } from "@/services/home";
-import { setTab } from "@/store/slices/chatSlice";
-import { useHistory } from "react-router";
 import { setMsgSource } from "@/store/slices/homeSlice";
-import { 
+import {
   useIonAlert
 } from "@ionic/react";
+import { useLiveQuery } from "dexie-react-hooks";
+import { useDispatch } from "react-redux";
+import { useHistory } from "react-router";
 
 interface DailyMessageModalProps {
   open: boolean;
@@ -88,13 +84,13 @@ const dispatch = useDispatch();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={`${styles["dailymessagemodal"]} max-w-sm mx-auto rounded-3xl border-0 bg-gradient-to-b from-accent/10 to-background p-6 overflow-hidden"`}>
+      <DialogContent className="max-w-sm mx-auto rounded-xl border-0 bg-gradient-to-b from-accent/10 to-background p-6 overflow-hidden">
         <DialogHeader className="text-left mb-4">
           <div className="flex items-center gap-2 text-accent mb-1">
             <MessageCircle className="w-4 h-4" />
-            <span className="text-sm font-medium">Mensaje del día</span>
+            <span className="text-sm !font-medium">Mensaje del día</span>
           </div>
-          <DialogTitle className="text-xl font-bold text-foreground">
+          <DialogTitle className="text-xl !font-bold text-foreground">
             Reflexión diaria
           </DialogTitle>
         </DialogHeader>
@@ -114,7 +110,7 @@ const dispatch = useDispatch();
           <Button
             variant="outline"
             onClick={handleShare}
-            className="flex-1 rounded-xl h-12 text-base font-semibold border-accent/30 text-accent hover:bg-accent/10"
+            className="flex-1 !rounded-xl h-12 text-base !font-semibold border-accent/30 text-accent hover:bg-accent/10"
           >
             <Share2 className="w-5 h-5 mr-2" />
             Compartir
@@ -124,7 +120,7 @@ const dispatch = useDispatch();
             onClick={onConfirmMensaje}
             disabled={isCompleted}
             className={cn(
-              "flex-1 rounded-xl h-12 text-base font-semibold",
+              "flex-1 !rounded-xl h-12 text-base !font-semibold",
               isCompleted
                 ? "bg-success text-success-foreground"
                 : "gradient-accent text-accent-foreground hover:opacity-90"

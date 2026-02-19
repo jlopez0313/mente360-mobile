@@ -43,6 +43,7 @@ export const DBProvider = ({ children }: any) => {
                   fecha_vencimiento: item.fecha_vencimiento,
                   id: item.id,
                   users_id: user.id,
+                  precio: item.precio,
                 },
                 updated_at: null,
               };

@@ -1,11 +1,11 @@
-import { 
-  ClipboardList, 
-  MessageCircle, 
-  Moon, 
-  Heart,
-  CheckCircle2
-} from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  CheckCircle2,
+  ClipboardList,
+  Heart,
+  MessageCircle,
+  Moon
+} from "lucide-react";
 
 interface DailyContentItem {
   id: string;
@@ -77,8 +77,8 @@ export function DailyContentGrid({ completed, onOpenModal }: DailyContentGridPro
               key={item.id}
               onClick={() => onOpenModal(item.id as "nightAudio" | "sosEmotional" | "dailyMessage" | "weeklyTask")}
               className={cn(
-                "relative flex flex-col items-center gap-2 p-4 rounded-2xl transition-all",
-                "bg-card shadow-card hover:shadow-elevated active:scale-[0.98]",
+                "relative flex flex-col items-center gap-2 p-4 !rounded-2xl transition-all",
+                "!bg-card shadow-card hover:shadow-elevated active:scale-[0.98]",
                 item.isCompleted && "ring-2 ring-success/50"
               )}
             >
