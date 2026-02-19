@@ -51,7 +51,7 @@ export const TrackList = ({
   }
 
   return (
-    <div className="h-[calc(100vh-370px)] space-y-3">
+    <div className="h-full pb-24 space-y-3">
       <Virtuoso
         key={`${selectedCategory}-${searchQuery}`}
         components={{

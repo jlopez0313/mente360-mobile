@@ -74,7 +74,7 @@ const Perfil: React.FC = () => {
   };
 
   return (
-    <AppLayout>
+    <AppLayout hideNav>
       <div className="h-full flex flex-col bg-background">
         {/* Header */}
         <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg border-b border-border/50">

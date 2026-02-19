@@ -77,7 +77,7 @@ const PlanesPage = () => {
   };
 
   return (
-    <AppLayout>
+    <AppLayout hideNav>
       <div className="h-full flex flex-col bg-background px-4 py-6">
         {/* Header */}
         <div className="flex items-center gap-3 mb-2">

@@ -42,7 +42,7 @@ const Musicaterapia: React.FC = () => {
 
   return (
     <AppLayout>
-      <div className="h-full pb-24">
+      <div className="h-full flex flex-col">
         {/* Header */}
         <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50 px-4 py-4 space-y-4">
           <div className="flex items-center gap-3">
@@ -74,8 +74,8 @@ const Musicaterapia: React.FC = () => {
         </div>
 
         {/* Content */}
-        <div className="px-4 py-6">
-          <Tabs defaultValue="clips" className="space-y-4">
+        <div className="px-4 py-6 flex-1">
+          <Tabs defaultValue="clips" className="space-y-4 h-full">
             <TabsList className="w-full grid grid-cols-2 bg-muted/50">
               <TabsTrigger value="clips" className="gap-2">
                 <Music className="w-4 h-4" />
@@ -87,7 +87,7 @@ const Musicaterapia: React.FC = () => {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="clips" className="space-y-2 mt-0">
+            <TabsContent value="clips" className="space-y-2 mt-0 h-full">
               {/* Categories */}
               <CategorySlider
                 categories={categories}

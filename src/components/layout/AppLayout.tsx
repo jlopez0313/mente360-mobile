@@ -14,7 +14,7 @@ export function AppLayout({ children, hideNav = false }: AppLayoutProps) {
         <div className="h-full flex flex-col bg-background">
           <main className={cn(
               "flex-1 flex flex-col min-h-0",
-              hideNav ? "pb-24" : ""
+              hideNav ? "pb-14" : ""
             )}>
             {children}
           </main>

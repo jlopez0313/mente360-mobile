@@ -54,7 +54,7 @@ export function FavoritesList({
   }
 
   return (
-    <div className="h-[calc(100vh-370px)] space-y-3">
+    <div className="h-full pb-24 space-y-3">
       <p className="text-sm text-muted-foreground mb-4">
         {playlist?.length} {playlist?.length === 1 ? "audio" : "audios"} en
         favoritos
