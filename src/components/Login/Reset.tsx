@@ -1,4 +1,4 @@
-import logo from "@/assets/images/logo.png";
+import { AuthLayout } from "@/components/layout/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -86,23 +86,15 @@ const Reset = ({ isLoading, setIsLoading }: Props) => {
   };
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center px-6 pb-12">
-      {/* Logo */}
-      <div className="mb-8 text-center">
-        <img src={logo} alt="Mente 360" className="w-20 mx-auto mb-4" />
-        <h1 className="text-2xl !font-bold text-foreground">
-          Recuperar contraseña
-        </h1>
-        <p className="text-muted-foreground mt-2">
-          Te enviaremos un correo para restablecer tu contraseña
-        </p>
-      </div>
-
+    <AuthLayout
+      title="Recuperar contraseña"
+      subtitle="Te enviaremos un correo para restablecer tu contraseña"
+    >
       {/* Form */}
       <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4">
         {/* Email */}
         <div className="space-y-2">
-          <Label htmlFor="email">Correo electrónico</Label>
+          <Label htmlFor="email" className="text-foreground">Correo electrónico</Label>
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input
@@ -130,7 +122,7 @@ const Reset = ({ isLoading, setIsLoading }: Props) => {
           )}
         </Button>
       </form>
-    </div>
+    </AuthLayout>
   );
 };
 

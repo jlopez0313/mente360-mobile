@@ -95,7 +95,7 @@ export const Test = () => {
           <Button
             variant="outline"
             onClick={onClearMomentos}
-            className="w-full"
+            className="w-full text-foreground"
           >
             Repetir test
           </Button>

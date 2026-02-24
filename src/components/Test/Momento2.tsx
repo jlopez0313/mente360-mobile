@@ -58,7 +58,7 @@ const Momento2 = memo(
           <Button
             variant="outline"
             onClick={onClearMomentos}
-            className="flex-1"
+            className="flex-1 text-foreground"
           >
             Anterior
           </Button>

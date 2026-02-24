@@ -1,73 +1,53 @@
-import {
-  IonButton,
-  IonButtons,
-  IonContent,
-  IonHeader,
-  IonPage,
-  IonTitle,
-  IonToolbar
-} from "@ionic/react";
-import styles from "./Clip.module.scss";
 
-import { IonIcon } from "@ionic/react";
-import { arrowBack, musicalNote } from "ionicons/icons";
 
+import { AppLayout } from "@/components/layout";
 import { Clip as ClipComponent } from "@/components/Musicaterapia/Clip/Clip";
-import { useEffect } from "react";
-import { Link, useHistory } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { useBackButton } from "@/hooks/useBackButton";
+import { Check, ChevronLeft, Download } from "lucide-react";
+import { useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
+import { toast } from "sonner";
 
 const Clip: React.FC = () => {
 
   const history = useHistory();
 
-  useEffect(() => {
-    const handleBackButton = (ev: Event) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      history.replace("/musicaterapia");
-    };
+  const { audioSrc, globalAudio, globalPos, listAudios } = useSelector(
+    (state: any) => state.audio
+  );
 
-    document.addEventListener("ionBackButton", handleBackButton);
-
-    return () => {
-      document.removeEventListener("ionBackButton", handleBackButton);
-    };
-  }, [history]);
+  useBackButton('/musicaterapia')
 
   return (
-    <IonPage>
-      <IonHeader>
-        <IonToolbar className={styles["ion-header"]}>
-          <IonButtons slot="start">
-            <Link to='/musicaterapia' replace={true}>
-              <IonButton fill="clear"  className={styles.backButton}>
-                <IonIcon slot="start" icon={arrowBack} />
-              </IonButton>
-            </Link>
-          </IonButtons>
-
-          <IonTitle className="ion-no-padding ion-padding-end">
-            En reproducción
-          </IonTitle>
-
-        </IonToolbar>
-      </IonHeader>
-
-      <IonContent className={`ion-padding ${styles["ion-content"]}`}>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">
-            <IonIcon icon={musicalNote} slot="start"></IonIcon>
-              En reproducción
-            </IonTitle>
-          </IonToolbar>
-        </IonHeader>
-        
+    <AppLayout hideNav>
+      <div className="min-h-screen bg-gradient-to-b from-primary/10 via-background to-background flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-4">
+          <Button variant="ghost" size="icon" onClick={() => history.go(-1)}>
+            <ChevronLeft className="w-6 h-6" />
+          </Button>
+          <span className="text-sm text-muted-foreground font-medium">
+            Musicoterapia
+          </span>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => {
+              setIsDownloaded(!globalAudio?.audio_local);
+              toast.success(globalAudio?.audio_local ? "Eliminado de descargas" : "Descargado para offline");
+            }}
+          >
+            {globalAudio?.audio_local ? (
+              <Check className="w-5 h-5 text-success" />
+            ) : (
+              <Download className="w-5 h-5" />
+            )}
+          </Button>
+        </div>
         <ClipComponent />
-        
-      </IonContent>
-
-    </IonPage>
+      </div>
+    </AppLayout>
   );
 };
 

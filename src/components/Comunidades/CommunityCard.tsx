@@ -8,9 +8,9 @@ import { valorPlan } from "@/database/planes";
 import { formatCurrency } from "@/helpers/Format";
 import { getYoutubeLink } from "@/helpers/Video";
 import { db } from "@/hooks/useDexie";
+import { useEpayco } from "@/hooks/useEpayco";
 import { usePayment } from "@/hooks/usePayment";
 import { cn } from "@/lib/utils";
-import { getEpaycoLink } from "@/services/subscribe";
 import { useLiveQuery } from "dexie-react-hooks";
 import { ChevronRight, Crown, Users } from "lucide-react";
 import { useContext, useMemo, useState } from "react";
@@ -25,6 +25,7 @@ type Props = {
 export const CommunityCard = ({ community }: Props) => {
   const history = useHistory();
   const { userEnabled, payment_status } = usePayment();
+  const { onSubscribe } = useEpayco();
 
   const { AudioNoWifi, baseURL, status } = useContext(NetworkContext);
 
@@ -82,8 +83,10 @@ export const CommunityCard = ({ community }: Props) => {
     return true;
   }, [community, user]);
 
-  const handlePayment = (v: valorPlan, open: boolean) => {
+  const handlePayment = (v: valorPlan | undefined, open: boolean) => {
     setShowPlanModal(open);
+
+    if (!v) return;
 
     onSubscribe({
       precio: v.valor,
@@ -91,44 +94,6 @@ export const CommunityCard = ({ community }: Props) => {
       titulo: v.descripcion ?? "Plan mensual",
       comunidad: community?.id,
     });
-  };
-
-  const onSubscribe = async (item: any) => {
-    try {
-      const { data } = await getEpaycoLink(item);
-
-      const handler = window.ePayco.checkout.configure({
-        // key: data.epayco.public_key,
-        key: import.meta.env.VITE_EPAYCO_PUBLIC_KEY,
-        test: data.epayco.test,
-      });
-
-      handler.open({
-        name: import.meta.env.VITE_NAME,
-        description: data.epayco.description,
-        invoice: data.epayco.invoice,
-        currency: data.epayco.currency,
-        amount: Number(item.precio).toFixed(2),
-        tax_base: "0",
-        tax: "0",
-        country: data.epayco.country,
-        lang: "es",
-        external: "false",
-        confirmation: import.meta.env.VITE_BASE_API + "/confirmation",
-        response: import.meta.env.VITE_BASE_BACK + "confirmation",
-        extra_1: data.epayco.extra_1,
-        extra_2: data.epayco.extra_2,
-        extra_3: data.epayco.extra_3,
-      });
-
-      /*
-      console.log(data.payment_link)
-      await Browser.open({ url: data.payment_link });
-      */
-      // window.open(data.url, "_blank");
-    } catch (error) {
-      console.log(error);
-    }
   };
 
   return (

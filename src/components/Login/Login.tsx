@@ -1,4 +1,4 @@
-import logo from "@/assets/images/logo.png";
+import { AuthLayout } from "@/components/layout/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -90,7 +90,7 @@ const Login = ({ isLoading, setIsLoading, switchMode }: Props) => {
 
       await db.user.put(data.user);
       dispatch(setUser(data.user));
-      
+
       history.replace("/home");
 
     } catch (error: any) {
@@ -110,23 +110,15 @@ const Login = ({ isLoading, setIsLoading, switchMode }: Props) => {
       <header className="p-4"></header>
 
       {/* Content */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 pb-12">
-        {/* Logo */}
-        <div className="mb-8 text-center">
-          <img src={logo} alt="Mente 360" className="w-20 mx-auto mb-4" />
-          <h1 className="text-2xl !font-bold text-foreground">
-            Bienvenido a {import.meta.env.VITE_NAME}
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Inicia sesión para continuar
-          </p>
-        </div>
-
+      <AuthLayout
+        title={`Bienvenido a ${import.meta.env.VITE_NAME}`}
+        subtitle="Inicia sesión para continuar"
+      >
         {/* Form */}
         <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4">
           {/* Email */}
           <div className="space-y-2">
-            <Label htmlFor="email">Correo electrónico</Label>
+            <Label htmlFor="email" className="text-foreground">Correo electrónico</Label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <Input
@@ -147,7 +139,7 @@ const Login = ({ isLoading, setIsLoading, switchMode }: Props) => {
 
           {/* Password (not for reset) */}
           <div className="space-y-2">
-            <Label htmlFor="password">Contraseña</Label>
+            <Label htmlFor="password" className="text-foreground">Contraseña</Label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <Input
@@ -206,7 +198,7 @@ const Login = ({ isLoading, setIsLoading, switchMode }: Props) => {
             Regístrate
           </button>
         </p>
-      </div>
+      </AuthLayout>
     </>
   );
 };

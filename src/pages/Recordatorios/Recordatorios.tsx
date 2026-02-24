@@ -35,36 +35,36 @@ export default function Recordatorios() {
 
   const history = useHistory();
   const [present, onDismiss] = useIonLoading();
-  
+
   const [reminders, setReminders] = useState<any[]>([]);
 
   const [user, setUser] = useState(mockUser);
   //const [reminders, setReminders] = useState(mockReminders);
   const [editProfileOpen, setEditProfileOpen] = useState(false);
   const [addReminderOpen, setAddReminderOpen] = useState(false);
-  
 
-   const getNotifications = async () => {
-      try {
-        present({
-          message: "Cargando ...",
-        });
-  
-        const { data: { data } } = await all();
-        setReminders(data);
-  
-      } catch (error) {
-        console.error(error);
-      } finally {
-        onDismiss();
-      }
-    };
 
-  
-    useEffect(() => {
-      getNotifications();
-    }, []);
-    
+  const getNotifications = async () => {
+    try {
+      present({
+        message: "Cargando ...",
+      });
+
+      const { data: { data } } = await all();
+      setReminders(data);
+
+    } catch (error) {
+      console.error(error);
+    } finally {
+      onDismiss();
+    }
+  };
+
+
+  useEffect(() => {
+    getNotifications();
+  }, []);
+
   // New reminder form state
   const [newReminder, setNewReminder] = useState({
     title: "",
@@ -72,106 +72,106 @@ export default function Recordatorios() {
     dias_semana: [1, 2, 3, 4, 5] as number[],
   });
 
- const toggleReminderActive2 = (reminderId: string) => {
-  setReminders(prev =>
-    prev.map(reminder =>
-      reminder.id === reminderId
-        ? { ...reminder, active: !reminder.active }
-        : reminder
-    )
-  );
-};
+  const toggleReminderActive2 = (reminderId: string) => {
+    setReminders(prev =>
+      prev.map(reminder =>
+        reminder.id === reminderId
+          ? { ...reminder, active: !reminder.active }
+          : reminder
+      )
+    );
+  };
 
-const toggleReminderActive = async (reminderId: string) => {
-  const reminder = reminders.find(r => r.id === reminderId);
-  if (!reminder) return;
+  const toggleReminderActive = async (reminderId: string) => {
+    const reminder = reminders.find(r => r.id === reminderId);
+    if (!reminder) return;
 
-  const newState = !reminder.active;
-
-  setReminders(prev =>
-    prev.map(r =>
-      r.id === reminderId
-        ? { ...r, active: newState }
-        : r
-    )
-  );
-
-  try {
-    await toggle(reminderId, { active: newState });
-  } catch (error) {
-    console.error(error);
+    const newState = !reminder.active;
 
     setReminders(prev =>
       prev.map(r =>
         r.id === reminderId
-          ? { ...r, active: reminder.active }
+          ? { ...r, active: newState }
           : r
       )
     );
 
-    console.log("ERROR COMPLETO:", error);
+    try {
+      await toggle(reminderId, { active: newState });
+    } catch (error) {
+      console.error(error);
 
-    toast.error("No se pudo actualizar el recordatorio");
-  }
-};
+      setReminders(prev =>
+        prev.map(r =>
+          r.id === reminderId
+            ? { ...r, active: reminder.active }
+            : r
+        )
+      );
 
+      console.log("ERROR COMPLETO:", error);
 
-
-
- const deleteReminder = async (reminderId: string) => {
-  try {
-    await remove(reminderId);
-
-    setReminders(prev => prev.filter(r => r.id !== reminderId));
-
-    toast.success("Recordatorio eliminado");
-  } catch (error) {
-    console.error(error);
-    toast.error("No se pudo eliminar");
-  }
-};
+      toast.error("No se pudo actualizar el recordatorio");
+    }
+  };
 
 
-const addReminder = async () => {
-  if (!newReminder.title) {
-    toast.error("Ingresa un nombre para el recordatorio");
-    return;
-  }
 
-  try {
-    present({ message: "Guardando..." });
 
-    const [hora, mins] = newReminder.time.split(":");
+  const deleteReminder = async (reminderId: string) => {
+    try {
+      await remove(reminderId);
 
-    const dataNotification = {
-      title: newReminder.title,
-      days: newReminder.dias_semana,
-      hora,
-      min: mins,
-    };
+      setReminders(prev => prev.filter(r => r.id !== reminderId));
 
-    await create(dataNotification);
+      toast.success("Recordatorio eliminado");
+    } catch (error) {
+      console.error(error);
+      toast.error("No se pudo eliminar");
+    }
+  };
 
-    await getNotifications();
 
-    setNewReminder({ title: "", time: "08:00", dias_semana: [1,2,3,4,5] });
-    setAddReminderOpen(false);
+  const addReminder = async () => {
+    if (!newReminder.title) {
+      toast.error("Ingresa un nombre para el recordatorio");
+      return;
+    }
 
-    toast.success("Recordatorio agregado");
+    try {
+      present({ message: "Guardando..." });
 
-  } catch (error) {
-    console.error(error);
-    toast.error("Error al guardar");
-  } finally {
-    onDismiss();
-  }
-};
- 
+      const [hora, mins] = newReminder.time.split(":");
+
+      const dataNotification = {
+        title: newReminder.title,
+        days: newReminder.dias_semana,
+        hora,
+        min: mins,
+      };
+
+      await create(dataNotification);
+
+      await getNotifications();
+
+      setNewReminder({ title: "", time: "08:00", dias_semana: [1, 2, 3, 4, 5] });
+      setAddReminderOpen(false);
+
+      toast.success("Recordatorio agregado");
+
+    } catch (error) {
+      console.error(error);
+      toast.error("Error al guardar");
+    } finally {
+      onDismiss();
+    }
+  };
+
 
   const toggleReminderDay = (day: number) => {
     setNewReminder(prev => ({
       ...prev,
-      dias_semana: prev.dias_semana.includes(day) 
+      dias_semana: prev.dias_semana.includes(day)
         ? prev.dias_semana.filter(d => d !== day)
         : [...prev.dias_semana, day].sort(),
     }));
@@ -190,71 +190,71 @@ const addReminder = async () => {
             <Link to="/" className="p-2 -ml-2 hover:bg-muted rounded-full">
               <ArrowLeft className="w-5 h-5 text-foreground" />
             </Link>
-            <h1 className="font-display font-semibold text-lg">Mis Recordatorios</h1>
+            <h1 className="font-display font-semibold text-lg text-foreground">Mis Recordatorios</h1>
             <Dialog open={addReminderOpen} onOpenChange={setAddReminderOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="ghost" size="sm" className="text-primary">
-                    <Plus className="w-4 h-4 mr-1" />
-                    Agregar
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-sm mx-auto rounded-2xl">
-                  <DialogHeader>
-                    <DialogTitle className="text-foreground">Nuevo recordatorio</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4 mt-4">
-                    <div>
-                      <Label className="text-foreground">Nombre</Label>
-                      <Input 
-                        placeholder="Ej: Meditación matutina"
-                        value={newReminder.title}
-                        onChange={(e) => setNewReminder(prev => ({ ...prev, title: e.target.value }))}
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-foreground">Hora</Label>
-                      <Input className="text-foreground"
-                        type="time"
-                        value={newReminder.time}
-                        onChange={(e) => setNewReminder(prev => ({ ...prev, time: e.target.value }))}
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-foreground">Días</Label>
-                      <div className="flex gap-2 mt-2">
-                        {weekDayLabels.map((day, index) => (
-                          <button
-                            key={index}
-                            onClick={() => toggleReminderDay(index)}
-                            className={cn(
-                              "w-9 h-9 !rounded-full text-sm font-semibold transition-all",
-                              newReminder.dias_semana.includes(index)
-                                ? "gradient-primary text-primary-foreground"
-                                : "bg-muted text-muted-foreground"
-                            )}
-                          >
-                            {day}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                    <Button onClick={addReminder} className="w-full gradient-primary text-primary-foreground">
-                      Crear recordatorio
-                    </Button>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="text-primary">
+                  <Plus className="w-4 h-4 mr-1" />
+                  Agregar
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-sm mx-auto rounded-2xl">
+                <DialogHeader>
+                  <DialogTitle className="text-foreground">Nuevo recordatorio</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 mt-4">
+                  <div>
+                    <Label className="text-foreground">Nombre</Label>
+                    <Input
+                      placeholder="Ej: Meditación matutina"
+                      value={newReminder.title}
+                      onChange={(e) => setNewReminder(prev => ({ ...prev, title: e.target.value }))}
+                    />
                   </div>
-                </DialogContent>
-              </Dialog>
+                  <div>
+                    <Label className="text-foreground">Hora</Label>
+                    <Input className="text-foreground"
+                      type="time"
+                      value={newReminder.time}
+                      onChange={(e) => setNewReminder(prev => ({ ...prev, time: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-foreground">Días</Label>
+                    <div className="flex gap-2 mt-2">
+                      {weekDayLabels.map((day, index) => (
+                        <button
+                          key={index}
+                          onClick={() => toggleReminderDay(index)}
+                          className={cn(
+                            "w-9 h-9 !rounded-full text-sm font-semibold transition-all",
+                            newReminder.dias_semana.includes(index)
+                              ? "gradient-primary text-primary-foreground"
+                              : "bg-muted text-muted-foreground"
+                          )}
+                        >
+                          {day}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <Button onClick={addReminder} className="w-full gradient-primary text-primary-foreground">
+                    Crear recordatorio
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </header>
 
         <div className="flex-1 overflow-y-auto pb-8">
-          
+
           {/* Reminders Section */}
           <div className="px-4 mt-6">
-            
+
             <div className="space-y-3">
               {reminders.map((reminder) => (
-                <div 
+                <div
                   key={reminder.id}
                   className="bg-card rounded-2xl shadow-card p-4"
                 >
@@ -275,11 +275,11 @@ const addReminder = async () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Switch 
+                      <Switch
                         checked={reminder.active}
                         onCheckedChange={() => toggleReminderActive(reminder.id)}
                       />
-                      <button 
+                      <button
                         onClick={() => deleteReminder(reminder.id)}
                         className="p-2 text-destructive hover:bg-destructive/10 rounded-full"
                       >
@@ -287,7 +287,7 @@ const addReminder = async () => {
                       </button>
                     </div>
                   </div>
-                  
+
 
                   {/* Days */}
                   <div className="flex gap-1.5">
@@ -297,8 +297,8 @@ const addReminder = async () => {
                         className={cn(
                           "w-7 h-7 rounded-full text-xs font-semibold flex items-center justify-center",
                           reminder.dias_semana.includes(index)
-                            ? reminder.active 
-                              ? "bg-primary/20 text-primary" 
+                            ? reminder.active
+                              ? "bg-primary/20 text-primary"
                               : "bg-muted text-muted-foreground"
                             : "bg-transparent text-muted-foreground/50"
                         )}
@@ -308,7 +308,7 @@ const addReminder = async () => {
                     ))}
                   </div>
                 </div>
-              ))}              
+              ))}
             </div>
           </div>
         </div>

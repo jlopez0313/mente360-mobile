@@ -1,107 +1,70 @@
-import { usePreferences } from '@/hooks/usePreferences';
+import { getPreference, KEYS } from '@/helpers/preferences';
 import { CapacitorHttp } from '@capacitor/core';
-import { } from '@ionic-native/http';
 
-export const baseApi = () => {
-    
-    const baseURL = import.meta.env.VITE_BASE_API;
-    const { keys, getPreference } = usePreferences();
-    
-    const headers = async() => {
-        const token = await getPreference( keys.TOKEN);
-        const Authorization =  token ? `Bearer ${token}` : '';
-        return { 
-            Authorization,
-        };
-    }
+const baseURL = import.meta.env.VITE_BASE_API;
 
-    const get = async (url: string, customHeaders: any = {}) => {
-        const myHeaders = await headers();
-        
-        const options = {
-            url: `${baseURL}${url}`,
-            headers: { 
-                ...myHeaders,
-                ...customHeaders
-            }
-        };
-
-        const response = await CapacitorHttp.get(options);
-        // const response = await axios.get( options.url, { headers: options.headers } );
-
-
-        if( response.status == 200 || response.status == 201 ) {
-            return Promise.resolve( response )
-        } else {
-            return Promise.reject( response )
-        }
+const getHeaders = async (customHeaders: Record<string, string> = {}) => {
+    const token = await getPreference(KEYS.TOKEN);
+    return {
+        Authorization: token ? `Bearer ${token}` : '',
+        ...customHeaders,
     };
-    
-    const post = async (url: string, formData: any, customHeaders: any = {}) => {
-        const myHeaders = await headers();
+};
 
-        const options = {
-            url: `${baseURL}${url}`,
-            headers: { 
-                ...myHeaders,
-                ...customHeaders
-            },
-            data: formData
-        };
+const isSuccess = (status: number) => status >= 200 && status < 300;
 
-        const response = await CapacitorHttp.post( options )
-        // const response = await axios.post( options.url, options.data, { headers: options.headers } );
+export const baseApi = async () => {
+    const get = async (url: string, customHeaders: Record<string, string> = {}) => {
+        const headers = await getHeaders(customHeaders);
+        const response = await CapacitorHttp.get({ url: `${baseURL}${url}`, headers });
 
-        if( response.status == 200 || response.status == 201 ) {
-            return Promise.resolve( response )
-        } else {
-            return Promise.reject( response )
+        if (isSuccess(response.status)) {
+            return response;
         }
-    }
-
-
-    const put = async (url: string, formData: any, customHeaders: any = {}) => {
-        const myHeaders = await headers();
-
-        const options = {
-            url: `${baseURL}${url}`,
-            headers: { 
-                ...myHeaders,
-                ...customHeaders
-            },
-            data: formData
-        };
-
-        const response = await CapacitorHttp.put( options )
-
-        if( response.status == 200 || response.status == 201 ) {
-            return Promise.resolve( response )
-        } else {
-            return Promise.reject( response )
-        }
+        throw response;
     };
 
-    const remove = async (url: string, formData: any, customHeaders: any = {}) => {
-        const myHeaders = await headers();
-
-        const options = {
+    const post = async (url: string, formData: unknown, customHeaders: Record<string, string> = {}) => {
+        const headers = await getHeaders(customHeaders);
+        const response = await CapacitorHttp.post({
             url: `${baseURL}${url}`,
-            headers: { 
-                ...myHeaders,
-                ...customHeaders
-            },
-            data: formData
-        };
+            headers,
+            data: formData,
+        });
 
-        const response = await CapacitorHttp.delete( options )
-
-        if( response.status == 200 || response.status == 201 ) {
-            return Promise.resolve( response )
-        } else {
-            return Promise.reject( response )
+        if (isSuccess(response.status)) {
+            return response;
         }
-    }
+        throw response;
+    };
 
-    return { get, post, put, remove }
+    const put = async (url: string, formData: unknown, customHeaders: Record<string, string> = {}) => {
+        const headers = await getHeaders(customHeaders);
+        const response = await CapacitorHttp.put({
+            url: `${baseURL}${url}`,
+            headers,
+            data: formData,
+        });
 
-}
+        if (isSuccess(response.status)) {
+            return response;
+        }
+        throw response;
+    };
+
+    const remove = async (url: string, formData: unknown, customHeaders: Record<string, string> = {}) => {
+        const headers = await getHeaders(customHeaders);
+        const response = await CapacitorHttp.delete({
+            url: `${baseURL}${url}`,
+            headers,
+            data: formData,
+        });
+
+        if (isSuccess(response.status)) {
+            return response;
+        }
+        throw response;
+    };
+
+    return { get, post, put, remove };
+};

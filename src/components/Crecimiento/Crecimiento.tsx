@@ -1,9 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { NetworkContext } from "@/context/NetworkContext";
 import Crecimientos from "@/database/crecimientos";
 import Niveles from "@/database/niveles";
-import { useAudio } from "@/hooks/useAudio";
+import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import {
   Download,
   Pause,
@@ -12,7 +11,7 @@ import {
   SkipForward,
   Trash2,
 } from "lucide-react";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 
 interface Props {
   crecimientos: Crecimientos[];
@@ -33,43 +32,30 @@ export const Crecimiento = ({
   onSaveNext,
   setCurrentAudio,
 }: Props) => {
-  const { AudioNoWifi, baseURL, status } = useContext(NetworkContext);
-
-  const [audioSrc, setAudioSrc] = useState<string | undefined>(undefined);
-
-  const audioRef: any = useRef({
-    currentTime: 0,
-    duration: 0,
-    pause: () => {},
-    play: () => {},
-    fastSeek: (time: number) => {},
-  });
 
   const {
-    progress,
-    buffer,
-    duration,
-    real_duration,
-    currentTime,
+    audioRef,
+    activeTrack,
     isPlaying,
+    status,
+    baseURL,
+    AudioNoWifi,
+    getAudioSrc,
+    progress,
+    duration,
+    currentTime,
+    buffer,
+    onTogglePlay,
+    onToggleDownload,
     onLoadedMetadata,
     onTimeUpdate,
     onUpdateBuffer,
-    onStart,
-    onEnd,
-    onPause,
-    onPlay,
-    onLoad,
-    downloadAudio,
-    deleteAudio,
-    getDownloadedAudio,
-  } = useAudio(audioRef, () => {});
+  } = useAudioPlayer(currentAudio, currentIndex);
 
   const handlePrevious = () => {
     if (crecimientos?.length && currentIndex > 0) {
       setCurrentAudio(crecimientos[currentIndex - 1]);
       setCurrentIndex(currentIndex - 1);
-      // navigate(`/comunidades/${comunidad?.id}/podcasts/${communityPodcasts[currentIndex - 1].id}`);
     }
   };
 
@@ -77,8 +63,7 @@ export const Crecimiento = ({
     if (crecimientos?.length && currentIndex < crecimientos.length - 1) {
       setCurrentAudio(crecimientos[currentIndex + 1]);
       setCurrentIndex(currentIndex + 1);
-      onPause();
-      // navigate(`/comunidades/${communityId}/podcasts/${communityPodcasts[currentIndex + 1].id}`);
+      if (isPlaying) onTogglePlay(); // Pause current before changing
     }
   };
 
@@ -87,31 +72,21 @@ export const Crecimiento = ({
     handleNext();
   };
 
+  // Autoplay or Reload specific for Crecimientos when audio changes
   useEffect(() => {
-    const loadAudio = async () => {
-      if (!currentAudio) {
-        setAudioSrc(undefined);
-        return;
-      }
-
-      if (currentAudio.downloaded == 1) {
-        const src = await getDownloadedAudio(currentAudio.audio_local);
-        setAudioSrc(src);
-      } else {
-        setAudioSrc(baseURL + currentAudio.audio);
-      }
-    };
-
-    loadAudio();
+    if (audioRef.current && getAudioSrc()) {
+      audioRef.current.load();
+    }
   }, [currentAudio]);
+
   return (
     <>
       {/* Cover Image */}
       <div className="flex-1 flex items-center justify-center px-8">
         <div className="w-full max-w-[480px] aspect-square rounded-3xl overflow-hidden shadow-glow">
           <img
-            src={status ? baseURL + currentAudio?.imagen : AudioNoWifi}
-            alt={currentAudio?.titulo}
+            src={status ? baseURL + activeTrack?.imagen : AudioNoWifi}
+            alt={activeTrack?.titulo}
             className="w-full h-full object-cover"
           />
         </div>
@@ -122,19 +97,19 @@ export const Crecimiento = ({
         {/* Title & Level */}
         <div className="text-center space-y-2">
           <h1 className="text-xl font-heading font-bold text-foreground !m-0">
-            {currentAudio?.titulo}
+            {activeTrack?.titulo}
           </h1>
           <span className="text-xs font-heading text-foreground">
             {nivel?.nivel}
           </span>
           <p className="text-sm text-muted-foreground line-clamp-2">
-            {currentAudio?.descripcion}
+            {activeTrack?.descripcion}
           </p>
 
           {/* Level Selector */}
           <div className="flex justify-center pt-2">
-            <Button size="sm" className="gap-1" variant="outline">
-              {!currentAudio?.audio_local ? (
+            <Button size="sm" className="gap-1" variant="outline" onClick={() => onToggleDownload('crecimientos')}>
+              {!activeTrack?.audio_local ? (
                 <>
                   {" "}
                   <Download className="w-5 h-5" /> Descargar{" "}
@@ -155,7 +130,11 @@ export const Crecimiento = ({
             max={100}
             step={0.1}
             buffer={buffer * 100}
-            onValueChange={(value) => onLoad(value)}
+            onValueChange={(value) => {
+              if (audioRef.current) {
+                audioRef.current.currentTime = (audioRef.current.duration * value[0]) / 100;
+              }
+            }}
             className="w-full"
           />
           <div className="flex justify-between text-xs text-muted-foreground">
@@ -178,7 +157,7 @@ export const Crecimiento = ({
 
           <Button
             size="icon"
-            onClick={() => (isPlaying ? onPause() : onPlay())}
+            onClick={onTogglePlay}
             className="w-16 h-16 !rounded-full bg-primary hover:bg-primary/90 shadow-glow"
           >
             {isPlaying ? (
@@ -192,7 +171,7 @@ export const Crecimiento = ({
             variant="ghost"
             size="icon"
             onClick={handleNext}
-            disabled={currentIndex === crecimientos.length - 1}
+            disabled={currentIndex === crecimientos?.length - 1}
             className="w-12 h-12"
           >
             <SkipForward className="w-6 h-6" />
@@ -202,7 +181,7 @@ export const Crecimiento = ({
 
       <audio
         ref={audioRef}
-        src={audioSrc}
+        src={getAudioSrc()}
         onLoadedMetadata={onLoadedMetadata}
         onTimeUpdate={onTimeUpdate}
         onProgress={onUpdateBuffer}

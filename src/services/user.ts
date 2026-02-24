@@ -1,120 +1,31 @@
 import { baseApi } from './api';
 
-export const nextCrecimiento = async( formData: {}, userID: string ): Promise<any> => {
+export const nextCrecimiento = async(formData: {}, userID: string): Promise<any> => {
+    const { post } = await baseApi();
+    return post('/usuarios/next_crecimiento/' + userID, formData, { 'Content-type': 'application/json' });
+};
 
-    return new Promise( async (resolve, reject) => {
-        const { post } = baseApi();
-    
-        try {
-            resolve ( await post('/usuarios/next_crecimiento/' + userID, formData, { "Content-type": "application/json" } ) )
-        } catch( error: any ) {
-            if (error.response) {
-                reject(error.response)
-            } else if (error.request) {
-                reject(error.request)
-            } else {
-                reject(error)
-            }
-        }    
-    })
-    
-}
+export const update = async(formData: {}, userID: string): Promise<any> => {
+    const { put } = await baseApi();
+    return put('/usuarios/' + userID, formData, { 'Content-type': 'application/json' });
+};
 
-export const update = async( formData: {}, userID: string ): Promise<any> => {
+export const invitar = async(formData: {}): Promise<any> => {
+    const { post } = await baseApi();
+    return post('/usuarios/invitar', formData, { 'Content-type': 'application/json' });
+};
 
-    return new Promise( async (resolve, reject) => {
-        const { put } = baseApi();
-    
-        try {
-            resolve ( await put('/usuarios/' + userID, formData, { "Content-type": "application/json" } ) )
-        } catch( error: any ) {
-            if (error.response) {
-                reject(error.response)
-            } else if (error.request) {
-                reject(error.request)
-            } else {
-                reject(error)
-            }
-        }    
-    })
-}
-
-export const invitar = async( formData: {} ): Promise<any> => {
-
-    return new Promise( async (resolve, reject) => {
-        const { post } = baseApi();
-    
-        try {
-            resolve ( await post('/usuarios/invitar', formData, { "Content-type": "application/json" } ) )
-        } catch( error: any ) {
-            if (error.response) {
-                reject(error.response)
-            } else if (error.request) {
-                reject(error.request)
-            } else {
-                reject(error)
-            }
-        }    
-    })
-    
-}
-
-export const misContactos = async( formData: {} ): Promise<any> => {
-
-    return new Promise( async (resolve, reject) => {
-        const { post } = baseApi();
-    
-        try {
-            resolve ( await post('/usuarios/contactos', formData, { "Content-type": "application/json" } ) )
-        } catch( error: any ) {
-            if (error.response) {
-                reject(error.response)
-            } else if (error.request) {
-                reject(error.request)
-            } else {
-                reject(error)
-            }
-        }    
-    })
-    
-}
-
+export const misContactos = async(formData: {}): Promise<any> => {
+    const { post } = await baseApi();
+    return post('/usuarios/contactos', formData, { 'Content-type': 'application/json' });
+};
 
 export const find = async(id: number): Promise<any> => {
-
-    return new Promise( async (resolve, reject) => {
-        const { get } = baseApi();
-    
-        try {
-            resolve ( await get('/usuarios/' + id) )
-        } catch( error: any ) {
-            if (error.response) {
-                reject(error.response)
-            } else if (error.request) {
-                reject(error.request)
-            } else {
-                reject(error)
-            }
-        }    
-    })   
-}
-
+    const { get } = await baseApi();
+    return get('/usuarios/' + id);
+};
 
 export const trial = async(): Promise<any> => {
-
-    return new Promise( async (resolve, reject) => {
-        const { get } = baseApi();
-    
-        try {
-            resolve ( await get('/usuarios/trial') )
-        } catch( error: any ) {
-            if (error.response) {
-                reject(error.response)
-            } else if (error.request) {
-                reject(error.request)
-            } else {
-                reject(error)
-            }
-        }    
-    })   
-}
+    const { get } = await baseApi();
+    return get('/usuarios/trial');
+};

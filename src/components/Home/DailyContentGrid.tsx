@@ -64,14 +64,14 @@ export function DailyContentGrid({ completed, onOpenModal }: DailyContentGridPro
 
   return (
     <div className="px-4 pb-4">
-      <h3 className="font-display font-semibold text-lg mb-3">
+      <h3 className="font-display font-semibold text-lg mb-3 text-foreground">
         Tu contenido diario
       </h3>
-      
+
       <div className="grid grid-cols-2 gap-3">
         {items.map((item) => {
           const Icon = item.icon;
-          
+
           return (
             <button
               key={item.id}
@@ -88,7 +88,7 @@ export function DailyContentGrid({ completed, onOpenModal }: DailyContentGridPro
                   <CheckCircle2 className="w-5 h-5 text-success" />
                 </div>
               )}
-              
+
               {/* Icon */}
               <div className={cn(
                 "w-12 h-12 rounded-full flex items-center justify-center",
@@ -96,7 +96,7 @@ export function DailyContentGrid({ completed, onOpenModal }: DailyContentGridPro
               )}>
                 <Icon className="w-6 h-6 text-white" />
               </div>
-              
+
               {/* Title */}
               <p className={cn(
                 "text-sm font-medium text-center",

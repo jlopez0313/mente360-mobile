@@ -11,7 +11,7 @@ import { useContext, useState } from "react";
 interface CommunityPlanModalProps {
   plan: Planes | undefined;
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onOpenChange: (selectedPlan: valorPlan | undefined, open: boolean) => void;
   communityName: string;
   communityLogo: string;
 }
@@ -31,16 +31,15 @@ export const CommunityPlanModal = ({
   const handleSubscribe = () => {
     toast({
       title: "Redirigiendo a pasarela de pago...",
-      description: `${
-        selectedPlan?.descripcion ?? "Plan mensual"
-      } de ${communityName}`,
+      description: `${selectedPlan?.descripcion ?? "Plan mensual"
+        } de ${communityName}`,
     });
     onOpenChange(selectedPlan, false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm p-0 overflow-hidden rounded-3xl border-premium/30">
+    <Dialog open={open} onOpenChange={(o) => onOpenChange(undefined, o)}>
+      <DialogContent className="max-w-sm p-0 overflow-hidden rounded-xl border-premium/30">
         <DialogTitle className="sr-only">Planes de {communityName}</DialogTitle>
 
         {/* Header */}

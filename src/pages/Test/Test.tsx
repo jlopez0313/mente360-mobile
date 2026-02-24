@@ -31,7 +31,7 @@ const Test: React.FC = () => {
             >
               <ArrowLeft className="w-5 h-5 text-foreground" />
             </button>
-            <h1 className="font-display font-semibold text-lg">
+            <h1 className="font-display font-semibold text-lg text-foreground">
               Test de Eneagrama
             </h1>
             <div className="w-9" />
@@ -39,7 +39,7 @@ const Test: React.FC = () => {
         </header>
 
         <div className="px-4 py-6 flex-1 overflow-y-auto">
-          <TestComponent />          
+          <TestComponent />
         </div>
       </div>
     </AppLayout>

@@ -36,7 +36,7 @@ const Musicaterapia: React.FC = () => {
     // dispatch(clearListAudios());
     setSearchQuery(value);
   };
-  
+
 
   useBackButton(`/home`);
 
@@ -53,7 +53,7 @@ const Musicaterapia: React.FC = () => {
             />
             <div>
               <h1 className="text-xl font-heading font-bold text-foreground">
-                Musicoterapia
+                Musicaterapia
               </h1>
               <p className="text-sm text-muted-foreground">
                 Sonidos para tu bienestar
@@ -103,7 +103,7 @@ const Musicaterapia: React.FC = () => {
               />
             </TabsContent>
 
-            <TabsContent value="favorites" className="mt-0">
+            <TabsContent value="favorites" className="space-y-2 mt-0 h-full">
               <FavoritesList
                 searchQuery={searchQuery}
                 currentTrackId={currentTrack?.id}

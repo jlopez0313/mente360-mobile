@@ -82,12 +82,12 @@ const Perfil: React.FC = () => {
             <Link to="/home" className="p-2 -ml-2 hover:bg-muted rounded-full">
               <ArrowLeft className="w-5 h-5 text-foreground" />
             </Link>
-            <h1 className="font-display font-semibold text-lg">Mi Perfil</h1>
+            <h1 className="font-display font-semibold text-lg text-foreground">Mi Perfil</h1>
             <div className="w-9" />
           </div>
         </header>
 
-        <div className="flex-1 overflow-auto">        
+        <div className="flex-1 overflow-auto">
           <div className="pb-8">
             {/* Profile Header */}
             <div className="relative bg-gradient-to-b from-primary/20 to-background pt-8 pb-16">
@@ -171,7 +171,7 @@ const Perfil: React.FC = () => {
             {/* Personal Info Section */}
             <div className="px-4 mt-6">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-display font-semibold text-lg">
+                <h3 className="font-display font-semibold text-lg text-foreground">
                   Información personal
                 </h3>
 
@@ -247,7 +247,7 @@ const Perfil: React.FC = () => {
             {/* Enneagram Section */}
             <div className="px-4 mt-6">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-display font-semibold text-lg">
+                <h3 className="font-display font-semibold text-lg text-foreground">
                   Tipo de Eneagrama
                 </h3>
                 <button

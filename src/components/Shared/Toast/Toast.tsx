@@ -15,9 +15,11 @@ import {
 import { Pause, Play, SkipBack, SkipForward, Star, X } from "lucide-react";
 import { useContext, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
 
 export const Toast = () => {
   const { AudioNoWifi, baseURL, status } = useContext(NetworkContext);
+  const history = useHistory();
 
   const dispatch = useDispatch();
   const { audioSrc, globalAudio, listAudios, globalPos, isGlobalPlaying } =
@@ -35,7 +37,7 @@ export const Toast = () => {
     onUpdateBuffer,
     getDownloadedAudio,
     onTogglePlaylist,
-  } = useAudio(audioRef, () => {});
+  } = useAudio(audioRef, () => { });
 
   const onUpdateElapsed = () => {
     onTimeUpdate();
@@ -86,9 +88,9 @@ export const Toast = () => {
     dispatch(setIsGlobalPlaying(true));
   };
 
-  const handleTogglePlaylist = async() => {
+  const handleTogglePlaylist = async () => {
     const playlistToggled = await onTogglePlaylist(globalAudio, globalAudio?.inMyPlaylist);
-    console.log( globalAudio, playlistToggled )
+    console.log(globalAudio, playlistToggled)
 
     if (!globalAudio?.inMyPlaylist) {
       dispatch(setGlobalAudio({ ...globalAudio, inMyPlaylist: playlistToggled }));
@@ -132,7 +134,7 @@ export const Toast = () => {
           {/* Cover */}
           <div
             className="w-12 h-12 rounded-xl overflow-hidden bg-muted cursor-pointer shrink-0"
-            // onClick={() => navigate(`/musicoterapia/player/${track.id}`)}
+            onClick={() => history.replace('/musicaterapia/clip')}
           >
             <img
               src={!status ? AudioNoWifi : baseURL + globalAudio?.imagen}
@@ -144,7 +146,7 @@ export const Toast = () => {
           {/* Info */}
           <div
             className="flex-1 min-w-0 cursor-pointer"
-            // onClick={() => navigate(`/musicoterapia/player/${track.id}`)}
+            onClick={() => history.replace('/musicaterapia/clip')}
           >
             <h6 className="!m-0 font-medium text-foreground text-sm truncate">
               {globalAudio?.titulo}

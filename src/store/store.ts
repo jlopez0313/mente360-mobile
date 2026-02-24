@@ -20,3 +20,7 @@ export const store = configureStore({
             serializableCheck: false,
     }),
 })
+
+// Fix #6: Exportar tipos para usar useSelector y useDispatch correctamente
+export type RootState = ReturnType<typeof store.getState>
+export type AppDispatch = typeof store.dispatch

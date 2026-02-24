@@ -1,19 +1,18 @@
-import logo from "@/assets/images/logo.png";
+import { AuthLayout } from "@/components/layout/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Eye, EyeOff, Loader2, Lock, Mail } from "lucide-react";
-import { useState } from "react";
-import { useHistory } from "react-router";
-import { z } from "zod";
-
 import { db } from "@/hooks/useDexie";
 import { usePreferences } from "@/hooks/usePreferences";
 import { register } from "@/services/auth";
 import { setUser } from "@/store/slices/userSlice";
 import { FCM } from "@capacitor-community/fcm";
+import { Eye, EyeOff, Loader2, Lock, Mail } from "lucide-react";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
+import { useHistory } from "react-router";
+import { z } from "zod";
 
 const emailSchema = z
   .string()
@@ -42,7 +41,6 @@ const Register = ({ isLoading, setIsLoading, switchMode }: Props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [name, setName] = useState("");
 
   // Errors
   const [emailError, setEmailError] = useState("");
@@ -116,21 +114,15 @@ const Register = ({ isLoading, setIsLoading, switchMode }: Props) => {
   };
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center px-6 pb-12">
-      {/* Logo */}
-      <div className="mb-8 text-center">
-        <img src={logo} alt="Mente 360" className="w-20 mx-auto mb-4" />
-        <h1 className="text-2xl !font-bold text-foreground">Crear cuenta</h1>
-        <p className="text-muted-foreground mt-2">
-          Completa tus datos para registrarte
-        </p>
-      </div>
-
+    <AuthLayout
+      title="Crear cuenta"
+      subtitle="Completa tus datos para registrarte"
+    >
       {/* Form */}
       <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4">
         {/* Email */}
         <div className="space-y-2">
-          <Label htmlFor="email">Correo electrónico</Label>
+          <Label htmlFor="email" className="text-foreground">Correo electrónico</Label>
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input
@@ -151,7 +143,7 @@ const Register = ({ isLoading, setIsLoading, switchMode }: Props) => {
 
         {/* Password (not for reset) */}
         <div className="space-y-2">
-          <Label htmlFor="password">Contraseña</Label>
+          <Label htmlFor="password" className="text-foreground">Contraseña</Label>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input
@@ -201,7 +193,7 @@ const Register = ({ isLoading, setIsLoading, switchMode }: Props) => {
           Inicia sesión
         </button>
       </p>
-    </div>
+    </AuthLayout>
   );
 };
 

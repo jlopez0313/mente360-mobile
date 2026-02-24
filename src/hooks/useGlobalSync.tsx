@@ -25,6 +25,19 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const initSync = "2024-01-01T00:00:00Z";
 
+/**
+ * Sincroniza una tabla simple: fetch incremental por fecha y bulkPut en Dexie.
+ */
+async function syncSimpleTable(
+  fetchFn: (from: string) => Promise<{ data: { data: any[] } }>,
+  bulkPutFn: (items: any[]) => Promise<unknown>,
+  fromDate: string
+) {
+  const { data: { data } } = await fetchFn(fromDate);
+  if (!data.length) return;
+  await bulkPutFn(data);
+}
+
 export const useGlobalSync = () => {
   const { getPreference, setPreference, keys } = usePreferences();
   const { status } = useContext(NetworkContext);
@@ -38,8 +51,6 @@ export const useGlobalSync = () => {
   // Constantes
   const syncConstants = async () => {
     try {
-      console.log("start syncConstants");
-
       const { data } = await getAllConstants();
 
       await db.enlaces.clear();
@@ -53,8 +64,6 @@ export const useGlobalSync = () => {
 
       await db.planes.clear();
       await db.planes.bulkPut(data.planes);
-
-      console.log("syncConstants completa.");
     } catch (error) {
       console.error("Error syncConstants:", error);
     }
@@ -63,22 +72,8 @@ export const useGlobalSync = () => {
   // Niveles
   const syncNiveles = async () => {
     try {
-      console.log("start syncNiveles");
-
       const lastSync = await getPreference(keys.SYNC_KEY);
-      const fromDate = lastSync ?? initSync;
-
-      const {
-        data: { data },
-      } = await getAllNiveles(fromDate);
-
-      if (!data.length) {
-        return;
-      }
-
-      await db.niveles.bulkPut(data);
-
-      console.log("syncNiveles completa.");
+      await syncSimpleTable(getAllNiveles, (data) => db.niveles.bulkPut(data), lastSync ?? initSync);
     } catch (error) {
       console.error("Error syncNiveles:", error);
     }
@@ -87,22 +82,8 @@ export const useGlobalSync = () => {
   // Comunidades
   const syncComunidades = async () => {
     try {
-      console.log("start syncComunidades");
-
       const lastSync = await getPreference(keys.SYNC_KEY);
-      const fromDate = lastSync ?? initSync;
-
-      const {
-        data: { data },
-      } = await getAllComunidades(fromDate);
-
-      if (!data.length) {
-        return;
-      }
-
-      await db.comunidades.bulkPut(data);
-
-      console.log("syncComunidades completa.");
+      await syncSimpleTable(getAllComunidades, (data) => db.comunidades.bulkPut(data), lastSync ?? initSync);
     } catch (error) {
       console.error("Error syncComunidades:", error);
     }
@@ -111,22 +92,8 @@ export const useGlobalSync = () => {
   // Canales
   const syncCanales = async () => {
     try {
-      console.log("start syncCanales");
-
       const lastSync = await getPreference(keys.SYNC_KEY);
-      const fromDate = lastSync ?? initSync;
-
-      const {
-        data: { data },
-      } = await getAllCanales(fromDate);
-
-      if (!data.length) {
-        return;
-      }
-
-      await db.canales.bulkPut(data);
-
-      console.log("syncCanales completa.");
+      await syncSimpleTable(getAllCanales, (data) => db.canales.bulkPut(data), lastSync ?? initSync);
     } catch (error) {
       console.error("Error syncCanales:", error);
     }
@@ -134,7 +101,6 @@ export const useGlobalSync = () => {
 
   // Crecimientos
   const syncCrecimientos = async () => {
-    console.log("start syncCrecimientos");
 
     const lastSync = await getPreference(keys.SYNC_KEY);
     const fromDate = lastSync ?? undefined;
@@ -197,33 +163,17 @@ export const useGlobalSync = () => {
         await setPreference(keys.CRECIMIENTOS_PAGE_KEY, page.toString());
         await delay(500);
       } catch (err: any) {
-        console.log(err);
+        console.error(err);
         throw new Error(`Too many requests en syncCrecimientos.`);
       }
     }
-
-    console.log("syncCrecimientos completa.");
   };
 
   // Categorías
   const syncCategorias = async () => {
     try {
-      console.log("start syncCategorias");
-
       const lastSync = await getPreference(keys.SYNC_KEY);
-      const fromDate = lastSync ?? initSync;
-
-      const {
-        data: { data },
-      } = await getAllCategorias(fromDate);
-
-      if (!data.length) {
-        return;
-      }
-
-      await db.categorias.bulkPut(data);
-
-      console.log("syncCategorias completa.");
+      await syncSimpleTable(getAllCategorias, (data) => db.categorias.bulkPut(data), lastSync ?? initSync);
     } catch (error) {
       console.error("Error syncCategorias:", error);
     }
@@ -232,8 +182,6 @@ export const useGlobalSync = () => {
   // Playlist
   const syncPlaylist = async () => {
     try {
-      console.log("start syncPlaylist");
-
       const lastSync = await getPreference(keys.SYNC_KEY);
       const fromDate = lastSync ?? initSync;
 
@@ -256,8 +204,6 @@ export const useGlobalSync = () => {
           return { id: item.id, clip: item.clip, users_id: item.user?.id };
         })
       );
-
-      console.log("syncPlaylist completa.");
     } catch (error) {
       console.error("Error syncPlaylist:", error);
     }
@@ -265,8 +211,6 @@ export const useGlobalSync = () => {
 
   // Clips de Musicaterapia
   const syncClips = async () => {
-    console.log("start syncClips");
-
     let page = parseInt((await getPreference(keys.CLIP_PAGE_KEY)) ?? "1");
     let hasMore = true;
 
@@ -338,12 +282,10 @@ export const useGlobalSync = () => {
         await setPreference(keys.CLIP_PAGE_KEY, page.toString());
         await delay(500);
       } catch (err: any) {
-        console.log(err);
+        console.error(err);
         throw new Error(`Too many requests en syncClips.`);
       }
     }
-
-    console.log("syncClips completa.");
   };
 
   // Batch Load
@@ -361,7 +303,6 @@ export const useGlobalSync = () => {
 
   // Clips Eliminados
   const syncClipsTrashed = async () => {
-    console.log("start syncClipsTrashed");
 
     const lastSync = await getPreference(keys.SYNC_KEY);
     const fromDate = lastSync ?? initSync;
@@ -379,11 +320,9 @@ export const useGlobalSync = () => {
         await db.clips.delete(clip.id);
       }
     } catch (err: any) {
-      console.log(err);
+      console.error(err);
       throw new Error(`Too many requests en syncClipsTrashed.`);
     }
-
-    console.log("syncClipsTrashed completa.");
   };
 
   // Sync Database
@@ -392,8 +331,6 @@ export const useGlobalSync = () => {
       try {
         setLoading(true);
         setMensaje("Descargando información...");
-
-        console.log("start syncAll");
 
         await Promise.all([
           syncConstants(),

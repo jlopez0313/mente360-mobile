@@ -200,10 +200,6 @@
     @apply font-semibold tracking-tight;
   }
 
-  .bg-background {
-    background-color: hsl(180 20% 99%) !important;
-  }
-
   .shadow-soft {
     box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--shadow-soft);
   }
@@ -286,6 +282,26 @@
       hsl(var(--accent)) 100%
     );
   }
+}
+
+/* ===============================
+   DATE / TIME INPUT — DARK MODE FIX
+   color-scheme: dark → ícono nativo blanco en dark mode.
+   ::-webkit-datetime-edit → texto forzado al token --foreground en ambos modos.
+================================ */
+
+/* Texto: siempre usa --foreground de Tailwind */
+input[type="date"]::-webkit-datetime-edit,
+input[type="time"]::-webkit-datetime-edit,
+input[type="month"]::-webkit-datetime-edit {
+  color: hsl(var(--foreground));
+}
+
+/* Ícono del picker: claro en dark mode */
+.dark input[type="date"],
+.dark input[type="time"],
+.dark input[type="month"] {
+  color-scheme: dark;
 }
 
 /* Custom scrollbar */

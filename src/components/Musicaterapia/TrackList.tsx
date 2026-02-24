@@ -40,7 +40,7 @@ export const TrackList = ({
 
     return lista;
   }, [selectedCategory, searchQuery]);
-  
+
 
   if (!tracks || tracks?.length === 0) {
     return (

@@ -14,12 +14,12 @@ import { toast } from "sonner";
 
 export default function SelectCommunityPage() {
   const { baseURL, status, AudioNoWifi } = useContext(NetworkContext);
-  
+
   const dispatch = useDispatch();
   const history = useHistory();
   const { user } = useSelector((state: any) => state.user);
   const { currentDay } = useSelector((state: any) => state.home);
-  
+
   // Filter only subscribed communities
   const misComunidades = useLiveQuery(
     () =>
@@ -29,7 +29,7 @@ export default function SelectCommunityPage() {
         .toArray(),
     [user]
   );
-  
+
   const [selectedCommunity, setSelectedCommunity] = useState<number>(0);
 
   const handleSave = () => {
@@ -41,9 +41,9 @@ export default function SelectCommunityPage() {
   useEffect(() => {
 
     const getSelected = () => {
-      if ( !misComunidades?.length ) return ;
+      if (!misComunidades?.length) return;
       const saved = localStorage.getItem("principal");
-      
+
       if (saved && misComunidades?.find(c => c.id == Number(saved))) {
         setSelectedCommunity(Number(saved));
       } else {
@@ -70,7 +70,7 @@ export default function SelectCommunityPage() {
             <button onClick={() => history.go(-1)} className="p-2 -ml-2 hover:bg-muted rounded-full">
               <ArrowLeft className="w-5 h-5 text-foreground" />
             </button>
-            <h1 className="font-display font-semibold text-lg">Comunidad Principal</h1>
+            <h1 className="font-display font-semibold text-lg text-foreground">Comunidad Principal</h1>
             <div className="w-9" />
           </div>
         </header>
@@ -93,11 +93,11 @@ export default function SelectCommunityPage() {
                 )}
               >
                 <img
-                  src={ status ? baseURL + community.imagen : AudioNoWifi }
+                  src={status ? baseURL + community.imagen : AudioNoWifi}
                   alt={community.comunidad}
                   className="w-14 h-14 rounded-xl object-cover"
                 />
-                
+
                 <div className="flex-1 text-left">
                   <div className="flex items-center gap-2">
                     <h3 className="font-semibold text-foreground">{community.comunidad}</h3>
@@ -119,8 +119,8 @@ export default function SelectCommunityPage() {
           {misComunidades?.length === 0 && (
             <div className="text-center py-12">
               <p className="text-muted-foreground">No tienes comunidades suscritas</p>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="mt-4"
                 onClick={() => history.replace("/comunidades")}
               >
@@ -130,7 +130,7 @@ export default function SelectCommunityPage() {
           )}
 
           {misComunidades?.length > 0 && (
-            <Button 
+            <Button
               onClick={handleSave}
               className="w-full mt-8 gradient-primary text-primary-foreground !rounded-xl"
             >

@@ -1,60 +1,16 @@
 import { baseApi } from './api';
 
-export const create = async( formData: {} ): Promise<any> => {
+export const create = async(formData: {}): Promise<any> => {
+    const { post } = await baseApi();
+    return post('/grupos', formData, { 'Content-type': 'application/json' });
+};
 
-    return new Promise( async (resolve, reject) => {
-        const { post } = baseApi();
-    
-        try {
-            resolve ( await post('/grupos', formData, { "Content-type": "application/json" } ) )
-        } catch( error: any ) {
-            if (error.response) {
-                reject(error.response)
-            } else if (error.request) {
-                reject(error.request)
-            } else {
-                reject(error)
-            }
-        }    
-    })
-    
-}
-
-export const getAll = async( fromDate: string = ''): Promise<any> => {
-
-    return new Promise( async (resolve, reject) => {
-        const { get } = baseApi();
-    
-        try {
-            resolve ( await get(`/grupos?last_sync=${fromDate}`) )
-        } catch( error: any ) {
-            if (error.response) {
-                reject(error.response)
-            } else if (error.request) {
-                reject(error.request)
-            } else {
-                reject(error)
-            }
-        }    
-    })   
-}
-
+export const getAll = async(fromDate: string = ''): Promise<any> => {
+    const { get } = await baseApi();
+    return get(`/grupos?last_sync=${fromDate}`);
+};
 
 export const find = async(id: number): Promise<any> => {
-
-    return new Promise( async (resolve, reject) => {
-        const { get } = baseApi();
-    
-        try {
-            resolve ( await get('/grupos/' + id) )
-        } catch( error: any ) {
-            if (error.response) {
-                reject(error.response)
-            } else if (error.request) {
-                reject(error.request)
-            } else {
-                reject(error)
-            }
-        }    
-    })   
-}
+    const { get } = await baseApi();
+    return get('/grupos/' + id);
+};

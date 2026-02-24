@@ -2,14 +2,15 @@ import logo from "@/assets/images/logo.png";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
+import { trial } from "@/services/user";
 import {
-    Bell,
-    ChevronLeft,
-    ChevronRight,
-    Heart,
-    Music,
-    Sparkles,
-    Users
+  Bell,
+  ChevronLeft,
+  ChevronRight,
+  Heart,
+  Music,
+  Sparkles,
+  Users
 } from "lucide-react";
 import { useState } from "react";
 import { useHistory } from "react-router";
@@ -78,8 +79,9 @@ export default function OnboardingPage() {
   const Icon = step.icon;
   const styles = colorStyles[step.color];
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (isLastStep) {
+      await trial();
       localStorage.setItem("mente360_onboarding_complete", "true");
       history.replace("/home");
     } else {
@@ -93,9 +95,10 @@ export default function OnboardingPage() {
     }
   };
 
-  const handleSkip = () => {
+  const handleSkip = async () => {
+    await trial();
     localStorage.setItem("mente360_onboarding_complete", "true");
-    history.replace("/");
+    history.replace("/home");
   };
 
   return (

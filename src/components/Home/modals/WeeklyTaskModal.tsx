@@ -96,7 +96,7 @@ export function WeeklyTaskModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm mx-auto rounded-3xl border-0 bg-gradient-to-b from-primary/10 to-background p-6 overflow-hidden max-h-[85vh]">
+      <DialogContent className="max-w-sm mx-auto rounded-xl border-0 bg-gradient-to-b from-primary/10 to-background p-6 overflow-hidden max-h-[85vh]">
         <DialogHeader className="text-left mb-4">
           <div className="flex items-center gap-2 text-primary mb-1">
             <ClipboardList className="w-4 h-4" />
@@ -130,11 +130,10 @@ export function WeeklyTaskModal({
 
         {/* Complete Button */}
         <Button
-          style={{ display: "none" }}
           onClick={onConfirmTarea}
-          disabled={isCompleted}
+          disabled={isCompleted || currentDay != 1 || !userEnabled || payment_status == 'free'}
           className={cn(
-            "w-full rounded-xl h-12 text-base font-semibold",
+            "w-full !rounded-xl h-12 text-base font-semibold",
             isCompleted
               ? "bg-success text-success-foreground"
               : "gradient-primary text-primary-foreground hover:opacity-90"
@@ -154,7 +153,7 @@ export function WeeklyTaskModal({
           onClick={onConfirmTarea}
           disabled={!userEnabled || payment_status == 'free'}
           className={cn(
-            "w-full rounded-xl h-12 text-base font-semibold",
+            "w-full !rounded-xl h-12 text-base font-semibold",
             isCompleted
               ? "bg-success text-success-foreground"
               : "gradient-primary text-primary-foreground hover:opacity-90"

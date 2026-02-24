@@ -61,16 +61,21 @@ export function FavoritesList({
       </p>
 
       <Virtuoso
-        key={`${searchQuery}`}
+        key={searchQuery}
         components={{
           List: forwardRef((props, ref) => (
-            <div {...props} ref={ref} className="space-y-3 p-1" />
+            <div
+              {...props}
+              ref={ref}
+              className="space-y-3 p-1"
+            />
           )),
         }}
         style={{ height: "100%" }}
         totalCount={playlist.length}
         itemContent={(index) => {
           const track = playlist[index].clip;
+
           return (
             <AudioCard
               idx={index}

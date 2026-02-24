@@ -112,20 +112,28 @@ const Suscripcion = ({ comunidad }: any) => {
             </button>
 
             {/* Price */}
-            <p className="mt-2 font-bold text-foreground">
-              {formatCurrency(suscripcion?.pivot?.precio ?? "0")}
-            </p>
+            {
+              suscripcion?.pivot?.precio ? (
+                <p className="mt-2 font-bold text-foreground">
+                  {formatCurrency(suscripcion?.pivot?.precio)}
+                </p>
+              ) : null
+            }
           </div>
         </div>
 
         {/* Dates */}
         <div className="mt-4 pt-3 border-t border-border/50 grid grid-cols-2 gap-3">
-          <div>
-            <p className="text-xs text-muted-foreground">Inicio</p>
-            <p className="text-sm font-medium text-foreground">
-              {formatCompleteDate(suscripcion?.pivot.fecha_pago)}
-            </p>
-          </div>
+          {
+            suscripcion?.pivot.fecha_pago ? (
+              <div>
+                <p className="text-xs text-muted-foreground">Inicio</p>
+                <p className="text-sm font-medium text-foreground">
+                  {formatCompleteDate(suscripcion?.pivot.fecha_pago)}
+                </p>
+              </div>
+            ) : null
+          }
           <div>
             <p className="text-xs text-muted-foreground">Vencimiento</p>
             <p

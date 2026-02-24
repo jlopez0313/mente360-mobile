@@ -58,41 +58,16 @@ const Registro = () => {
   const [constants, setConstants] = useState({ eneatipos: [], generos: [] });
 
   // Form fields
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
 
   // Errors
-  const [emailError, setEmailError] = useState("");
   const [nameError, setNameError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-  
+
   const maxDate = useMemo(() => {
     const today = new Date();
     today.setFullYear(today.getFullYear() - 14);
-    return today.toISOString();
+    return today.toISOString().split("T")[0];
   }, []);
-
-  const validateEmail = () => {
-    const result = emailSchema.safeParse(email);
-    if (!result.success) {
-      setEmailError(result.error.issues[0].message);
-      return false;
-    }
-    setEmailError("");
-    return true;
-  };
-
-  const validatePassword = () => {
-    const result = passwordSchema.safeParse(password);
-    if (!result.success) {
-      setPasswordError(result.error.issues[0].message);
-      return false;
-    }
-    setPasswordError("");
-    return true;
-  };
 
   const validateName = () => {
     const result = nameSchema.safeParse(name);
@@ -126,8 +101,7 @@ const Registro = () => {
     e.preventDefault();
 
     // Validate based on mode
-    let isValid = validateEmail();
-    isValid = validateName() && isValid;
+    let isValid = validateName();
 
     if (!isValid) return;
 
@@ -148,7 +122,7 @@ const Registro = () => {
       });
 
       goToHome();
-      
+
     } catch (error: any) {
       toast({
         title: "Error",
@@ -207,7 +181,7 @@ const Registro = () => {
       <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4">
         {/* Name (only for register) */}
         <div className="space-y-2">
-          <Label htmlFor="name">Nombre completo</Label>
+          <Label htmlFor="name" className="text-foreground">Nombre completo</Label>
           <div className="relative">
             <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input
@@ -225,11 +199,11 @@ const Registro = () => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="name">Teléfono</Label>
+          <Label htmlFor="name" className="text-foreground">Teléfono</Label>
           <div className="relative">
             <PhoneInput
               defaultCountry={usuario.country}
-              className="border rounded-md px-3 py-2 w-full"
+              className="border rounded-md px-3 py-2 w-full text-foreground"
               placeholder="Teléfono"
               onChange={(e) => handleSetUser("phone", e)}
               onCountryChange={(e) => handleSetUser("country", e)}
@@ -240,7 +214,7 @@ const Registro = () => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="name">Fecha de Nacimiento</Label>
+          <Label htmlFor="name" className="text-foreground">Fecha de Nacimiento</Label>
           <div className="relative">
             <Input
               id="name"
@@ -251,14 +225,14 @@ const Registro = () => {
               onChange={(e) =>
                 handleSetUser("fecha_nacimiento", e.target.value?.split("T")[0])
               }
-              className="pl-10"
+              className="pl-10 text-foreground"
               disabled={isLoading}
             />
           </div>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="name">Genero</Label>
+          <Label htmlFor="name" className="text-foreground">Genero</Label>
           <div className="relative">
             <Select
               value={usuario.genero}
@@ -292,7 +266,7 @@ const Registro = () => {
         <Button
           type="button"
           variant={"outline"}
-          className="w-full"
+          className="w-full text-foreground"
           disabled={isLoading}
           onClick={goToHome}
         >

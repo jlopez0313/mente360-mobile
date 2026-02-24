@@ -21,10 +21,8 @@ import Registro from "./pages/Registro/Registro";
 import Splash from "./pages/Splash/Splash";
 import Suscripcion from "./pages/Suscripcion/Suscripcion";
 import Test from "./pages/Test/Test";
-import Thanks from "./pages/Thanks/Thanks";
-import Welcome from "./pages/Welcome/Wecome";
 
-import { DBProvider } from "./context/DBContext";
+import { FirebaseProvider } from "./context/FirebaseContext";
 
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
@@ -46,7 +44,6 @@ import { Toast } from "@/components/Shared/Toast/Toast";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { TabsLayout } from "./components/layout/TabsLayout";
 import { NetworkProvider } from "./context/NetworkContext";
@@ -60,33 +57,7 @@ const App: React.FC = () => {
     (state: any) => state.audio
   );
 
-  const checkForUpdates = async () => {
-    try {
-      /*
-      const updateAvailable = await CapacitorUpdater.isAutoUpdateAvailable();
 
-      if (updateAvailable) {
-        console.log("Actualización automática disponible");
-
-        // Escucha cuando la app está lista después de la actualización
-        CapacitorUpdater.addListener("appReady", () => {
-          console.log("La aplicación se actualizó y está lista");
-          CapacitorUpdater.reload();
-        });
-
-        console.log("Esperando la aplicación actualizada...");
-      } else {
-        console.log("No hay actualizaciones automáticas disponibles");
-      }
-        */
-    } catch (error) {
-      // console.error("Error verificando actualizaciones:", error);
-    }
-  };
-
-  useEffect(() => {
-    checkForUpdates();
-  }, []);
 
   return (
     <IonApp>
@@ -95,7 +66,7 @@ const App: React.FC = () => {
           <Toaster />
           <Sonner />
           <NetworkProvider>
-            <DBProvider>
+            <FirebaseProvider>
               <IonReactRouter>
                 {globalAudio && showGlobalAudio && <Toast />}
                 <Route exact path="/">
@@ -120,16 +91,8 @@ const App: React.FC = () => {
                   <Principal />
                 </Route>
 
-                <Route exact path="/thanks">
-                  <Thanks />
-                </Route>
-
                 <Route exact path="/onboarding">
                   <Onboarding />
-                </Route>
-
-                <Route exact path="/welcome">
-                  <Welcome />
                 </Route>
 
                 <Route exact path="/planes">
@@ -195,7 +158,7 @@ const App: React.FC = () => {
                 </Route>
 
               </IonReactRouter>
-            </DBProvider>
+            </FirebaseProvider>
           </NetworkProvider>
         </TooltipProvider>
       </ThemeProvider>

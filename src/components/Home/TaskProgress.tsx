@@ -8,7 +8,7 @@ interface TaskProgressProps {
 export function TaskProgress({ daysRemaining }: TaskProgressProps) {
   return (
     <div className="px-4 pb-4">
-      <Link 
+      <Link
         to="/comunidades/1/tareas"
         className="block bg-gradient-to-r from-primary to-primary/80 rounded-2xl p-4 shadow-card"
       >
@@ -21,8 +21,8 @@ export function TaskProgress({ daysRemaining }: TaskProgressProps) {
               Tarea semanal
             </p>
             <p className="text-primary-foreground font-semibold text-lg">
-              {daysRemaining > 0 
-                ? `${daysRemaining} días para finalizar` 
+              {daysRemaining > 0
+                ? `${daysRemaining} días para finalizar`
                 : "¡Completa tu tarea hoy!"}
             </p>
           </div>

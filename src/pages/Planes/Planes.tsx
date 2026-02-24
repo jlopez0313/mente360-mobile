@@ -6,6 +6,7 @@ import { valorPlan } from "@/database/planes";
 import { formatCurrency } from "@/helpers/Format";
 import { useToast } from "@/hooks/use-toast";
 import { db } from "@/hooks/useDexie";
+import { useEpayco } from "@/hooks/useEpayco";
 import { usePayment } from "@/hooks/usePayment";
 import { cn } from "@/lib/utils";
 import { updateData } from "@/services/realtime-db";
@@ -31,6 +32,7 @@ const PlanesPage = () => {
   const { toast } = useToast();
   const dispatch = useDispatch();
   const { payment_status } = usePayment();
+  const { onSubscribe } = useEpayco();
 
   const { user } = useSelector((state: any) => state.user);
 
@@ -43,11 +45,12 @@ const PlanesPage = () => {
   );
 
   const handleSubscribe = () => {
-    toast({
-      title: "¡Redirigiendo a pasarela de pago!",
-      description: `${selectedPlan?.descripcion} ${selectedPlan?.periodo} — $${selectedPlan?.valor} USD`,
+    onSubscribe({
+      precio: selectedPlan?.valor,
+      periodicidad: selectedPlan?.key,
+      titulo: selectedPlan?.descripcion ?? "Plan mensual",
+      comunidad: null,
     });
-    history.replace("/home");
   };
 
   const handleCancelSubscription = async () => {
@@ -163,10 +166,10 @@ const PlanesPage = () => {
           ) : null}
 
           {
-            payment_status == 'free' || payment_status == 'trial' ? 
-            <p className="text-xs text-muted-foreground text-center mt-3 mb-6">
-              Prueba gratuita de 14 días. Cancela en cualquier momento.
-            </p> : null
+            payment_status == 'free' || payment_status == 'trial' ?
+              <p className="text-xs text-muted-foreground text-center mt-3 mb-6">
+                Prueba gratuita de 14 días. Cancela en cualquier momento.
+              </p> : null
           }
 
 

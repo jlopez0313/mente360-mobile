@@ -32,11 +32,11 @@ export const Item = ({ markAsRead, deleteNotification, notification }: Props) =>
           )}
         >
           <img alt="" src={
-            status ? 
-              notification.comunidad ? 
-              baseURL + notification.comunidad?.imagen
-              : Logo
-            : Logo} />
+            status ?
+              notification.comunidad ?
+                baseURL + notification.comunidad?.imagen
+                : Logo
+              : Logo} />
         </div>
         <div className="flex-1 min-w-0">
           <p
@@ -56,7 +56,7 @@ export const Item = ({ markAsRead, deleteNotification, notification }: Props) =>
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8"
+              className="h-8 w-8 text-success"
               onClick={() => markAsRead(notification.id)}
             >
               <Check className="w-4 h-4" />

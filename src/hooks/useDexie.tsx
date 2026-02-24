@@ -16,9 +16,11 @@ import Tareas from "@/database/tareas";
 import User from "@/database/user";
 import UsuariosClips from "@/database/usuarios_clips";
 
+import Notificaciones from "@/database/notificaciones";
 import Dexie, { Table } from "dexie";
 
 export class Mente360DB extends Dexie {
+  notificaciones!: Table<Notificaciones, string>;
   audios!: Table<Audios, number>;
   canales!: Table<Canales, number>;
   categorias!: Table<Categorias, number>;
@@ -57,6 +59,10 @@ export class Mente360DB extends Dexie {
       tareas: "++id",
       usuarios_clips: "++id,users_id,clips_id",
       user: "++id,name,email",
+    });
+
+    this.version(4).stores({
+      notificaciones: "id, user_id, isRead, isDeleted, created_at"
     });
   }
 }

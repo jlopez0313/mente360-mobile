@@ -1,559 +1,154 @@
-import AudioNoWifi from "@/assets/images/audio_no_wifi.jpg";
-import {
-  IonCard,
-  IonCardContent,
-  IonCardHeader,
-  IonCardSubtitle,
-  IonChip,
-  IonIcon,
-  IonProgressBar,
-  IonSkeletonText,
-  IonText,
-  useIonAlert,
-  useIonLoading,
-  useIonToast,
-} from "@ionic/react";
-import {
-  downloadOutline,
-  heart,
-  heartOutline,
-  musicalNotesOutline,
-  pause,
-  play,
-  playSkipBack,
-  playSkipForward,
-  shareSocial,
-  star,
-  starOutline,
-  trashBinOutline,
-} from "ionicons/icons";
-import { useEffect, useRef, useState } from "react";
-import styles from "./Clip.module.scss";
-
-import { useAudio } from "@/hooks/useAudio";
-import {
-  putGlobalAudio,
-  setAudioItem,
-  setAudioSrc,
-  setGlobalAudio,
-  setGlobalPos,
-  setShowGlobalAudio,
-} from "@/store/slices/audioSlice";
-import { useDispatch, useSelector } from "react-redux";
-
-import { startBackground } from "@/helpers/background";
-import { create, updateElapsed } from "@/helpers/musicControls";
-
-import AudioProgressCircle from "@/components/Shared/Animations/ProgressCircle/ProgressCircle";
-// import ClipsDB from "@/database/clips";
-import Likes from "@/database/likes";
-import { db } from "@/hooks/useDexie";
-import { useNetwork } from "@/hooks/useNetwork";
-import { dislike, like } from "@/services/likes";
-import { add, trash } from "@/services/playlist";
-import { useLiveQuery } from "dexie-react-hooks";
+import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
+import { formatCount } from "@/helpers/Format";
+import { useAudioPlayer } from "@/hooks/useAudioPlayer";
+import { cn } from "@/lib/utils";
+import { Heart, Pause, Play, Share2, SkipBack, SkipForward, Star } from "lucide-react";
 
 export const Clip = () => {
-  const { user } = useSelector((state: any) => state.user);
-
-  const dispatch = useDispatch();
-  const network = useNetwork();
-
-  const [presentToast] = useIonToast();
-  const [presentAlert] = useIonAlert();
-  const [present, dismiss] = useIonLoading();
-
-  const [isLoading, setIsLoading] = useState(true);
-  const [percent, setPercent] = useState(0);
-
-  const { audioSrc, globalAudio, globalPos, listAudios } = useSelector(
-    (state: any) => state.audio
-  );
-
-  const likes = useLiveQuery(
-    () => db.likes.where("clips_id").equals(globalAudio.id).toArray(),
-    [globalAudio]
-  );
-
-  const in_my_playlist = useLiveQuery(
-    () =>
-      db.playlist
-        .where("users_id")
-        .equals(user.id)
-        .and((playlist: any) => playlist?.clip?.id === globalAudio.id)
-        .first(),
-    [globalAudio]
-  );
-
-  const my_like = useLiveQuery(
-    () =>
-      db.likes
-        .where("users_id")
-        .equals(user.id)
-        .and((like: Likes) => like.clips_id === globalAudio.id)
-        .first(),
-    [globalAudio]
-  );
-
-  const audioRef = useRef<any>();
-
   const {
+    audioRef,
+    activeTrack, // In Clip, track is implicitly the globalTrack
+    isPlaying,
+    likesCount,
+    hasLiked,
+    inMyPlaylist,
+    status,
     baseURL,
+    AudioNoWifi,
+    getAudioSrc,
     progress,
     duration,
-    real_duration,
-    buffer,
     currentTime,
-    isPlaying,
+    buffer,
+    onToggleLike,
+    handleTogglePlaylist,
+    onShareLink,
+    onTogglePlay,
+    goToPrev,
+    goToNext,
     onLoadedMetadata,
     onTimeUpdate,
     onUpdateBuffer,
-    onPause,
-    onPlay,
-    onShareLink,
-    downloadAudio,
-    deleteAudio,
-    getDownloadedAudio,
-  } = useAudio(
-    audioRef,
-    () => { },
-    () => { }
-  );
-
-  const onPresentToast = (
-    position: "top" | "middle" | "bottom",
-    message: string,
-    icon: any
-  ) => {
-    presentToast({
-      message: message,
-      duration: 2000,
-      position: position,
-      icon: icon,
-    });
-  };
-
-  const onDownload = async () => {
-    try {
-      onPresentToast(
-        "bottom",
-        "Descargando " + globalAudio.titulo + "...",
-        downloadOutline
-      );
-
-      const ruta = await downloadAudio(
-        baseURL + globalAudio.audio,
-        "audio_" + globalAudio.id,
-        async (p: any) => {
-          setPercent(p);
-        }
-      );
-
-      if (!ruta) {
-        throw new Error("No se pudo descargar el audio");
-      }
-
-      console.log("Ruta es ", ruta);
-      setPercent(0);
-
-      await db.clips.update(globalAudio.id, {
-        imagen_local: globalAudio.imagen,
-        audio_local: ruta,
-        downloaded: 1,
-      });
-
-      dispatch(
-        setAudioItem({
-          index: globalPos,
-          newData: {
-            imagen_local: globalAudio.imagen,
-            audio_local: ruta,
-            downloaded: 1,
-          },
-        })
-      );
-
-      onPresentToast(
-        "bottom",
-        globalAudio.titulo + " está listo para escucharse sin conexión. Podrás acceder a él desde esta misma aplicación",
-        musicalNotesOutline
-      );
-    } catch (error) {
-      console.log(" error ondownload", error);
-    }
-  };
-
-  const onRemoveLocal = async () => {
-    await deleteAudio(globalAudio.audio_local);
-
-    await db.clips.update(globalAudio.id, {
-      imagen_local: '',
-      audio_local: '',
-      downloaded: 0,
-    });
-
-
-    dispatch(
-      setAudioItem({
-        index: globalPos,
-        newData: {
-          imagen_local: null,
-          audio_local: null,
-          downloaded: 0,
-        },
-      })
-    );
-
-    dispatch(putGlobalAudio({ ...globalAudio, audio_local: null }));
-
-    onPresentToast(
-      "bottom",
-      globalAudio.titulo + " ha sido eliminado de tu biblioteca.",
-      musicalNotesOutline
-    );
-  };
-
-  const onTrashFromPlaylist = async () => {
-    try {
-      present({
-        message: "Cargando ...",
-      });
-
-      await trash(in_my_playlist?.id ?? 0);
-
-      await db.playlist
-        .where("id")
-        .equals(in_my_playlist?.id ?? 0)
-        .delete();
-
-      const newItem = {
-        ...globalAudio,
-      };
-
-      dispatch(setGlobalAudio(newItem));
-
-    } catch (error: any) {
-      console.log(error);
-
-      presentAlert({
-        header: "Alerta!",
-        subHeader: "Mensaje importante.",
-        message: error.data?.message || "Error Interno",
-        buttons: ["OK"],
-      });
-    } finally {
-      dismiss();
-    }
-  };
-
-  const onAddToPlaylist = async () => {
-    try {
-      present({
-        message: "Cargando ...",
-      });
-      const data = {
-        clips_id: globalAudio.id,
-        users_id: user.id,
-      };
-
-      const {
-        data: { data: added },
-      } = await add(data);
-
-      await db.playlist.add({
-        id: added.id,
-        clip: globalAudio,
-        users_id: user.id,
-      });
-
-      const newItem = {
-        ...globalAudio,
-      };
-
-      dispatch(setGlobalAudio(newItem));
-    } catch (error: any) {
-      console.log(error);
-
-      presentAlert({
-        header: "Alerta!",
-        subHeader: "Mensaje importante.",
-        message: error.data?.message || "Error Interno",
-        buttons: ["OK"],
-      });
-    } finally {
-      dismiss();
-    }
-  };
-
-  const onDislike = async () => {
-    try {
-      present({
-        message: "Cargando ...",
-      });
-
-      await dislike(my_like?.id ?? 0);
-      await db.likes
-        .where("id")
-        .equals(my_like?.id ?? 0)
-        .delete();
-
-      const newItem = {
-        ...globalAudio,
-      };
-
-      dispatch(setGlobalAudio(newItem));
-    } catch (error: any) {
-      console.log(error);
-
-      presentAlert({
-        header: "Alerta!",
-        subHeader: "Mensaje importante.",
-        message: error.data?.message || "Error Interno",
-        buttons: ["OK"],
-      });
-    } finally {
-      dismiss();
-    }
-  };
-
-  const onLike = async () => {
-    try {
-      present({
-        message: "Cargando ...",
-      });
-
-      const data = {
-        clips_id: globalAudio.id,
-        users_id: user.id,
-      };
-
-      const {
-        data: { data: added },
-      } = await like(data);
-
-      await db.likes.add({
-        ...data,
-        id: added.id,
-      });
-
-      const newItem = {
-        ...globalAudio,
-      };
-
-      dispatch(setGlobalAudio(newItem));
-    } catch (error: any) {
-      console.log(error);
-
-      presentAlert({
-        header: "Alerta!",
-        subHeader: "Mensaje importante.",
-        message: error.data?.message || "Error Interno",
-        buttons: ["OK"],
-      });
-    } finally {
-      dismiss();
-    }
-  };
-
-  const onUpdateElapsed = () => {
-    onTimeUpdate();
-    updateElapsed(audioRef.current?.currentTime);
-  };
-
-  const goToPrev = async () => {
-    const prevIdx = globalPos == 0 ? listAudios.length - 1 : globalPos - 1;
-    dispatch(setGlobalPos(prevIdx));
-
-    const prev = listAudios[prevIdx];
-
-    if (prev.audio_local) {
-      const audioBlob = await getDownloadedAudio(prev.audio_local);
-      dispatch(setAudioSrc(audioBlob));
-    } else {
-      dispatch(setAudioSrc(baseURL + prev.audio));
-    }
-
-    dispatch(setGlobalAudio(prev));
-  };
-
-  const goToNext = async () => {
-    // onEnd();
-    const nextIdx = globalPos == listAudios.length - 1 ? 0 : globalPos + 1;
-    dispatch(setGlobalPos(nextIdx));
-
-    const next = listAudios[nextIdx];
-
-    if (next.audio_local) {
-      const audioBlob = await getDownloadedAudio(next.audio_local);
-      dispatch(setAudioSrc(audioBlob));
-    } else {
-      dispatch(setAudioSrc(baseURL + next.audio));
-    }
-
-    dispatch(setGlobalAudio(next));
-  };
-
-  useEffect(() => {
-    if (real_duration) {
-      startBackground();
-      create(
-        baseURL,
-        globalAudio,
-        real_duration,
-        onPlay,
-        onPause,
-        goToPrev,
-        goToNext
-      );
-    }
-  }, [real_duration]);
-
-  useEffect(() => {
-    onPlay();
-    dispatch(setShowGlobalAudio(false));
-  }, [globalAudio]);
+    globalPos,
+    listAudios,
+  } = useAudioPlayer(null); // Passing null implies this is the primary Global Player
 
   return (
-    <div className={styles["ion-content"]}>
-      <IonCard className={styles.card}>
-        {isLoading && (
-          <IonSkeletonText
-            animated
-            style={{
-              width: "100%",
-              height: "300px",
-              borderRadius: "5px",
-            }}
+    <>
+      {/* Cover Image */}
+      <div className="flex-1 flex items-center justify-center px-10 py-6">
+        <div className="w-full max-w-[300px] aspect-square rounded-3xl overflow-hidden shadow-glow">
+          <img
+            src={!status ? AudioNoWifi : baseURL + activeTrack?.imagen}
+            alt={activeTrack?.titulo}
+            className="w-full h-full object-cover"
           />
-        )}
-        <img
-          alt=""
-          src={!network.status ? AudioNoWifi : baseURL + globalAudio.imagen}
-          style={{ display: isLoading ? "none" : "block" }}
-          onLoad={() => setIsLoading(false)}
-          className="ion-margin-bottom"
-        />
+        </div>
+      </div>
 
-        <IonCardHeader className="ion-no-padding">
-          <IonCardSubtitle className="ion-no-padding">
-            <IonText> {globalAudio.titulo} </IonText>
-            <span> {globalAudio.categoria?.categoria} </span>
-          </IonCardSubtitle>
-
-          <IonCardSubtitle className={"ion-no-padding"}>
-            <div className={styles["chip-list"]}>
-              <IonChip
-                disabled={!network.status}
-                onClick={() =>
-                  in_my_playlist ? onTrashFromPlaylist() : onAddToPlaylist()
-                }
-              >
-                <IonIcon
-                  className={`${styles["share-icon"]}`}
-                  icon={in_my_playlist ? star : starOutline}
-                />
-                Favoritos
-              </IonChip>
-
-              <IonChip
-                disabled={!network.status}
-                onClick={() => (my_like ? onDislike() : onLike())}
-              >
-                <IonIcon
-                  className={`${styles["share-icon"]}`}
-                  icon={my_like ? heart : heartOutline}
-                />
-                {likes && likes.length > 0
-                  ? likes.length + " Me gusta"
-                  : "Me gusta"}
-              </IonChip>
-
-              <IonChip
-                disabled={!network.status}
-                onClick={() => onShareLink(globalAudio.id)}
-              >
-                <IonIcon
-                  className={`${styles["share-icon"]}`}
-                  icon={shareSocial}
-                />
-                Compartir
-              </IonChip>
-
-              <IonChip
-                disabled={!network.status && !globalAudio.audio_local}
-                onClick={() =>
-                  globalAudio.audio_local ? onRemoveLocal() : onDownload()
-                }
-              >
-                <IonIcon
-                  className={`${styles["share-icon"]}`}
-                  icon={
-                    globalAudio.audio_local ? trashBinOutline : downloadOutline
-                  }
-                />
-                {globalAudio.audio_local ? "Eliminar" : "Descargar"}
-              </IonChip>
-
-
-            </div>
-          </IonCardSubtitle>
-        </IonCardHeader>
-
-        <IonCardContent className="ion-padding">
-          <div className={`${styles["unread-indicator"]}`}>
-            <IonProgressBar
-              color="warning"
-              buffer={buffer}
-              value={progress / 100}
-            />
+      {/* Info & Actions */}
+      <div className="px-6 pb-8 space-y-6">
+        {/* Title & Actions */}
+        <div className="flex items-start justify-between">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-xl font-heading !font-bold text-foreground truncate !m-0">
+              {activeTrack?.titulo}
+            </h1>
+            <p className="text-sm text-muted-foreground">{activeTrack?.categoria?.categoria}</p>
           </div>
-
-          <div className={`ion-margin-top ${styles.time}`}>
-            <span> {currentTime} </span>
-            <span> {duration} </span>
-          </div>
-
-          <div className={`${styles.controls}`}>
-
-
-            <span onClick={goToPrev} className={` material-symbols-outlined filled ${styles.previous}`}>
-              skip_previous
-            </span>
-
-            <div className={`${styles.play}`}>
-              {isPlaying ? (
-                <IonIcon onClick={onPause} icon={pause}></IonIcon>
-              ) : (
-                <IonIcon onClick={onPlay} icon={play}></IonIcon>
-              )}
-            </div>
-
-            <span onClick={goToNext} className={` material-symbols-outlined filled ${styles.next}`}>
-              skip_next
-            </span>
-          </div>
-          <audio
-            ref={audioRef}
-            onLoadedMetadata={onLoadedMetadata}
-            onTimeUpdate={onUpdateElapsed}
-            onProgress={onUpdateBuffer}
-            onEnded={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              goToNext();
-            }}
-            src={audioSrc}
-          />
-
-          {percent > 0 && (
-            <div
-              style={{ width: "100%", display: "flex", justifyContent: "end" }}
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="gap-1"
+              onClick={onToggleLike}
             >
-              <AudioProgressCircle />
-            </div>
-          )}
-        </IonCardContent>
-      </IonCard>
-    </div>
+              <Heart className={cn("w-5 h-5 text-muted-foreground",
+                hasLiked ? "fill-sos text-sos" : "text-muted-foreground"
+              )} />
+              {likesCount > 0 && formatCount(likesCount)}
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleTogglePlaylist}
+            >
+              <Star
+                className={cn(
+                  "w-5 h-5",
+                  inMyPlaylist ? "fill-sos text-sos" : "text-muted-foreground"
+                )}
+              />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={() => onShareLink(activeTrack?.id)}>
+              <Share2 className="w-5 h-5 text-muted-foreground" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="space-y-2">
+          <Slider
+            value={[progress]}
+            buffer={buffer}
+            onValueChange={() => { }}
+            className="w-full"
+          />
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <span>{currentTime}</span>
+            <span>{duration}</span>
+          </div>
+        </div>
+
+        {/* Controls */}
+        <div className="flex items-center justify-between px-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={goToPrev}
+            disabled={globalPos === 0}
+            className="w-12 h-12"
+          >
+            <SkipBack className="w-6 h-6" />
+          </Button>
+
+          <Button
+            size="icon"
+            onClick={onTogglePlay}
+            className="w-16 h-16 !rounded-full bg-primary hover:bg-primary/90 shadow-glow"
+          >
+            {isPlaying ? (
+              <Pause className="w-7 h-7 text-primary-foreground" />
+            ) : (
+              <Play className="w-7 h-7 text-primary-foreground ml-1" />
+            )}
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={goToNext}
+            disabled={globalPos === listAudios?.length - 1}
+            className="w-12 h-12"
+          >
+            <SkipForward className="w-6 h-6" />
+          </Button>
+        </div>
+      </div>
+
+      <audio
+        ref={audioRef}
+        src={getAudioSrc()}
+        onLoadedMetadata={onLoadedMetadata}
+        onTimeUpdate={onTimeUpdate}
+        onProgress={onUpdateBuffer}
+        onEnded={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          goToNext();
+        }}
+      />
+    </>
   );
 };

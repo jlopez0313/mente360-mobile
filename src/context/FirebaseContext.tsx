@@ -5,9 +5,9 @@ import { onValue } from "firebase/database";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-export const DBContext = React.createContext<any>(undefined);
+export const FirebaseContext = React.createContext<any>(undefined);
 
-export const DBProvider = ({ children }: any) => {
+export const FirebaseProvider = ({ children }: any) => {
   const dispatch = useDispatch();
 
   const { user } = useSelector((state: any) => state.user);
@@ -17,9 +17,15 @@ export const DBProvider = ({ children }: any) => {
   useEffect(() => {
     const checkPayment = () => {
       if (network.status && user) {
+        onValue(readData("users/" + user.id), (snapshot) => {
+          const data = snapshot.val();
+          if (user) {
+            dispatch(setUser({ ...user, ...data }));
+          }
+        });
+
         onValue(readData("payments/" + user.id), (snapshot) => {
           const data = snapshot.val();
-
           if (user) {
             dispatch(setUser({ ...user, ...data }));
           }
@@ -28,7 +34,6 @@ export const DBProvider = ({ children }: any) => {
         onValue(readData("subscriptions/" + user.id), (snapshot) => {
           const objData = snapshot.val();
           const data = snapshotToArray(objData);
-
           const suscripciones = data
             ?.filter((item: any) => item)
             .map((item: any) => {
@@ -58,5 +63,5 @@ export const DBProvider = ({ children }: any) => {
     checkPayment();
   }, []);
 
-  return <DBContext.Provider value={state}>{children}</DBContext.Provider>;
+  return <FirebaseContext.Provider value={state}>{children}</FirebaseContext.Provider>;
 };

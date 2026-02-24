@@ -1,4 +1,7 @@
-import { Preferences } from "@capacitor/preferences";
+import { getPreference, KEYS, removePreference, setPreference, type PreferenceKey } from '@/helpers/preferences';
+
+export { KEYS };
+export type { PreferenceKey };
 
 export interface IKeys {
   SYNC_KEY: string;
@@ -16,33 +19,16 @@ interface IPreferences {
   removePreference: (key: string) => Promise<void>;
 }
 
+/**
+ * Hook de preferencias para uso dentro de componentes y hooks de React.
+ * Para uso fuera de componentes (servicios, etc.), importar directamente
+ * desde '@/helpers/preferences'.
+ */
 export const usePreferences = (): IPreferences => {
-  const keys: IKeys = {
-    SYNC_KEY: "lastSyncDate",
-    HOME_SYNC_KEY: "lastHomeSync",
-    CLIP_PAGE_KEY: "lastClipPage",
-    CRECIMIENTOS_PAGE_KEY: "lastCrecimientoPage",
-    DARK_MODE: "darkMode",
-    TOKEN: "token",
-  };
-
-  const getPreference = async (key: string): Promise<string | null> => {
-    const result = await Preferences.get({ key });
-    return result.value;
-  };
-
-  const setPreference = async (key: string, value: string) => {
-    await Preferences.set({ key, value });
-  };
-
-  const removePreference = async (key: string) => {
-    await Preferences.remove({ key });
-  };
-
   return {
+    keys: KEYS,
     getPreference,
     setPreference,
     removePreference,
-    keys,
   };
 };

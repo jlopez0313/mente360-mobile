@@ -2,37 +2,47 @@ import { AppLayout } from "@/components/layout";
 import { Item } from "@/components/Notifications/Item";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { db } from "@/hooks/useDexie";
 import { setShowGlobalAudio } from "@/store/slices/audioSlice";
-import { setGeneral, update } from "@/store/slices/notificationSlice";
+import { setGeneral } from "@/store/slices/notificationSlice"; // Eliminamos update import
+import { useLiveQuery } from "dexie-react-hooks";
 import { Bell, Check } from "lucide-react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const Notifications = () => {
   const dispatch = useDispatch();
-  const { notificaciones } = useSelector((state: any) => state.notifications);
-
   const { toast } = useToast();
+  const { user } = useSelector((state: any) => state.user);
 
-  const markAsRead = (id: string) => {
-    const lista = notificaciones.map((n: any) =>
-      n.id === id ? { ...n, isRead: true } : n
-    );
+  // Escuchamos la base de datos local y omitimos las eliminadas
+  const notificaciones = useLiveQuery(async () => {
+    const list = await db.notificaciones
+      .where({ user_id: user.id })
+      .filter((n: any) => !n.isDeleted).toArray();
+    // Ordenar de más reciente a más antigua
+    return list.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  }, []) || [];
 
-    dispatch(update({ notificaciones: lista }));
+  const markAsRead = async (id: string) => {
+    await db.notificaciones.update(id, { isRead: true });
   };
 
-  const markAllAsRead = () => {
-    // setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
-    toast({ title: "Todas las notificaciones marcadas como leídas" });
+  const markAllAsRead = async () => {
+    const unreadIds = notificaciones
+      .filter((n: any) => !n.isRead)
+      .map((n: any) => n.id);
+
+    if (unreadIds.length > 0) {
+      await Promise.all(
+        unreadIds.map(id => db.notificaciones.update(id, { isRead: true }))
+      );
+      toast({ title: "Todas las notificaciones marcadas como leídas" });
+    }
   };
 
-  const deleteNotification = (id: string) => {
-    // setNotifications(prev => prev.filter(n => n.id !== id));
-    const lista = notificaciones.filter((n: any) => n.id !== id);
-
-    dispatch(update({ notificaciones: lista }));
-
+  const deleteNotification = async (id: string) => {
+    await db.notificaciones.update(id, { isDeleted: true });
     toast({ title: "Notificación eliminada" });
   };
 
@@ -45,9 +55,8 @@ const Notifications = () => {
 
   return (
     <AppLayout>
-      <div className="min-h-full pb-24">
+      <div className="h-full flex flex-col">
         {/* Header */}
-
         <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50 px-4 py-4 space-y-4">
           <div className="flex items-center justify-between mb-1">
             <div className="flex items-center gap-3">
@@ -78,7 +87,7 @@ const Notifications = () => {
         </div>
 
         {/* Notifications List */}
-        <div className="space-y-3 px-4 py-6">
+        <div className="flex-1 overflow-y-auto space-y-3 px-4 py-6">
           {notificaciones.length === 0 ? (
             <div className="text-center py-12">
               <Bell className="w-12 h-12 text-muted-foreground/50 mx-auto mb-3" />
@@ -87,7 +96,7 @@ const Notifications = () => {
           ) : (
             notificaciones.map((notification: any, idx: number) => (
               <Item
-                key={idx}
+                key={notification.id || idx}
                 notification={notification}
                 markAsRead={markAsRead}
                 deleteNotification={deleteNotification}
