@@ -77,7 +77,7 @@ export function DailyContentGrid({ completed, onOpenModal }: DailyContentGridPro
               key={item.id}
               onClick={() => onOpenModal(item.id as "nightAudio" | "sosEmotional" | "dailyMessage" | "weeklyTask")}
               className={cn(
-                "relative flex flex-col items-center gap-2 p-4 !rounded-2xl transition-all",
+                "relative flex flex-col items-center gap-2 !p-4 !rounded-2xl transition-all",
                 "!bg-card shadow-card hover:shadow-elevated active:scale-[0.98]",
                 item.isCompleted && "ring-2 ring-success/50"
               )}

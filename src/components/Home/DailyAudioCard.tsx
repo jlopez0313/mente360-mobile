@@ -1,5 +1,6 @@
 import { NetworkContext } from "@/context/NetworkContext";
 import { db } from "@/hooks/useDexie";
+import { usePayment } from "@/hooks/usePayment";
 import { useLiveQuery } from "dexie-react-hooks";
 import { Headphones, Play } from "lucide-react";
 import { useContext, useEffect, useMemo, useState } from "react";
@@ -42,6 +43,7 @@ function useAudioDuration(src: string | undefined): string | null {
 export function DailyAudioCard() {
   const { user } = useSelector((state: any) => state.user);
   const { baseURL, status } = useContext(NetworkContext);
+  const { userEnabled, payment_status } = usePayment();
   const history = useHistory();
 
   // El crecimiento actual del usuario viene en user.crecimientos[0]
@@ -70,6 +72,12 @@ export function DailyAudioCard() {
 
   const handleClick = () => {
     if (!nivelId) return;
+
+    if (!userEnabled || payment_status == "free") {
+      history.push('/planes');
+      return;
+    }
+
     history.push(`/niveles/${nivelId}/crecimientos`);
   };
 

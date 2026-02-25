@@ -166,22 +166,6 @@ const Suscripcion = ({ comunidad }: any) => {
           </div>
         )}
       </div>
-
-      {/*
-                    <Modal
-                      isOpen={isPremiumOpen}
-                      title={import.meta.env.VITE_NAME + " premium"}
-                      hideButtons={!network.status || false}
-                      showButtons={false}
-                      onConfirm={() => {}}
-                      onWillDismiss={() => setIsPremiumOpen(false)}
-                    >
-                      <div className="ion-padding">
-                        <Premium />
-                        <Buttons />
-                      </div>
-                    </Modal>
-              */}
     </div>
   );
 };

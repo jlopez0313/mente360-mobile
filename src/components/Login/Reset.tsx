@@ -10,22 +10,11 @@ import { z } from "zod";
 
 import { reset } from "@/services/auth";
 
-type AuthMode = "login" | "register" | "reset";
-
 const emailSchema = z
   .string()
   .trim()
   .email("Correo electrónico inválido")
   .max(255);
-const passwordSchema = z
-  .string()
-  .min(6, "La contraseña debe tener al menos 6 caracteres")
-  .max(100);
-const nameSchema = z
-  .string()
-  .trim()
-  .min(2, "El nombre debe tener al menos 2 caracteres")
-  .max(100);
 
 interface Props {
   isLoading: boolean;

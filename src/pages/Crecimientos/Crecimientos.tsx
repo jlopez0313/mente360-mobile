@@ -77,7 +77,6 @@ const Crecimientos: React.FC = () => {
       db.crecimientos
         .toArray()
         .then((lista: any[]) => {
-          // swiper.slideTo(0);
           return lista;
         })
         .then((resultados: any[]) => {
@@ -92,7 +91,6 @@ const Crecimientos: React.FC = () => {
             const idx = resultados.findIndex(
               (x: any) => x.id == user.crecimientos_id
             );
-            // swiper.slideTo(idx);
           }
 
           return resultados;
@@ -106,20 +104,14 @@ const Crecimientos: React.FC = () => {
   };
 
   const onSaveNext = async (nextIdx: number) => {
-    if (crecimientos && crecimientos[nextIdx]) {
-      const updatePromise = nextCrecimiento(
-        {
-          crecimientos_id: crecimientos[nextIdx].id,
-        },
-        user.id
-      );
+    const isLevelZero = nivel?.orden === 0 || nivel?.nivel === "Nivel 0";
+    const currentAudioTitle = crecimientos?.[currentIndex]?.titulo ?? "";
+    const regex = new RegExp(`eneatipo\\s*${user.eneatipo}`, "i");
+    const isEneatipoMatch = regex.test(currentAudioTitle);
 
-      const setUserPromise = updatePromise.then(({ data }) => {
-        return dispatch(setUser(data.data));
-      });
+    const shouldAdvanceLevel = (isLevelZero && isEneatipoMatch) || nextIdx === crecimientos?.length;
 
-      await Promise.all([updatePromise, setUserPromise]);
-    } else if (nextIdx == crecimientos?.length) {
+    if (shouldAdvanceLevel) {
       const nextNivelIdx = niveles?.findIndex((n) => n.id == Number(id)) ?? -1;
 
       if (niveles && niveles[nextNivelIdx + 1]) {
@@ -139,6 +131,20 @@ const Crecimientos: React.FC = () => {
           `/niveles/${niveles[nextNivelIdx + 1]?.id}/crecimientos`
         );
       }
+    } else if (crecimientos && crecimientos[nextIdx]) {
+      // Normal progression to the next audio in the same level
+      const updatePromise = nextCrecimiento(
+        {
+          crecimientos_id: crecimientos[nextIdx].id,
+        },
+        user.id
+      );
+
+      const setUserPromise = updatePromise.then(({ data }) => {
+        return dispatch(setUser(data.data));
+      });
+
+      await Promise.all([updatePromise, setUserPromise]);
     }
 
     // await dispatch(setPodcast({ done: 1 }));

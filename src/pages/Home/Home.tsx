@@ -14,7 +14,7 @@ import { useContext, useEffect, useState } from "react";
 
 import { mockUser } from "@/lib/mockData";
 import { Settings, Trophy } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 
 import { SuccessOverlay } from "@/components/Shared/Animations/Success/SuccessOverlay";
 import { Sync } from "@/components/Shared/Animations/Sync/Sync";
@@ -25,6 +25,7 @@ import { destroy } from "@/helpers/musicControls";
 import { useCompletedItems } from "@/hooks/useCompletedItems";
 import { db } from "@/hooks/useDexie";
 import { useGlobalSync } from "@/hooks/useGlobalSync";
+import { usePayment } from "@/hooks/usePayment";
 import { usePreferences } from "@/hooks/usePreferences";
 import { update } from "@/services/user";
 import { setAdmin, setCurrentDay, setPodcast } from "@/store/slices/homeSlice";
@@ -43,9 +44,11 @@ const Home: React.FC = () => {
 
   const { currentDay } = useSelector((state: any) => state.home);
   const dispatch = useDispatch();
+  const history = useHistory();
 
   const { status, baseURL, AvatarLogo } = useContext(NetworkContext);
   const { loading, error, success, mensaje, syncAll } = useGlobalSync();
+  const { userEnabled, payment_status } = usePayment();
 
   const [nightAudioOpen, setNightAudioOpen] = useState(false);
   const [sosOpen, setSosOpen] = useState(false);
@@ -67,17 +70,33 @@ const Home: React.FC = () => {
   const handleOpenModal = (
     modal: "nightAudio" | "sosEmotional" | "dailyMessage" | "weeklyTask"
   ) => {
+
     switch (modal) {
       case "nightAudio":
+        if (!userEnabled || payment_status == "free") {
+          history.push('/planes');
+          return;
+        }
+
         setNightAudioOpen(true);
         break;
       case "sosEmotional":
+        if (!userEnabled || payment_status == "free") {
+          history.push('/planes');
+          return;
+        }
+
         setSosOpen(true);
         break;
       case "dailyMessage":
         setDailyMessageOpen(true);
         break;
       case "weeklyTask":
+        if (!userEnabled || payment_status == "free") {
+          history.push('/planes');
+          return;
+        }
+
         setWeeklyTaskOpen(true);
         break;
     }

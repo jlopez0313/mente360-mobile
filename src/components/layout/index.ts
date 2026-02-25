@@ -1,3 +1,3 @@
 export { AppLayout } from "./AppLayout";
-export { BottomNav } from "./BottomNav";
+export { TabsLayout } from "./TabsLayout";
 

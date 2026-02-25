@@ -298,6 +298,12 @@ const Configuracion: React.FC = () => {
               </Button>
             </div>
           </div>
+
+          <div className="text-center">
+            <p className="text-muted-foreground text-sm">
+              Versión {import.meta.env.VITE_VERSION}
+            </p>
+          </div>
         </div>
       </div>
     </AppLayout>

@@ -10,7 +10,6 @@ import { cn } from "@/lib/utils";
 import { CheckCircle2, ClipboardList } from "lucide-react";
 
 import { db } from "@/hooks/useDexie";
-import { usePayment } from "@/hooks/usePayment";
 import { confirmTarea } from "@/services/home";
 import { setTab } from "@/store/slices/chatSlice";
 import {
@@ -38,7 +37,6 @@ export function WeeklyTaskModal({
   const dispatch = useDispatch();
 
   const history = useHistory();
-  const { userEnabled, payment_status } = usePayment();
 
   const [presentAlert] = useIonAlert();
 
@@ -94,6 +92,10 @@ export function WeeklyTaskModal({
     return nextSunday;
   }
 
+  const goToPlanes = () => {
+    history.replace("/planes");
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-sm mx-auto rounded-xl border-0 bg-gradient-to-b from-primary/10 to-background p-6 overflow-hidden max-h-[85vh]">
@@ -131,7 +133,7 @@ export function WeeklyTaskModal({
         {/* Complete Button */}
         <Button
           onClick={onConfirmTarea}
-          // disabled={isCompleted || currentDay != 1 || !userEnabled || payment_status == 'free'}
+          disabled={isCompleted || currentDay != 1}
           className={cn(
             "w-full !rounded-xl h-12 text-base font-semibold",
             isCompleted
@@ -148,10 +150,8 @@ export function WeeklyTaskModal({
             "Marcar como completada"
           )}
         </Button>
-
         <Button
           onClick={onConfirmTarea}
-          disabled={!userEnabled || payment_status == 'free'}
           className={cn(
             "w-full !rounded-xl h-12 text-base font-semibold",
             isCompleted
@@ -159,10 +159,7 @@ export function WeeklyTaskModal({
               : "gradient-primary text-primary-foreground hover:opacity-90"
           )}
         >
-          {(
-            userEnabled && payment_status != 'free' ? "Ir a Grupo" : "Premium"
-
-          )}
+          Ir a Grupo
         </Button>
       </DialogContent>
     </Dialog>
