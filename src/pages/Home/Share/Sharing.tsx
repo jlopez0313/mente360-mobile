@@ -1,10 +1,9 @@
-import { IonContent, IonPage } from "@ionic/react";
 import React, { useEffect } from "react";
-import styles from "./Sharing.module.scss";
 
 import { FileSharer } from "@byteowls/capacitor-filesharer";
 import { App } from "@capacitor/app";
 
+import { AppLayout } from "@/components/layout";
 import { db } from "@/hooks/useDexie";
 import { useLiveQuery } from "dexie-react-hooks";
 import * as htmlToImage from "html-to-image";
@@ -14,7 +13,7 @@ import { useHistory } from "react-router";
 const Sharing: React.FC = () => {
   const history = useHistory();
 
-  const mensaje = useLiveQuery( ( ) => db.mensajes.toCollection().first() )
+  const mensaje = useLiveQuery(() => db.mensajes.toCollection().first())
 
   const { panico, msgSource } = useSelector(
     (state: any) => state.home
@@ -68,22 +67,20 @@ const Sharing: React.FC = () => {
   }, [mensaje, panico]);
 
   return (
-    <IonPage>
-      <IonContent className={styles["ion-content"]}>
-        <div id="content" className={styles["content"]}>
-          <div className={styles.texto}>
-            <p style={{ whiteSpace: "pre-wrap" }}>
-              {msgSource == "mensaje" ? mensaje?.mensaje : panico?.texto}
-            </p>
+    <AppLayout>
+      <div id="content" className="bg-background">
+        <div className="text-center">
+          <p style={{ whiteSpace: "pre-wrap" }}>
+            {msgSource == "mensaje" ? mensaje?.mensaje : panico?.texto}
+          </p>
 
-            <img
-              src="assets/images/logo_texto.png"
-              style={{ width: "90px", display: "block", margin: "10px auto" }}
-            />
-          </div>
+          <img
+            src="assets/images/logo_texto.png"
+            style={{ width: "90px", display: "block", margin: "10px auto" }}
+          />
         </div>
-      </IonContent>
-    </IonPage>
+      </div>
+    </AppLayout>
   );
 };
 

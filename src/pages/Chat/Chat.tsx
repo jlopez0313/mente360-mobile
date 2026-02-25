@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 const Lista: React.FC = () => {
   const dispatch = useDispatch();
-  
+
   const { isRoom, isGrupo } = useSelector((state: any) => state.notifications);
   const { activeTab } = useSelector((state: any) => state.chat);
 
@@ -33,7 +33,7 @@ const Lista: React.FC = () => {
 
   return (
     <AppLayout>
-      <div className="min-h-full pb-24">
+      <div className="min-h-full flex flex-col">
         <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50 px-4 py-4 space-y-4">
           {/* Header */}
           <div className="flex items-center gap-3 mb-6">
@@ -61,7 +61,7 @@ const Lista: React.FC = () => {
         </div>
 
         {/* Tabs */}
-        <div className="px-4 py-6">
+        <div className="px-4 py-6 flex-1 overflow-y-auto">
           <Tabs value={activeTab} onValueChange={onSetTab}>
             <TabsList className="w-full mb-4">
               <TabsTrigger value="chats" className="relative flex-1 gap-1 text-xs px-2">

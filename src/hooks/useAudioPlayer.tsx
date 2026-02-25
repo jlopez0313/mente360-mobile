@@ -17,29 +17,22 @@ import { useContext, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
-export const useAudioPlayer = (track: Clips | null, idx?: number) => {
+export const useAudioPlayer = (track: Clips | null, idx?: number, isGlobal: boolean = true) => {
     const { user } = useSelector((state: any) => state.user);
     const { status, AudioNoWifi, baseURL } = useContext(NetworkContext);
 
     const dispatch = useDispatch();
 
-    const { audioSrc, globalAudio, isGlobalPlaying, globalPos, listAudios } = useSelector(
+    const { globalAudio, isGlobalPlaying, globalPos, listAudios } = useSelector(
         (state: any) => state.audio
     );
 
     // We determine if THIS track is the currently playing track globally.
     // If track is null, we assume we are controlling the global track directly (like in Clip.tsx)
-    const isCurrentlyPlayingGlobalTrack = track ? (globalAudio?.id === track.id) : true;
-    const activeTrack = track || globalAudio;
-    const isPlaying = isCurrentlyPlayingGlobalTrack && isGlobalPlaying;
+    const activeTrack = isGlobal ? (track || globalAudio) : track;
+    const isCurrentlyPlayingGlobalTrack = isGlobal ? (track ? (globalAudio?.id === track.id) : true) : false;
 
-    const audioRef = useRef<HTMLAudioElement | any>({
-        currentTime: 0,
-        duration: 0,
-        pause: () => { },
-        play: () => Promise.resolve(),
-        fastSeek: () => { },
-    });
+    const audioRef = useRef<HTMLAudioElement | null>(null);
 
     const {
         progress,
@@ -47,17 +40,21 @@ export const useAudioPlayer = (track: Clips | null, idx?: number) => {
         real_duration,
         buffer,
         currentTime,
-        onLoadedMetadata,
-        onTimeUpdate,
-        onUpdateBuffer,
+        isPlaying: localIsPlaying,
         onPause: audioPause,
         onPlay: audioPlay,
+        onLoad,
         onShareLink,
         downloadAudio,
         deleteAudio,
         getDownloadedAudio,
         onTogglePlaylist: originalTogglePlaylist,
-    } = useAudio(audioRef, () => { });
+        onTimeUpdate,
+        onLoadedMetadata,
+        onUpdateBuffer,
+    } = useAudio(audioRef, () => { }, isGlobal);
+
+    const isPlaying = isGlobal ? (isCurrentlyPlayingGlobalTrack && isGlobalPlaying) : localIsPlaying;
 
     // Queries
     const likes = useLiveQuery(
@@ -137,20 +134,27 @@ export const useAudioPlayer = (track: Clips | null, idx?: number) => {
     // ===============================
     const onTogglePlay = async () => {
         if (isPlaying) {
-            dispatch(setIsGlobalPlaying(false));
+            if (isGlobal) dispatch(setIsGlobalPlaying(false));
             audioPause();
         } else {
-            if (activeTrack.audio_local) {
-                const audioBlob = await getDownloadedAudio(activeTrack.audio_local);
-                dispatch(setAudioSrc(audioBlob));
+            if (isGlobal) {
+                if (activeTrack.audio_local) {
+                    const audioBlob = await getDownloadedAudio(activeTrack.audio_local);
+                    dispatch(setAudioSrc(audioBlob));
+                } else {
+                    dispatch(setAudioSrc(baseURL + activeTrack.audio));
+                }
+
+                if (idx !== undefined) dispatch(setGlobalPos(idx));
+
+                dispatch(setGlobalAudio({ ...activeTrack, inMyPlaylist }));
+                dispatch(setIsGlobalPlaying(true));
             } else {
-                dispatch(setAudioSrc(baseURL + activeTrack.audio));
+                // Modificar src del ref directamente para audio local
+                if (!audioRef.current?.src) {
+                    audioRef.current!.src = getAudioSrc();
+                }
             }
-
-            if (idx !== undefined) dispatch(setGlobalPos(idx));
-
-            dispatch(setGlobalAudio({ ...activeTrack, inMyPlaylist }));
-            dispatch(setIsGlobalPlaying(true));
             audioPlay();
         }
     };
@@ -225,12 +229,13 @@ export const useAudioPlayer = (track: Clips | null, idx?: number) => {
         onShareLink,
         onToggleDownload,
         onTogglePlay,
+        onLoad,
         goToPrev,
         goToNext,
-        onLoadedMetadata,
-        onTimeUpdate,
-        onUpdateBuffer,
         globalPos,
         listAudios,
+        onTimeUpdate,
+        onLoadedMetadata,
+        onUpdateBuffer,
     };
 };

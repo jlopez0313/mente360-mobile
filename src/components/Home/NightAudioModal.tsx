@@ -15,7 +15,6 @@ import { Buttons } from "../Shared/Premium/Buttons/Buttons";
 import { Premium } from "../Shared/Premium/Premium";
 
 import { db } from "@/hooks/useDexie";
-import { useIonAlert } from "@ionic/react";
 import { useLiveQuery } from "dexie-react-hooks";
 
 import { NetworkContext } from "@/context/NetworkContext";
@@ -56,7 +55,7 @@ export function NightAudioModal({
     onPause,
     onPlay,
     onLoad,
-  } = useAudio(audioRef);
+  } = useAudio(audioRef, () => { }, false);
 
   const onDoPause = () => {
     onPause();
@@ -75,7 +74,7 @@ export function NightAudioModal({
 
   const audio = useLiveQuery(() => db.audios.toCollection().first());
 
-  const [presentAlert] = useIonAlert();
+
 
   const onConfirmAudio = async () => {
     try {
@@ -89,12 +88,13 @@ export function NightAudioModal({
     if (isPlaying) {
       onPause();
     } else {
+      dispatch(setIsGlobalPlaying(false));
       onPlay();
     }
   };
 
   useEffect(() => {
-    if (real_duration) {
+    if (real_duration && open && audio) {
       startBackground();
       create(
         baseURL,
@@ -102,11 +102,11 @@ export function NightAudioModal({
         real_duration,
         onPlay,
         onPause,
-        () => {},
-        () => {}
+        () => { },
+        () => { }
       );
     }
-  }, [real_duration]);
+  }, [real_duration, open, audio]);
 
   return (
     <>

@@ -40,6 +40,7 @@ import "@ionic/react/css/padding.css";
 import "@ionic/react/css/text-alignment.css";
 import "@ionic/react/css/text-transformation.css";
 
+import { GlobalAudioController } from "@/components/Shared/GlobalAudioController/GlobalAudioController";
 import { Toast } from "@/components/Shared/Toast/Toast";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
@@ -53,11 +54,9 @@ setupIonicReact({
 });
 
 const App: React.FC = () => {
-  const { globalAudio, showGlobalAudio } = useSelector(
+  const { globalAudio } = useSelector(
     (state: any) => state.audio
   );
-
-
 
   return (
     <IonApp>
@@ -68,7 +67,8 @@ const App: React.FC = () => {
           <NetworkProvider>
             <FirebaseProvider>
               <IonReactRouter>
-                {globalAudio && showGlobalAudio && <Toast />}
+                <GlobalAudioController />
+                {globalAudio && <Toast />}
                 <Route exact path="/">
                   <Splash />
                 </Route>

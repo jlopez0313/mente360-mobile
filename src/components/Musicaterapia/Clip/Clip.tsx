@@ -7,7 +7,6 @@ import { Heart, Pause, Play, Share2, SkipBack, SkipForward, Star } from "lucide-
 
 export const Clip = () => {
   const {
-    audioRef,
     activeTrack, // In Clip, track is implicitly the globalTrack
     isPlaying,
     likesCount,
@@ -16,7 +15,6 @@ export const Clip = () => {
     status,
     baseURL,
     AudioNoWifi,
-    getAudioSrc,
     progress,
     duration,
     currentTime,
@@ -27,9 +25,6 @@ export const Clip = () => {
     onTogglePlay,
     goToPrev,
     goToNext,
-    onLoadedMetadata,
-    onTimeUpdate,
-    onUpdateBuffer,
     globalPos,
     listAudios,
   } = useAudioPlayer(null); // Passing null implies this is the primary Global Player
@@ -136,19 +131,6 @@ export const Clip = () => {
           </Button>
         </div>
       </div>
-
-      <audio
-        ref={audioRef}
-        src={getAudioSrc()}
-        onLoadedMetadata={onLoadedMetadata}
-        onTimeUpdate={onTimeUpdate}
-        onProgress={onUpdateBuffer}
-        onEnded={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          goToNext();
-        }}
-      />
     </>
   );
 };

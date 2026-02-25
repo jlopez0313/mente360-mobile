@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { destroy } from "@/helpers/musicControls";
 import { useBackButton } from "@/hooks/useBackButton";
 import { db } from "@/hooks/useDexie";
-import { setShowGlobalAudio } from "@/store/slices/audioSlice";
 import { useLiveQuery } from "dexie-react-hooks";
 import { ArrowLeft } from "lucide-react";
 import { useEffect } from "react";
@@ -39,8 +38,6 @@ const Niveles: React.FC = () => {
   };
 
   useEffect(() => {
-    dispatch(setShowGlobalAudio(true));
-
     return () => {
       destroy();
     };

@@ -18,8 +18,11 @@ import { NetworkContext } from "@/context/NetworkContext";
 import { useAudio } from "@/hooks/useAudio";
 import { usePayment } from "@/hooks/usePayment";
 import { activar } from "@/services/sos";
+import { setIsGlobalPlaying } from "@/store/slices/audioSlice";
+import { setMsgSource, setPanico } from "@/store/slices/homeSlice";
 import { IonButton } from "@ionic/react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router";
 
 interface SOSModalProps {
   open: boolean;
@@ -38,7 +41,6 @@ export function SOSModal({
   const {
     progress,
     duration,
-    real_duration,
     buffer,
     currentTime,
     isPlaying,
@@ -48,7 +50,7 @@ export function SOSModal({
     onPause,
     onPlay,
     onLoad,
-  } = useAudio(audioRef);
+  } = useAudio(audioRef, () => { }, false);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -58,31 +60,24 @@ export function SOSModal({
 
   const { AudioNoWifi, baseURL, status } = useContext(NetworkContext);
   const { user } = useSelector((state: any) => state.user);
+  const dispatch = useDispatch();
+  const history = useHistory();
 
   const { userEnabled, payment_status } = usePayment();
 
   const [sos, setSOS] = useState<any>({});
   const [isPremiumOpen, setIsPremiumOpen] = useState(false);
 
-  useEffect(() => {
-    const onGetSos = async () => {
-      if (!open) return;
-
-      try {
-        const { data } = await activar(user.eneatipo);
-        setSOS(data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    onGetSos();
-  }, [open]);
+  const handleShare = async () => {
+    dispatch(setMsgSource('sos'));
+    history.replace("/share")
+  };
 
   const handlePlayPause = () => {
     if (isPlaying) {
       onPause();
     } else {
+      dispatch(setIsGlobalPlaying(false));
       onPlay();
     }
   };
@@ -94,6 +89,23 @@ export function SOSModal({
     }
     onOpenChange(open);
   }
+
+  useEffect(() => {
+    const onGetSos = async () => {
+      if (!open) return;
+
+      try {
+        const { data } = await activar(user.eneatipo);
+        setSOS(data);
+
+        dispatch(setPanico(data.texto));
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    onGetSos();
+  }, [open]);
 
   return (
     <>
@@ -183,6 +195,7 @@ export function SOSModal({
                   <Button
                     variant="outline"
                     className="flex-1 !rounded-xl h-12 text-base !font-semibold border-accent/30 text-accent hover:bg-accent/10"
+                    onClick={handleShare}
                   >
                     <Share2 className="w-5 h-5 mr-2" />
                     Compartir

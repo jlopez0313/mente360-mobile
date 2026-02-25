@@ -17,7 +17,7 @@ export const audioSlice = createSlice({
     name: 'audio',
     initialState: { ...initialState },
     reducers: {
-        resetStore: (state) => {
+        resetStore: () => {
             return { ...initialState };
         },
         setTab: (state, action) => {

@@ -11,7 +11,6 @@ import {
   SkipForward,
   Trash2,
 } from "lucide-react";
-import { useEffect } from "react";
 
 interface Props {
   crecimientos: Crecimientos[];
@@ -34,23 +33,24 @@ export const Crecimiento = ({
 }: Props) => {
 
   const {
-    audioRef,
     activeTrack,
     isPlaying,
     status,
     baseURL,
     AudioNoWifi,
-    getAudioSrc,
     progress,
     duration,
     currentTime,
     buffer,
     onTogglePlay,
     onToggleDownload,
-    onLoadedMetadata,
+    onLoad,
+    audioRef,
+    getAudioSrc,
     onTimeUpdate,
+    onLoadedMetadata,
     onUpdateBuffer,
-  } = useAudioPlayer(currentAudio, currentIndex);
+  } = useAudioPlayer(currentAudio, currentIndex, false);
 
   const handlePrevious = () => {
     if (crecimientos?.length && currentIndex > 0) {
@@ -71,13 +71,6 @@ export const Crecimiento = ({
     onSaveNext(currentIndex + 1);
     handleNext();
   };
-
-  // Autoplay or Reload specific for Crecimientos when audio changes
-  useEffect(() => {
-    if (audioRef.current && getAudioSrc()) {
-      audioRef.current.load();
-    }
-  }, [currentAudio]);
 
   return (
     <>
@@ -131,9 +124,7 @@ export const Crecimiento = ({
             step={0.1}
             buffer={buffer * 100}
             onValueChange={(value) => {
-              if (audioRef.current) {
-                audioRef.current.currentTime = (audioRef.current.duration * value[0]) / 100;
-              }
+              onLoad(value[0]);
             }}
             className="w-full"
           />

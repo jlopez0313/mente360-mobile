@@ -16,21 +16,23 @@ import { mockUser } from "@/lib/mockData";
 import { Settings, Trophy } from "lucide-react";
 import { Link } from "react-router-dom";
 
+import { SuccessOverlay } from "@/components/Shared/Animations/Success/SuccessOverlay";
 import { Sync } from "@/components/Shared/Animations/Sync/Sync";
 import { NetworkContext } from "@/context/NetworkContext";
 import { diferenciaEnDias } from "@/helpers/Fechas";
 import { DB, localDB } from "@/helpers/localStore";
 import { destroy } from "@/helpers/musicControls";
 import { useCompletedItems } from "@/hooks/useCompletedItems";
+import { db } from "@/hooks/useDexie";
 import { useGlobalSync } from "@/hooks/useGlobalSync";
 import { usePreferences } from "@/hooks/usePreferences";
 import { update } from "@/services/user";
-import { setShowGlobalAudio } from "@/store/slices/audioSlice";
 import { setAdmin, setCurrentDay, setPodcast } from "@/store/slices/homeSlice";
 import { setUser } from "@/store/slices/userSlice";
 import { getHomeThunk } from "@/store/thunks/home";
 import { getNotifications } from "@/store/thunks/notifications";
 import { FCM } from "@capacitor-community/fcm";
+import { useLiveQuery } from "dexie-react-hooks";
 import { useDispatch, useSelector } from "react-redux";
 
 const Home: React.FC = () => {
@@ -50,6 +52,12 @@ const Home: React.FC = () => {
   const [dailyMessageOpen, setDailyMessageOpen] = useState(false);
   const [weeklyTaskOpen, setWeeklyTaskOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  const nightlyAudio = useLiveQuery(() => db.audios.toCollection().first());
+  const weeklyTask = useLiveQuery(() => db.tareas.toCollection().first());
+  const dailyMessage = useLiveQuery(() => db.mensajes.toCollection().first());
+  const { podcast } = useSelector((state: any) => state.home);
 
   const { user } = useSelector((state: any) => state.user);
 
@@ -76,21 +84,41 @@ const Home: React.FC = () => {
   };
 
   useEffect(() => {
-    const daysLeft = 7 - new Date().getDay();
-    dispatch(setCurrentDay(daysLeft));
-  }, []);
+    const onCompleteAll = () => {
+      setShowSuccess(true);
+
+      localHome.set({ ...localData, showSuccess: true });
+
+      setTimeout(() => {
+        setShowSuccess(false);
+      }, 2500);
+    };
+
+    if (
+      nightlyAudio?.done == 1 &&
+      dailyMessage?.done == 1 &&
+      weeklyTask?.done == 1 &&
+      podcast.done &&
+      !localData.showSuccess
+    ) {
+      onCompleteAll();
+    }
+  }, [nightlyAudio, dailyMessage, weeklyTask, podcast]);
 
   useEffect(() => {
+    // Set current day
+    const daysLeft = 7 - new Date().getDay();
+    dispatch(setCurrentDay(daysLeft));
+
+    // Get notifications
     const onGetNotifications = async () => {
       dispatch(getNotifications());
     };
 
-    dispatch(setShowGlobalAudio(true));
     onGetNotifications();
     destroy();
-  }, []);
 
-  useEffect(() => {
+    // Global sync
     const onGlobalSync = async () => {
       const lastDateStr =
         (await getPreference(keys.SYNC_KEY)) ?? "2024-01-01T00:00:00Z";
@@ -104,6 +132,7 @@ const Home: React.FC = () => {
 
     onGlobalSync();
 
+    // Check if user has eneatipo
     const onCheckEneatipo = () => {
       if (!user.eneatipo) {
         setIsOpen(true);
@@ -111,6 +140,7 @@ const Home: React.FC = () => {
     };
     onCheckEneatipo();
 
+    // Update FCM token
     const onUpdateFCM = async () => {
       try {
         const token = await FCM.getToken();
@@ -129,6 +159,7 @@ const Home: React.FC = () => {
       }
     };
 
+    // Get home data
     const onGetHome = async () => {
       try {
         if (user.eneatipo) {
@@ -161,6 +192,9 @@ const Home: React.FC = () => {
 
   return (
     <AppLayout>
+
+      <SuccessOverlay show={showSuccess} />
+
       <div className="safe-top">
         {/* Header */}
         <header className="px-4 pt-4 pb-2 flex items-center justify-between">

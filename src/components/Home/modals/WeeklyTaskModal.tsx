@@ -131,7 +131,7 @@ export function WeeklyTaskModal({
         {/* Complete Button */}
         <Button
           onClick={onConfirmTarea}
-          disabled={isCompleted || currentDay != 1 || !userEnabled || payment_status == 'free'}
+          // disabled={isCompleted || currentDay != 1 || !userEnabled || payment_status == 'free'}
           className={cn(
             "w-full !rounded-xl h-12 text-base font-semibold",
             isCompleted

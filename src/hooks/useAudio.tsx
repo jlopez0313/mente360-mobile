@@ -4,11 +4,11 @@ import { add, trash } from "@/services/playlist";
 import { updateCurrentTime } from "@/store/slices/audioSlice";
 import { Directory, Filesystem } from "@capacitor/filesystem";
 import { Share } from "@capacitor/share";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { db } from "./useDexie";
 
-export const useAudio: any = (audio: any, onConfirm: any = () => {}) => {
+export const useAudio: any = (audio: any, onConfirm: any = () => { }, isGlobalControllable: boolean = true) => {
   const { user } = useSelector((state: any) => state.user);
 
   const dispatch = useDispatch();
@@ -149,9 +149,8 @@ export const useAudio: any = (audio: any, onConfirm: any = () => {}) => {
       title: `¡Tienes que escuchar esto en ${import.meta.env.VITE_NAME}!`,
       text: "Esta canción está transformando mi día. Escúchalo también. ¡Se que te va a encantar!",
       url: baseURL + "audios/" + btoa(id),
-      dialogTitle: `Invita a tus amigos a escuchar esta canción y descubrir ${
-        import.meta.env.VITE_NAME
-      }.`,
+      dialogTitle: `Invita a tus amigos a escuchar esta canción y descubrir ${import.meta.env.VITE_NAME
+        }.`,
     });
   };
 
@@ -179,18 +178,41 @@ export const useAudio: any = (audio: any, onConfirm: any = () => {}) => {
       );
       const duration = audio.current.duration;
 
-      setBuffer(duration > 0 ? bufferedEnd / duration : 0);
+      const newBuffer = duration > 0 ? bufferedEnd / duration : 0;
+      setBuffer(newBuffer);
+
+      if (isGlobalControllable) {
+        window.dispatchEvent(new CustomEvent('globalAudioState', {
+          detail: { type: 'buffer', buffer: newBuffer }
+        }));
+      }
     }
   };
 
   const onTimeUpdate = () => {
-    dispatch(updateCurrentTime(audio.current?.currentTime));
+    if (!audio.current) return;
 
-    const current = audio.current?.currentTime || 0;
+    if (isGlobalControllable) {
+      dispatch(updateCurrentTime(audio.current.currentTime));
+    }
+
+    const current = audio.current.currentTime || 0;
+    const computedProgress = (current / (audio.current.duration || 1)) * 100;
+
     setCurrentTime(formatTime(current));
-    setProgress((current / (audio.current?.duration || 1)) * 100);
+    setProgress(computedProgress);
 
-    // console.log('updating time', current, audio.current)
+    if (isGlobalControllable) {
+      window.dispatchEvent(new CustomEvent('globalAudioState', {
+        detail: {
+          type: 'time',
+          progress: computedProgress,
+          currentTime: formatTime(current),
+          duration: formatTime(audio.current.duration || 0),
+          real_duration: audio.current.duration || 0
+        }
+      }));
+    }
   };
 
   const onStart = () => {
@@ -211,22 +233,25 @@ export const useAudio: any = (audio: any, onConfirm: any = () => {}) => {
   };
 
   const onPause = async () => {
-    audio.current?.pause();
+    if (audio.current) {
+      audio.current.pause();
+    }
     setIsPlaying(false);
   };
 
   const onPlay = async () => {
     try {
-      if (myCurrentTime && audio.current) {
+      if (isGlobalControllable && myCurrentTime && audio.current) {
         audio.current.currentTime = myCurrentTime;
       }
-      audio.current?.play().catch((error: any) => {
-        console.log("Chrome cannot play sound without user interaction first");
-        onStart();
-      });
+      if (audio.current) {
+        audio.current.play().catch((error: any) => {
+          console.log("Chrome cannot play sound without user interaction first");
+          onStart();
+        });
+      }
     } catch (error: any) {
       console.error(error);
-
       console.log(
         "Error Chrome cannot play sound without user interaction first"
       );
@@ -240,8 +265,61 @@ export const useAudio: any = (audio: any, onConfirm: any = () => {}) => {
     if (audio.current) {
       audio.current.currentTime = (audio.current.duration * time) / 100;
       onTimeUpdate();
+    } else {
+      if (isGlobalControllable) {
+        window.dispatchEvent(new CustomEvent('globalAudioSeek', { detail: time }));
+      }
     }
   };
+
+  // Sync state between instances
+  useEffect(() => {
+    if (!isGlobalControllable) return;
+
+    const handleGlobalState = (e: any) => {
+      if (!audio?.current) {
+        if (e.detail.type === 'time') {
+          setProgress(e.detail.progress);
+          setCurrentTime(e.detail.currentTime);
+          setDuration(e.detail.duration);
+          setRealDuration(e.detail.real_duration);
+        } else if (e.detail.type === 'buffer') {
+          setBuffer(e.detail.buffer);
+        }
+      }
+    };
+
+    const handleGlobalSeek = (e: any) => {
+      // Solo el que tiene el audio instanciado procesa el rebobinado
+      if (audio?.current) {
+        onLoad(e.detail);
+      }
+    };
+
+    const handleGlobalStateReq = () => {
+      if (audio?.current) {
+        onTimeUpdate();
+        onUpdateBuffer();
+      }
+    };
+
+    window.addEventListener('globalAudioState', handleGlobalState);
+    window.addEventListener('globalAudioSeek', handleGlobalSeek);
+    window.addEventListener('requestGlobalAudioState', handleGlobalStateReq);
+
+    const timeout = setTimeout(() => {
+      if (!audio?.current) {
+        window.dispatchEvent(new CustomEvent('requestGlobalAudioState'));
+      }
+    }, 100);
+
+    return () => {
+      clearTimeout(timeout);
+      window.removeEventListener('globalAudioState', handleGlobalState);
+      window.removeEventListener('globalAudioSeek', handleGlobalSeek);
+      window.removeEventListener('requestGlobalAudioState', handleGlobalStateReq);
+    };
+  }, [isGlobalControllable]);
 
   // Playlist Management
   const onTogglePlaylist = (track: Clips, inMyPlaylist: Playlist) => {

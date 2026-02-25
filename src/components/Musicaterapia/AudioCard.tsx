@@ -166,14 +166,6 @@ export const AudioCard = ({ idx, track }: AudioCardProps) => {
             </DropdownMenu>
           </div>
         </div>
-
-        <audio
-          ref={audioRef}
-          src={getAudioSrc()}
-          onLoadedMetadata={onLoadedMetadata}
-          onTimeUpdate={onTimeUpdate}
-          onProgress={onUpdateBuffer}
-        />
       </CardContent>
     </Card>
   );

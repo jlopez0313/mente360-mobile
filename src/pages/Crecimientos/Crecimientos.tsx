@@ -13,7 +13,6 @@ import { destroy } from "@/helpers/musicControls";
 import { useBackButton } from "@/hooks/useBackButton";
 import { db } from "@/hooks/useDexie";
 import { nextCrecimiento } from "@/services/user";
-import { setShowGlobalAudio } from "@/store/slices/audioSlice";
 import { setUser } from "@/store/slices/userSlice";
 import { useLiveQuery } from "dexie-react-hooks";
 import { ArrowLeft } from "lucide-react";
@@ -159,8 +158,6 @@ const Crecimientos: React.FC = () => {
   }, [crecimientos, myCrecimiento]);
 
   useEffect(() => {
-    dispatch(setShowGlobalAudio(true));
-
     return () => {
       destroy();
     };

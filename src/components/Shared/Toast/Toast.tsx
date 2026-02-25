@@ -22,7 +22,7 @@ export const Toast = () => {
   const history = useHistory();
 
   const dispatch = useDispatch();
-  const { audioSrc, globalAudio, listAudios, globalPos, isGlobalPlaying } =
+  const { audioSrc, globalAudio, listAudios, globalPos, isGlobalPlaying, showGlobalAudio } =
     useSelector((state: any) => state.audio);
 
   const audioRef: any = useRef();
@@ -128,7 +128,12 @@ export const Toast = () => {
   }, [isGlobalPlaying]);
 
   return (
-    <div className="fixed bottom-16 left-0 right-0 z-40 px-2">
+    <div
+      className={cn(
+        "fixed bottom-16 left-0 right-0 z-40 px-2",
+        !showGlobalAudio && "hidden"
+      )}
+    >
       <div className="bg-card/95 backdrop-blur-md border border-border/50 rounded-2xl  shadow-md overflow-hidden">
         <div className="flex items-center gap-3 p-3">
           {/* Cover */}
