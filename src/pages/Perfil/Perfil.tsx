@@ -90,7 +90,7 @@ const Perfil: React.FC = () => {
         <div className="flex-1 overflow-auto">
           <div className="pb-8">
             {/* Profile Header */}
-            <div className="relative bg-gradient-to-b from-primary/20 to-background pt-8 pb-16">
+            <div className="relative bg-gradient-to-b from-primary/20 to-background py-6">
               <div className="flex flex-col items-center">
                 {/* Avatar */}
                 <div className="relative">
@@ -146,20 +146,18 @@ const Perfil: React.FC = () => {
             </div>
 
             {/* Stats */}
+            {/*
             <div className="px-4 -mt-4">
               <div className="bg-card rounded-2xl shadow-card px-8 py-6 grid grid-cols-3 gap-4">
                 <div className="text-center">
-                  {/*user.stats.daysActive*/}
                   <p className="text-2xl font-bold text-primary">{45}</p>
                   <p className="text-xs text-muted-foreground">Días activo</p>
                 </div>
                 <div className="text-center border-x border-border">
-                  {/*user.stats.tasksCompleted*/}
                   <p className="text-2xl font-bold text-primary">{5}</p>
                   <p className="text-xs text-muted-foreground">Tareas</p>
                 </div>
                 <div className="text-center">
-                  {/**user.stats.minutesListened  */}
                   <p className="text-2xl font-bold text-primary">
                     {Math.round(289 / 60)}h
                   </p>
@@ -167,6 +165,7 @@ const Perfil: React.FC = () => {
                 </div>
               </div>
             </div>
+            */}
 
             {/* Personal Info Section */}
             <div className="px-4 mt-6">

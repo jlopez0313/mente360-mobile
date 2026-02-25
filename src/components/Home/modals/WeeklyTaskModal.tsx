@@ -92,13 +92,9 @@ export function WeeklyTaskModal({
     return nextSunday;
   }
 
-  const goToPlanes = () => {
-    history.replace("/planes");
-  }
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm mx-auto rounded-xl border-0 bg-gradient-to-b from-primary/10 to-background p-6 overflow-hidden max-h-[85vh]">
+      <DialogContent className="max-w-sm mx-auto rounded-xl border-0 bg-gradient-to-b from-primary/10 to-background p-6 overflow-hidden">
         <DialogHeader className="text-left mb-4">
           <div className="flex items-center gap-2 text-primary mb-1">
             <ClipboardList className="w-4 h-4" />
@@ -131,36 +127,39 @@ export function WeeklyTaskModal({
         </div>
 
         {/* Complete Button */}
-        <Button
-          onClick={onConfirmTarea}
-          disabled={isCompleted || currentDay != 1}
-          className={cn(
-            "w-full !rounded-xl h-12 text-base font-semibold",
-            isCompleted
-              ? "bg-success text-success-foreground"
-              : "gradient-primary text-primary-foreground hover:opacity-90"
-          )}
-        >
-          {isCompleted ? (
-            <>
-              <CheckCircle2 className="w-5 h-5 mr-2" />
-              Completada
-            </>
-          ) : (
-            "Marcar como completada"
-          )}
-        </Button>
-        <Button
-          onClick={onConfirmTarea}
-          className={cn(
-            "w-full !rounded-xl h-12 text-base font-semibold",
-            isCompleted
-              ? "bg-success text-success-foreground"
-              : "gradient-primary text-primary-foreground hover:opacity-90"
-          )}
-        >
-          Ir a Grupo
-        </Button>
+        <div className="flex items-center justify-between mb-4 px-1 gap-4">
+
+          <Button
+            onClick={onConfirmTarea}
+            disabled={isCompleted || currentDay != 1}
+            className={cn(
+              "w-full !rounded-xl h-12 text-base font-semibold",
+              isCompleted
+                ? "bg-success text-success-foreground"
+                : "gradient-primary text-primary-foreground hover:opacity-90"
+            )}
+          >
+            {isCompleted ? (
+              <>
+                <CheckCircle2 className="w-5 h-5 mr-2" />
+                Completada
+              </>
+            ) : (
+              "Marcar como completada"
+            )}
+          </Button>
+          <Button
+            onClick={onConfirmTarea}
+            className={cn(
+              "w-full !rounded-xl h-12 text-base font-semibold",
+              isCompleted
+                ? "bg-success text-success-foreground"
+                : "gradient-primary text-primary-foreground hover:opacity-90"
+            )}
+          >
+            Ir a Grupo
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );

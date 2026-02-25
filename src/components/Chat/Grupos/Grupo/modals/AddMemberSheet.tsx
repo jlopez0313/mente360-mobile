@@ -76,31 +76,31 @@ export default function AddMemberSheet({
       setMembers([]);
       return;
     }
-  
+
     let cancelled = false;
-  
+
     const loadMembers = async () => {
       const promises = currentMemberIds.map(async (user: any) => {
         if (usersCacheRef.current[user.id]) {
           return usersCacheRef.current[user.id];
         }
-  
+
         const data = await getData(`users/${user.id}`);
         const userData = data.val();
-  
+
         usersCacheRef.current[user.id] = userData;
         return userData;
       });
-  
+
       const listaUsuarios = await Promise.all(promises);
-  
+
       if (!cancelled) {
         setMembers(listaUsuarios);
       }
     };
-  
+
     loadMembers();
-  
+
     return () => {
       cancelled = true;
     };
@@ -190,7 +190,7 @@ export default function AddMemberSheet({
       }}
     >
       <SheetContent side="right" className="w-full sm:max-w-md p-0">
-        <SheetHeader className="px-4 pt-4 pb-2">
+        <SheetHeader className="pl-4 pr-14 pt-4 pb-2">
           <SheetTitle>Agregar miembro</SheetTitle>
         </SheetHeader>
 

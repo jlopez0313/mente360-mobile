@@ -1,11 +1,19 @@
 export const formatDate = (dateString: string) => {
   const date = new Date(dateString);
-  return date.toLocaleDateString("es-ES", { 
-    day: "numeric", 
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit"
-  });
+  const now = new Date();
+
+  const diffMs = now.getTime() - date.getTime();
+  const diffDias = diffMs / (1000 * 60 * 60 * 24);
+
+  if (diffDias < 1) {
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  } else if (diffDias < 2) {
+    return "Ayer";
+  } else if (diffDias < 7) {
+    return date.toLocaleDateString("es-ES", { weekday: "long" });
+  } else {
+    return date.toLocaleDateString()
+  }
 };
 
 export const formatCompleteDate = (dateString: string) => {

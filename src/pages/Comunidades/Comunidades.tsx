@@ -7,7 +7,7 @@ import { AppLayout } from "@/components/layout";
 import { CommunityCard } from "@/components/Comunidades/CommunityCard";
 
 const Comunidades = () => {
-  const comunidades = useLiveQuery(() => db.comunidades.toArray());
+  const comunidades = useLiveQuery(() => db.comunidades.toArray(), []);
 
   return (
     <AppLayout>

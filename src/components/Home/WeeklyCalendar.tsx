@@ -8,22 +8,22 @@ interface WeeklyCalendarProps {
 
 export function WeeklyCalendar({ selectedDay, onSelectDay }: WeeklyCalendarProps) {
   const today = new Date().getDay();
-  
+
   // Get the dates for the current week
   const getWeekDates = () => {
     const now = new Date();
     const currentDay = now.getDay();
     const dates: Date[] = [];
-    
+
     for (let i = 0; i < 7; i++) {
       const date = new Date(now);
       date.setDate(now.getDate() - currentDay + i);
       dates.push(date);
     }
-    
+
     return dates;
   };
-  
+
   const weekDates = getWeekDates();
 
   return (
@@ -34,11 +34,10 @@ export function WeeklyCalendar({ selectedDay, onSelectDay }: WeeklyCalendarProps
             const date = weekDates[index];
             const isToday = index === today;
             const isSelected = index === selectedDay;
-            
+
             return (
               <button
                 key={index}
-                onClick={() => onSelectDay(index)}
                 className={cn(
                   "flex flex-col items-center gap-1 !p-2 !rounded-xl transition-all min-w-[40px]",
                   isSelected && "bg-primary text-primary-foreground",

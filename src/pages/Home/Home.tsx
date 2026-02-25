@@ -12,8 +12,7 @@ import {
 import { AppLayout } from "@/components/layout";
 import { useContext, useEffect, useState } from "react";
 
-import { mockUser } from "@/lib/mockData";
-import { Settings, Trophy } from "lucide-react";
+import { Settings } from "lucide-react";
 import { Link, useHistory } from "react-router-dom";
 
 import { SuccessOverlay } from "@/components/Shared/Animations/Success/SuccessOverlay";
@@ -214,7 +213,7 @@ const Home: React.FC = () => {
 
       <SuccessOverlay show={showSuccess} />
 
-      <div className="safe-top">
+      <div className="h-full safe-top flex flex-col">
         {/* Header */}
         <header className="px-4 pt-4 pb-2 flex items-center justify-between">
           <div className="flex items-center gap-3 mb-4">
@@ -234,12 +233,14 @@ const Home: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2">
+            {/*
             <div className="flex items-center gap-1 bg-accent/20 px-3 py-1.5 rounded-full">
               <Trophy className="w-4 h-4 text-accent" />
               <span className="text-sm font-semibold text-accent-foreground">
                 {mockUser.stats.daysActive}
               </span>
             </div>
+            */}
             <Link
               to="/configuracion"
               className="p-2 hover:bg-muted rounded-full transition-colors"
@@ -249,20 +250,23 @@ const Home: React.FC = () => {
           </div>
         </header>
 
-        {/* Task Progress */}
-        <TaskProgress daysRemaining={currentDay} />
+        <div className="flex-1 overflow-y-auto">
 
-        {/* Weekly Calendar */}
-        <WeeklyCalendar
-          selectedDay={selectedDay}
-          onSelectDay={setSelectedDay}
-        />
+          {/* Task Progress */}
+          <TaskProgress daysRemaining={currentDay} />
 
-        {/* Daily Content Grid */}
-        <DailyContentGrid completed={completed} onOpenModal={handleOpenModal} />
+          {/* Weekly Calendar */}
+          <WeeklyCalendar
+            selectedDay={selectedDay}
+            onSelectDay={setSelectedDay}
+          />
 
-        {/* Daily Audio */}
-        <DailyAudioCard />
+          {/* Daily Content Grid */}
+          <DailyContentGrid completed={completed} onOpenModal={handleOpenModal} />
+
+          {/* Daily Audio */}
+          <DailyAudioCard />
+        </div>
       </div>
 
       {/* Modals */}

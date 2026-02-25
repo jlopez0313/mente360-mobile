@@ -100,7 +100,7 @@ export const TabsLayout = () => {
         ))}
       </IonRouterOutlet>
 
-      <IonTabBar className="border-t border-border safe-bottom" slot="bottom">
+      <IonTabBar className="border-t border-border safe-bottom bg-background" slot="bottom" style={{ '--background': 'hsl(var(--background))' } as any}>
         {navItems.map((item, index) => (
           <IonTabButton
             tab={item.tab}

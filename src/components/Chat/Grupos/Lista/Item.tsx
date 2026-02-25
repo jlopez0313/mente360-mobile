@@ -59,11 +59,11 @@ export const Item = ({ grupo }: any) => {
         }
       );
 
-      unsubTyping = onValue(readData(`grupos/${grupo.id}/users`), async(snap) => {
+      unsubTyping = onValue(readData(`grupos/${grupo.id}/users`), async (snap) => {
         const usuarios = snapshotToArray(snap.val());
         const userWriting = usuarios.find((usuario: any) => usuario.writing);
 
-        if( userWriting ) {
+        if (userWriting) {
           const data = await getData(`users/${userWriting.id}`);
           setLastUser(data.val());
         }
@@ -117,9 +117,6 @@ export const Item = ({ grupo }: any) => {
           <h6 className="!m-0 font-semibold text-foreground truncate">
             {grupo.grupo}
           </h6>
-          <span className="text-xs text-muted-foreground">
-            {lastMsg ? formatDate(lastMsg.date) : null}
-          </span>
         </div>
         <p className="text-sm text-muted-foreground truncate">
           {lastUser?.name}: {isWriting ? <i>Escribiendo...</i> : lastMsg?.mensaje}
@@ -132,7 +129,7 @@ export const Item = ({ grupo }: any) => {
           </Badge>
         )}
         <span className="text-xs text-muted-foreground">
-          {(snapshotToArray(grupo.users) ?? []).length} miembros
+          {lastMsg ? formatDate(lastMsg.date) : null}
         </span>
       </div>
     </div>

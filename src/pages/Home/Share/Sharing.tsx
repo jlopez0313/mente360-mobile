@@ -68,7 +68,7 @@ const Sharing: React.FC = () => {
 
   return (
     <AppLayout>
-      <div id="content" className="bg-background">
+      <div id="content" className="bg-background p-4">
         <div className="text-center">
           <p style={{ whiteSpace: "pre-wrap" }}>
             {msgSource == "mensaje" ? mensaje?.mensaje : panico?.texto}

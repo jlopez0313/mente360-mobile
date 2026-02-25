@@ -1,5 +1,4 @@
 import { Clock } from "lucide-react";
-import { Link } from "react-router-dom";
 
 interface TaskProgressProps {
   daysRemaining: number;
@@ -8,9 +7,7 @@ interface TaskProgressProps {
 export function TaskProgress({ daysRemaining }: TaskProgressProps) {
   return (
     <div className="px-4 pb-4">
-      <Link
-        to="/comunidades/1/tareas"
-        className="block bg-gradient-to-r from-primary to-primary/80 rounded-2xl p-4 shadow-card"
+      <div className="block bg-gradient-to-r from-primary to-primary/80 rounded-2xl p-4 shadow-card"
       >
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
@@ -27,7 +24,7 @@ export function TaskProgress({ daysRemaining }: TaskProgressProps) {
             </p>
           </div>
         </div>
-      </Link>
+      </div>
     </div>
   );
 }

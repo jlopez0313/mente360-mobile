@@ -72,16 +72,20 @@ export function FavoritesList({
           )),
         }}
         style={{ height: "100%" }}
-        totalCount={playlist.length}
+        totalCount={playlist?.length}
         itemContent={(index) => {
-          const track = playlist[index].clip;
+          const track = playlist ? playlist[index].clip : null;
+
+          if (!track) {
+            return null;
+          }
 
           return (
             <AudioCard
               idx={index}
-              key={track.id}
+              key={track?.id}
               track={track}
-              isPlaying={track.id === currentTrackId}
+              isPlaying={track?.id === currentTrackId}
             />
           );
         }}
