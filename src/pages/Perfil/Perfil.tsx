@@ -79,9 +79,9 @@ const Perfil: React.FC = () => {
         {/* Header */}
         <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg border-b border-border/50">
           <div className="flex items-center justify-between px-4 py-3">
-            <Link to="/home" className="p-2 -ml-2 hover:bg-muted rounded-full">
+            <button onClick={() => history.replace("/home")} className="p-2 -ml-2 hover:bg-muted rounded-full">
               <ArrowLeft className="w-5 h-5 text-foreground" />
-            </Link>
+            </button>
             <h1 className="font-display font-semibold text-lg text-foreground">Mi Perfil</h1>
             <div className="w-9" />
           </div>

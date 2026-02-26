@@ -198,7 +198,7 @@ export const CommunityCard = ({ community }: Props) => {
                 onClick={handleAccess}
                 className="border-accent text-accent hover:bg-accent hover:text-accent-foreground"
               >
-                {formatCurrency(Number(planMensual?.valor || "0"))}/mes
+                {formatCurrency(Number(planMensual?.valor || "0"))} {planMensual?.periodo}
               </Button>
             )}
           </div>

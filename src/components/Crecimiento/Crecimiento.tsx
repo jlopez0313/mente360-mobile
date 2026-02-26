@@ -3,8 +3,9 @@ import { Slider } from "@/components/ui/slider";
 import Crecimientos from "@/database/crecimientos";
 import Niveles from "@/database/niveles";
 import { startBackground } from "@/helpers/background";
-import { create, destroy, updateTrack } from "@/helpers/musicControls";
+import { create, destroy, updateCallbacks, updateTrack } from "@/helpers/musicControls";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
+import { cn } from "@/lib/utils";
 import {
   Download,
   Pause,
@@ -13,7 +14,7 @@ import {
   SkipForward,
   Trash2,
 } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface Props {
   crecimientos: Crecimientos[];
@@ -34,6 +35,7 @@ export const Crecimiento = ({
   onSaveNext,
   setCurrentAudio,
 }: Props) => {
+  const [expandido, setExpandido] = useState(false);
 
   const {
     activeTrack,
@@ -46,6 +48,8 @@ export const Crecimiento = ({
     currentTime,
     buffer,
     onTogglePlay,
+    onPlay,
+    onPause,
     onToggleDownload,
     onLoad,
     audioRef,
@@ -53,12 +57,13 @@ export const Crecimiento = ({
     onTimeUpdate,
     onLoadedMetadata,
     onUpdateBuffer,
-  } = useAudioPlayer(currentAudio, currentIndex, false);
+  } = useAudioPlayer(currentAudio as any, currentIndex, false);
 
   const handlePrevious = () => {
     if (crecimientos?.length && currentIndex > 0) {
       setCurrentAudio(crecimientos[currentIndex - 1]);
       setCurrentIndex(currentIndex - 1);
+      setTimeout(() => onPlay(), 100);
     }
   };
 
@@ -66,7 +71,7 @@ export const Crecimiento = ({
     if (crecimientos?.length && currentIndex < crecimientos.length - 1) {
       setCurrentAudio(crecimientos[currentIndex + 1]);
       setCurrentIndex(currentIndex + 1);
-      if (isPlaying) onTogglePlay(); // Pause current before changing
+      setTimeout(() => onPlay(), 100);
     }
   };
 
@@ -75,12 +80,11 @@ export const Crecimiento = ({
     handleNext();
   };
 
-  // Background controls initialization state
+  // Background controls initialization — Crecimiento owns the bg controls while mounted
   const bgControlsInit = useRef(false);
 
   useEffect(() => {
     if (duration && duration !== "0" && duration !== "00:00" && activeTrack) {
-      // Attempt to parse duration back to seconds for the plugin since real_duration isn't exported here
       const timeParts = duration.split(':');
       const durationSeconds = timeParts.length === 2 ? parseInt(timeParts[0]) * 60 + parseInt(timeParts[1]) : 0;
 
@@ -90,14 +94,17 @@ export const Crecimiento = ({
           baseURL,
           activeTrack,
           durationSeconds,
-          onTogglePlay, // For Play
-          onTogglePlay, // For Pause
-          handlePrevious, // For goPrev
-          handleNext // For goNext
+          onPlay,       // Separate play
+          onPause,      // Separate pause
+          handlePrevious,
+          handleNext,
+          onLoad        // For onSeek
         );
         bgControlsInit.current = true;
       } else {
         updateTrack(baseURL, activeTrack, durationSeconds);
+        // Keep background callbacks pointing at this component's handlers
+        updateCallbacks(onPlay, onPause, handlePrevious, handleNext, onLoad);
       }
     }
   }, [duration, activeTrack]);
@@ -111,8 +118,8 @@ export const Crecimiento = ({
   return (
     <>
       {/* Cover Image */}
-      <div className="flex-1 flex items-center justify-center px-8">
-        <div className="w-full max-w-[480px] aspect-square overflow-hidden shadow-glow">
+      <div className="flex items-center justify-center px-8">
+        <div className="flex items-center w-full max-w-[480px] aspect-square overflow-hidden shadow-glow">
           <img
             src={status ? baseURL + activeTrack?.imagen : AudioNoWifi}
             alt={activeTrack?.titulo}
@@ -124,19 +131,29 @@ export const Crecimiento = ({
       {/* Info & Controls */}
       <div className="px-6 pb-8 space-y-6">
         {/* Title & Level */}
-        <div className="text-center space-y-2">
-          <h1 className="text-xl font-heading font-bold text-foreground !m-0">
+        <div className="space-y-3 flex flex-col justify-center gap-3">
+          <h1 className="text-center text-xl font-heading font-bold text-foreground !m-0">
             {activeTrack?.titulo}
           </h1>
-          <span className="text-xs font-heading text-foreground">
+          <span className="text-center text-xs font-heading text-foreground">
             {nivel?.nivel}
           </span>
-          <p className="text-sm text-muted-foreground line-clamp-2">
+          <p className={cn(
+            "text-sm text-muted-foreground mb-0",
+            expandido ? "line-clamp-none" : "line-clamp-2"
+          )}>
             {activeTrack?.descripcion}
           </p>
 
+          <button
+            className="text-sm text-primary underline hover:opacity-80 transition"
+            onClick={() => setExpandido(!expandido)}
+          >
+            {expandido ? "Leer menos" : "Leer más"}
+          </button>
+
           {/* Level Selector */}
-          <div className="flex justify-center pt-2">
+          <div className="flex justify-center pt-4">
             <Button size="sm" className="gap-1" variant="outline" onClick={() => onToggleDownload('crecimientos')}>
               {!activeTrack?.audio_local ? (
                 <>

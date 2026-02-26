@@ -11,10 +11,11 @@ import { cn } from "@/lib/utils";
 import { useLiveQuery } from "dexie-react-hooks";
 import { ArrowLeft, Play, Users } from "lucide-react";
 import { useContext, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 
 const Canales: React.FC = () => {
   const { id } = useParams<any>();
+  const history = useHistory();
 
   const { AudioNoWifi, baseURL, status } = useContext(NetworkContext);
 
@@ -54,15 +55,14 @@ const Canales: React.FC = () => {
           ></iframe>
 
           {/* Back button */}
-          <Link to="/comunidades" replace={true}>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute top-4 left-4 bg-background/80 backdrop-blur-sm hover:bg-background"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-          </Link>
+          <Button
+            onClick={() => history.replace("/comunidades")}
+            variant="ghost"
+            size="icon"
+            className="absolute top-4 left-4 bg-background/80 backdrop-blur-sm hover:bg-background"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
 
           {/* Community Info Overlay */}
           <div className="absolute -bottom-7 left-4 right-4">

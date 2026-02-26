@@ -1,9 +1,8 @@
 
-import { Link, useHistory, useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 
 import { NivelCard } from "@/components/Niveles/NivelCard";
 import { AppLayout } from "@/components/layout";
-import { Button } from "@/components/ui/button";
 import { destroy } from "@/helpers/musicControls";
 import { useBackButton } from "@/hooks/useBackButton";
 import { db } from "@/hooks/useDexie";
@@ -61,15 +60,9 @@ const Niveles: React.FC = () => {
         {/* Header */}
         <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50 px-4 py-4">
           <div className="flex items-center gap-3">
-            <Link to={`/comunidades/${channel?.comunidad?.id}/canales`} replace={true}>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="shrink-0"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-            </Link>
+            <button onClick={() => history.replace(`/comunidades/${channel?.comunidad?.id}/canales`)}>
+              <ArrowLeft className="w-5 h-5" />
+            </button>
             <div className="min-w-0">
               <h1 className="text-lg font-heading font-bold text-foreground truncate">
                 {channel?.canal}

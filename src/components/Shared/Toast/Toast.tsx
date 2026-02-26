@@ -45,10 +45,11 @@ export const Toast = () => {
   };
 
   const onClear = () => {
-    destroy();
     onPause();
+    dispatch(setIsGlobalPlaying(false));
     dispatch(setGlobalPos(0));
     dispatch(setGlobalAudio(null));
+    destroy();
   };
 
   const onTogglePlay = () => {
@@ -107,12 +108,21 @@ export const Toast = () => {
   useEffect(() => {
     if (real_duration) {
       startBackground();
+      // Wrap callbacks with Redux dispatch so background play/pause updates the icon
+      const bgPlay = () => {
+        dispatch(setIsGlobalPlaying(true));
+        onPlay();
+      };
+      const bgPause = () => {
+        dispatch(setIsGlobalPlaying(false));
+        onPause();
+      };
       create(
         baseURL,
         globalAudio,
         real_duration,
-        onPlay,
-        onPause,
+        bgPlay,
+        bgPause,
         goToPrev,
         goToNext
       );

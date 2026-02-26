@@ -1,8 +1,7 @@
 import { NetworkContext } from "@/context/NetworkContext";
 import Clips from "@/database/clips";
 import Likes from "@/database/likes";
-import { startBackground } from "@/helpers/background";
-import { create, updateCallbacks, updateTrack } from "@/helpers/musicControls";
+import { updateCallbacks } from "@/helpers/musicControls";
 import { useAudio } from "@/hooks/useAudio";
 import { db } from "@/hooks/useDexie";
 import { dislike, like } from "@/services/likes";
@@ -195,57 +194,29 @@ export const useAudioPlayer = (track: Clips | null, idx?: number, isGlobal: bool
         return activeTrack?.audio_local ? activeTrack.audio_local : baseURL + activeTrack?.audio;
     }
 
-    // Stable callback refs so background control listeners always call the latest handlers
-    const onPlayRef = useRef(audioPlay);
-    const onPauseRef = useRef(audioPause);
+    // Stable callback refs — keep them fresh so background events always use the latest handlers
+    const onPlayRef = useRef(() => { dispatch(setIsGlobalPlaying(true)); audioPlay(); });
+    const onPauseRef = useRef(() => { dispatch(setIsGlobalPlaying(false)); audioPause(); });
     const onGoBackRef = useRef(goToPrev);
     const onGoNextRef = useRef(goToNext);
 
-    // Keep refs current on every render — include Redux dispatch so the UI icon updates
-    onPlayRef.current = () => {
-        dispatch(setIsGlobalPlaying(true));
-        audioPlay();
-    };
-    onPauseRef.current = () => {
-        dispatch(setIsGlobalPlaying(false));
-        audioPause();
-    };
+    onPlayRef.current = () => { dispatch(setIsGlobalPlaying(true)); audioPlay(); };
+    onPauseRef.current = () => { dispatch(setIsGlobalPlaying(false)); audioPause(); };
     onGoBackRef.current = goToPrev;
     onGoNextRef.current = goToNext;
 
-    // Stable wrappers that delegate to the latest ref
     const stablePlay = useCallback(() => onPlayRef.current(), []);
     const stablePause = useCallback(() => onPauseRef.current(), []);
     const stableGoBack = useCallback(() => onGoBackRef.current(), []);
     const stableGoNext = useCallback(() => onGoNextRef.current(), []);
 
-    // Background controls initialization state
-    const bgControlsInit = useRef(false);
-
-    // Effect for Background controls (if controlling global audio)
+    // Keep background module callbacks current when this is the main player (Clip view)
+    // Toast.tsx owns create(); this just ensures next/prev/play/pause stay up to date
     useEffect(() => {
-        if (real_duration && !track) { // Only bind background if it's the main player (Clip)
-            if (!bgControlsInit.current) {
-                startBackground();
-                create(
-                    baseURL,
-                    globalAudio,
-                    real_duration,
-                    stablePlay,
-                    stablePause,
-                    stableGoBack,
-                    stableGoNext
-                );
-                bgControlsInit.current = true;
-            } else {
-                // Update the notification display without touching listeners
-                updateTrack(baseURL, globalAudio, real_duration);
-                // Ensure callbacks are always current (stable refs already handle this,
-                // but explicit update guards against module-level drift)
-                updateCallbacks(stablePlay, stablePause, stableGoBack, stableGoNext);
-            }
+        if (!track) {
+            updateCallbacks(stablePlay, stablePause, stableGoBack, stableGoNext);
         }
-    }, [real_duration, globalAudio]);
+    });
 
     return {
         audioRef,
@@ -267,6 +238,8 @@ export const useAudioPlayer = (track: Clips | null, idx?: number, isGlobal: bool
         onShareLink,
         onToggleDownload,
         onTogglePlay,
+        onPlay: audioPlay,
+        onPause: audioPause,
         onLoad,
         goToPrev,
         goToNext,

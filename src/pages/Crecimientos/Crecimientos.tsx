@@ -2,7 +2,6 @@ import { Crecimiento as CrecimientoComponent } from "@/components/Crecimiento/Cr
 import { AppLayout } from "@/components/layout";
 import { ContactDetailModal } from "@/components/Shared/Contact/ContactModal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { NetworkContext } from "@/context/NetworkContext";
 import Canales from "@/database/canales";
 import Comunidades from "@/database/comunidades";
@@ -18,7 +17,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { ArrowLeft } from "lucide-react";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useHistory, useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 
 type Props = {
   nivel: Niveles | undefined;
@@ -184,14 +183,12 @@ const Crecimientos: React.FC = () => {
 
   return (
     <AppLayout hideNav>
-      <div className="min-h-screen bg-gradient-to-b from-primary/5 to-background flex flex-col">
+      <div className="h-full bg-gradient-to-b from-primary/5 to-background flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-4">
-          <Link to={`/canales/${nivel?.canal?.id}/niveles`} replace={true}>
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="w-6 h-6" />
-            </Button>
-          </Link>
+          <button onClick={() => history.replace(`/canales/${nivel?.canal?.id}/niveles`)}>
+            <ArrowLeft className="w-6 h-6" />
+          </button>
           <span className="text-sm text-muted-foreground font-medium">
             {community?.comunidad}
           </span>

@@ -1,7 +1,7 @@
 import { getEpaycoLink } from "@/services/subscribe";
-
 import { App } from "@capacitor/app";
 import { useEffect } from "react";
+
 
 export const useEpayco = () => {
 
@@ -41,8 +41,7 @@ export const useEpayco = () => {
 			const { data } = await getEpaycoLink(item);
 
 			const handler = window.ePayco.checkout.configure({
-				// key: data.epayco.public_key,
-				key: import.meta.env.VITE_EPAYCO_PUBLIC_KEY,
+				key: data.epayco.public_key,
 				test: data.epayco.test,
 			});
 
