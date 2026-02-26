@@ -1,5 +1,6 @@
 import Clips from "@/database/clips";
 import Playlist from "@/database/playlist";
+import { toggle, updateElapsed } from "@/helpers/musicControls";
 import { add, trash } from "@/services/playlist";
 import { updateCurrentTime } from "@/store/slices/audioSlice";
 import { Directory, Filesystem } from "@capacitor/filesystem";
@@ -202,6 +203,9 @@ export const useAudio: any = (audio: any, onConfirm: any = () => { }, isGlobalCo
     setCurrentTime(formatTime(current));
     setProgress(computedProgress);
 
+    // Update capacitor music controls
+    updateElapsed(current);
+
     if (isGlobalControllable) {
       window.dispatchEvent(new CustomEvent('globalAudioState', {
         detail: {
@@ -237,6 +241,7 @@ export const useAudio: any = (audio: any, onConfirm: any = () => { }, isGlobalCo
       audio.current.pause();
     }
     setIsPlaying(false);
+    toggle(false, audio.current?.currentTime || 0);
   };
 
   const onPlay = async () => {
@@ -259,6 +264,7 @@ export const useAudio: any = (audio: any, onConfirm: any = () => { }, isGlobalCo
     }
 
     setIsPlaying(true);
+    toggle(true, audio.current?.currentTime || 0);
   };
 
   const onLoad = async (time: any) => {

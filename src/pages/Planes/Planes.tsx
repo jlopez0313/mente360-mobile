@@ -85,7 +85,7 @@ const PlanesPage = () => {
         {/* Header */}
         <div className="flex items-center gap-3 mb-2">
           <button
-            onClick={() => history.go(-1)}
+            onClick={() => history.replace('/configuracion')}
             className="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center hover:bg-muted transition-colors"
           >
             <ArrowLeft className="w-5 h-5 text-foreground" />

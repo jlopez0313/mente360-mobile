@@ -2,6 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import Crecimientos from "@/database/crecimientos";
 import Niveles from "@/database/niveles";
+import { startBackground } from "@/helpers/background";
+import { create, destroy, updateTrack } from "@/helpers/musicControls";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import {
   Download,
@@ -11,6 +13,7 @@ import {
   SkipForward,
   Trash2,
 } from "lucide-react";
+import { useEffect, useRef } from "react";
 
 interface Props {
   crecimientos: Crecimientos[];
@@ -72,15 +75,48 @@ export const Crecimiento = ({
     handleNext();
   };
 
+  // Background controls initialization state
+  const bgControlsInit = useRef(false);
+
+  useEffect(() => {
+    if (duration && duration !== "0" && duration !== "00:00" && activeTrack) {
+      // Attempt to parse duration back to seconds for the plugin since real_duration isn't exported here
+      const timeParts = duration.split(':');
+      const durationSeconds = timeParts.length === 2 ? parseInt(timeParts[0]) * 60 + parseInt(timeParts[1]) : 0;
+
+      if (!bgControlsInit.current) {
+        startBackground();
+        create(
+          baseURL,
+          activeTrack,
+          durationSeconds,
+          onTogglePlay, // For Play
+          onTogglePlay, // For Pause
+          handlePrevious, // For goPrev
+          handleNext // For goNext
+        );
+        bgControlsInit.current = true;
+      } else {
+        updateTrack(baseURL, activeTrack, durationSeconds);
+      }
+    }
+  }, [duration, activeTrack]);
+
+  useEffect(() => {
+    return () => {
+      destroy();
+    };
+  }, []);
+
   return (
     <>
       {/* Cover Image */}
       <div className="flex-1 flex items-center justify-center px-8">
-        <div className="w-full max-w-[480px] aspect-square rounded-3xl overflow-hidden shadow-glow">
+        <div className="w-full max-w-[480px] aspect-square overflow-hidden shadow-glow">
           <img
             src={status ? baseURL + activeTrack?.imagen : AudioNoWifi}
             alt={activeTrack?.titulo}
-            className="w-full h-full object-cover"
+            className="w-full object-contain rounded-3xl"
           />
         </div>
       </div>

@@ -47,23 +47,13 @@ export const NivelCard = ({ nivel }: Props) => {
             .map((item: any) => {
               return { ...item, playing: false };
             });
-        })
-        .then((resultados: any) => {
-          if (user.crecimientos_id) {
-            const idx = resultados.findIndex(
-              (x: any) => x.id == user.crecimientos_id
-            );
-            // swiper.slideTo(idx);
-          }
-
-          return resultados;
         }),
     [nivel]
   );
 
   const progress = useMemo(() => {
     if (!crecimientos) return null;
-    
+
     const index = crecimientos.findIndex((c) => c.id == myCrecimiento?.id);
     if (index === -1) {
       setPodcast(crecimientos[0]);

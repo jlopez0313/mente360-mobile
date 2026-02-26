@@ -85,15 +85,6 @@ const Crecimientos: React.FC = () => {
             .map((item: any) => {
               return { ...item, playing: false };
             });
-        })
-        .then((resultados: any[]) => {
-          if (user.crecimientos_id) {
-            const idx = resultados.findIndex(
-              (x: any) => x.id == user.crecimientos_id
-            );
-          }
-
-          return resultados;
         }),
     [id]
   );
@@ -192,7 +183,7 @@ const Crecimientos: React.FC = () => {
   }
 
   return (
-    <AppLayout>
+    <AppLayout hideNav>
       <div className="min-h-screen bg-gradient-to-b from-primary/5 to-background flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-4">

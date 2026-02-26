@@ -24,7 +24,7 @@ const Clip: React.FC = () => {
       <div className="min-h-screen bg-gradient-to-b from-primary/10 via-background to-background flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-4">
-          <Button variant="ghost" size="icon" onClick={() => history.go(-1)}>
+          <Button variant="ghost" size="icon" onClick={() => history.replace('/musicaterapia')}>
             <ChevronLeft className="w-6 h-6" />
           </Button>
           <span className="text-sm text-muted-foreground font-medium">

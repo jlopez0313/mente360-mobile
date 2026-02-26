@@ -2,7 +2,7 @@ import { NetworkContext } from "@/context/NetworkContext";
 import Clips from "@/database/clips";
 import Likes from "@/database/likes";
 import { startBackground } from "@/helpers/background";
-import { create } from "@/helpers/musicControls";
+import { create, updateCallbacks, updateTrack } from "@/helpers/musicControls";
 import { useAudio } from "@/hooks/useAudio";
 import { db } from "@/hooks/useDexie";
 import { dislike, like } from "@/services/likes";
@@ -13,7 +13,7 @@ import {
     setIsGlobalPlaying
 } from "@/store/slices/audioSlice";
 import { useLiveQuery } from "dexie-react-hooks";
-import { useContext, useEffect, useRef } from "react";
+import { useCallback, useContext, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
@@ -58,28 +58,30 @@ export const useAudioPlayer = (track: Clips | null, idx?: number, isGlobal: bool
 
     // Queries
     const likes = useLiveQuery(
-        () => db.likes.where("clips_id").equals(activeTrack?.id).toArray(),
+        () => {
+            if (!activeTrack) return [];
+            return db.likes.where("clips_id").equals(activeTrack.id).toArray()
+        },
         [activeTrack?.id]
     );
 
-    const my_like = useLiveQuery(
-        () =>
-            db.likes
-                .where("users_id")
-                .equals(user?.id)
-                .and((like: Likes) => like.clips_id === activeTrack?.id)
-                .first(),
-        [user?.id, activeTrack?.id]
-    );
-
-    const inMyPlaylist = useLiveQuery(() =>
-        db.playlist
+    const my_like = useLiveQuery(() => {
+        if (!activeTrack) return null;
+        return db.likes
             .where("users_id")
             .equals(user?.id)
-            .and((playlist: any) => playlist?.clip?.id === activeTrack?.id)
-            .first(),
-        [user?.id, activeTrack?.id]
-    );
+            .and((like: Likes) => like.clips_id === activeTrack.id)
+            .first()
+    }, [user?.id, activeTrack?.id]);
+
+    const inMyPlaylist = useLiveQuery(() => {
+        if (!activeTrack) return false;
+        return db.playlist
+            .where("users_id")
+            .equals(user?.id)
+            .and((playlist: any) => playlist?.crecimiento?.id === activeTrack.id)
+            .first()
+    }, [user?.id, activeTrack?.id]);
 
     // ===============================
     // LIKES
@@ -193,21 +195,57 @@ export const useAudioPlayer = (track: Clips | null, idx?: number, isGlobal: bool
         return activeTrack?.audio_local ? activeTrack.audio_local : baseURL + activeTrack?.audio;
     }
 
+    // Stable callback refs so background control listeners always call the latest handlers
+    const onPlayRef = useRef(audioPlay);
+    const onPauseRef = useRef(audioPause);
+    const onGoBackRef = useRef(goToPrev);
+    const onGoNextRef = useRef(goToNext);
+
+    // Keep refs current on every render — include Redux dispatch so the UI icon updates
+    onPlayRef.current = () => {
+        dispatch(setIsGlobalPlaying(true));
+        audioPlay();
+    };
+    onPauseRef.current = () => {
+        dispatch(setIsGlobalPlaying(false));
+        audioPause();
+    };
+    onGoBackRef.current = goToPrev;
+    onGoNextRef.current = goToNext;
+
+    // Stable wrappers that delegate to the latest ref
+    const stablePlay = useCallback(() => onPlayRef.current(), []);
+    const stablePause = useCallback(() => onPauseRef.current(), []);
+    const stableGoBack = useCallback(() => onGoBackRef.current(), []);
+    const stableGoNext = useCallback(() => onGoNextRef.current(), []);
+
+    // Background controls initialization state
+    const bgControlsInit = useRef(false);
+
     // Effect for Background controls (if controlling global audio)
     useEffect(() => {
         if (real_duration && !track) { // Only bind background if it's the main player (Clip)
-            startBackground();
-            create(
-                baseURL,
-                globalAudio,
-                real_duration,
-                audioPlay,
-                audioPause,
-                goToPrev,
-                goToNext
-            );
+            if (!bgControlsInit.current) {
+                startBackground();
+                create(
+                    baseURL,
+                    globalAudio,
+                    real_duration,
+                    stablePlay,
+                    stablePause,
+                    stableGoBack,
+                    stableGoNext
+                );
+                bgControlsInit.current = true;
+            } else {
+                // Update the notification display without touching listeners
+                updateTrack(baseURL, globalAudio, real_duration);
+                // Ensure callbacks are always current (stable refs already handle this,
+                // but explicit update guards against module-level drift)
+                updateCallbacks(stablePlay, stablePause, stableGoBack, stableGoNext);
+            }
         }
-    }, [real_duration]);
+    }, [real_duration, globalAudio]);
 
     return {
         audioRef,

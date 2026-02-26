@@ -3,37 +3,87 @@ import { CapacitorMusicControls } from "capacitor-music-controls-plugin";
 let elapsedTime = 0;
 let isPlaying = true;
 
-export const create = (baseURL, audio, duration, onPlay, onPause, onGoBack, onGoNext) => {
+// Module-level callback storage — always points to latest handlers
+let _onPlay: () => void = () => {};
+let _onPause: () => void = () => {};
+let _onGoBack: () => void = () => {};
+let _onGoNext: () => void = () => {};
+let _listenersRegistered = false;
 
-  // destroy();
+/**
+ * Register the background control listeners exactly once.
+ * Call this on mount with stable references (or refs).
+ */
+export const setupListeners = (
+  onPlay: () => void,
+  onPause: () => void,
+  onGoBack: () => void,
+  onGoNext: () => void
+) => {
+  // Always update the stored callbacks so they stay current
+  _onPlay = onPlay;
+  _onPause = onPause;
+  _onGoBack = onGoBack;
+  _onGoNext = onGoNext;
+
+  if (_listenersRegistered) return; // Only register once
+  _listenersRegistered = true;
+
+  CapacitorMusicControls.addListener("controlsNotification", (action) => {
+    handleControlsEvent(action, _onPlay, _onPause, _onGoBack, _onGoNext);
+  });
+
+  document.addEventListener("controlsNotification", (event: any) => {
+    const info = { message: event.message, position: event.position || 0, elapsed: elapsedTime };
+    handleControlsEvent(info, _onPlay, _onPause, _onGoBack, _onGoNext);
+  });
+};
+
+/**
+ * Update callbacks without re-registering listeners.
+ * Call this whenever the callbacks change (e.g., track changes).
+ */
+export const updateCallbacks = (
+  onPlay: () => void,
+  onPause: () => void,
+  onGoBack: () => void,
+  onGoNext: () => void
+) => {
+  _onPlay = onPlay;
+  _onPause = onPause;
+  _onGoBack = onGoBack;
+  _onGoNext = onGoNext;
+};
+
+export const create = (baseURL: string, audio: any, duration: number, onPlay: () => void, onPause: () => void, onGoBack: () => void, onGoNext: () => void) => {
+
+  elapsedTime = 0;
+  isPlaying = true;
+
+  // Store the initial callbacks
+  _onPlay = onPlay;
+  _onPause = onPause;
+  _onGoBack = onGoBack;
+  _onGoNext = onGoNext;
 
   CapacitorMusicControls.create({
-    track: audio.titulo, // optional, default : ''
-    artist: "Mente360", // optional, default : ''
-    album: audio.categoria?.categoria || '', // optional, default: ''
-    cover: baseURL + audio.imagen, // optional, default : nothing
-
-    // hide previous/next/close buttons:
-    hasPrev: true, // show previous button, optional, default: true
-    hasNext: true, // show next button, optional, default: true
-    hasClose: true, // show close button, optional, default: false
-
-    // iOS only, all optional
-    duration: duration * 1000, // default: 0
-    elapsed: elapsedTime, // default: 0
-    hasSkipForward: true, // default: false. true value overrides hasNext.
-    hasSkipBackward: true, // default: false. true value overrides hasPrev.
-    skipForwardInterval: 15, // default: 15.
-    skipBackwardInterval: 15, // default: 15.
-    hasScrubbing: false, // default: false. Enable scrubbing from control center progress bar
-
-    // Android only, all optional
-    isPlaying: isPlaying, // default : true
-    dismissable: false, // default : false
-    // text displayed in the status bar when the notification (and the ticker) are updated
+    track: audio.titulo,
+    artist: "Mente360",
+    album: audio.categoria?.categoria || '',
+    cover: baseURL + audio.imagen,
+    hasPrev: true,
+    hasNext: true,
+    hasClose: true,
+    duration: duration * 1000,
+    elapsed: elapsedTime,
+    hasSkipForward: true,
+    hasSkipBackward: true,
+    skipForwardInterval: 15,
+    skipBackwardInterval: 15,
+    hasScrubbing: false,
+    isPlaying: isPlaying,
+    dismissable: false,
     ticker: audio.titulo,
-    // All icons default to their built-in android equivalents
-    // The supplied drawable name, e.g. 'media_play', is the name of a drawable found under android/res/drawable* folders
     playIcon: "media_play",
     pauseIcon: "media_pause",
     prevIcon: "media_prev",
@@ -47,28 +97,69 @@ export const create = (baseURL, audio, duration, onPlay, onPause, onGoBack, onGo
         isPlaying: true,
       });
 
-      CapacitorMusicControls.addListener("controlsNotification", (action) => {
-        handleControlsEvent(action, onPlay, onPause, onGoBack, onGoNext);
-      });
+      // Only register listeners once
+      if (!_listenersRegistered) {
+        _listenersRegistered = true;
 
-      document.addEventListener("controlsNotification", (event: any) => {
-        const info = { message: event.message, position: event.position || 0, elapsed: elapsedTime };
-        handleControlsEvent(info, onPlay, onPause, onGoBack, onGoNext);
-      });
+        CapacitorMusicControls.addListener("controlsNotification", (action) => {
+          handleControlsEvent(action, _onPlay, _onPause, _onGoBack, _onGoNext);
+        });
+
+        document.addEventListener("controlsNotification", (event: any) => {
+          const info = { message: event.message, position: event.position || 0, elapsed: elapsedTime };
+          handleControlsEvent(info, _onPlay, _onPause, _onGoBack, _onGoNext);
+        });
+      }
     })
     .catch((e) => {
       console.error(e);
     });
 };
 
-export const updateElapsed = ( currentTime: number ) => {
-    elapsedTime = currentTime * 1000;
-}
+export const updateTrack = (baseURL: string, audio: any, duration: number) => {
+  elapsedTime = 0;
+  isPlaying = true;
+
+  // Update the notification display without re-registering listeners
+  CapacitorMusicControls.create({
+    track: audio.titulo,
+    artist: "Mente360",
+    album: audio.categoria?.categoria || '',
+    cover: baseURL + audio.imagen,
+    hasPrev: true,
+    hasNext: true,
+    hasClose: true,
+    duration: duration * 1000,
+    elapsed: 0,
+    isPlaying: true,
+    dismissable: false,
+    ticker: audio.titulo,
+    playIcon: "media_play",
+    pauseIcon: "media_pause",
+    prevIcon: "media_prev",
+    nextIcon: "media_next",
+    closeIcon: "media_close",
+    notificationIcon: "notification",
+  }).catch((e) => {
+    console.error(e);
+  });
+};
+
+export const updateElapsed = (currentTime: number) => {
+  elapsedTime = currentTime * 1000;
+  try {
+    CapacitorMusicControls.updateElapsed({
+      elapsed: elapsedTime,
+      isPlaying: isPlaying,
+    });
+  } catch (e) {
+    console.error("Error updating elapsed:", e);
+  }
+};
 
 export const toggle = (_isPlaying = true, _elapsed = 0) => {
   isPlaying = _isPlaying;
   CapacitorMusicControls.updateElapsed({ isPlaying: _isPlaying, elapsed: _elapsed });
-  // CapacitorMusicControls.updateDismissable(isPlaying ? false : true);
 };
 
 export const handleControlsEvent = (
@@ -100,31 +191,19 @@ export const handleControlsEvent = (
     case "music-controls-destroy":
       destroy();
       break;
-
-    // External controls (iOS only)
     case "music-controls-toggle-play-pause":
-      // do something
       break;
     case "music-controls-skip-to":
-      // do something
       break;
     case "music-controls-skip-forward":
-      // Do something
       break;
     case "music-controls-skip-backward":
-      // Do something
       break;
-
-    // Headset events (Android only)
-    // All media button events are listed below
     case "music-controls-media-button":
-      // Do something
       break;
     case "music-controls-headset-unplugged":
-      // Do something
       break;
     case "music-controls-headset-plugged":
-      // Do something
       break;
     default:
       break;
@@ -132,5 +211,6 @@ export const handleControlsEvent = (
 };
 
 export const destroy = () => {
+  _listenersRegistered = false;
   CapacitorMusicControls.destroy();
 };

@@ -23,7 +23,9 @@ export function FavoritesList({
   const { user } = useSelector((state: any) => state.user);
 
   const playlist = useLiveQuery(async () => {
-    let collection = db.playlist.where("users_id").equals(user.id);
+    let collection = db.playlist
+      .where("users_id").equals(user.id)
+      .and((playlist: Playlist) => playlist.clip !== null);
 
     if (searchQuery) {
       collection = collection.filter((c: Playlist) =>
@@ -75,6 +77,8 @@ export function FavoritesList({
         totalCount={playlist?.length}
         itemContent={(index) => {
           const track = playlist ? playlist[index].clip : null;
+
+          console.log('track', track);
 
           if (!track) {
             return null;

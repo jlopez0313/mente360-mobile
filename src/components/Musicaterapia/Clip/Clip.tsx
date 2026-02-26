@@ -33,11 +33,11 @@ export const Clip = () => {
     <>
       {/* Cover Image */}
       <div className="flex-1 flex items-center justify-center px-10 py-6">
-        <div className="w-full max-w-[300px] aspect-square rounded-3xl overflow-hidden shadow-glow">
+        <div className="w-full max-w-[300px] aspect-square overflow-hidden shadow-glow">
           <img
             src={!status ? AudioNoWifi : baseURL + activeTrack?.imagen}
             alt={activeTrack?.titulo}
-            className="w-full h-full object-cover"
+            className="w-full object-cover rounded-3xl"
           />
         </div>
       </div>
@@ -45,14 +45,8 @@ export const Clip = () => {
       {/* Info & Actions */}
       <div className="px-6 pb-8 space-y-6">
         {/* Title & Actions */}
-        <div className="flex items-start justify-between">
-          <div className="flex-1 min-w-0">
-            <h1 className="text-xl font-heading !font-bold text-foreground truncate !m-0">
-              {activeTrack?.titulo}
-            </h1>
-            <p className="text-sm text-muted-foreground">{activeTrack?.categoria?.categoria}</p>
-          </div>
-          <div className="flex items-center gap-1">
+        <div className="flex flex-col justify-between">
+          <div className="flex items-center justify-end gap-1">
             <Button
               variant="ghost"
               size="icon"
@@ -79,6 +73,12 @@ export const Clip = () => {
             <Button variant="ghost" size="icon" onClick={() => onShareLink(activeTrack?.id)}>
               <Share2 className="w-5 h-5 text-muted-foreground" />
             </Button>
+          </div>
+          <div className="flex-1 min-w-0">
+            <h4 className="text-xl font-heading !font-bold text-foreground truncate !m-0">
+              {activeTrack?.titulo}
+            </h4>
+            <p className="text-sm text-muted-foreground">{activeTrack?.categoria?.categoria}</p>
           </div>
         </div>
 

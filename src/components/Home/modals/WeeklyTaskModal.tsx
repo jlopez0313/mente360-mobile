@@ -94,13 +94,13 @@ export function WeeklyTaskModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm mx-auto rounded-xl border-0 bg-gradient-to-b from-primary/10 to-background p-6 overflow-hidden">
+      <DialogContent className="max-w-sm mx-auto rounded-xl border-0 bg-gradient-to-b from-primary/10 to-background max-h-[90vh] p-6 overflow-auto">
         <DialogHeader className="text-left mb-4">
           <div className="flex items-center gap-2 text-primary mb-1">
             <ClipboardList className="w-4 h-4" />
             <span className="text-sm font-medium">Tarea de la semana</span>
           </div>
-          <DialogTitle className="text-xl font-bold text-foreground">
+          <DialogTitle className="!m-1 text-xl font-bold text-foreground">
             {currentTask.title}
           </DialogTitle>
         </DialogHeader>
@@ -127,7 +127,7 @@ export function WeeklyTaskModal({
         </div>
 
         {/* Complete Button */}
-        <div className="flex items-center justify-between mb-4 px-1 gap-4">
+        <div className="flex flex-col items-center justify-between mb-4 px-1 gap-4">
 
           <Button
             onClick={onConfirmTarea}

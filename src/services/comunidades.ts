@@ -2,5 +2,5 @@ import { baseApi } from './api';
 
 export const all = async(fromDate: string = ''): Promise<any> => {
     const { get } = await baseApi();
-    return get(`/comunidades/all?last_sync=${fromDate}`, { 'Content-type': 'application/json' });
+    return get(`/comunidades?last_sync=${fromDate}`, { 'Content-type': 'application/json' });
 };

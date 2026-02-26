@@ -1,6 +1,28 @@
 import { getEpaycoLink } from "@/services/subscribe";
 
+import { App } from "@capacitor/app";
+import { useEffect } from "react";
+
 export const useEpayco = () => {
+
+	useEffect(() => {
+		const listener = App.addListener('appStateChange', ({ isActive }) => {
+			if (isActive) {
+				// Remove any stuck ePayco modal overlays when app returns to foreground
+				const epaycoElements = document.querySelectorAll('.epayco-modal, .epayco-checkout-modal, #epayco-checkout, #epayco-checkout-global, iframe[src*="epayco"]');
+				epaycoElements.forEach(el => {
+					// We only remove UI elements, not script tags. 
+					if (el.tagName !== 'SCRIPT' && el.parentElement) {
+						(el as HTMLElement).style.display = 'none';
+					}
+				});
+			}
+		});
+
+		return () => {
+			listener.then(l => l.remove());
+		};
+	}, []);
 
 	const getInvoice = () => {
 		const currentDate = new Date();
