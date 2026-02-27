@@ -1,44 +1,13 @@
 import { NetworkContext } from "@/context/NetworkContext";
+import { useAudioDuration } from "@/hooks/useAudioDuration";
 import { db } from "@/hooks/useDexie";
 import { usePayment } from "@/hooks/usePayment";
 import { useLiveQuery } from "dexie-react-hooks";
 import { Headphones, Play } from "lucide-react";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 
-/**
- * Carga la duración real del audio en background a partir de la metadata del elemento <audio>.
- * Retorna una cadena formateada como "4:32" o null mientras carga.
- */
-function useAudioDuration(src: string | undefined): string | null {
-  const [duration, setDuration] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!src) return;
-    setDuration(null);
-
-    const audio = new Audio();
-    const handler = () => {
-      const secs = audio.duration;
-      if (!isNaN(secs) && isFinite(secs)) {
-        const mins = Math.floor(secs / 60);
-        const s = Math.floor(secs % 60);
-        setDuration(`${mins}:${s.toString().padStart(2, "0")}`);
-      }
-    };
-    audio.addEventListener("loadedmetadata", handler);
-    audio.preload = "metadata";
-    audio.src = src;
-
-    return () => {
-      audio.removeEventListener("loadedmetadata", handler);
-      audio.src = "";
-    };
-  }, [src]);
-
-  return duration;
-}
 
 export function DailyAudioCard() {
   const { user } = useSelector((state: any) => state.user);

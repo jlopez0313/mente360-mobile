@@ -222,6 +222,7 @@ export const useAudioPlayer = (track: Clips | null, idx?: number, isGlobal: bool
         audioRef,
         activeTrack,
         isPlaying,
+        isGlobalActive: isCurrentlyPlayingGlobalTrack,
         likesCount: likes?.length || 0,
         hasLiked: !!my_like,
         inMyPlaylist: !!inMyPlaylist,

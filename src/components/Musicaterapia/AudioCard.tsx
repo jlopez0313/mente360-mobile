@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Clips from "@/database/clips";
 import { formatCount } from "@/helpers/Format";
+import { useAudioDuration } from "@/hooks/useAudioDuration";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { cn } from "@/lib/utils";
 import {
@@ -30,9 +31,8 @@ interface AudioCardProps {
 
 export const AudioCard = ({ idx, track }: AudioCardProps) => {
   const {
-    audioRef,
-    activeTrack,
     isPlaying,
+    isGlobalActive,
     likesCount,
     hasLiked,
     inMyPlaylist,
@@ -40,19 +40,14 @@ export const AudioCard = ({ idx, track }: AudioCardProps) => {
     baseURL,
     AudioNoWifi,
     getAudioSrc,
-    duration,
     onToggleLike,
     handleTogglePlaylist,
     onShareLink,
     onToggleDownload,
     onTogglePlay,
-    onLoadedMetadata,
-    onTimeUpdate,
-    onUpdateBuffer,
   } = useAudioPlayer(track, idx);
 
-  // Checks if this card is currently active in global playback to show background highlight
-  const isGlobalActive = isPlaying || activeTrack?.id === track.id;
+  const trackDuration = useAudioDuration(getAudioSrc());
 
   return (
     <Card
@@ -103,7 +98,7 @@ export const AudioCard = ({ idx, track }: AudioCardProps) => {
               {track.categoria?.categoria}
             </p>
             <div className="flex items-center gap-2 mt-1">
-              <span className="text-xs text-muted-foreground">{duration}</span>
+              <span className="text-xs text-muted-foreground">{trackDuration || "00:00"}</span>
               {track.audio_local && <Check className="w-3 h-3 text-success" />}
             </div>
           </div>
