@@ -161,9 +161,18 @@ export const useAudioPlayer = (track: Clips | null, idx?: number, isGlobal: bool
     };
 
     const goToPrev = async () => {
-        const prevIdx = globalPos === 0 ? listAudios.length - 1 : globalPos - 1;
-        dispatch(setGlobalPos(prevIdx));
+        if (listAudios.length === 0) return;
+
+        // Dynamically find current index in the potentially filtered list
+        const currentIdx = listAudios.findIndex((a: Clips) => a.id === globalAudio?.id);
+
+        // If current audio not found in list, start from the end
+        const prevIdx = currentIdx <= 0 ? listAudios.length - 1 : currentIdx - 1;
+
         const prev = listAudios[prevIdx];
+        if (!prev) return;
+
+        dispatch(setGlobalPos(prevIdx));
 
         if (prev.audio_local) {
             const audioBlob = await getDownloadedAudio(prev.audio_local);
@@ -176,9 +185,18 @@ export const useAudioPlayer = (track: Clips | null, idx?: number, isGlobal: bool
     };
 
     const goToNext = async () => {
-        const nextIdx = globalPos === listAudios.length - 1 ? 0 : globalPos + 1;
-        dispatch(setGlobalPos(nextIdx));
+        if (listAudios.length === 0) return;
+
+        // Dynamically find current index in the potentially filtered list
+        const currentIdx = listAudios.findIndex((a: Clips) => a.id === globalAudio?.id);
+
+        // If current audio not found in list, start from the beginning
+        const nextIdx = (currentIdx === -1 || currentIdx === listAudios.length - 1) ? 0 : currentIdx + 1;
+
         const next = listAudios[nextIdx];
+        if (!next) return;
+
+        dispatch(setGlobalPos(nextIdx));
 
         if (next.audio_local) {
             const audioBlob = await getDownloadedAudio(next.audio_local);

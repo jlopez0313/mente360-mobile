@@ -1,4 +1,3 @@
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { NetworkContext } from "@/context/NetworkContext";
@@ -80,16 +79,18 @@ export const NivelCard = ({ nivel }: Props) => {
                   className="w-full h-full object-cover"
                 />
               </div>
-              {(nivel.id == myCrecimiento?.nivel.id || isCompleted) && (
-                <Link to={`/niveles/${nivel.id}/crecimientos`}>
-                  <Button
-                    size="icon"
-                    className="absolute inset-0 m-auto w-10 h-10 !rounded-full bg-primary/90 hover:bg-primary shadow-medium"
-                  >
-                    <Play className="w-4 h-4 text-primary-foreground fill-current" />
-                  </Button>
-                </Link>
-              )}
+              {(nivel.id == myCrecimiento?.nivel.id ||
+                isCompleted ||
+                (myCrecimiento?.nivel.orden === 0 && nivel.orden === 1)) && (
+                  <Link to={`/niveles/${nivel.id}/crecimientos`}>
+                    <Button
+                      size="icon"
+                      className="absolute inset-0 m-auto w-10 h-10 !rounded-full bg-primary/90 hover:bg-primary shadow-medium"
+                    >
+                      <Play className="w-4 h-4 text-primary-foreground fill-current" />
+                    </Button>
+                  </Link>
+                )}
             </div>
 
             {/* Content */}
@@ -109,9 +110,7 @@ export const NivelCard = ({ nivel }: Props) => {
               </div>
 
               <div className="flex items-center gap-2 mt-2">
-                <Badge variant="outline" className="text-xs px-2 py-0 w-40">
-                  <span className="block truncate">{nivel?.nivel}</span>
-                </Badge>
+                <span className="font-semibold text-xs">{nivel?.nivel}</span>
                 <span className="text-xs text-muted-foreground">
                   {
                     // formatDuration(podcast?.duration)
@@ -130,12 +129,19 @@ export const NivelCard = ({ nivel }: Props) => {
           </div>
 
           {/* Progress bar */}
-          <div className="px-3 pb-3">
-            <Progress
-              value={(progress ?? (isCompleted ? 1 : 0)) * 100}
-              className="h-1"
-            />
-          </div>
+          {nivel.id == myCrecimiento?.nivel.id || progress ? (
+            podcast?.audio_local ? (
+              null
+            ) : (
+              <div className="px-3 pb-3">
+                <Progress
+                  value={(progress ?? (isCompleted ? 1 : 0)) * 100}
+                  className="h-1"
+                />
+              </div>
+            )
+          ) : null}
+
         </CardContent>
       </Card>
     );

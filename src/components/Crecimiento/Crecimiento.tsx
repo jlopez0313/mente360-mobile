@@ -154,7 +154,7 @@ export const Crecimiento = ({
 
           {/* Level Selector */}
           <div className="flex justify-center pt-4">
-            <Button size="sm" className="gap-1" variant="outline" onClick={() => onToggleDownload('crecimientos')}>
+            <Button size="sm" className="gap-1 text-foreground" variant="outline" onClick={() => onToggleDownload('crecimientos')}>
               {!activeTrack?.audio_local ? (
                 <>
                   {" "}
@@ -194,7 +194,7 @@ export const Crecimiento = ({
             size="icon"
             onClick={handlePrevious}
             disabled={currentIndex === 0}
-            className="w-12 h-12"
+            className="w-12 h-12 text-foreground"
           >
             <SkipBack className="w-6 h-6" />
           </Button>
@@ -216,7 +216,7 @@ export const Crecimiento = ({
             size="icon"
             onClick={handleNext}
             disabled={currentIndex === crecimientos?.length - 1}
-            className="w-12 h-12"
+            className="w-12 h-12 text-foreground"
           >
             <SkipForward className="w-6 h-6" />
           </Button>

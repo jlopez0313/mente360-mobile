@@ -152,7 +152,7 @@ const Perfil = () => {
             <Select
               value={editForm.genero}
               onValueChange={(v) =>
-                setEditForm((prev: any) => ({ ...prev, gender: v }))
+                setEditForm((prev: any) => ({ ...prev, genero: v }))
               }
             >
               <SelectTrigger>
@@ -174,7 +174,7 @@ const Perfil = () => {
               onValueChange={(v) =>
                 setEditForm((prev: any) => ({
                   ...prev,
-                  enneagramType: parseInt(v),
+                  eneatipo: parseInt(v),
                 }))
               }
             >

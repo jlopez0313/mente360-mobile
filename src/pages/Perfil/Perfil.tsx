@@ -217,14 +217,20 @@ const Perfil: React.FC = () => {
                       Fecha de nacimiento
                     </p>
                     <p className="font-medium text-foreground">
-                      {new Date(user.fecha_nacimiento).toLocaleDateString(
-                        "es-ES",
-                        {
-                          day: "numeric",
-                          month: "long",
-                          year: "numeric",
-                        }
-                      )}
+                      {(() => {
+                        if (!user.fecha_nacimiento) return "No definida";
+                        const [year, month, day] = user.fecha_nacimiento
+                          .split("-")
+                          .map(Number);
+                        return new Date(year, month - 1, day).toLocaleDateString(
+                          "es-ES",
+                          {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                          }
+                        );
+                      })()}
                     </p>
                   </div>
                 </div>

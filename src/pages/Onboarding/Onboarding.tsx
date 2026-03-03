@@ -41,7 +41,7 @@ const steps: OnboardingStep[] = [
   {
     id: "music",
     icon: Music,
-    title: "Musicaterapia",
+    title: "Musicoterapia",
     description: "Accede a una biblioteca de sonidos y música diseñada para reducir el estrés, mejorar el sueño y aumentar tu concentración.",
     color: "accent",
   },

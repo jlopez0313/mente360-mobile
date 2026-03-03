@@ -99,9 +99,15 @@ const Crecimientos: React.FC = () => {
     const regex = new RegExp(`eneatipo\\s*${user.eneatipo}`, "i");
     const isEneatipoMatch = regex.test(currentAudioTitle);
 
-    const shouldAdvanceLevel = (isLevelZero && isEneatipoMatch) || nextIdx === crecimientos?.length;
+    // If it's the last audio of the level, or if it's Level 0 and we finished the first audio or the eneatipo audio,
+    // we unlock the next level but DON'T force navigate if there are more audios.
+    const isLastAudio = nextIdx === crecimientos?.length;
+    const isEneatipoInZero = isLevelZero && isEneatipoMatch;
+    const isFirstAudioInZero = isLevelZero && currentIndex === 0;
 
-    if (shouldAdvanceLevel) {
+    const shouldUnlockNextLevel = isLastAudio || isEneatipoInZero || isFirstAudioInZero;
+
+    if (shouldUnlockNextLevel) {
       const nextNivelIdx = niveles?.findIndex((n) => n.id == Number(id)) ?? -1;
 
       if (niveles && niveles[nextNivelIdx + 1]) {
@@ -117,12 +123,20 @@ const Crecimientos: React.FC = () => {
         });
 
         await Promise.all([updatePromise, setUserPromise]);
-        history.replace(
-          `/niveles/${niveles[nextNivelIdx + 1]?.id}/crecimientos`
-        );
+
+        // Only redirect IF it's the last audio and NOT Level 0 (Level 0 behaves like others now)
+        // Actually, user wants Level 0 to behave like others, so only redirect if it's the last audio of ANY level.
+        if (isLastAudio) {
+          history.replace(
+            `/niveles/${niveles[nextNivelIdx + 1]?.id}/crecimientos`
+          );
+          return;
+        }
       }
-    } else if (crecimientos && crecimientos[nextIdx]) {
-      // Normal progression to the next audio in the same level
+    }
+
+    // Normal progression to the next audio in the same level
+    if (crecimientos && crecimientos[nextIdx]) {
       const updatePromise = nextCrecimiento(
         {
           crecimientos_id: crecimientos[nextIdx].id,
@@ -136,8 +150,6 @@ const Crecimientos: React.FC = () => {
 
       await Promise.all([updatePromise, setUserPromise]);
     }
-
-    // await dispatch(setPodcast({ done: 1 }));
   };
 
   useEffect(() => {

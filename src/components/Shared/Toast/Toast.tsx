@@ -63,17 +63,19 @@ export const Toast = () => {
   };
 
   const goToPrev = async () => {
-    const prevIdx = (globalPos - 1 + listAudios.length) % listAudios.length;
+    if (listAudios.length === 0) return;
+    const currentIdx = listAudios.findIndex((a: Clips) => a.id === globalAudio?.id);
+    const prevIdx = currentIdx <= 0 ? listAudios.length - 1 : currentIdx - 1;
     const prev = listAudios[prevIdx];
-
-    handleNextPrev(prevIdx, prev);
+    if (prev) handleNextPrev(prevIdx, prev);
   };
 
   const goToNext = async () => {
-    const nextIdx = (globalPos + 1) % listAudios.length;
+    if (listAudios.length === 0) return;
+    const currentIdx = listAudios.findIndex((a: Clips) => a.id === globalAudio?.id);
+    const nextIdx = (currentIdx === -1 || currentIdx === listAudios.length - 1) ? 0 : currentIdx + 1;
     const next = listAudios[nextIdx];
-
-    handleNextPrev(nextIdx, next);
+    if (next) handleNextPrev(nextIdx, next);
   };
 
   const handleNextPrev = async (index: number, track: Clips) => {
@@ -140,7 +142,7 @@ export const Toast = () => {
   return (
     <div
       className={cn(
-        "fixed bottom-16 left-0 right-0 z-40 px-2",
+        "fixed bottom-24 left-0 right-0 z-40 px-2",
         !showGlobalAudio && "hidden"
       )}
     >

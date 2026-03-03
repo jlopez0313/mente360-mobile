@@ -53,7 +53,7 @@ const Musicaterapia: React.FC = () => {
             />
             <div>
               <h1 className="text-xl font-heading font-bold text-foreground">
-                Musicaterapia
+                Musicoterapia
               </h1>
               <p className="text-sm text-muted-foreground">
                 Sonidos para tu bienestar
