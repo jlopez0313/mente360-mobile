@@ -1,4 +1,4 @@
-import { ChannelCard } from "@/components/Canales/ChannelCard";
+import { ChannelCard, ProgramaCard } from "@/components/Canales";
 import { AppLayout } from "@/components/layout";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -9,7 +9,7 @@ import { useBackButton } from "@/hooks/useBackButton";
 import { db } from "@/hooks/useDexie";
 import { cn } from "@/lib/utils";
 import { useLiveQuery } from "dexie-react-hooks";
-import { ArrowLeft, Play, Users } from "lucide-react";
+import { ArrowLeft, GraduationCap, Play, Users } from "lucide-react";
 import { useContext, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 
@@ -28,6 +28,11 @@ const Canales: React.FC = () => {
 
   const canales = useLiveQuery(
     () => db.canales.filter((c) => c.comunidad?.id == community?.id).toArray(),
+    [community]
+  );
+
+  const programas = useLiveQuery(
+    () => db.programas.filter((c) => c.comunidad_id == community?.id).toArray(),
     [community]
   );
 
@@ -152,6 +157,24 @@ const Canales: React.FC = () => {
                   communityId={id}
                   key={idx}
                   channel={channel}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Programs */}
+          <div>
+            <h2 className="font-heading font-semibold text-foreground mb-3 flex items-center gap-2">
+              <GraduationCap className="w-5 h-5 text-primary" />
+              Programas de Formación
+            </h2>
+
+            <div className="space-y-2">
+              {programas?.map((programa, idx) => (
+                <ProgramaCard
+                  communityId={id}
+                  key={idx}
+                  programa={programa}
                 />
               ))}
             </div>

@@ -3,7 +3,7 @@ import { Progress } from "@/components/ui/progress";
 import { NetworkContext } from "@/context/NetworkContext";
 import Clips from "@/database/clips";
 import { startBackground } from "@/helpers/background";
-import { create, destroy, updateElapsed } from "@/helpers/musicControls";
+import { create, destroy, updateElapsed, updateTrack } from "@/helpers/musicControls";
 import { useAudio } from "@/hooks/useAudio";
 import { cn } from "@/lib/utils";
 import {
@@ -26,6 +26,7 @@ export const Toast = () => {
     useSelector((state: any) => state.audio);
 
   const audioRef: any = useRef();
+  const hasCreatedControls = useRef(false);
   const {
     real_duration,
     progress,
@@ -49,6 +50,7 @@ export const Toast = () => {
     dispatch(setIsGlobalPlaying(false));
     dispatch(setGlobalPos(0));
     dispatch(setGlobalAudio(null));
+    hasCreatedControls.current = false;
     destroy();
   };
 
@@ -89,6 +91,9 @@ export const Toast = () => {
     dispatch(setGlobalPos(index));
     dispatch(setGlobalAudio(track));
     dispatch(setIsGlobalPlaying(true));
+
+    // Update track info immediately to keep background active
+    updateTrack(baseURL, track, 0);
   };
 
   const handleTogglePlaylist = async () => {
@@ -119,15 +124,21 @@ export const Toast = () => {
         dispatch(setIsGlobalPlaying(false));
         onPause();
       };
-      create(
-        baseURL,
-        globalAudio,
-        real_duration,
-        bgPlay,
-        bgPause,
-        goToPrev,
-        goToNext
-      );
+
+      if (!hasCreatedControls.current) {
+        hasCreatedControls.current = true;
+        create(
+          baseURL,
+          globalAudio,
+          real_duration,
+          bgPlay,
+          bgPause,
+          goToPrev,
+          goToNext
+        );
+      } else {
+        updateTrack(baseURL, globalAudio, real_duration);
+      }
     }
   }, [real_duration]);
 

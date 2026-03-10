@@ -1,0 +1,1367 @@
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/AndroidManifest.xml b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/AndroidManifest.xml
+new file mode 100644
+index 0000000..b6ed144
+--- /dev/null
++++ b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/AndroidManifest.xml
+@@ -0,0 +1,32 @@
++<?xml version="1.0" encoding="utf-8"?>
++<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++    package="com.ingageco.capacitormusiccontrols.capacitormusiccontrolsplugin" >
++
++    <uses-sdk android:minSdkVersion="23" />
++
++    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
++    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
++
++    <application>
++        <service
++            android:name="com.ingageco.capacitormusiccontrols.MusicControlsNotificationKiller"
++            android:foregroundServiceType="mediaPlayback"
++            android:stopWithTask="true" />
++
++        <receiver
++            android:name="com.ingageco.capacitormusiccontrols.capacitormusiccontrolsplugin.MusicControlsBroadcastReceiver"
++            android:exported="false" >
++            <intent-filter>
++                <action android:name="music-controls-previous" />
++                <action android:name="music-controls-pause" />
++                <action android:name="music-controls-play" />
++                <action android:name="music-controls-next" />
++                <action android:name="music-controls-media-button" />
++                <action android:name="music-controls-destroy" />
++                <action android:name="android.intent.action.HEADSET_PLUG" />
++                <action android:name="android.bluetooth.headset.profile.action.CONNECTION_STATE_CHANGED" />
++            </intent-filter>
++        </receiver>
++    </application>
++
++</manifest>
+\ No newline at end of file
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/output-metadata.json b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/output-metadata.json
+new file mode 100644
+index 0000000..ec17e99
+--- /dev/null
++++ b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/output-metadata.json
+@@ -0,0 +1,18 @@
++{
++  "version": 3,
++  "artifactType": {
++    "type": "AAPT_FRIENDLY_MERGED_MANIFESTS",
++    "kind": "Directory"
++  },
++  "applicationId": "com.ingageco.capacitormusiccontrols.capacitormusiccontrolsplugin",
++  "variantName": "debug",
++  "elements": [
++    {
++      "type": "SINGLE",
++      "filters": [],
++      "attributes": [],
++      "outputFile": "AndroidManifest.xml"
++    }
++  ],
++  "elementType": "File"
++}
+\ No newline at end of file
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/aar_metadata/debug/writeDebugAarMetadata/aar-metadata.properties b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/aar_metadata/debug/writeDebugAarMetadata/aar-metadata.properties
+new file mode 100644
+index 0000000..1211b1e
+--- /dev/null
++++ b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/aar_metadata/debug/writeDebugAarMetadata/aar-metadata.properties
+@@ -0,0 +1,6 @@
++aarFormatVersion=1.0
++aarMetadataVersion=1.0
++minCompileSdk=1
++minCompileSdkExtension=0
++minAndroidGradlePluginVersion=1.0.0
++coreLibraryDesugaringEnabled=false
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/annotation_processor_list/debug/javaPreCompileDebug/annotationProcessors.json b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/annotation_processor_list/debug/javaPreCompileDebug/annotationProcessors.json
+new file mode 100644
+index 0000000..9e26dfe
+--- /dev/null
++++ b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/annotation_processor_list/debug/javaPreCompileDebug/annotationProcessors.json
+@@ -0,0 +1 @@
++{}
+\ No newline at end of file
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/compile_r_class_jar/debug/generateDebugRFile/R.jar b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/compile_r_class_jar/debug/generateDebugRFile/R.jar
+new file mode 100644
+index 0000000..b7eb4e2
+Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/compile_r_class_jar/debug/generateDebugRFile/R.jar differ
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/compile_symbol_list/debug/generateDebugRFile/R.txt b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/compile_symbol_list/debug/generateDebugRFile/R.txt
+new file mode 100644
+index 0000000..f7ac549
+--- /dev/null
++++ b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/compile_symbol_list/debug/generateDebugRFile/R.txt
+@@ -0,0 +1,3 @@
++int id webview 0x0
++int layout bridge_layout_main 0x0
++int string my_string 0x0
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/layout_bridge_layout_main.xml.flat b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/layout_bridge_layout_main.xml.flat
+new file mode 100644
+index 0000000..c0806b3
+Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/layout_bridge_layout_main.xml.flat differ
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties
+new file mode 100644
+index 0000000..8cc1cf0
+--- /dev/null
++++ b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties
+@@ -0,0 +1,2 @@
++#Tue Mar 10 13:30:07 COT 2026
++com.ingageco.capacitormusiccontrols.capacitormusiccontrolsplugin.capacitor-music-controls-plugin-main-6\:/layout/bridge_layout_main.xml=C\:\\Users\\jonna\\Desktop\\Jonathan\\AyD\\mente360\\node_modules\\capacitor-music-controls-plugin\\android\\build\\intermediates\\packaged_res\\debug\\packageDebugResources\\layout\\bridge_layout_main.xml
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/incremental/debug/packageDebugResources/merged.dir/values/values.xml b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/incremental/debug/packageDebugResources/merged.dir/values/values.xml
+new file mode 100644
+index 0000000..e95bf66
+--- /dev/null
++++ b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/incremental/debug/packageDebugResources/merged.dir/values/values.xml
+@@ -0,0 +1,4 @@
++<?xml version="1.0" encoding="utf-8"?>
++<resources>
++    <string name="my_string">Just a simple string</string>
++</resources>
+\ No newline at end of file
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml
+new file mode 100644
+index 0000000..e869272
+--- /dev/null
++++ b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main" generated-set="main$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\res"><file name="bridge_layout_main" path="C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\res\layout\bridge_layout_main.xml" qualifiers="" type="layout"/><file path="C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\res\values\colors.xml" qualifiers=""/><file path="C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\res\values\strings.xml" qualifiers=""><string name="my_string">Just a simple string</string></file><file path="C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\res\values\styles.xml" qualifiers=""/></source></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="debug$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\debug\res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="debug" generated-set="debug$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\debug\res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\build\generated\res\resValues\debug"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated" generated-set="generated$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\build\generated\res\resValues\debug"/></dataSet><mergedItems/></merger>
+\ No newline at end of file
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/local_only_symbol_list/debug/parseDebugLocalResources/R-def.txt b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/local_only_symbol_list/debug/parseDebugLocalResources/R-def.txt
+new file mode 100644
+index 0000000..80ec5cb
+--- /dev/null
++++ b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/local_only_symbol_list/debug/parseDebugLocalResources/R-def.txt
+@@ -0,0 +1,5 @@
++R_DEF: Internal format may change without notice
++local
++id webview
++layout bridge_layout_main
++string my_string
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/manifest_merge_blame_file/debug/processDebugManifest/manifest-merger-blame-debug-report.txt b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/manifest_merge_blame_file/debug/processDebugManifest/manifest-merger-blame-debug-report.txt
+new file mode 100644
+index 0000000..337e6dd
+--- /dev/null
++++ b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/manifest_merge_blame_file/debug/processDebugManifest/manifest-merger-blame-debug-report.txt
+@@ -0,0 +1,61 @@
++1<?xml version="1.0" encoding="utf-8"?>
++2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++3    package="com.ingageco.capacitormusiccontrols.capacitormusiccontrolsplugin" >
++4
++5    <uses-sdk android:minSdkVersion="23" />
++6
++7    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
++7-->C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:3:3-75
++7-->C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:3:20-72
++8    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
++8-->C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:4:3-90
++8-->C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:4:20-87
++9
++10    <application>
++10-->C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:5:3-22:17
++11        <service
++11-->C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:6:5-7:83
++12            android:name="com.ingageco.capacitormusiccontrols.MusicControlsNotificationKiller"
++12-->C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:6:14-96
++13            android:foregroundServiceType="mediaPlayback"
++13-->C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:7:35-80
++14            android:stopWithTask="true" />
++14-->C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:7:7-34
++15
++16        <receiver
++16-->C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:8:5-21:16
++17            android:name="com.ingageco.capacitormusiccontrols.capacitormusiccontrolsplugin.MusicControlsBroadcastReceiver"
++17-->C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:9:7-53
++18            android:exported="false" >
++18-->C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:10:7-31
++19            <intent-filter>
++19-->C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:11:7-20:23
++20                <action android:name="music-controls-previous" />
++20-->C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:12:9-58
++20-->C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:12:17-55
++21                <action android:name="music-controls-pause" />
++21-->C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:13:9-55
++21-->C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:13:17-52
++22                <action android:name="music-controls-play" />
++22-->C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:14:9-54
++22-->C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:14:17-51
++23                <action android:name="music-controls-next" />
++23-->C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:15:9-54
++23-->C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:15:17-51
++24                <action android:name="music-controls-media-button" />
++24-->C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:16:9-62
++24-->C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:16:17-59
++25                <action android:name="music-controls-destroy" />
++25-->C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:17:9-57
++25-->C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:17:17-54
++26                <action android:name="android.intent.action.HEADSET_PLUG" />
++26-->C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:18:9-69
++26-->C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:18:17-66
++27                <action android:name="android.bluetooth.headset.profile.action.CONNECTION_STATE_CHANGED" />
++27-->C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:19:9-100
++27-->C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:19:17-97
++28            </intent-filter>
++29        </receiver>
++30    </application>
++31
++32</manifest>
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml
+new file mode 100644
+index 0000000..b6ed144
+--- /dev/null
++++ b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml
+@@ -0,0 +1,32 @@
++<?xml version="1.0" encoding="utf-8"?>
++<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++    package="com.ingageco.capacitormusiccontrols.capacitormusiccontrolsplugin" >
++
++    <uses-sdk android:minSdkVersion="23" />
++
++    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
++    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
++
++    <application>
++        <service
++            android:name="com.ingageco.capacitormusiccontrols.MusicControlsNotificationKiller"
++            android:foregroundServiceType="mediaPlayback"
++            android:stopWithTask="true" />
++
++        <receiver
++            android:name="com.ingageco.capacitormusiccontrols.capacitormusiccontrolsplugin.MusicControlsBroadcastReceiver"
++            android:exported="false" >
++            <intent-filter>
++                <action android:name="music-controls-previous" />
++                <action android:name="music-controls-pause" />
++                <action android:name="music-controls-play" />
++                <action android:name="music-controls-next" />
++                <action android:name="music-controls-media-button" />
++                <action android:name="music-controls-destroy" />
++                <action android:name="android.intent.action.HEADSET_PLUG" />
++                <action android:name="android.bluetooth.headset.profile.action.CONNECTION_STATE_CHANGED" />
++            </intent-filter>
++        </receiver>
++    </application>
++
++</manifest>
+\ No newline at end of file
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/navigation_json/debug/extractDeepLinksDebug/navigation.json b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/navigation_json/debug/extractDeepLinksDebug/navigation.json
+new file mode 100644
+index 0000000..0637a08
+--- /dev/null
++++ b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/navigation_json/debug/extractDeepLinksDebug/navigation.json
+@@ -0,0 +1 @@
++[]
+\ No newline at end of file
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/nested_resources_validation_report/debug/generateDebugResources/nestedResourcesValidationReport.txt b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/nested_resources_validation_report/debug/generateDebugResources/nestedResourcesValidationReport.txt
+new file mode 100644
+index 0000000..08f4ebe
+--- /dev/null
++++ b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/nested_resources_validation_report/debug/generateDebugResources/nestedResourcesValidationReport.txt
+@@ -0,0 +1 @@
++0 Warning/Error
+\ No newline at end of file
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/packaged_res/debug/packageDebugResources/layout/bridge_layout_main.xml b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/packaged_res/debug/packageDebugResources/layout/bridge_layout_main.xml
+new file mode 100644
+index 0000000..56fec15
+--- /dev/null
++++ b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/packaged_res/debug/packageDebugResources/layout/bridge_layout_main.xml
+@@ -0,0 +1,15 @@
++<?xml version="1.0" encoding="utf-8"?>
++<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
++    xmlns:app="http://schemas.android.com/apk/res-auto"
++    xmlns:tools="http://schemas.android.com/tools"
++    android:layout_width="match_parent"
++    android:layout_height="match_parent"
++    tools:context="com.getcapacitor.BridgeActivity"
++    >
++
++    <WebView
++        android:id="@+id/webview"
++        android:layout_width="fill_parent"
++        android:layout_height="fill_parent" />
++
++</androidx.coordinatorlayout.widget.CoordinatorLayout>
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/packaged_res/debug/packageDebugResources/values/values.xml b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/packaged_res/debug/packageDebugResources/values/values.xml
+new file mode 100644
+index 0000000..e95bf66
+--- /dev/null
++++ b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/packaged_res/debug/packageDebugResources/values/values.xml
+@@ -0,0 +1,4 @@
++<?xml version="1.0" encoding="utf-8"?>
++<resources>
++    <string name="my_string">Just a simple string</string>
++</resources>
+\ No newline at end of file
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/symbol_list_with_package_name/debug/generateDebugRFile/package-aware-r.txt b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/symbol_list_with_package_name/debug/generateDebugRFile/package-aware-r.txt
+new file mode 100644
+index 0000000..d29d45f
+--- /dev/null
++++ b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/symbol_list_with_package_name/debug/generateDebugRFile/package-aware-r.txt
+@@ -0,0 +1,4 @@
++com.ingageco.capacitormusiccontrols.capacitormusiccontrolsplugin
++id webview
++layout bridge_layout_main
++string my_string
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/outputs/logs/manifest-merger-debug-report.txt b/node_modules/capacitor-music-controls-plugin/android/build/outputs/logs/manifest-merger-debug-report.txt
+new file mode 100644
+index 0000000..3b5ebbb
+--- /dev/null
++++ b/node_modules/capacitor-music-controls-plugin/android/build/outputs/logs/manifest-merger-debug-report.txt
+@@ -0,0 +1,74 @@
++-- Merging decision tree log ---
++manifest
++ADDED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:1:1-23:12
++INJECTED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:1:1-23:12
++	package
++		INJECTED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml
++	xmlns:android
++		ADDED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:1:11-69
++uses-permission#android.permission.FOREGROUND_SERVICE
++ADDED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:3:3-75
++	android:name
++		ADDED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:3:20-72
++uses-permission#android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK
++ADDED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:4:3-90
++	android:name
++		ADDED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:4:20-87
++application
++ADDED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:5:3-22:17
++service#com.ingageco.capacitormusiccontrols.MusicControlsNotificationKiller
++ADDED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:6:5-7:83
++	android:stopWithTask
++		ADDED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:7:7-34
++	android:foregroundServiceType
++		ADDED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:7:35-80
++	android:name
++		ADDED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:6:14-96
++receiver#com.ingageco.capacitormusiccontrols.capacitormusiccontrolsplugin.MusicControlsBroadcastReceiver
++ADDED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:8:5-21:16
++	android:exported
++		ADDED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:10:7-31
++	android:name
++		ADDED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:9:7-53
++intent-filter#action:name:android.bluetooth.headset.profile.action.CONNECTION_STATE_CHANGED+action:name:android.intent.action.HEADSET_PLUG+action:name:music-controls-destroy+action:name:music-controls-media-button+action:name:music-controls-next+action:name:music-controls-pause+action:name:music-controls-play+action:name:music-controls-previous
++ADDED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:11:7-20:23
++action#music-controls-previous
++ADDED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:12:9-58
++	android:name
++		ADDED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:12:17-55
++action#music-controls-pause
++ADDED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:13:9-55
++	android:name
++		ADDED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:13:17-52
++action#music-controls-play
++ADDED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:14:9-54
++	android:name
++		ADDED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:14:17-51
++action#music-controls-next
++ADDED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:15:9-54
++	android:name
++		ADDED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:15:17-51
++action#music-controls-media-button
++ADDED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:16:9-62
++	android:name
++		ADDED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:16:17-59
++action#music-controls-destroy
++ADDED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:17:9-57
++	android:name
++		ADDED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:17:17-54
++action#android.intent.action.HEADSET_PLUG
++ADDED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:18:9-69
++	android:name
++		ADDED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:18:17-66
++action#android.bluetooth.headset.profile.action.CONNECTION_STATE_CHANGED
++ADDED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:19:9-100
++	android:name
++		ADDED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml:19:17-97
++uses-sdk
++INJECTED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml reason: use-sdk injection requested
++INJECTED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml
++INJECTED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml
++	android:targetSdkVersion
++		INJECTED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml
++	android:minSdkVersion
++		INJECTED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml
+diff --git a/node_modules/capacitor-music-controls-plugin/android/src/main/java/com/ingageco/capacitormusiccontrols/CapacitorMusicControls.java b/node_modules/capacitor-music-controls-plugin/android/src/main/java/com/ingageco/capacitormusiccontrols/CapacitorMusicControls.java
+index 054d618..123aa75 100644
+--- a/node_modules/capacitor-music-controls-plugin/android/src/main/java/com/ingageco/capacitormusiccontrols/CapacitorMusicControls.java
++++ b/node_modules/capacitor-music-controls-plugin/android/src/main/java/com/ingageco/capacitormusiccontrols/CapacitorMusicControls.java
+@@ -1,431 +1,430 @@
+ package com.ingageco.capacitormusiccontrols;
+ 
++import java.io.BufferedInputStream;
++import java.io.File;
++import java.io.FileInputStream;
++import java.io.InputStream;
++import java.net.HttpURLConnection;
++import java.net.URL;
++
++import android.app.Notification;
++import android.content.Context;
+ import com.getcapacitor.JSObject;
++
++import org.json.JSONException;
++
+ import com.getcapacitor.Plugin;
+ import com.getcapacitor.PluginCall;
+ import com.getcapacitor.PluginMethod;
+ import com.getcapacitor.annotation.CapacitorPlugin;
+ 
+-
++import android.app.Activity;
++import android.app.PendingIntent;
++import android.content.Intent;
++import android.content.IntentFilter;
+ import android.graphics.Bitmap;
+ import android.graphics.BitmapFactory;
++import android.media.AudioManager;
+ import android.net.Uri;
++import android.os.Build;
+ import android.support.v4.media.MediaMetadataCompat;
+ import android.support.v4.media.session.MediaSessionCompat;
+ import android.support.v4.media.session.PlaybackStateCompat;
+-import androidx.core.content.ContextCompat;
+-
+-import android.media.session.MediaSession.Token;
+-
+ import android.util.Log;
+-import android.app.Activity;
+-import android.app.Notification;
+-
+-import android.content.Context;
+-import android.content.IntentFilter;
+-import android.content.Intent;
+-import android.app.PendingIntent;
+-import android.content.ServiceConnection;
+-import android.content.ComponentName;
+-import android.app.Service;
+-import android.os.IBinder;
+-import android.os.Bundle;
+-import android.os.Build;
+-import android.R;
+-import android.content.BroadcastReceiver;
+-import android.media.AudioManager;
+-
+-import org.json.JSONArray;
+-import org.json.JSONException;
++import androidx.core.content.ContextCompat;
+ 
+-import java.io.BufferedInputStream;
+-import java.io.File;
+-import java.io.FileInputStream;
+-import java.io.InputStream;
+-import java.net.HttpURLConnection;
+-import java.net.URL;
+ 
+-@CapacitorPlugin(name="CapacitorMusicControls")
++@CapacitorPlugin(name = "CapacitorMusicControls")
+ public class CapacitorMusicControls extends Plugin {
+ 
+-	private static final String TAG = "CapacitorMusicControls";
+-
+-	private MusicControlsBroadcastReceiver mMessageReceiver;
+-	private MusicControlsNotification notification;
+-	private MediaSessionCompat mediaSessionCompat;
+-	private final int notificationID=7824;
+-	private AudioManager mAudioManager;
+-	private PendingIntent mediaButtonPendingIntent;
+-	private boolean mediaButtonAccess=true;
+-	private android.media.session.MediaSession.Token token;
+-	private MusicControlsServiceConnection mConnection;
+-
++    private static final String TAG = "CapacitorMusicControls";
+ 
+-	private MediaSessionCallback mMediaSessionCallback = new MediaSessionCallback(this);
++    private MusicControlsBroadcastReceiver mMessageReceiver;
++    private MusicControlsNotification notification;
++    private MediaSessionCompat mediaSessionCompat;
++    private final int notificationID = 7824;
++    private AudioManager mAudioManager;
++    private PendingIntent mediaButtonPendingIntent;
++    private boolean mediaButtonAccess = true;
++    private android.media.session.MediaSession.Token token;
++    private MusicControlsServiceConnection mConnection;
+ 
++    private MediaSessionCallback mMediaSessionCallback = new MediaSessionCallback(this);
+ 
+-	@PluginMethod()
++    @PluginMethod()
+     public void create(PluginCall call) {
+ 
+-			JSObject options = call.getData();
++        JSObject options = call.getData();
+ 
+-			final Context context=getActivity().getApplicationContext();
+-			final Activity activity = getActivity();
++        final Context context = getActivity().getApplicationContext();
++        final Activity activity = getActivity();
+ 
+-			initialize();
++        initialize();
+ 
+-			try{
++        try {
+ 
+-				final MusicControlsInfos infos = new MusicControlsInfos(options);
++            final MusicControlsInfos infos = new MusicControlsInfos(options);
+ 
+-				final MediaMetadataCompat.Builder metadataBuilder = new MediaMetadataCompat.Builder();
++            final MediaMetadataCompat.Builder metadataBuilder = new MediaMetadataCompat.Builder();
+ 
+-				notification.updateNotification(infos);
++            notification.updateNotification(infos);
+ 
+-				// track title
+-				metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, infos.track);
+-				// artists
+-				metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, infos.artist);
+-				//album
+-				metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, infos.album);
++            metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, infos.track);
++            metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, infos.artist);
++            metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, infos.album);
+ 
+-				Bitmap art = getBitmapCover(infos.cover);
+-				if(art != null){
+-					metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, art);
+-					metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, art);
++            Bitmap art = getBitmapCover(infos.cover);
++            if (art != null) {
++                metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, art);
++                metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, art);
++            }
+ 
+-				}
++            if (infos.duration > 0) {
++                metadataBuilder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, infos.duration);
++            }
+ 
+-				mediaSessionCompat.setMetadata(metadataBuilder.build());
++            mediaSessionCompat.setMetadata(metadataBuilder.build());
+ 
+-				if(infos.isPlaying)
+-					setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING);
+-				else
+-					setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED);
++            if (infos.isPlaying)
++                setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING, infos.elapsed);
++            else
++                setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED, infos.elapsed);
+ 
+-				call.resolve();
++            call.resolve();
+ 
+-			} catch(JSONException e){
+-				call.reject("error in initializing MusicControlsInfos "+e.toString());
+-
+-			}
++        } catch (JSONException e) {
++            call.reject("error in initializing MusicControlsInfos " + e.toString());
++        }
+ 
+     }
+ 
++    @PluginMethod()
++    public void updateTrack(PluginCall call) {
++        if (this.notification == null || this.mediaSessionCompat == null) {
++            // If not created yet, just create it
++            this.create(call);
++            return;
++        }
+ 
++        JSObject options = call.getData();
+ 
+-	private void registerBroadcaster(MusicControlsBroadcastReceiver mMessageReceiver){
+-    final Context context = getActivity().getApplicationContext();
+-    IntentFilter filter = new IntentFilter();
+-    filter.addAction("music-controls-previous");
+-    filter.addAction("music-controls-pause");
+-    filter.addAction("music-controls-play");
+-    filter.addAction("music-controls-next");
+-    filter.addAction("music-controls-media-button");
+-    filter.addAction("music-controls-destroy");
+-    filter.addAction(Intent.ACTION_HEADSET_PLUG);
+-    filter.addAction(android.bluetooth.BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED);
+-
+-    ContextCompat.registerReceiver(context, mMessageReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
+-	}
+-
+-	// Register pendingIntent for broacast
+-	public void registerMediaButtonEvent(){
+-		if (this.mediaSessionCompat != null) {
+-			this.mediaSessionCompat.setMediaButtonReceiver(this.mediaButtonPendingIntent);
+-		}
+-	}
+-
+-	public void unregisterMediaButtonEvent(){
+-		if (this.mediaSessionCompat != null) {
+-			this.mediaSessionCompat.setMediaButtonReceiver(null);
+-			this.mediaSessionCompat.release();
+-		}
+-	}
+-
+-	public void destroyPlayerNotification(){
+-		if (this.notification != null) {
+-			try {
+-				this.notification.destroy();
+-				this.notification = null;
+-			} catch (NullPointerException e) {
+-				e.printStackTrace();
+-			}
+-		}
+-	}
+-
+-
+-
+-
+-	public void initialize() {
++        try {
++            final MusicControlsInfos infos = new MusicControlsInfos(options);
++            final MediaMetadataCompat.Builder metadataBuilder = new MediaMetadataCompat.Builder();
+ 
+-		final Activity activity=getActivity();
++            notification.updateNotification(infos);
+ 
+-		final Context context=activity.getApplicationContext();
++            metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, infos.track);
++            metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, infos.artist);
++            metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, infos.album);
+ 
+-		final MusicControlsServiceConnection mConnection = new MusicControlsServiceConnection(activity);
+-		this.mConnection = mConnection;
++            Bitmap art = getBitmapCover(infos.cover);
++            if (art != null) {
++                metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, art);
++                metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, art);
++            }
+ 
++            if (infos.duration > 0) {
++                metadataBuilder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, infos.duration);
++            }
+ 
+-		// avoid spawning multiple receivers
+-		if(this.mMessageReceiver != null){
++            mediaSessionCompat.setMetadata(metadataBuilder.build());
+ 
+-			try{
++            if (infos.isPlaying)
++                setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING, infos.elapsed);
++            else
++                setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED, infos.elapsed);
+ 
+-				context.unregisterReceiver(this.mMessageReceiver);
++            call.resolve();
+ 
+-			} catch(IllegalArgumentException e) {
++        } catch (JSONException e) {
++            call.reject("error in updating MusicControlsInfos " + e.toString());
++        }
++    }
+ 
+-				e.printStackTrace();
++    private void registerBroadcaster(MusicControlsBroadcastReceiver mMessageReceiver) {
++        final Context context = getActivity().getApplicationContext();
++        IntentFilter filter = new IntentFilter();
++        filter.addAction("music-controls-previous");
++        filter.addAction("music-controls-pause");
++        filter.addAction("music-controls-play");
++        filter.addAction("music-controls-next");
++        filter.addAction("music-controls-media-button");
++        filter.addAction("music-controls-destroy");
++        filter.addAction(Intent.ACTION_HEADSET_PLUG);
++        filter.addAction(android.bluetooth.BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED);
++        ContextCompat.registerReceiver(context, mMessageReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
++    }
+ 
+-			}
++    public void registerMediaButtonEvent() {
++        if (this.mediaSessionCompat != null) {
++            this.mediaSessionCompat.setMediaButtonReceiver(this.mediaButtonPendingIntent);
++        }
++    }
+ 
+-			unregisterMediaButtonEvent();
++    public void unregisterMediaButtonEvent() {
++        if (this.mediaSessionCompat != null) {
++            this.mediaSessionCompat.setMediaButtonReceiver(null);
++            this.mediaSessionCompat.release();
++        }
++    }
+ 
+-		}
+-		// end avoid spawn
++    public void destroyPlayerNotification() {
++        if (this.notification != null) {
++            try {
++                this.notification.destroy();
++                this.notification = null;
++            } catch (NullPointerException e) {
++                e.printStackTrace();
++            }
++        }
++    }
+ 
+-		this.mMessageReceiver = new MusicControlsBroadcastReceiver(this);
+-		this.registerBroadcaster(this.mMessageReceiver);
++    public void initialize() {
+ 
+-		this.mediaSessionCompat = new MediaSessionCompat(context, "capacitor-music-controls-media-session", null, this.mediaButtonPendingIntent);
+-		this.mediaSessionCompat.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
++        final Activity activity = getActivity();
++        final Context context = activity.getApplicationContext();
++        final MusicControlsServiceConnection mConnection = new MusicControlsServiceConnection(activity);
++        this.mConnection = mConnection;
+ 
+-		MediaSessionCompat.Token _token = this.mediaSessionCompat.getSessionToken();
+-		this.token = (android.media.session.MediaSession.Token) _token.getToken();
++        if (this.mMessageReceiver != null) {
++            try {
++                context.unregisterReceiver(this.mMessageReceiver);
++            } catch (IllegalArgumentException e) {
++                e.printStackTrace();
++            }
++            unregisterMediaButtonEvent();
++        }
+ 
+-		setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED);
++        this.mMessageReceiver = new MusicControlsBroadcastReceiver(this);
++        this.registerBroadcaster(this.mMessageReceiver);
++
++        this.mediaSessionCompat = new MediaSessionCompat(context, "capacitor-music-controls-media-session", null,
++                this.mediaButtonPendingIntent);
++        this.mediaSessionCompat.setFlags(
++                MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
++
++        MediaSessionCompat.Token _token = this.mediaSessionCompat.getSessionToken();
++        this.token = (android.media.session.MediaSession.Token) _token.getToken();
++
++        setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED, 0);
++
++        this.mediaSessionCompat.setActive(true);
++        this.mediaSessionCompat.setCallback(this.mMediaSessionCallback);
++
++        this.notification = new MusicControlsNotification(activity, this.notificationID, this.token) {
++            @Override
++            protected void onNotificationUpdated(Notification notification) {
++                mConnection.setNotification(notification, this.infos.isPlaying);
++            }
++
++            @Override
++            protected void onNotificationDestroyed() {
++                mConnection.setNotification(null, false);
++            }
++        };
++
++        try {
++            this.mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
++            Intent headsetIntent = new Intent("music-controls-media-button");
++            this.mediaButtonPendingIntent = PendingIntent.getBroadcast(
++                    context, 0, headsetIntent,
++                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
++                            ? PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
++                            : PendingIntent.FLAG_UPDATE_CURRENT);
++            this.registerMediaButtonEvent();
++        } catch (Exception e) {
++            this.mediaButtonAccess = false;
++            e.printStackTrace();
++        }
+ 
+-		this.mediaSessionCompat.setActive(true);
+-		this.mediaSessionCompat.setCallback(this.mMediaSessionCallback);
++        Intent startServiceIntent = new Intent(activity, MusicControlsNotificationKiller.class);
++        startServiceIntent.putExtra("notificationID", this.notificationID);
++        activity.bindService(startServiceIntent, this.mConnection, Context.BIND_AUTO_CREATE);
+ 
+-		this.notification = new MusicControlsNotification(activity, this.notificationID, this.token) {
+-			@Override
+-			protected void onNotificationUpdated(Notification notification) {
+-				mConnection.setNotification(notification, this.infos.isPlaying);
+-			}
++    }
+ 
+-			@Override
+-			protected void onNotificationDestroyed() {
+-				mConnection.setNotification(null, false);
+-			}
+-		};
++    @PluginMethod()
++    public void destroy(PluginCall call) {
++        final Activity activity = getActivity();
++        final Context context = activity.getApplicationContext();
++        this.destroyPlayerNotification();
++        this.stopMessageReceiver(context);
++        this.unregisterMediaButtonEvent();
++        this.stopServiceConnection(activity);
++        call.resolve();
++    }
+ 
++    protected void handleOnDestroy() {
++        final Activity activity = getActivity();
++        final Context context = activity.getApplicationContext();
++        this.destroyPlayerNotification();
++        this.stopMessageReceiver(context);
++        this.unregisterMediaButtonEvent();
++        this.stopServiceConnection(activity);
++    }
+ 
+-		// Register media (headset) button event receiver
+-		try {
+-			this.mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+-			Intent headsetIntent = new Intent("music-controls-media-button");
+-			this.mediaButtonPendingIntent = PendingIntent.getBroadcast(
+-				context, 0, headsetIntent, 
+-				Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ? PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE : PendingIntent.FLAG_UPDATE_CURRENT
+-			);
+-			this.registerMediaButtonEvent();
+-		} catch (Exception e) {
+-			this.mediaButtonAccess=false;
+-			e.printStackTrace();
+-		}
++    public void stopMessageReceiver(Context context) {
++        if (this.mMessageReceiver != null) {
++            this.mMessageReceiver.stopListening();
++            try {
++                context.unregisterReceiver(this.mMessageReceiver);
++            } catch (IllegalArgumentException e) {
++                e.printStackTrace();
++            }
++            this.mMessageReceiver = null;
++        }
++    }
+ 
+-		Intent startServiceIntent = new Intent(activity, MusicControlsNotificationKiller.class);
+-		startServiceIntent.putExtra("notificationID", this.notificationID);
+-		activity.bindService(startServiceIntent, this.mConnection, Context.BIND_AUTO_CREATE);
++    public void stopServiceConnection(Activity activity) {
++        if (this.mConnection != null) {
++            Intent stopServiceIntent = new Intent(activity, MusicControlsNotificationKiller.class);
++            activity.unbindService(this.mConnection);
++            activity.stopService(stopServiceIntent);
++            this.mConnection = null;
++        }
++    }
+ 
+-	}
++    @PluginMethod()
++    public void updateIsPlaying(PluginCall call) {
++        JSObject params = call.getData();
+ 
++        if (this.notification == null) {
++            call.resolve();
++            return;
++        }
+ 
++        try {
++            final boolean isPlaying = params.getBoolean("isPlaying");
++            this.notification.updateIsPlaying(isPlaying);
+ 
+-	@PluginMethod()
+-	public void destroy(PluginCall call) {
++            if (isPlaying)
++                setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING,
++                        this.notification.infos != null ? this.notification.infos.elapsed : 0);
++            else
++                setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED,
++                        this.notification.infos != null ? this.notification.infos.elapsed : 0);
+ 
+-		final Activity activity = getActivity();
+-		final Context context = activity.getApplicationContext();
++            call.resolve();
++        } catch (JSONException e) {
++            call.reject("error updateIsPlaying: " + e.toString());
++        }
++    }
+ 
+-		this.destroyPlayerNotification();
+-		this.stopMessageReceiver(context);
+-		this.unregisterMediaButtonEvent();
+-		this.stopServiceConnection(activity);
++    @PluginMethod()
++    public void updateElapsed(PluginCall call) {
++        JSObject params = call.getData();
+ 
++        try {
++            final boolean isPlaying = params.getBoolean("isPlaying");
++            Long elapsedObj = params.getLong("elapsed");
++            final long elapsed = elapsedObj != null ? elapsedObj
++                    : (this.notification.infos != null ? this.notification.infos.elapsed : 0);
+ 
+-		call.resolve();
+-	}
++            if (this.notification.infos != null) {
++                this.notification.infos.elapsed = elapsed;
++                this.notification.infos.isPlaying = isPlaying;
++            }
+ 
++            this.notification.updateIsPlaying(isPlaying);
+ 
+-	protected void handleOnDestroy() {
++            if (isPlaying)
++                setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING, elapsed);
++            else
++                setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED, elapsed);
+ 
+-		final Activity activity = getActivity();
+-		final Context context = activity.getApplicationContext();
++            call.resolve();
++        } catch (JSONException e) {
++            call.reject("error updateElapsed: " + e.toString());
++        } catch (NullPointerException e) {
++            e.printStackTrace();
++        }
++    }
+ 
+-		this.destroyPlayerNotification();
+-		this.stopMessageReceiver(context);
+-		this.unregisterMediaButtonEvent();
+-		this.stopServiceConnection(activity);
++    @PluginMethod()
++    public void updateDismissable(PluginCall call) {
++        JSObject params = call.getData();
++        try {
++            final boolean dismissable = params.getBoolean("dismissable");
++            this.notification.updateDismissable(dismissable);
++            call.resolve();
++        } catch (JSONException e) {
++            call.reject("error updateDismissable: " + e.toString());
++        }
++    }
+ 
+-	}
++    public void controlsNotification(JSObject ret) {
++        Log.i(TAG, "controlsNotification fired " + ret.getString("message"));
++        this.bridge.triggerJSEvent("controlsNotification", "document", ret.toString());
++    }
+ 
+-	public void stopMessageReceiver(Context context){
++    private void setMediaPlaybackState(int state, long elapsed) {
++        PlaybackStateCompat.Builder playbackstateBuilder = new PlaybackStateCompat.Builder();
++        if (state == PlaybackStateCompat.STATE_PLAYING) {
++            playbackstateBuilder.setActions(PlaybackStateCompat.ACTION_PLAY_PAUSE | PlaybackStateCompat.ACTION_PAUSE
++                    | PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
++                    PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID |
++                    PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH | PlaybackStateCompat.ACTION_SEEK_TO);
++            playbackstateBuilder.setState(state, elapsed, 1.0f);
++        } else {
++            playbackstateBuilder.setActions(PlaybackStateCompat.ACTION_PLAY_PAUSE | PlaybackStateCompat.ACTION_PLAY
++                    | PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
++                    PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID |
++                    PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH | PlaybackStateCompat.ACTION_SEEK_TO);
++            playbackstateBuilder.setState(state, elapsed, 0);
++        }
++        this.mediaSessionCompat.setPlaybackState(playbackstateBuilder.build());
++    }
+ 
+-		if(this.mMessageReceiver != null){
+-        this.mMessageReceiver.stopListening();
+-        try{
+-            context.unregisterReceiver(this.mMessageReceiver);
+-        } catch(IllegalArgumentException e) {
+-            e.printStackTrace();
++    private Bitmap getBitmapCover(String coverURL) {
++        try {
++            if (coverURL.matches("^(https?|ftp)://.*$"))
++                return this.getBitmapFromURL(coverURL);
++            else {
++                return this.getBitmapFromLocal(coverURL);
++            }
++        } catch (Exception ex) {
++            ex.printStackTrace();
++            return null;
+         }
+-        this.mMessageReceiver = null;
+     }
+ 
++    private Bitmap getBitmapFromLocal(String localURL) {
++        try {
++            Uri uri = Uri.parse(localURL);
++            File file = new File(uri.getPath());
++            FileInputStream fileStream = new FileInputStream(file);
++            BufferedInputStream buf = new BufferedInputStream(fileStream);
++            Bitmap myBitmap = BitmapFactory.decodeStream(buf);
++            buf.close();
++            return myBitmap;
++        } catch (Exception ex) {
++            try {
++                InputStream fileStream = getActivity().getAssets().open("public/" + localURL);
++                BufferedInputStream buf = new BufferedInputStream(fileStream);
++                Bitmap myBitmap = BitmapFactory.decodeStream(buf);
++                buf.close();
++                return myBitmap;
++            } catch (Exception ex2) {
++                ex.printStackTrace();
++                ex2.printStackTrace();
++                return null;
++            }
++        }
++    }
+ 
+-	}
+-
+-	public void stopServiceConnection(Activity activity){
+-		if (this.mConnection != null) {
+-			Intent stopServiceIntent = new Intent(activity, MusicControlsNotificationKiller.class);
+-			activity.unbindService(this.mConnection);
+-			activity.stopService(stopServiceIntent);
+-			this.mConnection = null;
+-		}
+-	}
+-
+-	@PluginMethod()
+-	public void updateIsPlaying(PluginCall call) {
+-		JSObject params = call.getData();
+-
+-		if (this.notification == null) {
+-			call.resolve();
+-			return;
+-		}
+-
+-		try{
+-			final boolean isPlaying = params.getBoolean("isPlaying");
+-			this.notification.updateIsPlaying(isPlaying);
+-
+-			if(isPlaying)
+-				setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING);
+-			else
+-				setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED);
+-
+-			call.resolve();
+-		} catch(JSONException e){
+-			call.reject("error updateIsPlaying: "+e.toString());
+-		}
+-
+-	}
+-
+-	@PluginMethod()
+-	public void updateElapsed(PluginCall call) {
+-		JSObject params = call.getData();
+-
+-		// final JSONObject params = args.getJSONObject(0);
+-		try{
+-			final boolean isPlaying = params.getBoolean("isPlaying");
+-			this.notification.updateIsPlaying(isPlaying);
+-
+-			if(isPlaying)
+-				setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING);
+-			else
+-				setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED);
+-
+-			call.resolve();
+-		} catch(JSONException e){
+-			call.reject("error updateElapsed: "+e.toString());
+-		} catch (NullPointerException e) {
+-			e.printStackTrace();
+-		}
+-
+-	}
+-
+-	@PluginMethod()
+-	public void updateDismissable(PluginCall call) {
+-		JSObject params = call.getData();
+-		// final JSONObject params = args.getJSONObject(0);
+-		try{
+-			final boolean dismissable = params.getBoolean("dismissable");
+-			this.notification.updateDismissable(dismissable);
+-		call.resolve();
+-		} catch(JSONException e){
+-			call.reject("error updateDismissable: "+e.toString());
+-		}
+-
+-	}
+-
+-	public void controlsNotification(JSObject ret){
+-
+-		Log.i(TAG, "controlsNotification fired "  + ret.getString("message"));
+-		// notifyListeners("controlsNotification", ret);
+-		this.bridge.triggerJSEvent("controlsNotification", "document", ret.toString());
+-
+-  }
+-
+-	private void setMediaPlaybackState(int state) {
+-		PlaybackStateCompat.Builder playbackstateBuilder = new PlaybackStateCompat.Builder();
+-		if( state == PlaybackStateCompat.STATE_PLAYING ) {
+-			playbackstateBuilder.setActions(PlaybackStateCompat.ACTION_PLAY_PAUSE | PlaybackStateCompat.ACTION_PAUSE | PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
+-					PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID |
+-					PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH);
+-			playbackstateBuilder.setState(state, PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1.0f);
+-		} else {
+-			playbackstateBuilder.setActions(PlaybackStateCompat.ACTION_PLAY_PAUSE | PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
+-					PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID |
+-					PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH);
+-			playbackstateBuilder.setState(state, PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 0);
+-		}
+-		this.mediaSessionCompat.setPlaybackState(playbackstateBuilder.build());
+-	}
+-
+-	// Get image from url
+-	private Bitmap getBitmapCover(String coverURL){
+-		try{
+-			if(coverURL.matches("^(https?|ftp)://.*$"))
+-				// Remote image
+-				return this.getBitmapFromURL(coverURL);
+-			else {
+-				// Local image
+-				return this.getBitmapFromLocal(coverURL);
+-			}
+-		} catch (Exception ex) {
+-			ex.printStackTrace();
+-			return null;
+-		}
+-	}
+-
+-	// get Local image
+-	private Bitmap getBitmapFromLocal(String localURL){
+-		try {
+-			Uri uri = Uri.parse(localURL);
+-			File file = new File(uri.getPath());
+-			FileInputStream fileStream = new FileInputStream(file);
+-			BufferedInputStream buf = new BufferedInputStream(fileStream);
+-			Bitmap myBitmap = BitmapFactory.decodeStream(buf);
+-			buf.close();
+-			return myBitmap;
+-		} catch (Exception ex) {
+-			try {
+-				InputStream fileStream = getActivity().getAssets().open("public/" + localURL);
+-				BufferedInputStream buf = new BufferedInputStream(fileStream);
+-				Bitmap myBitmap = BitmapFactory.decodeStream(buf);
+-				buf.close();
+-				return myBitmap;
+-			} catch (Exception ex2) {
+-				ex.printStackTrace();
+-				ex2.printStackTrace();
+-				return null;
+-			}
+-		}
+-	}
+-
+-	// get Remote image
+-	private Bitmap getBitmapFromURL(String strURL) {
+-		try {
+-			URL url = new URL(strURL);
+-			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+-			connection.setDoInput(true);
+-			connection.connect();
+-			InputStream input = connection.getInputStream();
+-			Bitmap myBitmap = BitmapFactory.decodeStream(input);
+-			return myBitmap;
+-		} catch (Exception ex) {
+-			ex.printStackTrace();
+-			return null;
+-		}
+-	}
++    private Bitmap getBitmapFromURL(String strURL) {
++        try {
++            URL url = new URL(strURL);
++            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
++            connection.setDoInput(true);
++            connection.connect();
++            InputStream input = connection.getInputStream();
++            Bitmap myBitmap = BitmapFactory.decodeStream(input);
++            return myBitmap;
++        } catch (Exception ex) {
++            ex.printStackTrace();
++            return null;
++        }
++    }
+ }
+\ No newline at end of file
+diff --git a/node_modules/capacitor-music-controls-plugin/android/src/main/java/com/ingageco/capacitormusiccontrols/MusicControlsInfos.java b/node_modules/capacitor-music-controls-plugin/android/src/main/java/com/ingageco/capacitormusiccontrols/MusicControlsInfos.java
+index da98a58..29fa6b0 100644
+--- a/node_modules/capacitor-music-controls-plugin/android/src/main/java/com/ingageco/capacitormusiccontrols/MusicControlsInfos.java
++++ b/node_modules/capacitor-music-controls-plugin/android/src/main/java/com/ingageco/capacitormusiccontrols/MusicControlsInfos.java
+@@ -2,47 +2,49 @@ package com.ingageco.capacitormusiccontrols;
+ 
+ import com.getcapacitor.JSObject;
+ 
+-import org.json.JSONArray;
+ import org.json.JSONException;
+-import org.json.JSONObject;
+ 
+-public class MusicControlsInfos{
+-	public String artist;
+-	public String album;
+-	public String track;
+-	public String ticker;
+-	public String cover;
+-	public boolean isPlaying;
+-	public boolean hasPrev;
+-	public boolean hasNext;
+-	public boolean hasClose;
+-	public boolean dismissable;
+-	public String playIcon;
+-	public String pauseIcon;
+-	public String prevIcon;
+-	public String nextIcon;
+-	public String closeIcon;
+-	public String notificationIcon;
++public class MusicControlsInfos {
++public String artist;
++public String album;
++public String track;
++public String ticker;
++public String cover;
++public long elapsed;
++public long duration;
++public boolean isPlaying;
++public boolean hasPrev;
++public boolean hasNext;
++public boolean hasClose;
++public boolean dismissable;
++public String playIcon;
++public String pauseIcon;
++public String prevIcon;
++public String nextIcon;
++public String closeIcon;
++public String notificationIcon;
+ 
+-	public MusicControlsInfos(JSObject args) throws JSONException {
+-		final JSObject params = args;
++public MusicControlsInfos(JSObject args) throws JSONException {
++final JSObject params = args;
+ 
+-		this.track = params.getString("track");
+-		this.artist = params.getString("artist");
+-		this.album = params.getString("album");
+-		this.ticker = params.getString("ticker");
+-		this.cover = params.getString("cover");
+-		this.isPlaying = params.getBoolean("isPlaying");
+-		this.hasPrev = params.getBoolean("hasPrev");
+-		this.hasNext = params.getBoolean("hasNext");
+-		this.hasClose = params.getBoolean("hasClose");
+-		this.dismissable = params.getBoolean("dismissable");
+-		this.playIcon = params.getString("playIcon");
+-		this.pauseIcon = params.getString("pauseIcon");
+-		this.prevIcon = params.getString("prevIcon");
+-		this.nextIcon = params.getString("nextIcon");
+-		this.closeIcon = params.getString("closeIcon");
+-		this.notificationIcon = params.getString("notificationIcon");
+-	}
++this.track = params.getString("track");
++this.artist = params.getString("artist");
++this.album = params.getString("album");
++this.ticker = params.getString("ticker");
++this.cover = params.getString("cover");
++this.isPlaying = params.getBoolean("isPlaying");
++this.elapsed = params.optLong("elapsed", 0);
++this.duration = params.optLong("duration", 0);
++this.hasPrev = params.getBoolean("hasPrev");
++this.hasNext = params.getBoolean("hasNext");
++this.hasClose = params.getBoolean("hasClose");
++this.dismissable = params.getBoolean("dismissable");
++this.playIcon = params.getString("playIcon");
++this.pauseIcon = params.getString("pauseIcon");
++this.prevIcon = params.getString("prevIcon");
++this.nextIcon = params.getString("nextIcon");
++this.closeIcon = params.getString("closeIcon");
++this.notificationIcon = params.getString("notificationIcon");
++}
+ 
+ }
+\ No newline at end of file
+diff --git a/node_modules/capacitor-music-controls-plugin/android/src/main/java/com/ingageco/capacitormusiccontrols/MusicControlsNotificationKiller.java b/node_modules/capacitor-music-controls-plugin/android/src/main/java/com/ingageco/capacitormusiccontrols/MusicControlsNotificationKiller.java
+index a520f59..6e2454c 100644
+--- a/node_modules/capacitor-music-controls-plugin/android/src/main/java/com/ingageco/capacitormusiccontrols/MusicControlsNotificationKiller.java
++++ b/node_modules/capacitor-music-controls-plugin/android/src/main/java/com/ingageco/capacitormusiccontrols/MusicControlsNotificationKiller.java
+@@ -3,11 +3,10 @@ package com.ingageco.capacitormusiccontrols;
+ import android.app.Activity;
+ import android.app.Notification;
+ import android.app.Service;
+-import android.os.Build;
+-import android.os.IBinder;
+-import android.os.Binder;
+ import android.app.NotificationManager;
+ import android.content.Intent;
++import android.os.Build;
++import android.os.IBinder;
+ import android.util.Log;
+ 
+ public class MusicControlsNotificationKiller extends Service {
+@@ -20,7 +19,7 @@ public class MusicControlsNotificationKiller extends Service {
+ 
+ 	@Override
+ 	public IBinder onBind(Intent intent) {
+-		this.NOTIFICATION_ID=intent.getIntExtra("notificationID",1);
++		this.NOTIFICATION_ID = intent.getIntExtra("notificationID", 1);
+ 		return mBinder;
+ 	}
+ 
+@@ -62,13 +61,17 @@ public class MusicControlsNotificationKiller extends Service {
+ 
+ 		Log.i(TAG, "setForeground");
+ 
+-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !this.isRunning) {
+-            Log.i(TAG, "startForegroundService");
+-            this.isRunning = true;
+-            this.startForegroundService(new Intent(activity, MusicControlsNotificationKiller.class));
+-        }
++		try {
++			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !this.isRunning) {
++				Log.i(TAG, "startForegroundService");
++				this.isRunning = true;
++				this.startForegroundService(new Intent(activity, MusicControlsNotificationKiller.class));
++			}
+ 
+-		this.startForeground(this.NOTIFICATION_ID, notification);
++			this.startForeground(this.NOTIFICATION_ID, notification);
++		} catch (Exception e) {
++			Log.e(TAG, "Failed to start foreground service (probably in background)", e);
++		}
+ 	}
+ 
+ 	public void clearForeground() {
+@@ -78,7 +81,7 @@ public class MusicControlsNotificationKiller extends Service {
+ 
+ 		Log.i(TAG, "clearForeground");
+ 
+-		this.stopForeground(STOP_FOREGROUND_DETACH);
++		this.stopForeground(true);
+ 	}
+ 
+ }
+diff --git a/node_modules/capacitor-music-controls-plugin/dist/esm/definitions.d.ts b/node_modules/capacitor-music-controls-plugin/dist/esm/definitions.d.ts
+index e987697..79f338c 100644
+--- a/node_modules/capacitor-music-controls-plugin/dist/esm/definitions.d.ts
++++ b/node_modules/capacitor-music-controls-plugin/dist/esm/definitions.d.ts
+@@ -32,10 +32,13 @@ export interface CapacitorMusicControlsPlugin {
+      */
+     create(options: CapacitorMusicControlsInfo): Promise<any>;
+     /**
+-     * Destroy the media controller
++    destroy(): Promise<any>;
++    /**
++     * Update the media controls without destroying the notification
++     * @param options {MusicControlsOptions}
+      * @returns {Promise<any>}
+      */
+-    destroy(): Promise<any>;
++    updateTrack(options: CapacitorMusicControlsInfo): Promise<any>;
+     /**
+      * Toggle play/pause:
+      * @param isPlaying {Object}
+diff --git a/node_modules/capacitor-music-controls-plugin/dist/esm/web.d.ts b/node_modules/capacitor-music-controls-plugin/dist/esm/web.d.ts
+index 0e3a6bb..1feb35b 100644
+--- a/node_modules/capacitor-music-controls-plugin/dist/esm/web.d.ts
++++ b/node_modules/capacitor-music-controls-plugin/dist/esm/web.d.ts
+@@ -3,6 +3,7 @@ import { CapacitorMusicControlsInfo, CapacitorMusicControlsPlugin } from ".";
+ export declare class CapacitorMusicControlsWeb extends WebPlugin implements CapacitorMusicControlsPlugin {
+     constructor();
+     create(options: CapacitorMusicControlsInfo): Promise<any>;
++    updateTrack(options: CapacitorMusicControlsInfo): Promise<any>;
+     destroy(): Promise<any>;
+     updateDismissable(dismissable: boolean): void;
+     updateElapsed(args: {
+diff --git a/node_modules/capacitor-music-controls-plugin/dist/esm/web.js b/node_modules/capacitor-music-controls-plugin/dist/esm/web.js
+index 180689c..1228386 100644
+--- a/node_modules/capacitor-music-controls-plugin/dist/esm/web.js
++++ b/node_modules/capacitor-music-controls-plugin/dist/esm/web.js
+@@ -10,6 +10,10 @@ export class CapacitorMusicControlsWeb extends WebPlugin {
+         console.log('create', options);
+         return Promise.resolve(undefined);
+     }
++    updateTrack(options) {
++        console.log('updateTrack', options);
++        return Promise.resolve(undefined);
++    }
+     destroy() {
+         return Promise.resolve(undefined);
+     }

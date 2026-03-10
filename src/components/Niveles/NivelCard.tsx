@@ -13,6 +13,7 @@ import { Progress } from "../ui/progress";
 
 interface Props {
   nivel: Niveles;
+  minOrden: number | null;
 }
 
 const formatDuration = (seconds: number) => {
@@ -20,17 +21,22 @@ const formatDuration = (seconds: number) => {
   return `${mins} min`;
 };
 
-export const NivelCard = ({ nivel }: Props) => {
+export const NivelCard = ({ nivel, minOrden }: Props) => {
   const { baseURL, AudioNoWifi, status } = useContext(NetworkContext);
 
   const { user } = useSelector((state: any) => state.user);
   const [podcast, setPodcast] = useState<Crecimientos | null>(null);
 
   const myCrecimiento = useMemo(() => {
-    return user.crecimientos[0];
-  }, [user]);
+    return user.crecimientos?.find(
+      (c: any) => c.nivel?.canal?.id == nivel?.canal?.id
+    );
+  }, [user, nivel]);
 
-  const isCompleted = myCrecimiento?.nivel.id > nivel.id;
+  const isCompleted = useMemo(() => {
+    if (!myCrecimiento) return false;
+    return myCrecimiento.nivel?.orden > nivel?.orden;
+  }, [myCrecimiento, nivel]);
 
   const crecimientos: Crecimientos[] = useLiveQuery(
     () =>
@@ -65,6 +71,13 @@ export const NivelCard = ({ nivel }: Props) => {
     return progress;
   }, [crecimientos, myCrecimiento]);
 
+  const isFirstNivel = nivel?.orden === minOrden;
+
+  const canPlay =
+    (isFirstNivel && !myCrecimiento) ||
+    nivel.id == myCrecimiento?.nivel.id ||
+    isCompleted;
+
   if (crecimientos?.length) {
     return (
       <Card className="overflow-hidden border-border/50 hover:shadow-soft transition-shadow">
@@ -79,18 +92,16 @@ export const NivelCard = ({ nivel }: Props) => {
                   className="w-full h-full object-cover"
                 />
               </div>
-              {(nivel.id == myCrecimiento?.nivel.id ||
-                isCompleted ||
-                (myCrecimiento?.nivel.orden === 0 && nivel.orden === 1)) && (
-                  <Link to={`/niveles/${nivel.id}/crecimientos`}>
-                    <Button
-                      size="icon"
-                      className="absolute inset-0 m-auto w-10 h-10 !rounded-full bg-primary/90 hover:bg-primary shadow-medium"
-                    >
-                      <Play className="w-4 h-4 text-primary-foreground fill-current" />
-                    </Button>
-                  </Link>
-                )}
+              {canPlay && (
+                <Link to={`/niveles/${nivel.id}/crecimientos`}>
+                  <Button
+                    size="icon"
+                    className="absolute inset-0 m-auto w-10 h-10 !rounded-full bg-primary/90 hover:bg-primary shadow-medium"
+                  >
+                    <Play className="w-4 h-4 text-primary-foreground fill-current" />
+                  </Button>
+                </Link>
+              )}
             </div>
 
             {/* Content */}
@@ -130,9 +141,7 @@ export const NivelCard = ({ nivel }: Props) => {
 
           {/* Progress bar */}
           {nivel.id == myCrecimiento?.nivel.id || progress ? (
-            podcast?.audio_local ? (
-              null
-            ) : (
+            podcast?.audio_local ? null : (
               <div className="px-3 pb-3">
                 <Progress
                   value={(progress ?? (isCompleted ? 1 : 0)) * 100}
@@ -141,7 +150,6 @@ export const NivelCard = ({ nivel }: Props) => {
               </div>
             )
           ) : null}
-
         </CardContent>
       </Card>
     );

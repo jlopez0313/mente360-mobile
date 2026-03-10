@@ -13,6 +13,7 @@ import {
 } from "@/services/crecimientos";
 import { all as getAllNiveles } from "@/services/niveles";
 import { all as getAllPlaylist } from "@/services/playlist";
+import { all as getAllProgramas } from "@/services/programas";
 
 import { useContext, useState } from "react";
 
@@ -96,6 +97,16 @@ export const useGlobalSync = () => {
       await syncSimpleTable(getAllCanales, (data) => db.canales.bulkPut(data), lastSync ?? initSync);
     } catch (error) {
       console.error("Error syncCanales:", error);
+    }
+  };
+
+  // Programas
+  const syncProgramas = async () => {
+    try {
+      const lastSync = await getPreference(keys.SYNC_KEY);
+      await syncSimpleTable(getAllProgramas, (data) => db.programas.bulkPut(data), lastSync ?? initSync);
+    } catch (error) {
+      console.error("Error syncProgramas:", error);
     }
   };
 
@@ -339,6 +350,7 @@ export const useGlobalSync = () => {
           syncCanales(),
           syncCategorias(),
           syncPlaylist(),
+          syncProgramas(),
         ]);
 
         await delay(2000);

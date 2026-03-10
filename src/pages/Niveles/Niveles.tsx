@@ -1,4 +1,3 @@
-
 import { useHistory, useParams } from "react-router-dom";
 
 import { NivelCard } from "@/components/Niveles/NivelCard";
@@ -8,7 +7,7 @@ import { useBackButton } from "@/hooks/useBackButton";
 import { db } from "@/hooks/useDexie";
 import { useLiveQuery } from "dexie-react-hooks";
 import { ArrowLeft } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useDispatch } from "react-redux";
 
 const Niveles: React.FC = () => {
@@ -29,6 +28,11 @@ const Niveles: React.FC = () => {
         .filter((n: any) => n?.canal?.id == id)
         .toArray(),
     [id]
+  );
+
+  const minOrden = useMemo(
+    () => Math.min(...(niveles?.map((n: any) => n.orden) ?? [])),
+    [niveles]
   );
 
   const goToLider = () => {
@@ -60,14 +64,22 @@ const Niveles: React.FC = () => {
         {/* Header */}
         <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50 px-4 py-4">
           <div className="flex items-center gap-3">
-            <button onClick={() => history.replace(`/comunidades/${channel?.comunidad?.id}/canales`)}>
+            <button
+              onClick={() =>
+                history.replace(
+                  `/comunidades/${channel?.comunidad?.id}/canales`
+                )
+              }
+            >
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div className="min-w-0">
               <h1 className="text-lg font-heading font-bold text-foreground truncate">
                 {channel?.canal}
               </h1>
-              <p className="text-xs text-muted-foreground">{channel?.comunidad?.comunidad}</p>
+              <p className="text-xs text-muted-foreground">
+                {channel?.comunidad?.comunidad}
+              </p>
             </div>
           </div>
         </div>
@@ -76,14 +88,13 @@ const Niveles: React.FC = () => {
         <div className="px-4 py-6 space-y-4 overflow-y-auto">
           {niveles?.length ? (
             niveles?.map((nivel, idx) => (
-              <NivelCard
-                key={idx}
-                nivel={nivel}
-              />
+              <NivelCard minOrden={minOrden} key={idx} nivel={nivel} />
             ))
           ) : (
             <div className="text-center py-12">
-              <p className="text-muted-foreground">No hay contenido aún en este canal</p>
+              <p className="text-muted-foreground">
+                No hay contenido aún en este canal
+              </p>
             </div>
           )}
         </div>

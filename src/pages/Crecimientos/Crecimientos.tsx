@@ -45,14 +45,16 @@ const Crecimientos: React.FC = () => {
   const [currentAudio, setCurrentAudio] = useState<Crecimiento | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const myCrecimiento = useMemo(() => {
-    return user.crecimientos[0];
-  }, [user]);
-
   const nivel = useLiveQuery(
     () => db.niveles.where("id").equals(Number(id)).first(),
     [id]
   );
+
+  const myCrecimiento = useMemo(() => {
+    return user.crecimientos?.find(
+      (c: any) => c.nivel?.canal?.id == nivel?.canal?.id
+    );
+  }, [user, nivel]);
 
   const niveles = useLiveQuery(
     () =>
