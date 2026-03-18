@@ -1,18 +1,21 @@
 import { NetworkContext } from "@/context/NetworkContext";
 import Clips from "@/database/clips";
 import Likes from "@/database/likes";
-import { updateCallbacks } from "@/helpers/musicControls";
 import { useAudio } from "@/hooks/useAudio";
 import { db } from "@/hooks/useDexie";
 import { dislike, like } from "@/services/likes";
 import {
+    selectGlobalAudio,
+    selectGlobalPos,
+    selectIsGlobalPlaying,
+    selectListAudios,
     setAudioSrc,
     setGlobalAudio,
     setGlobalPos,
     setIsGlobalPlaying
 } from "@/store/slices/audioSlice";
 import { useLiveQuery } from "dexie-react-hooks";
-import { useCallback, useContext, useEffect, useRef } from "react";
+import { useContext, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
@@ -22,9 +25,10 @@ export const useAudioPlayer = (track: Clips | null, idx?: number, isGlobal: bool
 
     const dispatch = useDispatch();
 
-    const { globalAudio, isGlobalPlaying, globalPos, listAudios } = useSelector(
-        (state: any) => state.audio
-    );
+    const globalAudio = useSelector(selectGlobalAudio);
+    const isGlobalPlaying = useSelector(selectIsGlobalPlaying);
+    const globalPos = useSelector(selectGlobalPos);
+    const listAudios = useSelector(selectListAudios);
 
     // We determine if THIS track is the currently playing track globally.
     // If track is null, we assume we are controlling the global track directly (like in Clip.tsx)
@@ -36,7 +40,6 @@ export const useAudioPlayer = (track: Clips | null, idx?: number, isGlobal: bool
     const {
         progress,
         duration,
-        real_duration,
         buffer,
         currentTime,
         isPlaying: localIsPlaying,
@@ -51,7 +54,7 @@ export const useAudioPlayer = (track: Clips | null, idx?: number, isGlobal: bool
         onTimeUpdate,
         onLoadedMetadata,
         onUpdateBuffer,
-    } = useAudio(audioRef, () => { }, isGlobal);
+    } = useAudio(audioRef, () => { }, { isGlobalControllable: isGlobal, needsProgress: track === null });
 
     const isPlaying = isGlobal ? (isCurrentlyPlayingGlobalTrack && isGlobalPlaying) : localIsPlaying;
 
@@ -64,22 +67,27 @@ export const useAudioPlayer = (track: Clips | null, idx?: number, isGlobal: bool
         [activeTrack?.id]
     );
 
-    const my_like = useLiveQuery(() => {
-        if (!activeTrack) return null;
-        return db.likes
+    const my_like = useLiveQuery(async () => {
+        if (!activeTrack) return undefined;
+        const result = await db.likes
             .where("users_id")
             .equals(user?.id)
             .and((like: Likes) => like.clips_id === activeTrack.id)
-            .first()
+            .first();
+        return result;
     }, [user?.id, activeTrack?.id]);
 
-    const inMyPlaylist = useLiveQuery(() => {
-        if (!activeTrack) return false;
-        return db.playlist
+    const inMyPlaylist = useLiveQuery(async () => {
+        if (!activeTrack) return undefined;
+        const result = await db.playlist
             .where("users_id")
             .equals(user?.id)
-            .and((playlist: any) => playlist?.crecimiento?.id === activeTrack.id)
-            .first()
+            .and((playlist: any) => 
+                playlist?.clip?.id === activeTrack.id || 
+                playlist?.crecimiento?.id === activeTrack.id
+            )
+            .first();
+        return result;
     }, [user?.id, activeTrack?.id]);
 
     // ===============================
@@ -212,29 +220,7 @@ export const useAudioPlayer = (track: Clips | null, idx?: number, isGlobal: bool
         return activeTrack?.audio_local ? activeTrack.audio_local : baseURL + activeTrack?.audio;
     }
 
-    // Stable callback refs — keep them fresh so background events always use the latest handlers
-    const onPlayRef = useRef(() => { dispatch(setIsGlobalPlaying(true)); audioPlay(); });
-    const onPauseRef = useRef(() => { dispatch(setIsGlobalPlaying(false)); audioPause(); });
-    const onGoBackRef = useRef(goToPrev);
-    const onGoNextRef = useRef(goToNext);
 
-    onPlayRef.current = () => { dispatch(setIsGlobalPlaying(true)); audioPlay(); };
-    onPauseRef.current = () => { dispatch(setIsGlobalPlaying(false)); audioPause(); };
-    onGoBackRef.current = goToPrev;
-    onGoNextRef.current = goToNext;
-
-    const stablePlay = useCallback(() => onPlayRef.current(), []);
-    const stablePause = useCallback(() => onPauseRef.current(), []);
-    const stableGoBack = useCallback(() => onGoBackRef.current(), []);
-    const stableGoNext = useCallback(() => onGoNextRef.current(), []);
-
-    // Keep background module callbacks current when this is the main player (Clip view)
-    // Toast.tsx owns create(); this just ensures next/prev/play/pause stay up to date
-    useEffect(() => {
-        if (!track) {
-            updateCallbacks(stablePlay, stablePause, stableGoBack, stableGoNext);
-        }
-    });
 
     return {
         audioRef,

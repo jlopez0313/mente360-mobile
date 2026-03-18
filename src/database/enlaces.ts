@@ -5,4 +5,5 @@ export default interface Enlaces {
   message?: string;
   valor: string;
   icon: any;
+  action?: string;
 }

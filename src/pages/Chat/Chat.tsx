@@ -1,5 +1,5 @@
 import { Lista as ChatComponent } from "@/components/Chat/Chat/Lista";
-import { Comunidad as ComunidadComponent } from "@/components/Chat/Comunidad/Comunidad";
+import { Contactos as ContactosComponent } from "@/components/Chat/Contactos/Contactos";
 import { Lista as GruposComponent } from "@/components/Chat/Grupos/Lista/Lista";
 import { AppLayout } from "@/components/layout";
 import { Input } from "@/components/ui/input";
@@ -79,7 +79,7 @@ const Lista: React.FC = () => {
                 className="flex-1 gap-1 text-xs px-2"
               >
                 <UserPlus className="w-4 h-4" />
-                Comunidad
+                Contactos
               </TabsTrigger>
             </TabsList>
 
@@ -92,7 +92,7 @@ const Lista: React.FC = () => {
             </TabsContent>
 
             <TabsContent value="community" className="space-y-6">
-              <ComunidadComponent searchQuery={searchQuery} />
+              <ContactosComponent searchQuery={searchQuery} />
             </TabsContent>
           </Tabs>
         </div>

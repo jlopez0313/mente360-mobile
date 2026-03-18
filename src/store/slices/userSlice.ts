@@ -10,8 +10,10 @@ export const userSlice = createSlice({
     },
     reducers: {
         setUser: (state, action) => {
-            state.user = action.payload
-            set({user: {...action.payload} } )
+            const isDifferentUser = action.payload?.id && state.user?.id && action.payload.id !== state.user.id;
+            const newUser = isDifferentUser ? action.payload : { ...state.user, ...action.payload };
+            state.user = newUser;
+            set({ user: newUser });
         }
     }
 });

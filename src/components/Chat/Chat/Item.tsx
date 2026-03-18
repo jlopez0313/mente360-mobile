@@ -64,6 +64,7 @@ export const Item = ({ usuario }: any) => {
     let unsubLastMsg: any;
     let unsubTyping: any;
     let unsubUnreads: any;
+    let unsubUnreadsQuery: any;
 
     const onCheckStatus = async () => {
       const roomID = [Number(user.id), Number(usuario.id)]
@@ -91,9 +92,30 @@ export const Item = ({ usuario }: any) => {
       );
 
       unsubUnreads = onValue(
-        readData(`rooms/${roomID}/users/${user.id}/unreads`),
-        (snap) => {
-          return setUnreads(snap.val());
+        readData(`rooms/${roomID}/users/${user.id}/exit_time`),
+        (snapshot) => {
+          const exitTime = snapshot.val();
+          if (unsubUnreadsQuery) unsubUnreadsQuery();
+
+          if (exitTime) {
+            const unreadQuery = queryTo(`rooms/${roomID}/messages`, {
+              orderBy: "date",
+              startAt: exitTime,
+            });
+
+            unsubUnreadsQuery = onValue(unreadQuery, (msgSnap) => {
+              const messages = snapshotToArray(msgSnap.val());
+              const count = messages.filter((m: any) => m.user !== user.id).length;
+              setUnreads(count);
+            });
+          } else {
+            // Si nunca ha entrado, todos los mensajes (de otros) cuentan como no leídos
+            unsubUnreadsQuery = onValue(readData(`rooms/${roomID}/messages`), (msgSnap) => {
+              const messages = snapshotToArray(msgSnap.val());
+              const count = messages.filter((m: any) => m.user !== user.id).length;
+              setUnreads(count);
+            });
+          }
         }
       );
     };
@@ -101,11 +123,12 @@ export const Item = ({ usuario }: any) => {
     onCheckStatus();
 
     return () => {
-      unsubLastMsg();
-      unsubTyping();
-      unsubUnreads();
+      unsubLastMsg?.();
+      unsubTyping?.();
+      unsubUnreads?.();
+      unsubUnreadsQuery?.();
     };
-  }, []);
+  }, [usuario.id, user.id]);
 
   return (
     <div className="flex items-center gap-3 p-3 rounded-xl bg-card border border-border hover:border-primary/30 transition-all">

@@ -3,14 +3,19 @@ import { Progress } from "@/components/ui/progress";
 import { NetworkContext } from "@/context/NetworkContext";
 import Clips from "@/database/clips";
 import { startBackground } from "@/helpers/background";
-import { create, destroy, updateElapsed, updateTrack } from "@/helpers/musicControls";
+import { create, destroy, updateTrack } from "@/helpers/musicControls";
 import { useAudio } from "@/hooks/useAudio";
 import { cn } from "@/lib/utils";
 import {
+  selectAudioSrc,
+  selectGlobalAudio,
+  selectIsGlobalPlaying,
+  selectListAudios,
+  selectShowGlobalAudio,
   setAudioSrc,
   setGlobalAudio,
   setGlobalPos,
-  setIsGlobalPlaying,
+  setIsGlobalPlaying
 } from "@/store/slices/audioSlice";
 import { Pause, Play, SkipBack, SkipForward, Star, X } from "lucide-react";
 import { useContext, useEffect, useRef } from "react";
@@ -22,27 +27,47 @@ export const Toast = () => {
   const history = useHistory();
 
   const dispatch = useDispatch();
-  const { audioSrc, globalAudio, listAudios, globalPos, isGlobalPlaying, showGlobalAudio } =
-    useSelector((state: any) => state.audio);
+  const audioSrc = useSelector(selectAudioSrc);
+  const globalAudio = useSelector(selectGlobalAudio);
+  const listAudios = useSelector(selectListAudios);
+  const isGlobalPlaying = useSelector(selectIsGlobalPlaying);
+  const showGlobalAudio = useSelector(selectShowGlobalAudio);
 
   const audioRef: any = useRef();
   const hasCreatedControls = useRef(false);
+
+  // ──────────────────────────────────────────────────────────────────
+  // Refs always pointing to the LATEST values so callbacks never go stale
+  // ──────────────────────────────────────────────────────────────────
+  const globalAudioRef = useRef(globalAudio);
+  const listAudiosRef = useRef(listAudios);
+  const isGlobalPlayingRef = useRef(isGlobalPlaying);
+  const currentBlobUrl = useRef<string | null>(null);
+
+  globalAudioRef.current = globalAudio;
+  listAudiosRef.current = listAudios;
+  isGlobalPlayingRef.current = isGlobalPlaying;
+
+  const onConfirmRef = useRef(() => { });
+
   const {
     real_duration,
     progress,
     buffer,
     onPlay,
     onPause,
+    onLoad,
     onTimeUpdate,
-    onLoadedMetadata,
+    onLoadedMetadata: baseOnLoadedMetadata,
     onUpdateBuffer,
     getDownloadedAudio,
     onTogglePlaylist,
-  } = useAudio(audioRef, () => { });
+    onEnd,
+    onError,
+  } = useAudio(audioRef, () => onConfirmRef.current(), { isGlobalControllable: true, needsProgress: true });
 
   const onUpdateElapsed = () => {
     onTimeUpdate();
-    updateElapsed(audioRef.current?.currentTime);
   };
 
   const onClear = () => {
@@ -55,7 +80,7 @@ export const Toast = () => {
   };
 
   const onTogglePlay = () => {
-    if (isGlobalPlaying) {
+    if (isGlobalPlayingRef.current) {
       onPause();
       dispatch(setIsGlobalPlaying(false));
     } else {
@@ -64,91 +89,132 @@ export const Toast = () => {
     }
   };
 
+  // ──────────────────────────────────────────────────────────────────
+  // Always reads from refs → never stale
+  // ──────────────────────────────────────────────────────────────────
   const goToPrev = async () => {
-    if (listAudios.length === 0) return;
-    const currentIdx = listAudios.findIndex((a: Clips) => a.id === globalAudio?.id);
-    const prevIdx = currentIdx <= 0 ? listAudios.length - 1 : currentIdx - 1;
-    const prev = listAudios[prevIdx];
-    if (prev) handleNextPrev(prevIdx, prev);
+    const audios = listAudiosRef.current;
+    const current = globalAudioRef.current;
+    if (!audios || audios.length === 0) return;
+    const currentIdx = audios.findIndex((a: Clips) => a.id === current?.id);
+    const prevIdx = currentIdx <= 0 ? audios.length - 1 : currentIdx - 1;
+    const prev = audios[prevIdx];
+    if (prev) await handleNextPrev(prevIdx, prev);
   };
 
   const goToNext = async () => {
-    if (listAudios.length === 0) return;
-    const currentIdx = listAudios.findIndex((a: Clips) => a.id === globalAudio?.id);
-    const nextIdx = (currentIdx === -1 || currentIdx === listAudios.length - 1) ? 0 : currentIdx + 1;
-    const next = listAudios[nextIdx];
-    if (next) handleNextPrev(nextIdx, next);
+    const audios = listAudiosRef.current;
+    const current = globalAudioRef.current;
+    if (!audios || audios.length === 0) return;
+    const currentIdx = audios.findIndex((a: Clips) => a.id === current?.id);
+    const nextIdx = (currentIdx === -1 || currentIdx === audios.length - 1) ? 0 : currentIdx + 1;
+    const next = audios[nextIdx];
+    if (next) await handleNextPrev(nextIdx, next);
   };
 
   const handleNextPrev = async (index: number, track: Clips) => {
+    onPause();
+
     if (track.audio_local) {
       const audioBlob = await getDownloadedAudio(track.audio_local);
+
+      // Cleanup previous blob URL to prevent memory leaks
+      if (currentBlobUrl.current && currentBlobUrl.current.startsWith('blob:')) {
+        URL.revokeObjectURL(currentBlobUrl.current);
+      }
+      currentBlobUrl.current = audioBlob;
       dispatch(setAudioSrc(audioBlob));
     } else {
+      // Cleanup previous blob URL even if switching to a remote URL
+      if (currentBlobUrl.current && currentBlobUrl.current.startsWith('blob:')) {
+        URL.revokeObjectURL(currentBlobUrl.current);
+        currentBlobUrl.current = null;
+      }
       dispatch(setAudioSrc(baseURL + track.audio));
+    }
+
+    // Explicitly load the new source to reset internal browser state
+    if (audioRef.current) {
+      audioRef.current.load();
     }
 
     dispatch(setGlobalPos(index));
     dispatch(setGlobalAudio(track));
     dispatch(setIsGlobalPlaying(true));
 
-    // Update track info immediately to keep background active
-    updateTrack(baseURL, track, 0);
+    // Update background notification info immediately, but marked as paused (loading)
+    updateTrack(baseURL, track, 0, false);
   };
 
   const handleTogglePlaylist = async () => {
-    const playlistToggled = await onTogglePlaylist(globalAudio, globalAudio?.inMyPlaylist);
-    console.log(globalAudio, playlistToggled)
-
-    if (!globalAudio?.inMyPlaylist) {
-      dispatch(setGlobalAudio({ ...globalAudio, inMyPlaylist: playlistToggled }));
+    const ga = globalAudioRef.current;
+    const playlistToggled = await onTogglePlaylist(ga, ga?.inMyPlaylist);
+    if (!ga?.inMyPlaylist) {
+      dispatch(setGlobalAudio({ ...ga, inMyPlaylist: playlistToggled }));
     } else {
-      dispatch(setGlobalAudio({ ...globalAudio, inMyPlaylist: null }));
+      dispatch(setGlobalAudio({ ...ga, inMyPlaylist: null }));
     }
   };
 
-  useEffect(() => {
-    onPause();
-    onPlay();
-  }, [globalAudio]);
 
-  useEffect(() => {
-    if (real_duration) {
-      startBackground();
-      // Wrap callbacks with Redux dispatch so background play/pause updates the icon
-      const bgPlay = () => {
-        dispatch(setIsGlobalPlaying(true));
-        onPlay();
-      };
-      const bgPause = () => {
-        dispatch(setIsGlobalPlaying(false));
-        onPause();
-      };
 
-      if (!hasCreatedControls.current) {
-        hasCreatedControls.current = true;
-        create(
-          baseURL,
-          globalAudio,
-          real_duration,
-          bgPlay,
-          bgPause,
-          goToPrev,
-          goToNext
-        );
-      } else {
-        updateTrack(baseURL, globalAudio, real_duration);
-      }
-    }
-  }, [real_duration]);
+  // ──────────────────────────────────────────────────────────────────
+  // Stable refs for background callbacks — these NEVER change identity,
+  // so the listeners registered in create() always call the latest handler
+  // ──────────────────────────────────────────────────────────────────
+  const stableGoToPrevRef = useRef(async () => { await goToPrev(); });
+  const stableGoToNextRef = useRef(async () => { await goToNext(); });
+  const stableBgPlayRef = useRef(() => { dispatch(setIsGlobalPlaying(true)); onPlay(); });
+  const stableBgPauseRef = useRef(() => { dispatch(setIsGlobalPlaying(false)); onPause(); });
 
+  // Keep the stable refs pointing to the latest implementations
+  stableGoToPrevRef.current = async () => { await goToPrev(); };
+  stableGoToNextRef.current = async () => { await goToNext(); };
+  stableBgPlayRef.current = () => { dispatch(setIsGlobalPlaying(true)); onPlay(); };
+  stableBgPauseRef.current = () => { dispatch(setIsGlobalPlaying(false)); onPause(); };
+
+  const stableGoToPrev = useRef(() => stableGoToPrevRef.current()).current;
+  const stableGoToNext = useRef(() => stableGoToNextRef.current()).current;
+  const stableBgPlay = useRef(() => stableBgPlayRef.current()).current;
+  const stableBgPause = useRef(() => stableBgPauseRef.current()).current;
+
+  // Break circular dependency: Link useAudio's confirm callback to the actual stableGoToNext
+  onConfirmRef.current = stableGoToNext;
+
+  // Seek: background sends a percentage (0-100), onLoad sets audio.currentTime accordingly
+  const stableOnSeekRef = useRef((pct: number) => { onLoad(pct); });
+  stableOnSeekRef.current = (pct: number) => { onLoad(pct); };
+  const stableOnSeek = useRef((pct: number) => stableOnSeekRef.current(pct)).current;
+
+
+
+
+
+  // ──────────────────────────────────────────────────────────────────
+  // Create/update background music controls once real_duration is known
+  // ──────────────────────────────────────────────────────────────────
   useEffect(() => {
-    if (isGlobalPlaying) {
-      onPlay();
+    if (!real_duration) return;
+
+    startBackground();
+
+    if (!hasCreatedControls.current) {
+      hasCreatedControls.current = true;
+      create(
+        baseURL,
+        globalAudioRef.current,
+        real_duration,
+        stableBgPlay,
+        stableBgPause,
+        stableGoToPrev,
+        stableGoToNext,
+        stableOnSeek
+      );
     } else {
-      onPause();
+      updateTrack(baseURL, globalAudioRef.current, real_duration, isGlobalPlayingRef.current);
+      // Removed toggle(true, 0) because onPlay() will handle toggling upon successful playback.
     }
-  }, [isGlobalPlaying]);
+  }, [real_duration, globalAudio?.id]);
 
   return (
     <div
@@ -252,14 +318,11 @@ export const Toast = () => {
       <audio
         // controls
         ref={audioRef}
-        onLoadedMetadata={onLoadedMetadata}
+        onLoadedMetadata={baseOnLoadedMetadata}
         onTimeUpdate={onUpdateElapsed}
         onProgress={onUpdateBuffer}
-        onEnded={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          goToNext();
-        }}
+        onEnded={onEnd}
+        onError={onError}
         src={audioSrc}
       />
     </div>

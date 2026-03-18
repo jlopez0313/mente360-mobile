@@ -75,4 +75,15 @@ export const {
     setGlobalPos,
     setShowGlobalAudio,
     setAudioItem,
-} = audioSlice.actions
+} = audioSlice.actions;
+
+// Selectores para optimizar renderizados y evitar re-renders por myCurrentTime
+export const selectAudioTab = (state: any) => state.audio.tab;
+export const selectBaseURL = (state: any) => state.audio.baseURL;
+export const selectAudioSrc = (state: any) => state.audio.audioSrc;
+export const selectIsGlobalPlaying = (state: any) => state.audio.isGlobalPlaying;
+export const selectGlobalAudio = (state: any) => state.audio.globalAudio;
+export const selectListAudios = (state: any) => state.audio.listAudios;
+export const selectGlobalPos = (state: any) => state.audio.globalPos;
+export const selectShowGlobalAudio = (state: any) => state.audio.showGlobalAudio;
+export const selectMyCurrentTime = (state: any) => state.audio.myCurrentTime;

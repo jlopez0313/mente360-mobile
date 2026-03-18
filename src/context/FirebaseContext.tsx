@@ -15,23 +15,30 @@ export const FirebaseProvider = ({ children }: any) => {
   const state = {};
 
   useEffect(() => {
+    let unsubscribes: (() => void)[] = [];
+
     const checkPayment = () => {
-      if (network.status && user) {
-        onValue(readData("users/" + user.id), (snapshot) => {
+      if (network.status && user?.id) {
+        const userRef = readData("users/" + user.id);
+        const unsubUser = onValue(userRef, (snapshot) => {
           const data = snapshot.val();
-          if (user) {
-            dispatch(setUser({ ...user, ...data }));
+          if (data) {
+            dispatch(setUser(data));
           }
         });
+        unsubscribes.push(unsubUser);
 
-        onValue(readData("payments/" + user.id), (snapshot) => {
+        const paymentRef = readData("payments/" + user.id);
+        const unsubPayment = onValue(paymentRef, (snapshot) => {
           const data = snapshot.val();
-          if (user) {
-            dispatch(setUser({ ...user, ...data }));
+          if (data) {
+            dispatch(setUser(data));
           }
         });
+        unsubscribes.push(unsubPayment);
 
-        onValue(readData("subscriptions/" + user.id), (snapshot) => {
+        const subRef = readData("subscriptions/" + user.id);
+        const unsubSubscription = onValue(subRef, (snapshot) => {
           const objData = snapshot.val();
           const data = snapshotToArray(objData);
           const suscripciones = data
@@ -54,14 +61,20 @@ export const FirebaseProvider = ({ children }: any) => {
               };
             });
 
-          suscripciones &&
-            dispatch(setUser({ ...user, suscripciones: [...suscripciones] }));
+          if (suscripciones?.length) {
+            dispatch(setUser({ suscripciones: [...suscripciones] }));
+          }
         });
+        unsubscribes.push(unsubSubscription);
       }
     };
 
     checkPayment();
-  }, []);
+
+    return () => {
+      unsubscribes.forEach((unsub) => unsub());
+    };
+  }, [user?.id, network.status]);
 
   return <FirebaseContext.Provider value={state}>{children}</FirebaseContext.Provider>;
 };

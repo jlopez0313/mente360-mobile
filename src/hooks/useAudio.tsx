@@ -2,20 +2,23 @@ import Clips from "@/database/clips";
 import Playlist from "@/database/playlist";
 import { toggle, updateElapsed } from "@/helpers/musicControls";
 import { add, trash } from "@/services/playlist";
-import { updateCurrentTime } from "@/store/slices/audioSlice";
+import { selectBaseURL, selectIsGlobalPlaying, selectMyCurrentTime, setIsGlobalPlaying, updateCurrentTime } from "@/store/slices/audioSlice";
 import { Directory, Filesystem } from "@capacitor/filesystem";
 import { Share } from "@capacitor/share";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { db } from "./useDexie";
 
-export const useAudio: any = (audio: any, onConfirm: any = () => { }, isGlobalControllable: boolean = true) => {
+export const useAudio: any = (audio: any, onConfirm: any = () => { }, options: { isGlobalControllable?: boolean, needsProgress?: boolean } = { isGlobalControllable: true, needsProgress: true }) => {
+  const { isGlobalControllable = true, needsProgress = true } = options;
+  const lastDispatchTime = useRef(0);
+  const pendingPlay = useRef(false);
+  const lastSrc = useRef<string | null>(null);
   const { user } = useSelector((state: any) => state.user);
 
   const dispatch = useDispatch();
-  const { baseURL, audioRef, myCurrentTime } = useSelector(
-    (state: any) => state.audio
-  );
+  const baseURL = useSelector(selectBaseURL);
+  const myCurrentTime = useSelector(selectMyCurrentTime);
 
   const [progress, setProgress] = useState(0);
   const [buffer, setBuffer] = useState(0);
@@ -127,11 +130,11 @@ export const useAudio: any = (audio: any, onConfirm: any = () => { }, isGlobalCo
 
   const base64ToBlob = (base64: string, mimeType: string) => {
     const byteCharacters = atob(base64);
-    const byteArrays = [];
+    const byteNumbers = new Uint8Array(byteCharacters.length);
     for (let i = 0; i < byteCharacters.length; i++) {
-      byteArrays.push(byteCharacters.charCodeAt(i));
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
     }
-    return new Blob([new Uint8Array(byteArrays)], { type: mimeType });
+    return new Blob([byteNumbers], { type: mimeType });
   };
 
   const getDownloadedAudio = async (filePath: string) => {
@@ -169,6 +172,11 @@ export const useAudio: any = (audio: any, onConfirm: any = () => { }, isGlobalCo
       onUpdateBuffer();
       setRealDuration(audio.current.duration);
       setDuration(formatTime(audio.current.duration));
+
+      if (pendingPlay.current) {
+        pendingPlay.current = false;
+        onPlay();
+      }
     }
   };
 
@@ -194,7 +202,12 @@ export const useAudio: any = (audio: any, onConfirm: any = () => { }, isGlobalCo
     if (!audio.current) return;
 
     if (isGlobalControllable) {
-      dispatch(updateCurrentTime(audio.current.currentTime));
+      // Throttle Redux updates to prevent UI thread starvation (every 2 seconds)
+      const now = Date.now();
+      if (now - lastDispatchTime.current > 2000) {
+        dispatch(updateCurrentTime(audio.current.currentTime));
+        lastDispatchTime.current = now;
+      }
     }
 
     const current = audio.current.currentTime || 0;
@@ -203,8 +216,9 @@ export const useAudio: any = (audio: any, onConfirm: any = () => { }, isGlobalCo
     setCurrentTime(formatTime(current));
     setProgress(computedProgress);
 
-    // Update capacitor music controls
-    updateElapsed(current);
+    // Note: updateElapsed should only be called on play/pause/seek.
+    // Calling it here on every timeupdate floods the Capacitor bridge and freezes the app in the background!
+    // Native MediaSession automatically interpolates time for us.
 
     if (isGlobalControllable) {
       window.dispatchEvent(new CustomEvent('globalAudioState', {
@@ -239,38 +253,65 @@ export const useAudio: any = (audio: any, onConfirm: any = () => { }, isGlobalCo
   const onPause = async () => {
     if (audio.current) {
       audio.current.pause();
+      setIsPlaying(false);
+      toggle(false, audio.current.currentTime || 0);
+
+      if (isGlobalControllable) {
+        dispatch(setIsGlobalPlaying(false));
+      }
     }
-    setIsPlaying(false);
-    toggle(false, audio.current?.currentTime || 0);
   };
 
   const onPlay = async () => {
+    if (!audio.current) return;
+
+    // If audio is not yet ready to play (no metadata), mark it as pending
+    if (audio.current.readyState < 1) {
+      console.log("Audio not ready, marking as pendingPlay");
+      pendingPlay.current = true;
+      return;
+    }
+
     try {
-      if (isGlobalControllable && myCurrentTime && audio.current) {
+      if (isGlobalControllable && myCurrentTime && (audio.current.duration > 0)) {
         audio.current.currentTime = myCurrentTime;
       }
-      if (audio.current) {
-        audio.current.play().catch((error: any) => {
-          console.log("Chrome cannot play sound without user interaction first");
-          onStart();
-        });
+
+      await audio.current.play();
+
+      setIsPlaying(true);
+      toggle(true, audio.current.currentTime || 0);
+
+      if (isGlobalControllable) {
+        dispatch(setIsGlobalPlaying(true));
       }
     } catch (error: any) {
       console.error(error);
-      console.log(
-        "Error Chrome cannot play sound without user interaction first"
-      );
-      onStart();
-    }
+      console.log("Error Chrome cannot play sound without user interaction first");
 
-    setIsPlaying(true);
-    toggle(true, audio.current?.currentTime || 0);
+      setIsPlaying(false);
+      toggle(false, audio.current?.currentTime || 0);
+
+      if (isGlobalControllable) {
+        dispatch(setIsGlobalPlaying(false));
+      }
+    }
+  };
+
+  const onError = () => {
+    console.error("Audio Load Error:", audio.current?.src);
+    setIsPlaying(false);
+    pendingPlay.current = false;
+    if (isGlobalControllable) {
+      dispatch(setIsGlobalPlaying(false));
+    }
   };
 
   const onLoad = async (time: any) => {
     if (audio.current) {
       audio.current.currentTime = (audio.current.duration * time) / 100;
       onTimeUpdate();
+      updateElapsed(audio.current.currentTime);
     } else {
       if (isGlobalControllable) {
         window.dispatchEvent(new CustomEvent('globalAudioSeek', { detail: time }));
@@ -278,9 +319,45 @@ export const useAudio: any = (audio: any, onConfirm: any = () => { }, isGlobalCo
     }
   };
 
+  const isGlobalPlaying = useSelector(selectIsGlobalPlaying);
+
+  // Unified State Sync Effect
+  useEffect(() => {
+    if (!audio.current || !isGlobalControllable) return;
+
+    // Handle Play/Pause sync
+    if (isGlobalPlaying) {
+      onPlay();
+    } else {
+      onPause();
+    }
+  }, [isGlobalPlaying, isGlobalControllable]);
+
+  // Source Change detection and auto-load
+  useEffect(() => {
+    if (!audio.current) return;
+
+    const currentSrc = audio.current.src;
+    if (lastSrc.current !== currentSrc) {
+      lastSrc.current = currentSrc;
+
+      // Reset duration and metadata to prevent showing stale info or "ghostly progress"
+      setRealDuration(0);
+      setDuration("00:00");
+      setProgress(0);
+      setCurrentTime("00:00");
+
+      if (isGlobalPlaying) {
+        pendingPlay.current = true;
+      }
+
+      audio.current.load();
+    }
+  }); // Run on every render to check the ref's src property
+
   // Sync state between instances
   useEffect(() => {
-    if (!isGlobalControllable) return;
+    if (!needsProgress) return;
 
     const handleGlobalState = (e: any) => {
       if (!audio?.current) {
@@ -386,6 +463,7 @@ export const useAudio: any = (audio: any, onConfirm: any = () => { }, isGlobalCo
     onLoadedMetadata,
     onUpdateBuffer,
     onTimeUpdate,
+    onError,
     onStart,
     onEnd,
     onPause,

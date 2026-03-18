@@ -1,7 +1,7 @@
 import { db } from "@/hooks/useDexie";
 import { setListAudios } from "@/store/slices/audioSlice";
 import { useLiveQuery } from "dexie-react-hooks";
-import { forwardRef } from "react";
+import { forwardRef, memo } from "react";
 import { useDispatch } from "react-redux";
 import { Virtuoso } from 'react-virtuoso';
 import { AudioCard } from "./AudioCard";
@@ -9,13 +9,11 @@ import { AudioCard } from "./AudioCard";
 interface TrackListProps {
   selectedCategory: number | undefined;
   searchQuery: string;
-  currentTrackId?: number;
 }
 
-export const TrackList = ({
+export const TrackList = memo(({
   selectedCategory,
   searchQuery,
-  currentTrackId,
 }: TrackListProps) => {
 
   const dispatch = useDispatch();
@@ -73,11 +71,10 @@ export const TrackList = ({
               idx={index}
               key={track.id}
               track={track}
-              isPlaying={track.id === currentTrackId}
             />
           );
         }}
       />
     </div>
   );
-};
+});

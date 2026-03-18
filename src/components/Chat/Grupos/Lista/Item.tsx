@@ -41,6 +41,7 @@ export const Item = ({ grupo }: any) => {
     let unsubLastMsg: any;
     let unsubTyping: any;
     let unsubUnreads: any;
+    let unsubMessages: any;
 
     const onCheckStatus = async () => {
       unsubLastMsg = onValue(
@@ -72,9 +73,30 @@ export const Item = ({ grupo }: any) => {
       });
 
       unsubUnreads = onValue(
-        readData(`grupos/${grupo.id}/users/${user.id}/unreads`),
-        (snap) => {
-          return setUnreads(snap.val());
+        readData(`grupos/${grupo.id}/users/${user.id}/exit_time`),
+        (snapshot) => {
+          const exitTime = snapshot.val();
+          if (unsubMessages) unsubMessages();
+
+          if (exitTime) {
+            const unreadQuery = queryTo(`grupos/${grupo.id}/messages`, {
+              orderBy: "date",
+              startAt: exitTime,
+            });
+
+            unsubMessages = onValue(unreadQuery, (msgSnap) => {
+              const messages = snapshotToArray(msgSnap.val());
+              const count = messages.filter((m: any) => m.user !== user.id).length;
+              setUnreads(count);
+            });
+          } else {
+            // Si nunca ha entrado, todos los mensajes (de otros) cuentan como no leídos
+            unsubMessages = onValue(readData(`grupos/${grupo.id}/messages`), (msgSnap) => {
+              const messages = snapshotToArray(msgSnap.val());
+              const count = messages.filter((m: any) => m.user !== user.id).length;
+              setUnreads(count);
+            });
+          }
         }
       );
     };
@@ -82,11 +104,12 @@ export const Item = ({ grupo }: any) => {
     onCheckStatus();
 
     return () => {
-      unsubLastMsg();
-      unsubTyping();
-      unsubUnreads();
+      unsubLastMsg?.();
+      unsubTyping?.();
+      unsubUnreads?.();
+      unsubMessages?.();
     };
-  }, []);
+  }, [grupo.id, user.id]);
 
   useEffect(() => {
     const onCheckUnreads = () => {
@@ -119,7 +142,7 @@ export const Item = ({ grupo }: any) => {
           </h6>
         </div>
         <p className="text-sm text-muted-foreground truncate">
-          {lastUser?.name}: {isWriting ? <i>Escribiendo...</i> : lastMsg?.mensaje}
+          {lastUser?.name ? `${lastUser.name}: ` : ""}{isWriting ? <i>Escribiendo...</i> : lastMsg?.mensaje}
         </p>
       </div>
       <div className="flex flex-col items-end gap-1">

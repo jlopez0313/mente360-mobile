@@ -1,12 +1,12 @@
 @font-face {
-  font-family: "Mente360";
-  src: local("Mente360"),
+  font-family: "Nunito";
+  src: local("Nunito"),
     url("../assets/fonts/Nunito/Nunito-VariableFont_wght.ttf") format("truetype");
 }
 
 @font-face {
-  font-family: "Mente360-bold";
-  src: local("Mente360-bold"),
+  font-family: "Nunito-bold";
+  src: local("Nunito-bold"),
     url("../assets/fonts/Nunito/Nunito-VariableFont_wght.ttf") format("truetype");
 }
 
@@ -30,7 +30,7 @@
 
 html,
 body {
-  font-family: Mente360;
+  font-family: "Nunito", sans-serif;
 }
 
 ion-item.ion-no-bg::part(native) {

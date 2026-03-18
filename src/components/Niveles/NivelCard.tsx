@@ -29,7 +29,7 @@ export const NivelCard = ({ nivel, minOrden }: Props) => {
 
   const myCrecimiento = useMemo(() => {
     return user.crecimientos?.find(
-      (c: any) => c.nivel?.canal?.id == nivel?.canal?.id
+      (c: any) => c.nivel?.canales_id == nivel?.canal?.id
     );
   }, [user, nivel]);
 

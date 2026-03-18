@@ -10,9 +10,17 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Check, Copy, Share2, UserPlus } from "lucide-react";
 import { useSelector } from "react-redux";
+import { useHistory } from "react-router";
+import { writeData } from "@/services/realtime-db";
+import { db } from "@/hooks/useDexie";
+import { useLiveQuery } from "dexie-react-hooks";
 
-export const Comunidad = ({ searchQuery }: any) => {
-  const invitationLink = "https://soymente360.com/#invitacion";
+export const Contactos = ({ searchQuery }: any) => {
+  const invitationEnlace = useLiveQuery(async () => {
+    return (await db.enlaces.toArray()).find((e) => e.action === "copyLink");
+  }, []);
+
+  const invitationLink = invitationEnlace?.link || import.meta.env.VITE_INVITATION_LINK;
 
   const { user } = useSelector((state: any) => state.user);
 
@@ -24,6 +32,24 @@ export const Comunidad = ({ searchQuery }: any) => {
   const [userContacts, setUserContacts] = useState<any>([]);
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
+  const history = useHistory();
+
+  const goToInterno = async (contact: any) => {
+    try {
+      const roomArray = [Number(user.id), Number(contact.id)];
+      const roomID = roomArray.sort((a, b) => a - b).join("_");
+
+      await Promise.all([
+        writeData(`users/${user.id}/rooms/${roomID}`, true),
+        writeData(`users/${contact.id}/rooms/${roomID}`, true),
+        writeData(`rooms/${roomID}/users/${user.id}/exit_time`, null),
+      ]);
+
+      history.replace(`/chat/${roomID}`);
+    } catch (error) {
+      console.error("Error al iniciar chat desde contactos:", error);
+    }
+  };
 
   const filteredUserContacts = useMemo(() => {
     if (searchQuery) {
@@ -239,7 +265,8 @@ export const Comunidad = ({ searchQuery }: any) => {
             {filteredUserContacts.map((contact) => (
               <div
                 key={contact.id}
-                className="flex items-center gap-3 p-3 rounded-xl bg-card border border-border"
+                onClick={() => goToInterno(contact)}
+                className="flex items-center gap-3 p-3 rounded-xl bg-card border border-border hover:border-primary/30 hover:bg-primary/5 transition-all cursor-pointer active:scale-[0.98]"
               >
                 <Avatar className="w-12 h-12">
                   <AvatarImage
@@ -248,7 +275,7 @@ export const Comunidad = ({ searchQuery }: any) => {
                     alt={contact.name}
                   />
                   <AvatarFallback className="bg-primary/10 text-primary">
-                    {contact.name.charAt(0)}
+                    {contact.name?.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
@@ -261,7 +288,7 @@ export const Comunidad = ({ searchQuery }: any) => {
                 </div>
                 <Badge
                   variant="secondary"
-                  className="bg-success/10 text-success"
+                  className="bg-success/10 text-success border-success/20"
                 >
                   En la app
                 </Badge>

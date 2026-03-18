@@ -6,35 +6,48 @@ import { FavoritesList } from "@/components/Musicaterapia/FavoritesList";
 import { TrackList } from "@/components/Musicaterapia/TrackList";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import Clips from "@/database/clips";
 import { useBackButton } from "@/hooks/useBackButton";
 import { db } from "@/hooks/useDexie";
 import { useLiveQuery } from "dexie-react-hooks";
 import { Music, Search, Star } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const Musicaterapia: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<number | undefined>(
-    undefined
-  );
-  const [currentTrack, setCurrentTrack] = useState<Clips | undefined>(
-    undefined
-  );
+  const [searchQuery, setSearchQuery] = useState(() => sessionStorage.getItem("musicaterapia_search") || "");
+  const [selectedCategory, setSelectedCategory] = useState<number | undefined>(() => {
+    const saved = sessionStorage.getItem("musicaterapia_category");
+    return saved ? Number(saved) : undefined;
+  });
+  const [activeTab, setActiveTab] = useState(() => sessionStorage.getItem("musicaterapia_tab") || "clips");
+  const [searchTerm, setSearchTerm] = useState(searchQuery);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchQuery(searchTerm);
+      sessionStorage.setItem("musicaterapia_search", searchTerm);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   const categories = useLiveQuery(() =>
     db.categorias.orderBy("categoria").toArray()
   );
 
   const handleCategory = (id: number | undefined) => {
-    // dispatch(clearListAudios());
     setSelectedCategory(id);
-    // -- setSearchQuery("");
+    if (id !== undefined) {
+      sessionStorage.setItem("musicaterapia_category", String(id));
+    } else {
+      sessionStorage.removeItem("musicaterapia_category");
+    }
   };
 
-  const handleSearchChange = (value: string) => {
-    // dispatch(clearListAudios());
-    setSearchQuery(value);
+  // handleSearchChange is now managed by the debounced useEffect on searchTerm
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    sessionStorage.setItem("musicaterapia_tab", value);
   };
 
 
@@ -66,8 +79,8 @@ const Musicaterapia: React.FC = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               placeholder="Buscar canciones o artistas..."
-              value={searchQuery}
-              onChange={(e) => handleSearchChange(e.target.value)}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 !bg-muted/50 !border-border/50"
             />
           </div>
@@ -75,7 +88,7 @@ const Musicaterapia: React.FC = () => {
 
         {/* Content */}
         <div className="px-4 py-6 flex-1">
-          <Tabs defaultValue="clips" className="space-y-4 h-full">
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4 h-full">
             <TabsList className="w-full grid grid-cols-2 bg-muted/50">
               <TabsTrigger value="clips" className="gap-2">
                 <Music className="w-4 h-4" />
@@ -99,14 +112,12 @@ const Musicaterapia: React.FC = () => {
               <TrackList
                 selectedCategory={selectedCategory}
                 searchQuery={searchQuery}
-                currentTrackId={currentTrack?.id}
               />
             </TabsContent>
 
             <TabsContent value="favorites" className="space-y-2 mt-0 h-full">
               <FavoritesList
                 searchQuery={searchQuery}
-                currentTrackId={currentTrack?.id}
               />
             </TabsContent>
           </Tabs>

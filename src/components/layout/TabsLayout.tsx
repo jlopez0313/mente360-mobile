@@ -16,14 +16,17 @@ import {
 } from "lucide-react";
 import { Route } from "react-router-dom";
 
-import Chat from "@/pages/Chat/Chat";
-import Comunidades from "@/pages/Comunidades/Comunidades";
-
-import { usePayment } from "@/hooks/usePayment";
-import Home from "@/pages/Home/Home";
-import Musicaterapia from "@/pages/Musicaterapia/Musicaterapia";
-import Notifications from "@/pages/Notifications/Notifications";
+import { lazy, Suspense } from "react";
 import { useSelector } from "react-redux";
+
+import { PageLoader } from "@/components/Shared/PageLoader/PageLoader";
+import { usePayment } from "@/hooks/usePayment";
+
+const Chat = lazy(() => import("@/pages/Chat/Chat"));
+const Comunidades = lazy(() => import("@/pages/Comunidades/Comunidades"));
+const Home = lazy(() => import("@/pages/Home/Home"));
+const Musicaterapia = lazy(() => import("@/pages/Musicaterapia/Musicaterapia"));
+const Notifications = lazy(() => import("@/pages/Notifications/Notifications"));
 
 const navItems: {
   isEnabled: boolean;
@@ -93,11 +96,13 @@ export const TabsLayout = () => {
   return (
     <IonTabs>
       <IonRouterOutlet>
-        {navItems.map((item, index) => (
-          <Route exact path={item.path} key={index}>
-            {item.child}
-          </Route>
-        ))}
+        <Suspense fallback={<PageLoader />}>
+          {navItems.map((item, index) => (
+            <Route exact path={item.path} key={index}>
+              {item.child}
+            </Route>
+          ))}
+        </Suspense>
       </IonRouterOutlet>
 
       <IonTabBar className="border-t border-border safe-bottom bg-background" slot="bottom" style={{ '--background': 'hsl(var(--background))' } as any}>

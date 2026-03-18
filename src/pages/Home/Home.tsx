@@ -20,14 +20,17 @@ import { Sync } from "@/components/Shared/Animations/Sync/Sync";
 import { NetworkContext } from "@/context/NetworkContext";
 import { diferenciaEnDias } from "@/helpers/Fechas";
 import { DB, localDB } from "@/helpers/localStore";
-import { destroy } from "@/helpers/musicControls";
 import { useCompletedItems } from "@/hooks/useCompletedItems";
 import { db } from "@/hooks/useDexie";
 import { useGlobalSync } from "@/hooks/useGlobalSync";
 import { usePayment } from "@/hooks/usePayment";
 import { usePreferences } from "@/hooks/usePreferences";
 import { update } from "@/services/user";
-import { setAdmin, setCurrentDay, setPodcast } from "@/store/slices/homeSlice";
+import {
+  setAdmin,
+  setCurrentDay,
+  setPodcast,
+} from "@/store/slices/homeSlice";
 import { setUser } from "@/store/slices/userSlice";
 import { getHomeThunk } from "@/store/thunks/home";
 import { getNotifications } from "@/store/thunks/notifications";
@@ -69,6 +72,11 @@ const Home: React.FC = () => {
   const handleOpenModal = (
     modal: "nightAudio" | "sosEmotional" | "dailyMessage" | "weeklyTask"
   ) => {
+    const isPrincipal = localStorage.getItem("principal");
+    if (!isPrincipal) {
+      history.push("/seleccionar-comunidad");
+      return;
+    }
 
     switch (modal) {
       case "nightAudio":
@@ -134,7 +142,7 @@ const Home: React.FC = () => {
     };
 
     onGetNotifications();
-    destroy();
+    // destroy(); // REMOVED: This was killing the background controls on mount/return to home
 
     // Global sync
     const onGlobalSync = async () => {

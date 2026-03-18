@@ -1,21 +1,16 @@
 
-
 import { AppLayout } from "@/components/layout";
 import { Clip as ClipComponent } from "@/components/Musicaterapia/Clip/Clip";
 import { Button } from "@/components/ui/button";
+import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { useBackButton } from "@/hooks/useBackButton";
 import { Check, ChevronLeft, Download } from "lucide-react";
-import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { toast } from "sonner";
 
 const Clip: React.FC = () => {
 
   const history = useHistory();
-
-  const { audioSrc, globalAudio, globalPos, listAudios } = useSelector(
-    (state: any) => state.audio
-  );
+  const { activeTrack, onToggleDownload } = useAudioPlayer(null);
 
   useBackButton('/musicaterapia')
 
@@ -33,12 +28,9 @@ const Clip: React.FC = () => {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => {
-              setIsDownloaded(!globalAudio?.audio_local);
-              toast.success(globalAudio?.audio_local ? "Eliminado de descargas" : "Descargado para offline");
-            }}
+            onClick={() => onToggleDownload('crecimientos')}
           >
-            {globalAudio?.audio_local ? (
+            {activeTrack?.audio_local ? (
               <Check className="w-5 h-5 text-success" />
             ) : (
               <Download className="w-5 h-5" />

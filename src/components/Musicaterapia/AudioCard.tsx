@@ -21,15 +21,15 @@ import {
   Share2,
   Star,
 } from "lucide-react";
+import { memo } from "react";
 import MusicBar from "../Shared/MusicBar/MusicBar";
 
 interface AudioCardProps {
   idx: number;
   track: Clips;
-  isPlaying: boolean;
 }
 
-export const AudioCard = ({ idx, track }: AudioCardProps) => {
+export const AudioCard = memo(({ idx, track }: AudioCardProps) => {
   const {
     isPlaying,
     isGlobalActive,
@@ -164,4 +164,4 @@ export const AudioCard = ({ idx, track }: AudioCardProps) => {
       </CardContent>
     </Card>
   );
-};
+});

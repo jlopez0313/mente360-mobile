@@ -3,20 +3,18 @@ import { db } from "@/hooks/useDexie";
 import { setListAudios } from "@/store/slices/audioSlice";
 import { useLiveQuery } from "dexie-react-hooks";
 import { Heart } from "lucide-react";
-import { forwardRef } from "react";
+import { forwardRef, memo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Virtuoso } from "react-virtuoso";
 import { AudioCard } from "./AudioCard";
 
 interface FavoritesListProps {
   searchQuery: string;
-  currentTrackId?: number;
 }
 
-export function FavoritesList({
+export const FavoritesList = memo(({
   searchQuery,
-  currentTrackId,
-}: FavoritesListProps) {
+}: FavoritesListProps) => {
 
   const dispatch = useDispatch();
 
@@ -34,9 +32,11 @@ export function FavoritesList({
     }
 
     const lista = await collection.toArray();
-    dispatch(setListAudios([...lista]));
+    const clips = lista.map((item: Playlist) => item.clip).filter(c => c !== null);
 
-    return await collection.toArray();
+    dispatch(setListAudios([...clips]));
+
+    return lista;
   }, [user?.id, searchQuery]);
 
   if (!playlist || playlist?.length === 0) {
@@ -89,11 +89,10 @@ export function FavoritesList({
               idx={index}
               key={track?.id}
               track={track}
-              isPlaying={track?.id === currentTrackId}
             />
           );
         }}
       />
     </div>
   );
-}
+});

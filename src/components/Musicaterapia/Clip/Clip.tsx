@@ -25,7 +25,6 @@ export const Clip = () => {
     onTogglePlay,
     goToPrev,
     goToNext,
-    globalPos,
     listAudios,
   } = useAudioPlayer(null); // Passing null implies this is the primary Global Player
 
@@ -104,7 +103,7 @@ export const Clip = () => {
             variant="ghost"
             size="icon"
             onClick={goToPrev}
-            disabled={globalPos === 0}
+            disabled={listAudios?.length <= 1}
             className="w-12 h-12"
           >
             <SkipBack className="w-6 h-6" />
@@ -126,7 +125,7 @@ export const Clip = () => {
             variant="ghost"
             size="icon"
             onClick={goToNext}
-            disabled={globalPos === listAudios?.length - 1}
+            disabled={listAudios?.length <= 1}
             className="w-12 h-12"
           >
             <SkipForward className="w-6 h-6" />

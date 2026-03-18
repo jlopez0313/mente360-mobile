@@ -261,9 +261,22 @@ const Configuracion: React.FC = () => {
                     key={enlace.key}
                     onClick={async (e) => {
                       e.preventDefault();
-                      await Browser.open({ url: enlace.link });
+                      if (enlace.action === "copyLink") {
+                        try {
+                          await navigator.clipboard.writeText(enlace.link);
+                          toast({
+                            title: "Link copiado",
+                            description:
+                              "El link se ha copiado al portapapeles",
+                          });
+                        } catch (err) {
+                          console.error("Error al copiar link:", err);
+                        }
+                      } else {
+                        await Browser.open({ url: enlace.link });
+                      }
                     }}
-                    className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
+                    className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors cursor-pointer"
                   >
                     <div className="flex items-center gap-3">
                       <Icon className="w-5 h-5 text-primary" />

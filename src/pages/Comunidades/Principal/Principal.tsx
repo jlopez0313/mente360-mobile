@@ -64,7 +64,7 @@ export default function SelectCommunityPage() {
 
   return (
     <AppLayout hideNav>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen overflow-y-auto bg-background">
         <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg border-b border-border/50">
           <div className="flex items-center justify-between px-4 py-3">
             <button onClick={() => history.replace('/configuracion')} className="p-2 -ml-2 hover:bg-muted rounded-full">
@@ -75,12 +75,12 @@ export default function SelectCommunityPage() {
           </div>
         </header>
 
-        <div className="px-4 py-6">
+        <div className="px-4 py-6 overflow-y-auto">
           <p className="text-muted-foreground mb-6">
             Selecciona la comunidad que deseas ver como principal. Las tareas y contenido del home se basarán en esta comunidad.
           </p>
 
-          <div className="space-y-3">
+          <div className="space-y-3 ">
             {misComunidades?.map((community) => (
               <button
                 key={community.id}

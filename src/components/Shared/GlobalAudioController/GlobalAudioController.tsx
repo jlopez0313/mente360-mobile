@@ -29,7 +29,7 @@ export const GlobalAudioController = () => {
             dispatch(setShowGlobalAudio(true));
         }
 
-    }, [location.pathname, isGlobalPlaying]);
+    }, [location.pathname]);
 
     return null;
 };

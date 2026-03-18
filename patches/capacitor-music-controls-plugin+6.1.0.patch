@@ -1,3 +1,14 @@
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/.transforms/8d76546749a8bd377dcefef5440d5172/results.bin b/node_modules/capacitor-music-controls-plugin/android/build/.transforms/8d76546749a8bd377dcefef5440d5172/results.bin
+new file mode 100644
+index 0000000..0d259dd
+--- /dev/null
++++ b/node_modules/capacitor-music-controls-plugin/android/build/.transforms/8d76546749a8bd377dcefef5440d5172/results.bin
+@@ -0,0 +1 @@
++o/classes
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/.transforms/8d76546749a8bd377dcefef5440d5172/transformed/classes/classes_dex/classes.dex b/node_modules/capacitor-music-controls-plugin/android/build/.transforms/8d76546749a8bd377dcefef5440d5172/transformed/classes/classes_dex/classes.dex
+new file mode 100644
+index 0000000..900cb35
+Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/.transforms/8d76546749a8bd377dcefef5440d5172/transformed/classes/classes_dex/classes.dex differ
 diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/AndroidManifest.xml b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/AndroidManifest.xml
 new file mode 100644
 index 0000000..b6ed144
@@ -62,6 +73,10 @@ index 0000000..ec17e99
 +  "elementType": "File"
 +}
 \ No newline at end of file
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/aar_main_jar/debug/syncDebugLibJars/classes.jar b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/aar_main_jar/debug/syncDebugLibJars/classes.jar
+new file mode 100644
+index 0000000..e4bada6
+Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/aar_main_jar/debug/syncDebugLibJars/classes.jar differ
 diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/aar_metadata/debug/writeDebugAarMetadata/aar-metadata.properties b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/aar_metadata/debug/writeDebugAarMetadata/aar-metadata.properties
 new file mode 100644
 index 0000000..1211b1e
@@ -82,6 +97,13 @@ index 0000000..9e26dfe
 @@ -0,0 +1 @@
 +{}
 \ No newline at end of file
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/annotations_typedef_file/debug/extractDebugAnnotations/typedefs.txt b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/annotations_typedef_file/debug/extractDebugAnnotations/typedefs.txt
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/compile_library_classes_jar/debug/bundleLibCompileToJarDebug/classes.jar b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/compile_library_classes_jar/debug/bundleLibCompileToJarDebug/classes.jar
+new file mode 100644
+index 0000000..b6449ee
+Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/compile_library_classes_jar/debug/bundleLibCompileToJarDebug/classes.jar differ
 diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/compile_r_class_jar/debug/generateDebugRFile/R.jar b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/compile_r_class_jar/debug/generateDebugRFile/R.jar
 new file mode 100644
 index 0000000..b7eb4e2
@@ -99,6 +121,10 @@ diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermed
 new file mode 100644
 index 0000000..c0806b3
 Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/layout_bridge_layout_main.xml.flat differ
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/incremental/debug-mergeJavaRes/merge-state b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/incremental/debug-mergeJavaRes/merge-state
+new file mode 100644
+index 0000000..1c983fc
+Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/incremental/debug-mergeJavaRes/merge-state differ
 diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties
 new file mode 100644
 index 0000000..8cc1cf0
@@ -127,6 +153,85 @@ index 0000000..e869272
 +<?xml version="1.0" encoding="utf-8"?>
 +<merger version="3"><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main" generated-set="main$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\res"><file name="bridge_layout_main" path="C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\res\layout\bridge_layout_main.xml" qualifiers="" type="layout"/><file path="C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\res\values\colors.xml" qualifiers=""/><file path="C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\res\values\strings.xml" qualifiers=""><string name="my_string">Just a simple string</string></file><file path="C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\res\values\styles.xml" qualifiers=""/></source></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="debug$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\debug\res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="debug" generated-set="debug$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\debug\res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\build\generated\res\resValues\debug"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated" generated-set="generated$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\build\generated\res\resValues\debug"/></dataSet><mergedItems/></merger>
 \ No newline at end of file
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml
+new file mode 100644
+index 0000000..7ed4509
+--- /dev/null
++++ b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\jniLibs"/></dataSet><dataSet config="debug" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\debug\jniLibs"/></dataSet></merger>
+\ No newline at end of file
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/incremental/mergeDebugShaders/merger.xml b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/incremental/mergeDebugShaders/merger.xml
+new file mode 100644
+index 0000000..ab70040
+--- /dev/null
++++ b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/incremental/mergeDebugShaders/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\shaders"/></dataSet><dataSet config="debug" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\debug\shaders"/></dataSet></merger>
+\ No newline at end of file
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/incremental/packageDebugAssets/merger.xml b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/incremental/packageDebugAssets/merger.xml
+new file mode 100644
+index 0000000..1d7d588
+--- /dev/null
++++ b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/incremental/packageDebugAssets/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\assets"/></dataSet><dataSet config="debug" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\debug\assets"/></dataSet><dataSet config="generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\build\intermediates\shader_assets\debug\compileDebugShaders\out"/></dataSet></merger>
+\ No newline at end of file
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/CapacitorMusicControls$1$1.class b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/CapacitorMusicControls$1$1.class
+new file mode 100644
+index 0000000..03a92c1
+Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/CapacitorMusicControls$1$1.class differ
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/CapacitorMusicControls$1.class b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/CapacitorMusicControls$1.class
+new file mode 100644
+index 0000000..a555a25
+Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/CapacitorMusicControls$1.class differ
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/CapacitorMusicControls$2.class b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/CapacitorMusicControls$2.class
+new file mode 100644
+index 0000000..f4cfdd9
+Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/CapacitorMusicControls$2.class differ
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/CapacitorMusicControls.class b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/CapacitorMusicControls.class
+new file mode 100644
+index 0000000..2c25878
+Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/CapacitorMusicControls.class differ
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/KillBinder.class b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/KillBinder.class
+new file mode 100644
+index 0000000..6b0bede
+Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/KillBinder.class differ
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/MediaSessionCallback.class b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/MediaSessionCallback.class
+new file mode 100644
+index 0000000..da7dc3f
+Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/MediaSessionCallback.class differ
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/MusicControlsBroadcastReceiver.class b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/MusicControlsBroadcastReceiver.class
+new file mode 100644
+index 0000000..dcc314b
+Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/MusicControlsBroadcastReceiver.class differ
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/MusicControlsInfos.class b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/MusicControlsInfos.class
+new file mode 100644
+index 0000000..7b2382a
+Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/MusicControlsInfos.class differ
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/MusicControlsNotification$1$1.class b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/MusicControlsNotification$1$1.class
+new file mode 100644
+index 0000000..116f671
+Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/MusicControlsNotification$1$1.class differ
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/MusicControlsNotification$1.class b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/MusicControlsNotification$1.class
+new file mode 100644
+index 0000000..a1c2805
+Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/MusicControlsNotification$1.class differ
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/MusicControlsNotification.class b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/MusicControlsNotification.class
+new file mode 100644
+index 0000000..37cf476
+Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/MusicControlsNotification.class differ
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/MusicControlsNotificationKiller.class b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/MusicControlsNotificationKiller.class
+new file mode 100644
+index 0000000..90c24ef
+Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/MusicControlsNotificationKiller.class differ
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/MusicControlsServiceConnection.class b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/MusicControlsServiceConnection.class
+new file mode 100644
+index 0000000..6021342
+Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/ingageco/capacitormusiccontrols/MusicControlsServiceConnection.class differ
 diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/local_only_symbol_list/debug/parseDebugLocalResources/R-def.txt b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/local_only_symbol_list/debug/parseDebugLocalResources/R-def.txt
 new file mode 100644
 index 0000000..80ec5cb
@@ -205,6 +310,10 @@ index 0000000..337e6dd
 +30    </application>
 +31
 +32</manifest>
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/merged_java_res/debug/mergeDebugJavaResource/feature-capacitor-music-controls-plugin.jar b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/merged_java_res/debug/mergeDebugJavaResource/feature-capacitor-music-controls-plugin.jar
+new file mode 100644
+index 0000000..15cb0ec
+Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/merged_java_res/debug/mergeDebugJavaResource/feature-capacitor-music-controls-plugin.jar differ
 diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml
 new file mode 100644
 index 0000000..b6ed144
@@ -292,6 +401,10 @@ index 0000000..e95bf66
 +    <string name="my_string">Just a simple string</string>
 +</resources>
 \ No newline at end of file
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/runtime_library_classes_jar/debug/bundleLibRuntimeToJarDebug/classes.jar b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/runtime_library_classes_jar/debug/bundleLibRuntimeToJarDebug/classes.jar
+new file mode 100644
+index 0000000..90de610
+Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/runtime_library_classes_jar/debug/bundleLibRuntimeToJarDebug/classes.jar differ
 diff --git a/node_modules/capacitor-music-controls-plugin/android/build/intermediates/symbol_list_with_package_name/debug/generateDebugRFile/package-aware-r.txt b/node_modules/capacitor-music-controls-plugin/android/build/intermediates/symbol_list_with_package_name/debug/generateDebugRFile/package-aware-r.txt
 new file mode 100644
 index 0000000..d29d45f
@@ -302,6 +415,10 @@ index 0000000..d29d45f
 +id webview
 +layout bridge_layout_main
 +string my_string
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/outputs/aar/capacitor-music-controls-plugin-debug.aar b/node_modules/capacitor-music-controls-plugin/android/build/outputs/aar/capacitor-music-controls-plugin-debug.aar
+new file mode 100644
+index 0000000..8159747
+Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/outputs/aar/capacitor-music-controls-plugin-debug.aar differ
 diff --git a/node_modules/capacitor-music-controls-plugin/android/build/outputs/logs/manifest-merger-debug-report.txt b/node_modules/capacitor-music-controls-plugin/android/build/outputs/logs/manifest-merger-debug-report.txt
 new file mode 100644
 index 0000000..3b5ebbb
@@ -382,13 +499,54 @@ index 0000000..3b5ebbb
 +		INJECTED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml
 +	android:minSdkVersion
 +		INJECTED from C:\Users\jonna\Desktop\Jonathan\AyD\mente360\node_modules\capacitor-music-controls-plugin\android\src\main\AndroidManifest.xml
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/CapacitorMusicControls$1$1.class.uniqueId2 b/node_modules/capacitor-music-controls-plugin/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/CapacitorMusicControls$1$1.class.uniqueId2
+new file mode 100644
+index 0000000..13e2db9
+Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/CapacitorMusicControls$1$1.class.uniqueId2 differ
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/CapacitorMusicControls$1.class.uniqueId3 b/node_modules/capacitor-music-controls-plugin/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/CapacitorMusicControls$1.class.uniqueId3
+new file mode 100644
+index 0000000..5c6e76c
+Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/CapacitorMusicControls$1.class.uniqueId3 differ
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/CapacitorMusicControls$2.class.uniqueId1 b/node_modules/capacitor-music-controls-plugin/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/CapacitorMusicControls$2.class.uniqueId1
+new file mode 100644
+index 0000000..f96f3f9
+Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/CapacitorMusicControls$2.class.uniqueId1 differ
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/CapacitorMusicControls.class.uniqueId4 b/node_modules/capacitor-music-controls-plugin/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/CapacitorMusicControls.class.uniqueId4
+new file mode 100644
+index 0000000..baae009
+Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/CapacitorMusicControls.class.uniqueId4 differ
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/KillBinder.class.uniqueId0 b/node_modules/capacitor-music-controls-plugin/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/KillBinder.class.uniqueId0
+new file mode 100644
+index 0000000..6b0bede
+Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/KillBinder.class.uniqueId0 differ
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MediaSessionCallback.class.uniqueId6 b/node_modules/capacitor-music-controls-plugin/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MediaSessionCallback.class.uniqueId6
+new file mode 100644
+index 0000000..da7dc3f
+Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MediaSessionCallback.class.uniqueId6 differ
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MusicControlsBroadcastReceiver.class.uniqueId5 b/node_modules/capacitor-music-controls-plugin/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MusicControlsBroadcastReceiver.class.uniqueId5
+new file mode 100644
+index 0000000..dcc314b
+Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MusicControlsBroadcastReceiver.class.uniqueId5 differ
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MusicControlsNotificationKiller.class.uniqueId7 b/node_modules/capacitor-music-controls-plugin/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MusicControlsNotificationKiller.class.uniqueId7
+new file mode 100644
+index 0000000..496f73f
+Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MusicControlsNotificationKiller.class.uniqueId7 differ
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MusicControlsServiceConnection.class.uniqueId8 b/node_modules/capacitor-music-controls-plugin/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MusicControlsServiceConnection.class.uniqueId8
+new file mode 100644
+index 0000000..6021342
+Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MusicControlsServiceConnection.class.uniqueId8 differ
+diff --git a/node_modules/capacitor-music-controls-plugin/android/build/tmp/compileDebugJavaWithJavac/previous-compilation-data.bin b/node_modules/capacitor-music-controls-plugin/android/build/tmp/compileDebugJavaWithJavac/previous-compilation-data.bin
+new file mode 100644
+index 0000000..ec0f5dc
+Binary files /dev/null and b/node_modules/capacitor-music-controls-plugin/android/build/tmp/compileDebugJavaWithJavac/previous-compilation-data.bin differ
 diff --git a/node_modules/capacitor-music-controls-plugin/android/src/main/java/com/ingageco/capacitormusiccontrols/CapacitorMusicControls.java b/node_modules/capacitor-music-controls-plugin/android/src/main/java/com/ingageco/capacitormusiccontrols/CapacitorMusicControls.java
-index 054d618..123aa75 100644
+index 054d618..494a1e5 100644
 --- a/node_modules/capacitor-music-controls-plugin/android/src/main/java/com/ingageco/capacitormusiccontrols/CapacitorMusicControls.java
 +++ b/node_modules/capacitor-music-controls-plugin/android/src/main/java/com/ingageco/capacitormusiccontrols/CapacitorMusicControls.java
-@@ -1,431 +1,430 @@
+@@ -1,431 +1,450 @@
  package com.ingageco.capacitormusiccontrols;
  
+-import com.getcapacitor.JSObject;
 +import java.io.BufferedInputStream;
 +import java.io.File;
 +import java.io.FileInputStream;
@@ -398,7 +556,6 @@ index 054d618..123aa75 100644
 +
 +import android.app.Notification;
 +import android.content.Context;
- import com.getcapacitor.JSObject;
 +
 +import org.json.JSONException;
 +
@@ -444,14 +601,15 @@ index 054d618..123aa75 100644
 -
 -import org.json.JSONArray;
 -import org.json.JSONException;
-+import androidx.core.content.ContextCompat;
- 
+-
 -import java.io.BufferedInputStream;
 -import java.io.File;
 -import java.io.FileInputStream;
 -import java.io.InputStream;
 -import java.net.HttpURLConnection;
 -import java.net.URL;
++import androidx.core.content.ContextCompat;
++import com.getcapacitor.JSObject;
  
 -@CapacitorPlugin(name="CapacitorMusicControls")
 +@CapacitorPlugin(name = "CapacitorMusicControls")
@@ -489,27 +647,20 @@ index 054d618..123aa75 100644
      public void create(PluginCall call) {
  
 -			JSObject options = call.getData();
-+        JSObject options = call.getData();
- 
+-
 -			final Context context=getActivity().getApplicationContext();
 -			final Activity activity = getActivity();
-+        final Context context = getActivity().getApplicationContext();
-+        final Activity activity = getActivity();
- 
+-
 -			initialize();
-+        initialize();
- 
+-
 -			try{
-+        try {
- 
+-
 -				final MusicControlsInfos infos = new MusicControlsInfos(options);
-+            final MusicControlsInfos infos = new MusicControlsInfos(options);
- 
+-
 -				final MediaMetadataCompat.Builder metadataBuilder = new MediaMetadataCompat.Builder();
-+            final MediaMetadataCompat.Builder metadataBuilder = new MediaMetadataCompat.Builder();
- 
+-
 -				notification.updateNotification(infos);
-+            notification.updateNotification(infos);
++        JSObject options = call.getData();
  
 -				// track title
 -				metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, infos.track);
@@ -517,43 +668,36 @@ index 054d618..123aa75 100644
 -				metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, infos.artist);
 -				//album
 -				metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, infos.album);
-+            metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, infos.track);
-+            metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, infos.artist);
-+            metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, infos.album);
- 
+-
 -				Bitmap art = getBitmapCover(infos.cover);
 -				if(art != null){
 -					metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, art);
 -					metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, art);
-+            Bitmap art = getBitmapCover(infos.cover);
-+            if (art != null) {
-+                metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, art);
-+                metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, art);
-+            }
- 
+-
 -				}
-+            if (infos.duration > 0) {
-+                metadataBuilder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, infos.duration);
-+            }
- 
+-
 -				mediaSessionCompat.setMetadata(metadataBuilder.build());
-+            mediaSessionCompat.setMetadata(metadataBuilder.build());
++        if (this.mediaSessionCompat != null && this.notification != null) {
++            // If already created and healthy, treat as an update to avoid destroying the session
++            this.updateTrack(call);
++            return;
++        }
  
 -				if(infos.isPlaying)
 -					setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING);
 -				else
 -					setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED);
-+            if (infos.isPlaying)
-+                setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING, infos.elapsed);
-+            else
-+                setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED, infos.elapsed);
++        initialize();
  
 -				call.resolve();
-+            call.resolve();
++        try {
  
 -			} catch(JSONException e){
 -				call.reject("error in initializing MusicControlsInfos "+e.toString());
--
++            final MusicControlsInfos infos = new MusicControlsInfos(options);
++            internalUpdate(infos);
++            call.resolve();
+ 
 -			}
 +        } catch (JSONException e) {
 +            call.reject("error in initializing MusicControlsInfos " + e.toString());
@@ -612,50 +756,90 @@ index 054d618..123aa75 100644
 -	}
 -
 -
--
--
--	public void initialize() {
 +        try {
 +            final MusicControlsInfos infos = new MusicControlsInfos(options);
-+            final MediaMetadataCompat.Builder metadataBuilder = new MediaMetadataCompat.Builder();
- 
--		final Activity activity=getActivity();
-+            notification.updateNotification(infos);
- 
--		final Context context=activity.getApplicationContext();
-+            metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, infos.track);
-+            metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, infos.artist);
-+            metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, infos.album);
- 
--		final MusicControlsServiceConnection mConnection = new MusicControlsServiceConnection(activity);
--		this.mConnection = mConnection;
-+            Bitmap art = getBitmapCover(infos.cover);
-+            if (art != null) {
-+                metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, art);
-+                metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, art);
-+            }
- 
-+            if (infos.duration > 0) {
-+                metadataBuilder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, infos.duration);
-+            }
- 
--		// avoid spawning multiple receivers
--		if(this.mMessageReceiver != null){
-+            mediaSessionCompat.setMetadata(metadataBuilder.build());
- 
--			try{
-+            if (infos.isPlaying)
-+                setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING, infos.elapsed);
-+            else
-+                setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED, infos.elapsed);
- 
--				context.unregisterReceiver(this.mMessageReceiver);
++            internalUpdate(infos);
 +            call.resolve();
  
--			} catch(IllegalArgumentException e) {
 +        } catch (JSONException e) {
 +            call.reject("error in updating MusicControlsInfos " + e.toString());
 +        }
++    }
+ 
+-	public void initialize() {
++    private void internalUpdate(MusicControlsInfos infos) {
++        final MediaMetadataCompat.Builder metadataBuilder = new MediaMetadataCompat.Builder();
+ 
+-		final Activity activity=getActivity();
++        notification.updateNotification(infos);
+ 
+-		final Context context=activity.getApplicationContext();
++        metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, infos.track);
++        metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, infos.artist);
++        metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, infos.album);
+ 
+-		final MusicControlsServiceConnection mConnection = new MusicControlsServiceConnection(activity);
+-		this.mConnection = mConnection;
++        // Always put duration to reset it, even if 0
++        metadataBuilder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, infos.duration);
+ 
++        mediaSessionCompat.setMetadata(metadataBuilder.build());
+ 
+-		// avoid spawning multiple receivers
+-		if(this.mMessageReceiver != null){
++        if (infos.isPlaying)
++            setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING, infos.elapsed);
++        else
++            setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED, infos.elapsed);
+ 
+-			try{
++        // Fetch cover async and update metadata
++        if (infos.cover != null && !infos.cover.isEmpty()) {
++            updateMetadataWithCoverAsync(infos);
++        }
++    }
+ 
+-				context.unregisterReceiver(this.mMessageReceiver);
+ 
+-			} catch(IllegalArgumentException e) {
++    private void updateMetadataWithCoverAsync(final MusicControlsInfos infos) {
++        final String coverURL = infos.cover;
++        new Thread(new Runnable() {
++            @Override
++            public void run() {
++                try {
++                    final Bitmap art;
++                    if (coverURL.matches("^(https?|ftp)://.*$"))
++                        art = getBitmapFromURL(coverURL);
++                    else {
++                        art = getBitmapFromLocal(coverURL);
++                    }
++
++                    if (art != null) {
++                        getActivity().runOnUiThread(new Runnable() {
++                            @Override
++                            public void run() {
++                                if (mediaSessionCompat != null) {
++                                    final MediaMetadataCompat.Builder metadataBuilder = new MediaMetadataCompat.Builder();
++                                    metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, infos.track);
++                                    metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, infos.artist);
++                                    metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, infos.album);
++                                    metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, art);
++                                    metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, art);
++                                    if (infos.duration > 0) {
++                                        metadataBuilder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION,
++                                                infos.duration);
++                                    }
++                                    mediaSessionCompat.setMetadata(metadataBuilder.build());
++                                }
++                            }
++                        });
++                    }
++                } catch (Exception ex) {
++                    ex.printStackTrace();
++                }
++            }
++        }).start();
 +    }
  
 -				e.printStackTrace();
@@ -685,6 +869,7 @@ index 054d618..123aa75 100644
 +        if (this.mediaSessionCompat != null) {
 +            this.mediaSessionCompat.setMediaButtonReceiver(null);
 +            this.mediaSessionCompat.release();
++            this.mediaSessionCompat = null;
 +        }
 +    }
  
@@ -1164,7 +1349,6 @@ index 054d618..123aa75 100644
 +        }
 +    }
  }
-\ No newline at end of file
 diff --git a/node_modules/capacitor-music-controls-plugin/android/src/main/java/com/ingageco/capacitormusiccontrols/MusicControlsInfos.java b/node_modules/capacitor-music-controls-plugin/android/src/main/java/com/ingageco/capacitormusiccontrols/MusicControlsInfos.java
 index da98a58..29fa6b0 100644
 --- a/node_modules/capacitor-music-controls-plugin/android/src/main/java/com/ingageco/capacitormusiccontrols/MusicControlsInfos.java
@@ -1258,8 +1442,365 @@ index da98a58..29fa6b0 100644
  
  }
 \ No newline at end of file
+diff --git a/node_modules/capacitor-music-controls-plugin/android/src/main/java/com/ingageco/capacitormusiccontrols/MusicControlsNotification.java b/node_modules/capacitor-music-controls-plugin/android/src/main/java/com/ingageco/capacitormusiccontrols/MusicControlsNotification.java
+index 84ea69e..83e6a5b 100644
+--- a/node_modules/capacitor-music-controls-plugin/android/src/main/java/com/ingageco/capacitormusiccontrols/MusicControlsNotification.java
++++ b/node_modules/capacitor-music-controls-plugin/android/src/main/java/com/ingageco/capacitormusiccontrols/MusicControlsNotification.java
+@@ -1,28 +1,26 @@
+ package com.ingageco.capacitormusiccontrols;
+ 
+ import java.io.BufferedInputStream;
++import java.io.File;
+ import java.io.FileInputStream;
+ import java.io.InputStream;
+-import java.io.File;
+ import java.net.HttpURLConnection;
+ import java.net.URL;
+ 
+-import android.util.Log;
++import android.app.Notification;
+ import android.content.Context;
+-import android.app.Activity;
+ 
+-import android.app.Notification;
++import android.app.Activity;
++import android.app.NotificationChannel;
+ import android.app.NotificationManager;
+ import android.app.PendingIntent;
+ import android.content.Intent;
+-import android.os.Build;
+-import android.graphics.BitmapFactory;
+ import android.graphics.Bitmap;
+-import android.net.Uri;
+-
++import android.graphics.BitmapFactory;
+ import android.media.session.MediaSession.Token;
+-
+-import android.app.NotificationChannel;
++import android.net.Uri;
++import android.os.Build;
++import android.util.Log;
+ 
+ public class MusicControlsNotification {
+ 	private static final String TAG = "CMCNotification";
+@@ -36,12 +34,10 @@ public class MusicControlsNotification {
+ 	private String CHANNEL_ID;
+ 	private Token token;
+ 
+-
+ 	// Public Constructor
+-	public MusicControlsNotification(Activity cordovaActivity, int id, Token token){
+-
++	public MusicControlsNotification(Activity cordovaActivity, int id, Token token) {
+ 
+-		this.CHANNEL_ID ="capacitor-music-channel-id";
++		this.CHANNEL_ID = "capacitor-music-channel-id";
+ 		this.notificationID = id;
+ 		this.cordovaActivity = cordovaActivity;
+ 		this.token = token;
+@@ -57,22 +53,22 @@ public class MusicControlsNotification {
+ 
+ 			int importance = NotificationManager.IMPORTANCE_LOW;
+ 
+-			NotificationChannel mChannel = new NotificationChannel(this.CHANNEL_ID, name,importance);
++			NotificationChannel mChannel = new NotificationChannel(this.CHANNEL_ID, name, importance);
+ 
+ 			// Configure the notification channel.
+ 			mChannel.setDescription(description);
+ 
+ 			this.notificationManager.createNotificationChannel(mChannel);
+-    }
++		}
+ 
+ 	}
+ 
+ 	// Show or update notification
+-	public void updateNotification(MusicControlsInfos newInfos){
++	public void updateNotification(MusicControlsInfos newInfos) {
+ 
+ 		Log.i(TAG, "updateNotification: infos: " + newInfos.toString());
+ 		// Check if the cover has changed
+-		if (!newInfos.cover.isEmpty() && (this.infos == null || !newInfos.cover.equals(this.infos.cover))){
++		if (!newInfos.cover.isEmpty() && (this.infos == null || !newInfos.cover.equals(this.infos.cover))) {
+ 			this.getBitmapCover(newInfos.cover);
+ 		}
+ 		this.infos = newInfos;
+@@ -93,7 +89,7 @@ public class MusicControlsNotification {
+ 
+ 		Log.i(TAG, "updateIsPlaying: pre:this.infos.isPlaying: " + this.infos.isPlaying);
+ 
+-		this.infos.isPlaying=isPlaying;
++		this.infos.isPlaying = isPlaying;
+ 
+ 		Log.i(TAG, "updateIsPlaying: post:this.infos.isPlaying: " + this.infos.isPlaying);
+ 
+@@ -103,28 +99,48 @@ public class MusicControlsNotification {
+ 
+ 	// Toggle the dismissable status
+ 	public void updateDismissable(boolean dismissable) {
+-		this.infos.dismissable=dismissable;
++		this.infos.dismissable = dismissable;
+ 		this.createBuilder();
+ 		this.createNotification();
+ 	}
+ 
+-	// Get image from url
+-	private void getBitmapCover(String coverURL){
+-		try{
+-			if(coverURL.matches("^(https?|ftp)://.*$"))
+-				// Remote image
+-				this.bitmapCover = getBitmapFromURL(coverURL);
+-			else{
+-				// Local image
+-				this.bitmapCover = getBitmapFromLocal(coverURL);
++	// Get image from url (Async to prevent bridge locking)
++	private void getBitmapCover(final String coverURL) {
++		new Thread(new Runnable() {
++			@Override
++			public void run() {
++				try {
++					final Bitmap bitmap;
++					if (coverURL.matches("^(https?|ftp)://.*$")) {
++						// Remote image
++						bitmap = getBitmapFromURL(coverURL);
++					} else {
++						// Local image
++						bitmap = getBitmapFromLocal(coverURL);
++					}
++
++					if (bitmap != null) {
++						cordovaActivity.runOnUiThread(new Runnable() {
++							@Override
++							public void run() {
++								// Only update if this is still the current cover
++								if (infos != null && coverURL.equals(infos.cover)) {
++									bitmapCover = bitmap;
++									createBuilder();
++									createNotification();
++								}
++							}
++						});
++					}
++				} catch (Exception ex) {
++					ex.printStackTrace();
++				}
+ 			}
+-		} catch (Exception ex) {
+-			ex.printStackTrace();
+-		}
++		}).start();
+ 	}
+ 
+ 	// get Local image
+-	private Bitmap getBitmapFromLocal(String localURL){
++	private Bitmap getBitmapFromLocal(String localURL) {
+ 		try {
+ 			Uri uri = Uri.parse(localURL);
+ 			File file = new File(uri.getPath());
+@@ -145,7 +161,7 @@ public class MusicControlsNotification {
+ 				ex2.printStackTrace();
+ 				return null;
+ 			}
+-		  }
++		}
+ 	}
+ 
+ 	// get Remote image
+@@ -164,7 +180,7 @@ public class MusicControlsNotification {
+ 		}
+ 	}
+ 
+-	private void createBuilder(){
++	private void createBuilder() {
+ 		Context context = cordovaActivity.getApplicationContext();
+ 		Notification.Builder builder = new Notification.Builder(context);
+ 
+@@ -173,25 +189,26 @@ public class MusicControlsNotification {
+ 			builder.setChannelId(this.CHANNEL_ID);
+ 		}
+ 
+-		//Configure builder
++		// Configure builder
+ 		builder.setContentTitle(this.infos.track);
+-		if (this.infos.artist != null){
++		if (this.infos.artist != null) {
+ 			builder.setContentText(this.infos.artist);
+ 		}
+ 
+ 		builder.setWhen(0);
+ 
+ 		// set if the notification can be destroyed by swiping
+-		if (this.infos.dismissable){
++		if (this.infos.dismissable) {
+ 			builder.setOngoing(false);
+ 			Intent dismissIntent = new Intent("music-controls-destroy");
+-			PendingIntent dismissPendingIntent = PendingIntent.getBroadcast(context, 1, dismissIntent, Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ? PendingIntent.FLAG_IMMUTABLE : 0);
++			PendingIntent dismissPendingIntent = PendingIntent.getBroadcast(context, 1, dismissIntent,
++					Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ? PendingIntent.FLAG_IMMUTABLE : 0);
+ 			builder.setDeleteIntent(dismissPendingIntent);
+ 		} else {
+ 			builder.setOngoing(true);
+ 		}
+ 
+-		if (this.infos.ticker != null && !this.infos.ticker.isEmpty()){
++		if (this.infos.ticker != null && !this.infos.ticker.isEmpty()) {
+ 			builder.setTicker(this.infos.ticker);
+ 		}
+ 
+@@ -199,18 +216,18 @@ public class MusicControlsNotification {
+ 
+ 		builder.setVisibility(Notification.VISIBILITY_PUBLIC);
+ 
+-		//Set SmallIcon
++		// Set SmallIcon
+ 		boolean usePlayingIcon = this.infos.notificationIcon.isEmpty();
+-		if(!usePlayingIcon){
++		if (!usePlayingIcon) {
+ 			int resId = this.getResourceId(this.infos.notificationIcon, 0);
+ 			usePlayingIcon = resId == 0;
+-			if(!usePlayingIcon) {
++			if (!usePlayingIcon) {
+ 				builder.setSmallIcon(resId);
+ 			}
+ 		}
+ 
+-		if(usePlayingIcon){
+-			if (this.infos.isPlaying){
++		if (usePlayingIcon) {
++			if (this.infos.isPlaying) {
+ 				builder.setSmallIcon(this.getResourceId(this.infos.playIcon, android.R.drawable.ic_media_play));
+ 			} else {
+ 				builder.setSmallIcon(this.getResourceId(this.infos.pauseIcon, android.R.drawable.ic_media_pause));
+@@ -218,7 +235,7 @@ public class MusicControlsNotification {
+ 		}
+ 
+ 		// Set LargeIcon
+-		if (!this.infos.cover.isEmpty() && this.bitmapCover != null){
++		if (!this.infos.cover.isEmpty() && this.bitmapCover != null) {
+ 			builder.setLargeIcon(this.bitmapCover);
+ 		}
+ 
+@@ -226,47 +243,58 @@ public class MusicControlsNotification {
+ 		Intent resultIntent = new Intent(context, cordovaActivity.getClass());
+ 		resultIntent.setAction(Intent.ACTION_MAIN);
+ 		resultIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+-		PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ? PendingIntent.FLAG_IMMUTABLE : 0);
++		PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent,
++				Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ? PendingIntent.FLAG_IMMUTABLE : 0);
+ 		builder.setContentIntent(resultPendingIntent);
+ 
+ 		// Controls
+-		int nbControls=0;
+-		/* Previous  */
+-		if (this.infos.hasPrev){
++		int nbControls = 0;
++		/* Previous */
++		if (this.infos.hasPrev) {
+ 			Log.i(TAG, "controls hasPrev");
+ 			nbControls++;
+ 			Intent previousIntent = new Intent("music-controls-previous");
+-			PendingIntent previousPendingIntent = PendingIntent.getBroadcast(context, 1, previousIntent, Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ? PendingIntent.FLAG_IMMUTABLE : 0);
+-			builder.addAction(this.getResourceId(this.infos.prevIcon, android.R.drawable.ic_media_previous), "", previousPendingIntent);
++			PendingIntent previousPendingIntent = PendingIntent.getBroadcast(context, 1, previousIntent,
++					Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ? PendingIntent.FLAG_IMMUTABLE : 0);
++			builder.addAction(this.getResourceId(this.infos.prevIcon, android.R.drawable.ic_media_previous), "",
++					previousPendingIntent);
+ 		}
+-		if (this.infos.isPlaying){
+-			/* Pause  */
++		if (this.infos.isPlaying) {
++			/* Pause */
+ 			nbControls++;
+ 			Intent pauseIntent = new Intent("music-controls-pause");
+-			PendingIntent pausePendingIntent = PendingIntent.getBroadcast(context, 1, pauseIntent, Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ? PendingIntent.FLAG_IMMUTABLE : 0);
+-			builder.addAction(this.getResourceId(this.infos.pauseIcon, android.R.drawable.ic_media_pause), "", pausePendingIntent);
++			PendingIntent pausePendingIntent = PendingIntent.getBroadcast(context, 1, pauseIntent,
++					Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ? PendingIntent.FLAG_IMMUTABLE : 0);
++			builder.addAction(this.getResourceId(this.infos.pauseIcon, android.R.drawable.ic_media_pause), "",
++					pausePendingIntent);
+ 		} else {
+-			/* Play  */
++			/* Play */
+ 			nbControls++;
+ 			Intent playIntent = new Intent("music-controls-play");
+-			PendingIntent playPendingIntent = PendingIntent.getBroadcast(context, 1, playIntent, Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ? PendingIntent.FLAG_IMMUTABLE : 0);
+-			builder.addAction(this.getResourceId(this.infos.playIcon, android.R.drawable.ic_media_play), "", playPendingIntent);
++			PendingIntent playPendingIntent = PendingIntent.getBroadcast(context, 1, playIntent,
++					Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ? PendingIntent.FLAG_IMMUTABLE : 0);
++			builder.addAction(this.getResourceId(this.infos.playIcon, android.R.drawable.ic_media_play), "",
++					playPendingIntent);
+ 		}
+ 		/* Next */
+-		if (this.infos.hasNext){
++		if (this.infos.hasNext) {
+ 			Log.i(TAG, "controls hasNext");
+ 			nbControls++;
+ 			Intent nextIntent = new Intent("music-controls-next");
+-			PendingIntent nextPendingIntent = PendingIntent.getBroadcast(context, 1, nextIntent, Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ? PendingIntent.FLAG_IMMUTABLE : 0);
+-			builder.addAction(this.getResourceId(this.infos.nextIcon, android.R.drawable.ic_media_next), "", nextPendingIntent);
++			PendingIntent nextPendingIntent = PendingIntent.getBroadcast(context, 1, nextIntent,
++					Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ? PendingIntent.FLAG_IMMUTABLE : 0);
++			builder.addAction(this.getResourceId(this.infos.nextIcon, android.R.drawable.ic_media_next), "",
++					nextPendingIntent);
+ 		}
+ 		/* Close */
+-		if (this.infos.hasClose){
++		if (this.infos.hasClose) {
+ 			Log.i(TAG, "controls hasClose");
+ 			nbControls++;
+ 			Intent destroyIntent = new Intent("music-controls-destroy");
+-			PendingIntent destroyPendingIntent = PendingIntent.getBroadcast(context, 1, destroyIntent, Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ? PendingIntent.FLAG_IMMUTABLE : 0);
+-			builder.addAction(this.getResourceId(this.infos.closeIcon, android.R.drawable.ic_menu_close_clear_cancel), "", destroyPendingIntent);
++			PendingIntent destroyPendingIntent = PendingIntent.getBroadcast(context, 1, destroyIntent,
++					Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ? PendingIntent.FLAG_IMMUTABLE : 0);
++			builder.addAction(this.getResourceId(this.infos.closeIcon, android.R.drawable.ic_menu_close_clear_cancel),
++					"", destroyPendingIntent);
+ 		}
+ 
+ 		int[] args = new int[nbControls];
+@@ -278,27 +306,31 @@ public class MusicControlsNotification {
+ 		this.notificationBuilder = builder;
+ 	}
+ 
+-	private int getResourceId(String name, int fallback){
+-		try{
+-			if(name.isEmpty()){
++	private int getResourceId(String name, int fallback) {
++		try {
++			if (name.isEmpty()) {
+ 				return fallback;
+ 			}
+ 
+-			int resId = this.cordovaActivity.getResources().getIdentifier(name, "drawable", this.cordovaActivity.getPackageName());
++			int resId = this.cordovaActivity.getResources().getIdentifier(name, "drawable",
++					this.cordovaActivity.getPackageName());
+ 			return resId == 0 ? fallback : resId;
+-		}
+-		catch(Exception ex){
++		} catch (Exception ex) {
+ 			return fallback;
+ 		}
+ 	}
+ 
+-	public void destroy(){
++	public void destroy() {
+ 		Log.i(TAG, "Destroying notification");
+ 		this.notificationManager.cancel(this.notificationID);
+ 		this.onNotificationDestroyed();
+ 		Log.i(TAG, "Notification destroyed");
+ 	}
+ 
+-		protected void onNotificationUpdated(Notification notification) {}
+-		protected void onNotificationDestroyed() {}
++	protected void onNotificationUpdated(Notification notification) {
++	}
++
++	protected void onNotificationDestroyed() {
++	}
+ }
++
 diff --git a/node_modules/capacitor-music-controls-plugin/android/src/main/java/com/ingageco/capacitormusiccontrols/MusicControlsNotificationKiller.java b/node_modules/capacitor-music-controls-plugin/android/src/main/java/com/ingageco/capacitormusiccontrols/MusicControlsNotificationKiller.java
-index a520f59..6e2454c 100644
+index a520f59..77187bf 100644
 --- a/node_modules/capacitor-music-controls-plugin/android/src/main/java/com/ingageco/capacitormusiccontrols/MusicControlsNotificationKiller.java
 +++ b/node_modules/capacitor-music-controls-plugin/android/src/main/java/com/ingageco/capacitormusiccontrols/MusicControlsNotificationKiller.java
 @@ -3,11 +3,10 @@ package com.ingageco.capacitormusiccontrols;
@@ -1309,15 +1850,73 @@ index a520f59..6e2454c 100644
  	}
  
  	public void clearForeground() {
-@@ -78,7 +81,7 @@ public class MusicControlsNotificationKiller extends Service {
+@@ -78,7 +81,9 @@ public class MusicControlsNotificationKiller extends Service {
  
  		Log.i(TAG, "clearForeground");
  
 -		this.stopForeground(STOP_FOREGROUND_DETACH);
-+		this.stopForeground(true);
++		// Using stopForeground(false) keeps the notification visible and swippable 
++		// when the service leaves the foreground (on pause).
++		this.stopForeground(false);
  	}
  
  }
+diff --git a/node_modules/capacitor-music-controls-plugin/android/src/main/java/com/ingageco/capacitormusiccontrols/MusicControlsServiceConnection.java b/node_modules/capacitor-music-controls-plugin/android/src/main/java/com/ingageco/capacitormusiccontrols/MusicControlsServiceConnection.java
+index 10950ad..3fba81e 100644
+--- a/node_modules/capacitor-music-controls-plugin/android/src/main/java/com/ingageco/capacitormusiccontrols/MusicControlsServiceConnection.java
++++ b/node_modules/capacitor-music-controls-plugin/android/src/main/java/com/ingageco/capacitormusiccontrols/MusicControlsServiceConnection.java
+@@ -9,6 +9,8 @@ import android.os.IBinder;
+ import android.util.Log;
+ 
+ import android.os.Build;
++import android.os.Handler;
++import android.os.Looper;
+ 
+ 
+ public class MusicControlsServiceConnection implements ServiceConnection {
+@@ -16,6 +18,8 @@ public class MusicControlsServiceConnection implements ServiceConnection {
+ 
+     protected MusicControlsNotificationKiller service;
+     protected Activity activity;
++    private Handler handler = new Handler(Looper.getMainLooper());
++    private Runnable clearForegroundRunnable;
+ 
+     MusicControlsServiceConnection(Activity activity) {
+         this.activity = activity;
+@@ -42,12 +46,30 @@ public class MusicControlsServiceConnection implements ServiceConnection {
+             return;
+         }
+ 
+-        Log.i(TAG, "setNotification");
++        Log.i(TAG, "setNotification: isPlaying=" + isPlaying);
+ 
+         if (isPlaying) {
++            if (clearForegroundRunnable != null) {
++                handler.removeCallbacks(clearForegroundRunnable);
++                clearForegroundRunnable = null;
++            }
+             this.service.setForeground(notification, this.activity);
+         } else {
+-            this.service.clearForeground();
++            // Delay clearing foreground to prevent background throttling during track transitions.
++            // This keeps the WebView alive while the next track is loading.
++            if (clearForegroundRunnable == null) {
++                clearForegroundRunnable = new Runnable() {
++                    @Override
++                    public void run() {
++                        if (service != null) {
++                            Log.i(TAG, "Executing delayed clearForeground");
++                            service.clearForeground();
++                        }
++                        clearForegroundRunnable = null;
++                    }
++                };
++                handler.postDelayed(clearForegroundRunnable, 10000);
++            }
+         }
+     }
+ }
+\ No newline at end of file
 diff --git a/node_modules/capacitor-music-controls-plugin/dist/esm/definitions.d.ts b/node_modules/capacitor-music-controls-plugin/dist/esm/definitions.d.ts
 index e987697..79f338c 100644
 --- a/node_modules/capacitor-music-controls-plugin/dist/esm/definitions.d.ts

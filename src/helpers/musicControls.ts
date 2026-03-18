@@ -12,6 +12,15 @@ let _onSeek: (percentage: number) => void = () => {};
 let _listenersRegistered = false;
 let _currentDuration = 0;
 
+// Queue system to prevent bridge congestion
+let bridgeQueue: Promise<any> = Promise.resolve();
+
+const queueAction = <T>(action: () => Promise<T>): Promise<T> => {
+  const next = bridgeQueue.then(() => action());
+  bridgeQueue = next.then(() => { }).catch(() => { }); // Continue queue even on failure
+  return next;
+};
+
 /**
  * Register the background control listeners exactly once.
  * Call this on mount with stable references (or refs).
@@ -71,45 +80,46 @@ export const create = (
   onGoNext: () => void,
   onSeek: (percentage: number) => void = () => {}
 ) => {
+  return queueAction(async () => {
+    elapsedTime = 0;
+    isPlaying = true;
+    _currentDuration = duration;
 
-  elapsedTime = 0;
-  isPlaying = true;
-  _currentDuration = duration;
+    // Store the initial callbacks
+    _onPlay = onPlay;
+    _onPause = onPause;
+    _onGoBack = onGoBack;
+    _onGoNext = onGoNext;
+    _onSeek = onSeek;
 
-  // Store the initial callbacks
-  _onPlay = onPlay;
-  _onPause = onPause;
-  _onGoBack = onGoBack;
-  _onGoNext = onGoNext;
-  _onSeek = onSeek;
+    try {
+      await CapacitorMusicControls.create({
+        track: audio.titulo,
+        artist: "Mente360",
+        album: audio.categoria?.categoria || '',
+        cover: baseURL + audio.imagen,
+        hasPrev: true,
+        hasNext: true,
+        hasClose: true,
+        duration: duration * 1000,
+        elapsed: elapsedTime,
+        hasSkipForward: true,
+        hasSkipBackward: true,
+        skipForwardInterval: 15,
+        skipBackwardInterval: 15,
+        hasScrubbing: true,
+        isPlaying: isPlaying,
+        dismissable: false,
+        ticker: audio.titulo,
+        playIcon: "media_play",
+        pauseIcon: "media_pause",
+        prevIcon: "media_prev",
+        nextIcon: "media_next",
+        closeIcon: "media_close",
+        notificationIcon: "notification",
+      });
 
-  CapacitorMusicControls.create({
-    track: audio.titulo,
-    artist: "Mente360",
-    album: audio.categoria?.categoria || '',
-    cover: baseURL + audio.imagen,
-    hasPrev: true,
-    hasNext: true,
-    hasClose: true,
-    duration: duration * 1000,
-    elapsed: elapsedTime,
-    hasSkipForward: true,
-    hasSkipBackward: true,
-    skipForwardInterval: 15,
-    skipBackwardInterval: 15,
-    hasScrubbing: true, // Enable scrubbing (seeking via the timeline)
-    isPlaying: isPlaying,
-    dismissable: false,
-    ticker: audio.titulo,
-    playIcon: "media_play",
-    pauseIcon: "media_pause",
-    prevIcon: "media_prev",
-    nextIcon: "media_next",
-    closeIcon: "media_close",
-    notificationIcon: "notification",
-  })
-    .then(() => {
-      CapacitorMusicControls.updateElapsed({
+      await CapacitorMusicControls.updateElapsed({
         elapsed: elapsedTime,
         isPlaying: true,
       });
@@ -127,63 +137,79 @@ export const create = (
           handleControlsEvent(info, _onPlay, _onPause, _onGoBack, _onGoNext, _onSeek);
         });
       }
-    })
-    .catch((e) => {
-      console.error(e);
-    });
+    } catch (e) {
+      console.error("MusicControls.create error:", e);
+    }
+  });
 };
 
-export const updateTrack = (baseURL: string, audio: any, duration: number) => {
-  elapsedTime = 0;
-  isPlaying = true;
-  _currentDuration = duration;
+export const updateTrack = (baseURL: string, audio: any, duration: number, playState?: boolean) => {
+  return queueAction(async () => {
+    if (duration === 0) {
+      elapsedTime = 0;
+    }
+    const nextPlaying = playState !== undefined ? playState : isPlaying;
+    _currentDuration = duration;
 
-  // Call the new native updateTrack method so it only updates info without destroying the notification
-  (CapacitorMusicControls as any).updateTrack({
-    track: audio.titulo,
-    artist: "Mente360",
-    album: audio.categoria?.categoria || '',
-    cover: baseURL + audio.imagen,
-    hasPrev: true,
-    hasNext: true,
-    hasClose: true,
-    duration: (duration > 0 ? duration : 1) * 1000,
-    elapsed: 0,
-    hasSkipForward: true,
-    hasSkipBackward: true,
-    skipForwardInterval: 15,
-    skipBackwardInterval: 15,
-    hasScrubbing: true,
-    isPlaying: true,
-    dismissable: false,
-    ticker: audio.titulo,
-    playIcon: "media_play",
-    pauseIcon: "media_pause",
-    prevIcon: "media_prev",
-    nextIcon: "media_next",
-    closeIcon: "media_close",
-    notificationIcon: "notification",
-  }).catch((e: any) => {
-    console.error("updateTrack native error", e);
+    try {
+      await (CapacitorMusicControls as any).updateTrack({
+        track: audio.titulo,
+        artist: "Mente360",
+        album: audio.categoria?.categoria || '',
+        cover: baseURL + audio.imagen,
+        hasPrev: true,
+        hasNext: true,
+        hasClose: true,
+        duration: (duration > 0 ? duration : 1) * 1000,
+        elapsed: elapsedTime,
+        hasSkipForward: true,
+        hasSkipBackward: true,
+        skipForwardInterval: 15,
+        skipBackwardInterval: 15,
+        hasScrubbing: true,
+        isPlaying: nextPlaying,
+        dismissable: false,
+        ticker: audio.titulo,
+        playIcon: "media_play",
+        pauseIcon: "media_pause",
+        prevIcon: "media_prev",
+        nextIcon: "media_next",
+        closeIcon: "media_close",
+        notificationIcon: "notification",
+      });
+      isPlaying = nextPlaying;
+    } catch (e: any) {
+      console.error("updateTrack bridge error", e);
+    }
   });
 };
 
 export const updateElapsed = (currentTime: number) => {
-  elapsedTime = currentTime * 1000;
-  try {
-    CapacitorMusicControls.updateElapsed({
-      elapsed: elapsedTime,
-      isPlaying: isPlaying,
-    });
-  } catch (e) {
-    console.error("Error updating elapsed:", e);
-  }
+  // Critical: we don't await elapsed updates inside the UI loop to avoid lag, 
+  // but we still queue them so they don't overlap with track changes.
+  queueAction(async () => {
+    elapsedTime = currentTime * 1000;
+    try {
+      await CapacitorMusicControls.updateElapsed({
+        elapsed: elapsedTime,
+        isPlaying: isPlaying,
+      });
+    } catch (e) {
+      console.error("Error updating elapsed:", e);
+    }
+  });
 };
 
 export const toggle = (_isPlaying = true, _elapsed?: number) => {
-  isPlaying = _isPlaying;
-  if (_elapsed !== undefined) elapsedTime = _elapsed;
-  CapacitorMusicControls.updateElapsed({ isPlaying: _isPlaying, elapsed: elapsedTime });
+  return queueAction(async () => {
+    isPlaying = _isPlaying;
+    if (_elapsed !== undefined) elapsedTime = _elapsed;
+    try {
+      await CapacitorMusicControls.updateElapsed({ isPlaying: _isPlaying, elapsed: elapsedTime });
+    } catch (e) {
+      console.error("Error in toggle bridge call:", e);
+    }
+  });
 };
 
 export const handleControlsEvent = (
@@ -251,6 +277,16 @@ export const handleControlsEvent = (
 };
 
 export const destroy = () => {
-  _listenersRegistered = false;
-  CapacitorMusicControls.destroy();
+  if (!_listenersRegistered && !isPlaying) return Promise.resolve(); // Already destroyed or never created
+  
+  return queueAction(async () => {
+    _listenersRegistered = false;
+    elapsedTime = 0;
+    isPlaying = false;
+    try {
+      await (CapacitorMusicControls as any).destroy();
+    } catch (e) {
+      console.error("Error destroying music controls:", e);
+    }
+  });
 };
