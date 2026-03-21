@@ -1,10 +1,9 @@
 import { useChat } from "@/hooks/useChat";
-import React from "react";
 import { useSelector } from "react-redux";
 import { Interacciones } from "../../Interacciones";
 import { Item } from "./Item";
 
-export const Interno: React.FC<any> = ({ roomID, setReplyTo }) => {
+export const Interno = ({ roomID, setReplyTo, initialMessageId }: any) => {
   const { user } = useSelector((state: any) => state.user);
 
   const {
@@ -17,7 +16,10 @@ export const Interno: React.FC<any> = ({ roomID, setReplyTo }) => {
     setPopoverEvent,
     onScrollToMessage,
     setPendingScrollId,
-  } = useChat({ basePath: roomID ? `rooms/${roomID}` : "" });
+  } = useChat({
+    basePath: roomID ? `rooms/${roomID}` : "",
+    initialMessageId: initialMessageId
+  });
 
   return (
     <div

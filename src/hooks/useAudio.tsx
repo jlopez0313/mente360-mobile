@@ -3,6 +3,7 @@ import Playlist from "@/database/playlist";
 import { toggle, updateElapsed } from "@/helpers/musicControls";
 import { add, trash } from "@/services/playlist";
 import { selectBaseURL, selectIsGlobalPlaying, selectMyCurrentTime, setIsGlobalPlaying, updateCurrentTime } from "@/store/slices/audioSlice";
+import { Capacitor } from "@capacitor/core";
 import { Directory, Filesystem } from "@capacitor/filesystem";
 import { Share } from "@capacitor/share";
 import { useEffect, useRef, useState } from "react";
@@ -117,35 +118,32 @@ export const useAudio: any = (audio: any, onConfirm: any = () => { }, options: {
     }
   };
 
-  const convertBlobToBase64 = async (blob: Blob): Promise<string> => {
-    const arrayBuffer = await blob.arrayBuffer();
-    let binary = "";
-    const bytes = new Uint8Array(arrayBuffer);
-    const len = bytes.byteLength;
-    for (let i = 0; i < len; i++) {
-      binary += String.fromCharCode(bytes[i]);
-    }
-    return btoa(binary);
-  };
-
-  const base64ToBlob = (base64: string, mimeType: string) => {
-    const byteCharacters = atob(base64);
-    const byteNumbers = new Uint8Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-    return new Blob([byteNumbers], { type: mimeType });
-  };
-
-  const getDownloadedAudio = async (filePath: string) => {
-    const file = await Filesystem.readFile({
-      path: filePath,
-      directory: Directory.Data,
+  const convertBlobToBase64 = (blob: Blob): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = reject;
+      reader.onload = () => {
+        const result = reader.result as string;
+        const base64String = result.split(",")[1];
+        resolve(base64String);
+      };
+      reader.readAsDataURL(blob);
     });
 
-    const ext = filePath.split(".").pop();
-    const blob = base64ToBlob(`${file.data}`, `audio/${ext}`);
-    return URL.createObjectURL(blob);
+
+
+  const getDownloadedAudio = async (filePath: string) => {
+    try {
+      const uri = await Filesystem.getUri({
+        path: filePath,
+        directory: Directory.Data,
+      });
+
+      return Capacitor.convertFileSrc(uri.uri);
+    } catch (error) {
+      console.error("Error al obtener el audio descargado:", error);
+      return "";
+    }
   };
 
   const onShareLink = async (id: any) => {

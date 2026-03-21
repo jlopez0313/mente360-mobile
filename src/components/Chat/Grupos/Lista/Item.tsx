@@ -22,7 +22,7 @@ export const Item = ({ grupo }: any) => {
   const dispatch = useDispatch();
   const { user } = useSelector((state: any) => state.user);
 
-  const [isLoading, setIsLoading] = useState(true);
+
   const [lastMsg, setLastMsg] = useState<any>(null);
   const [unreads, setUnreads] = useState<any>(0);
   const [isWriting, setIsWriting] = useState<any>(null);
@@ -131,8 +131,8 @@ export const Item = ({ grupo }: any) => {
           src={baseURL + grupo.photo}
           alt={grupo.grupo}
         />
-        <AvatarFallback className="bg-secondary text-secondary-foreground">
-          {grupo.grupo.charAt(0)}
+        <AvatarFallback className="bg-primary/10 text-primary">
+          {grupo?.grupo?.charAt(0) || ""}
         </AvatarFallback>
       </Avatar>
       <div className="flex-1 min-w-0">

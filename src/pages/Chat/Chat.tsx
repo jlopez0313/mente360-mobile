@@ -83,15 +83,13 @@ const Lista: React.FC = () => {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="chats" className="space-y-2">
-              <ChatComponent />
+            <TabsContent value="chats" className="m-0 focus-visible:outline-none">
+              <ChatComponent searchQuery={searchQuery} />
             </TabsContent>
-
-            <TabsContent value="groups" className="space-y-2">
-              <GruposComponent />
+            <TabsContent value="groups" className="m-0 focus-visible:outline-none">
+              <GruposComponent searchQuery={searchQuery} />
             </TabsContent>
-
-            <TabsContent value="community" className="space-y-6">
+            <TabsContent value="contacts" className="m-0 focus-visible:outline-none">
               <ContactosComponent searchQuery={searchQuery} />
             </TabsContent>
           </Tabs>

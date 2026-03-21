@@ -14,8 +14,10 @@ import { Plus, Users } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { CrearGrupoModal } from "./CrearGrupoModal";
 import { Item } from "./Item";
+import { useChatSearch } from "@/hooks/useChatSearch";
+import { MessageSearchResult } from "../../MessageSearchResult";
 
-export const Lista = () => {
+export const Lista = ({ searchQuery = "" }: { searchQuery?: string }) => {
   const { user } = useSelector((state: any) => state.user);
 
   const dispatch = useDispatch();
@@ -23,13 +25,20 @@ export const Lista = () => {
   const [grupos, setGrupos] = useState<any>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const { results: searchResults, loading: searchLoading } = useChatSearch({
+    userId: user.id || "",
+    query: searchQuery,
+    type: "groups",
+  });
+
   const filteredGrupos = useMemo(() => {
+    if (searchQuery) return [];
     return [...grupos].sort((a, b) => {
       const aDate = a.lastMessageDate ? new Date(a.lastMessageDate).getTime() : 0;
       const bDate = b.lastMessageDate ? new Date(b.lastMessageDate).getTime() : 0;
       return bDate - aDate;
     });
-  }, [grupos]);
+  }, [grupos, searchQuery]);
 
   const listenersRef = useRef<any>({});
   const gruposRef = useRef<Record<string, any>>({});
@@ -96,8 +105,8 @@ export const Lista = () => {
                   ...processedGrupo,
                 };
 
-                setGrupos((prev) =>
-                  prev.map((u) =>
+                setGrupos((prev: any) =>
+                  prev.map((u: any) =>
                     u.id === grupoData.id ? { ...u, ...processedGrupo } : u
                   )
                 );
@@ -128,7 +137,27 @@ export const Lista = () => {
 
   return (
     <>
-      {filteredGrupos.length === 0 ? (
+      {searchQuery ? (
+        searchLoading ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground animate-pulse">Buscando...</p>
+          </div>
+        ) : searchResults.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">No se encontraron resultados</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {searchResults.map((result) => (
+              result.matchType === "name" ? (
+                <Item key={result.id} grupo={{ id: result.id, grupo: result.name, photo: result.photo }} />
+              ) : (
+                <MessageSearchResult key={result.messageId} result={result} query={searchQuery} />
+              )
+            ))}
+          </div>
+        )
+      ) : filteredGrupos.length === 0 ? (
         <div className="text-center py-12">
           <Users className="w-12 h-12 text-muted-foreground/50 mx-auto mb-3" />
           <p className="text-muted-foreground">No hay grupos</p>

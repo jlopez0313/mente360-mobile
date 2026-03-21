@@ -1,10 +1,9 @@
 import { useChat } from "@/hooks/useChat";
-import React from "react";
 import { useSelector } from "react-redux";
 import { Interacciones } from "../../Interacciones";
 import { Item } from "./Item";
 
-export const Grupo: React.FC<any> = ({ grupoID, setReplyTo }) => {
+export const Grupo = ({ grupoID, setReplyTo, initialMessageId }: any) => {
   const { user } = useSelector((state: any) => state.user);
 
   const {
@@ -21,6 +20,7 @@ export const Grupo: React.FC<any> = ({ grupoID, setReplyTo }) => {
   } = useChat({
     basePath: grupoID ? `grupos/${grupoID}` : "",
     withUsers: true,
+    initialMessageId: initialMessageId
   });
 
   return (

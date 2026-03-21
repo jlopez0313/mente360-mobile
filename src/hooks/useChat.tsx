@@ -5,11 +5,12 @@ import { useEffect, useRef, useState } from "react";
 interface UseChatProps {
     basePath: string; // "rooms/ROOMID" or "grupos/GRUPOID"
     withUsers?: boolean; // If true, listen to global "users" ref
+    initialMessageId?: string | null;
 }
 
 const PAGINATION_LIMIT = 20;
 
-export const useChat = ({ basePath, withUsers = false }: UseChatProps) => {
+export const useChat = ({ basePath, withUsers = false, initialMessageId = null }: UseChatProps) => {
     const chatListRef = useRef<HTMLDivElement | null>(null);
     const topSentinelRef = useRef<HTMLDivElement | null>(null);
 
@@ -98,16 +99,34 @@ export const useChat = ({ basePath, withUsers = false }: UseChatProps) => {
         }
 
         const loadInitial = async () => {
-            const baseQuery = await queryTo(`${basePath}/messages`, {
-                orderBy: "date",
-                limit: PAGINATION_LIMIT,
-                direction: "last",
-            });
-            const snapshot = await getQuery(baseQuery);
-            const initialMessages = snapshotToArray(snapshot.val());
-            setMessages(initialMessages);
-
-            requestAnimationFrame(scrollToBottom);
+            if (initialMessageId) {
+                // If we have an initial message, load messages around it or from it
+                // To keep it simple, we'll load from the start of that message's room/node 
+                // up to the latest or at least a good chunk.
+                // For now, let's load the latest 100 messages if initialMessageId is present
+                // and then scroll to it.
+                const baseQuery = await queryTo(`${basePath}/messages`, {
+                    orderBy: "date",
+                    limit: 100, // Load a larger chunk to ensure the message is there
+                    direction: "last",
+                });
+                const snapshot = await getQuery(baseQuery);
+                const initialMessages = snapshotToArray(snapshot.val());
+                setMessages(initialMessages);
+                
+                // Trigger scroll to the specific message
+                setPendingScrollId(initialMessageId);
+            } else {
+                const baseQuery = await queryTo(`${basePath}/messages`, {
+                    orderBy: "date",
+                    limit: PAGINATION_LIMIT,
+                    direction: "last",
+                });
+                const snapshot = await getQuery(baseQuery);
+                const initialMessages = snapshotToArray(snapshot.val());
+                setMessages(initialMessages);
+                requestAnimationFrame(scrollToBottom);
+            }
             firstLoad.current = false;
         };
 

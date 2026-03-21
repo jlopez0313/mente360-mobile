@@ -5,10 +5,10 @@ export const useBackButton = (route: string) => {
   const history = useHistory();
 
   useEffect(() => {
-    const handleBackButton = (ev: Event) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      history.replace(route);
+    const handleBackButton = (ev: any) => {
+      ev.detail.register(10, () => {
+        history.replace(route);
+      });
     };
 
     document.addEventListener("ionBackButton", handleBackButton);
@@ -16,7 +16,7 @@ export const useBackButton = (route: string) => {
     return () => {
       document.removeEventListener("ionBackButton", handleBackButton);
     };
-  }, [history]);
+  }, [history, route]);
 
   return { history };
 };

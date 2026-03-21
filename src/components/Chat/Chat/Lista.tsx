@@ -2,14 +2,16 @@ import { queryTo, readData, snapshotToArray } from "@/services/realtime-db";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { setRoom } from "@/store/slices/notificationSlice";
+import { useChatSearch } from "@/hooks/useChatSearch";
 import { setTab } from "@/store/slices/chatSlice";
+import { setRoom } from "@/store/slices/notificationSlice";
 import { onValue } from "firebase/database";
 import { MessageCircle, UserPlus } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
+import { MessageSearchResult } from "../MessageSearchResult";
 import { Item } from "./Item";
 
-export const Lista = () => {
+export const Lista = ({ searchQuery = "" }: { searchQuery?: string }) => {
   const { user } = useSelector((state: any) => state.user);
   const dispatch = useDispatch();
 
@@ -17,13 +19,21 @@ export const Lista = () => {
   const usersRef = useRef<Record<string, any>>({});
 
   const [users, setUsers] = useState<any[]>([]);
+
+  const { results: searchResults, loading: searchLoading } = useChatSearch({
+    userId: user.id || "",
+    query: searchQuery,
+    type: "chats",
+  });
+
   const filteredUsers = useMemo(() => {
+    if (searchQuery) return []; // Hide normal list when searching
     return [...users].sort((a, b) => {
       const aDate = a.lastMessageDate ? new Date(a.lastMessageDate).getTime() : 0;
       const bDate = b.lastMessageDate ? new Date(b.lastMessageDate).getTime() : 0;
       return bDate - aDate;
     });
-  }, [users]);
+  }, [users, searchQuery]);
 
   useEffect(() => {
     let unsubRooms: any;
@@ -101,15 +111,38 @@ export const Lista = () => {
     };
   }, []);
 
-  const content = filteredUsers.length === 0 ? (
+  const content = searchQuery ? (
+    searchLoading ? (
+      <div className="text-center py-12">
+        <p className="text-muted-foreground animate-pulse">Buscando...</p>
+      </div>
+    ) : searchResults.length === 0 ? (
+      <div className="text-center py-12">
+        <p className="text-muted-foreground">No se encontraron resultados</p>
+      </div>
+    ) : (
+      <div className="space-y-3">
+        {searchResults.map((result) => (
+          result.matchType === "name" ? (
+            // Convert search result back to user-like object for Item
+            <Item key={result.id} usuario={{ id: result.id, name: result.name, photo: result.photo }} />
+          ) : (
+            <MessageSearchResult key={result.messageId} result={result} query={searchQuery} />
+          )
+        ))}
+      </div>
+    )
+  ) : filteredUsers.length === 0 ? (
     <div className="text-center py-12">
       <MessageCircle className="w-12 h-12 text-muted-foreground/50 mx-auto mb-3" />
       <p className="text-muted-foreground">No hay chats</p>
     </div>
   ) : (
-    filteredUsers.map((usuario: any) => (
-      <Item key={usuario.id} usuario={usuario} />
-    ))
+    <div className="space-y-3">
+      {filteredUsers.map((usuario: any) => (
+        <Item key={usuario.id} usuario={usuario} />
+      ))}
+    </div>
   );
 
   return (

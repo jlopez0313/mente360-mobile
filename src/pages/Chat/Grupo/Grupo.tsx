@@ -1,4 +1,4 @@
-import { Link, useHistory, useParams } from "react-router-dom";
+import { Link, useHistory, useParams, useLocation } from "react-router-dom";
 
 import { useContext, useEffect, useState } from "react";
 
@@ -50,6 +50,10 @@ const Grupo: React.FC = () => {
   const history = useHistory();
 
   const { id: groupId } = useParams<any>();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const msgId = queryParams.get('msgId');
+  
   const [newMessage, setNewMessage] = useState("");
 
   const [removed, setRemoved] = useState(false);
@@ -60,15 +64,10 @@ const Grupo: React.FC = () => {
   const [otherUser, setOtherUser] = useState<any>({});
   const [showEmojiModal, setShowEmojiModal] = useState(false);
 
-  const [selectedContact, setSelectedContact] = useState<any>(null);
-  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [showMembers, setShowMembers] = useState(false);
   const [showAddMember, setShowAddMember] = useState(false);
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
 
-  const goToDetalle = () => {
-    history.replace("/grupo/info/" + groupId);
-  };
 
   const onCheckInput = async (e: any) => {
     setNewMessage(e.target.value);
@@ -150,7 +149,6 @@ const Grupo: React.FC = () => {
   useEffect(() => {
     let unsubRoom: any;
     let unsubTyping: any;
-    let unsubUsers: any;
 
     const onGetRoom = async () => {
       unsubRoom = onValue(readData(`grupos/${groupId}`), async (snapshot) => {
@@ -179,8 +177,8 @@ const Grupo: React.FC = () => {
     onGetRoom();
 
     return () => {
-      unsubRoom();
-      unsubTyping();
+      unsubRoom && unsubRoom();
+      unsubTyping && unsubTyping();
     };
   }, [groupId]);
 
@@ -260,7 +258,7 @@ const Grupo: React.FC = () => {
                 alt={grupo?.grupo}
               />
               <AvatarFallback className="bg-secondary text-secondary-foreground">
-                {grupo?.grupo.charAt(0)}
+                {grupo?.grupo?.charAt(0) || ""}
               </AvatarFallback>
             </Avatar>
 
@@ -310,7 +308,7 @@ const Grupo: React.FC = () => {
         </div>
 
         {/* Messages */}
-        <GrupoComponent grupoID={groupId} setReplyTo={setReplyTo} />
+        <GrupoComponent grupoID={groupId} setReplyTo={setReplyTo} initialMessageId={msgId} />
 
         {/* Input */}
         {/* Input */}
@@ -338,11 +336,13 @@ const Grupo: React.FC = () => {
         setShowEmojiModal={setShowEmojiModal}
       />
 
+      {/*
       <ContactDetailModal
         contact={selectedContact}
         open={isContactModalOpen}
         onOpenChange={setIsContactModalOpen}
       />
+      */}
 
       <GroupMembersSheet
         open={showMembers}

@@ -15,7 +15,7 @@ import {
     setIsGlobalPlaying
 } from "@/store/slices/audioSlice";
 import { useLiveQuery } from "dexie-react-hooks";
-import { useContext, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
@@ -36,6 +36,7 @@ export const useAudioPlayer = (track: Clips | null, idx?: number, isGlobal: bool
     const isCurrentlyPlayingGlobalTrack = isGlobal ? (track ? (globalAudio?.id === track.id) : true) : false;
 
     const audioRef = useRef<HTMLAudioElement | null>(null);
+    const [resolvedLocalSrc, setResolvedLocalSrc] = useState<string | null>(null);
 
     const {
         progress,
@@ -89,6 +90,15 @@ export const useAudioPlayer = (track: Clips | null, idx?: number, isGlobal: bool
             .first();
         return result;
     }, [user?.id, activeTrack?.id]);
+
+    // Resolve local path if it exists
+    useEffect(() => {
+        if (activeTrack?.audio_local) {
+            getDownloadedAudio(activeTrack.audio_local).then(setResolvedLocalSrc);
+        } else {
+            setResolvedLocalSrc(null);
+        }
+    }, [activeTrack?.audio_local]);
 
     // ===============================
     // LIKES
@@ -148,8 +158,8 @@ export const useAudioPlayer = (track: Clips | null, idx?: number, isGlobal: bool
         } else {
             if (isGlobal) {
                 if (activeTrack.audio_local) {
-                    const audioBlob = await getDownloadedAudio(activeTrack.audio_local);
-                    dispatch(setAudioSrc(audioBlob));
+                    const localPath = resolvedLocalSrc || await getDownloadedAudio(activeTrack.audio_local);
+                    dispatch(setAudioSrc(localPath));
                 } else {
                     dispatch(setAudioSrc(baseURL + activeTrack.audio));
                 }
@@ -217,7 +227,10 @@ export const useAudioPlayer = (track: Clips | null, idx?: number, isGlobal: bool
     };
 
     const getAudioSrc = () => {
-        return activeTrack?.audio_local ? activeTrack.audio_local : baseURL + activeTrack?.audio;
+        if (activeTrack?.audio_local && resolvedLocalSrc) {
+            return resolvedLocalSrc;
+        }
+        return activeTrack?.audio ? baseURL + activeTrack.audio : "";
     }
 
 

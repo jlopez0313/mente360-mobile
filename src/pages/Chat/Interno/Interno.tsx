@@ -18,10 +18,13 @@ import { onValue } from "firebase/database";
 import { ArrowLeft } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useLocation } from "react-router-dom";
 
 const Interno: React.FC = () => {
   const { room } = useParams<any>();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const msgId = queryParams.get('msgId');
   const { user } = useSelector((state: any) => state.user);
   const { status, baseURL, AvatarLogo } = useContext(NetworkContext);
 
@@ -123,9 +126,9 @@ const Interno: React.FC = () => {
     onGetRoom();
 
     return () => {
-      unsubRoom();
-      unsubUsers();
-      unsubTyping();
+      unsubRoom && unsubRoom();
+      unsubUsers && unsubUsers();
+      unsubTyping && unsubTyping();
     };
   }, [room]);
 
@@ -187,7 +190,7 @@ const Interno: React.FC = () => {
                   alt={otherUser?.name}
                 />
                 <AvatarFallback className="bg-primary/10 text-primary">
-                  {otherUser?.name.charAt(0)}
+                  {otherUser?.name?.charAt(0) || ""}
                 </AvatarFallback>
               </Avatar>
               {dataUserRoom?.exit_time ? null : (
@@ -227,7 +230,7 @@ const Interno: React.FC = () => {
         </div>
 
         {/* Messages */}
-        <InternoComponent roomID={room} setReplyTo={setReplyTo} />
+        <InternoComponent roomID={room} setReplyTo={setReplyTo} initialMessageId={msgId} />
 
         {/* Input */}
         {/* Input */}

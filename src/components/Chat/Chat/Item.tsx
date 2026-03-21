@@ -22,11 +22,11 @@ export const Item = ({ usuario }: any) => {
   const history = useHistory();
   const dispatch = useDispatch();
 
-  const [isLoading, setIsLoading] = useState(true);
+
   const [lastMsg, setLastMsg] = useState<any>(null);
   const [isWriting, setIsWriting] = useState<any>(false);
   const [unreads, setUnreads] = useState<any>(0);
-  const [showProfileModal, setShowProfileModal] = useState(false);
+
   const [selectedContact, setSelectedContact] = useState<any | null>(null);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
@@ -146,7 +146,7 @@ export const Item = ({ usuario }: any) => {
             alt={usuario?.name}
           />
           <AvatarFallback className="bg-primary/10 text-primary">
-            {usuario?.name.charAt(0)}
+            {usuario?.name?.charAt(0) || ""}
           </AvatarFallback>
         </Avatar>
         {usuario?.isOnline && (

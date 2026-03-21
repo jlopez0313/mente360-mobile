@@ -11,7 +11,6 @@ import { Undo2 } from "lucide-react";
 import React, { useContext, useState } from "react";
 
 export const Item: React.FC<any> = ({
-  index,
   message,
   usuarios,
   setReplyTo,
@@ -126,8 +125,8 @@ export const Item: React.FC<any> = ({
                   }
                   alt={onGetSender(message.user)?.name}
                 />
-                <AvatarFallback className="text-xs bg-primary/10 text-primary">
-                  {onGetSender(message.user)?.name?.charAt(0)}
+                <AvatarFallback className="bg-primary/10 text-primary uppercase font-bold text-[10px]">
+                  {onGetSender(message.user)?.name?.charAt(0) || ""}
                 </AvatarFallback>
               </Avatar>
             )}
