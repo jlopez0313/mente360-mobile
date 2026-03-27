@@ -247,7 +247,7 @@ const Grupo: React.FC = () => {
           <div className="flex items-center gap-3">
             <Link to={`/chat/`} replace={true}>
               <Button variant="ghost" size="icon">
-                <ArrowLeft className="w-5 h-5" />
+                <ArrowLeft className="w-5 h-5 text-foreground" />
               </Button>
             </Link>
 

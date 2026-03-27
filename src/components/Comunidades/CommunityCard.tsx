@@ -17,6 +17,7 @@ import { useContext, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import { CommunityPlanModal } from "./CommunityPlanModal";
+import { ExpandableText } from "../Shared/ExpandableText";
 
 type Props = {
   community: Comunidades;
@@ -32,7 +33,6 @@ export const CommunityCard = ({ community }: Props) => {
   const { user } = useSelector((state: any) => state.user);
 
   const [showPlanModal, setShowPlanModal] = useState(false);
-  const [expandido, setExpandido] = useState(false);
 
   const plan = useLiveQuery(() =>
     db.planes.where("key").equals("COMUNIDAD").first()
@@ -101,21 +101,29 @@ export const CommunityCard = ({ community }: Props) => {
       <CardContent className="p-0">
         {/* Header with image */}
         <div className="relative h-40 bg-gradient-to-r from-primary/20 to-secondary/20">
-          <iframe
-            className="w-full h-full object-cover"
-            src={getYoutubeLink(community?.video)}
-            title="YouTube video player"
-            allowFullScreen
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-            }}
-          ></iframe>
+          {status ? (
+            <iframe
+              className="w-full h-full object-cover"
+              src={getYoutubeLink(community?.video)}
+              title="YouTube video player"
+              allowFullScreen
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+              }}
+            ></iframe>
+          ) : (
+            <img
+              src={AudioNoWifi}
+              alt="Sin conexión"
+              className="w-full h-full object-cover"
+            />
+          )}
 
           {/* Premium Badge */}
           {!hasSuscription && (
@@ -158,21 +166,10 @@ export const CommunityCard = ({ community }: Props) => {
             </div>
           </div>
 
-          <p
-            className={cn(
-              "text-sm text-muted-foreground mb-0",
-              expandido ? "line-clamp-none" : "line-clamp-2"
-            )}
-          >
-            {community.descripcion}
-          </p>
-
-          <button
-            className="text-sm text-primary underline hover:opacity-80 transition"
-            onClick={() => setExpandido(!expandido)}
-          >
-            {expandido ? "Leer menos" : "Leer más"}
-          </button>
+          <ExpandableText
+            text={community.descripcion || ""}
+            maxLines={2}
+          />
 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1 text-muted-foreground">

@@ -5,7 +5,6 @@ import Niveles from "@/database/niveles";
 import { startBackground } from "@/helpers/background";
 import { create, destroy, updateCallbacks, updateTrack } from "@/helpers/musicControls";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
-import { cn } from "@/lib/utils";
 import {
   Download,
   Pause,
@@ -14,7 +13,8 @@ import {
   SkipForward,
   Trash2,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
+import { ExpandableText } from "../Shared/ExpandableText";
 
 interface Props {
   crecimientos: Crecimientos[];
@@ -35,7 +35,6 @@ export const Crecimiento = ({
   onSaveNext,
   setCurrentAudio,
 }: Props) => {
-  const [expandido, setExpandido] = useState(false);
 
   const {
     activeTrack,
@@ -138,19 +137,10 @@ export const Crecimiento = ({
           <span className="text-center text-xs font-heading text-foreground">
             {nivel?.nivel}
           </span>
-          <p className={cn(
-            "text-sm text-muted-foreground mb-0",
-            expandido ? "line-clamp-none" : "line-clamp-2"
-          )}>
-            {activeTrack?.descripcion}
-          </p>
-
-          <button
-            className="text-sm text-primary underline hover:opacity-80 transition"
-            onClick={() => setExpandido(!expandido)}
-          >
-            {expandido ? "Leer menos" : "Leer más"}
-          </button>
+          <ExpandableText
+            text={activeTrack?.descripcion || ""}
+            maxLines={2}
+          />
 
           {/* Level Selector */}
           <div className="flex justify-center pt-4">

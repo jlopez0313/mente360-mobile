@@ -3,14 +3,13 @@ import { diferenciaRealEnDias, formatCompleteDate } from "@/helpers/Fechas";
 import { formatCurrency } from "@/helpers/Format";
 import { cn } from "@/lib/utils";
 import { CalendarClock, CheckCircle2, Users, XCircle } from "lucide-react";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { useSelector } from "react-redux";
+import { ExpandableText } from "../Shared/ExpandableText";
 
 const Suscripcion = ({ comunidad }: any) => {
   const { baseURL, status, AudioNoWifi } = useContext(NetworkContext);
   const { user } = useSelector((state: any) => state.user);
-
-  const [expandido, setExpandido] = useState(false);
 
   const getSuscripcion = (comunidadID: number) => {
     const suscripcion = user.suscripciones.find(
@@ -48,11 +47,11 @@ const Suscripcion = ({ comunidad }: any) => {
       <div
         className={cn(
           "px-4 py-2 flex items-center justify-between",
-          suscripcion?.remaining > 0 ? "bg-primary/10" : "bg-muted"
+          (suscripcion?.remaining || 0) > 0 ? "bg-primary/10" : "bg-muted"
         )}
       >
         <div className="flex items-center gap-2">
-          {suscripcion?.remaining > 0 ? (
+          {(suscripcion?.remaining || 0) > 0 ? (
             <CheckCircle2 className="w-4 h-4 text-primary" />
           ) : (
             <XCircle className="w-4 h-4 text-muted-foreground" />
@@ -60,12 +59,12 @@ const Suscripcion = ({ comunidad }: any) => {
           <span
             className={cn(
               "text-xs font-semibold uppercase tracking-wide",
-              suscripcion?.remaining > 0
+              (suscripcion?.remaining || 0) > 0
                 ? "text-primary"
                 : "text-muted-foreground"
             )}
           >
-            {suscripcion?.remaining > 0 ? "Activa" : "Expirada"}
+            {(suscripcion?.remaining || 0) > 0 ? "Activa" : "Expirada"}
           </span>
         </div>
         <span className="text-xs text-muted-foreground"></span>
@@ -95,21 +94,10 @@ const Suscripcion = ({ comunidad }: any) => {
             <h3 className="font-semibold text-foreground truncate !m-0">
               {comunidad.comunidad}
             </h3>
-            <p
-              className={cn(
-                "text-sm text-muted-foreground mb-0",
-                expandido ? "line-clamp-none" : "line-clamp-1"
-              )}
-            >
-              {comunidad.descripcion}
-            </p>
-
-            <button
-              className="text-sm text-primary underline hover:opacity-80 transition"
-              onClick={() => setExpandido(!expandido)}
-            >
-              {expandido ? "Leer menos" : "Leer más"}
-            </button>
+            <ExpandableText
+              text={comunidad.descripcion || ""}
+              maxLines={1}
+            />
 
             {/* Price */}
             {

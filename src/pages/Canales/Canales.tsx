@@ -6,20 +6,18 @@ import { Button } from "@/components/ui/button";
 import { NetworkContext } from "@/context/NetworkContext";
 import { getYoutubeLink, goToYoutube } from "@/helpers/Video";
 import { useBackButton } from "@/hooks/useBackButton";
-import { db } from "@/hooks/useDexie";
-import { cn } from "@/lib/utils";
 import { useLiveQuery } from "dexie-react-hooks";
+import { db } from "@/hooks/useDexie";
 import { ArrowLeft, GraduationCap, Play, Users } from "lucide-react";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { useHistory, useParams } from "react-router-dom";
+import { ExpandableText } from "@/components/Shared/ExpandableText";
 
 const Canales: React.FC = () => {
   const { id } = useParams<any>();
   const history = useHistory();
 
   const { AudioNoWifi, baseURL, status } = useContext(NetworkContext);
-
-  const [expandido, setExpandido] = useState(false);
 
   const community = useLiveQuery(
     () => db.comunidades.filter((c) => c.id == id).first(),
@@ -43,21 +41,29 @@ const Canales: React.FC = () => {
       <div className="h-full flex flex-col">
         {/* Header Image */}
         <div className="relative h-50 bg-gradient-primary">
-          <iframe
-            className="w-full h-full object-cover"
-            src={getYoutubeLink(community?.video)}
-            title="YouTube video player"
-            allowFullScreen
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-            }}
-          ></iframe>
+          {status ? (
+            <iframe
+              className="w-full h-full object-cover"
+              src={getYoutubeLink(community?.video)}
+              title="YouTube video player"
+              allowFullScreen
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+              }}
+            ></iframe>
+          ) : (
+            <img
+              src={AudioNoWifi}
+              alt="Sin conexión"
+              className="w-full h-full object-cover"
+            />
+          )}
 
           {/* Back button */}
           <Button
@@ -66,7 +72,7 @@ const Canales: React.FC = () => {
             size="icon"
             className="absolute top-4 left-4 bg-background/80 backdrop-blur-sm hover:bg-background"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-5 h-5 text-foreground" />
           </Button>
 
           {/* Community Info Overlay */}
@@ -128,21 +134,10 @@ const Canales: React.FC = () => {
             <h2 className="font-heading font-semibold text-foreground mb-2">
               Sobre esta comunidad
             </h2>
-            <p
-              className={cn(
-                "text-sm text-muted-foreground leading-relaxed mb-0",
-                expandido ? "line-clamp-none" : "line-clamp-2"
-              )}
-            >
-              {community?.descripcion}
-            </p>
-
-            <button
-              className="text-sm text-primary underline hover:opacity-80 transition"
-              onClick={() => setExpandido(!expandido)}
-            >
-              {expandido ? "Leer menos" : "Leer más"}
-            </button>
+            <ExpandableText
+              text={community?.descripcion || ""}
+              maxLines={2}
+            />
           </div>
 
           {/* Channels */}
@@ -166,7 +161,7 @@ const Canales: React.FC = () => {
           <div>
             <h2 className="font-heading font-semibold text-foreground mb-3 flex items-center gap-2">
               <GraduationCap className="w-5 h-5 text-primary" />
-              Programas de Formación
+              Programas de Mentoría
             </h2>
 
             <div className="space-y-2">

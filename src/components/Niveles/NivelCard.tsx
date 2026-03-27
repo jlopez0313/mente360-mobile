@@ -1,12 +1,12 @@
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { NetworkContext } from "@/context/NetworkContext";
 import Crecimientos from "@/database/crecimientos";
 import Niveles from "@/database/niveles";
 import { db } from "@/hooks/useDexie";
+import { cn } from "@/lib/utils";
 import { useLiveQuery } from "dexie-react-hooks";
-import { BookmarkCheck, Check, Download, Play } from "lucide-react";
-import { useContext, useMemo, useState } from "react";
+import { BookmarkCheck, Download, Lock, Play, Save } from "lucide-react";
+import { useContext, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { Progress } from "../ui/progress";
@@ -25,8 +25,6 @@ export const NivelCard = ({ nivel, minOrden }: Props) => {
   const { baseURL, AudioNoWifi, status } = useContext(NetworkContext);
 
   const { user } = useSelector((state: any) => state.user);
-  const [podcast, setPodcast] = useState<Crecimientos | null>(null);
-
   const myCrecimiento = useMemo(() => {
     return user.crecimientos?.find(
       (c: any) => c.nivel?.canales_id == nivel?.canal?.id
@@ -56,16 +54,24 @@ export const NivelCard = ({ nivel, minOrden }: Props) => {
     [nivel]
   );
 
+  const podcast = useMemo(() => {
+    if (!crecimientos) return null;
+
+    const index = crecimientos.findIndex((c) => c.id == myCrecimiento?.id);
+    if (index === -1) {
+      return crecimientos[0];
+    }
+
+    return crecimientos[index];
+  }, [crecimientos, myCrecimiento]);
+
   const progress = useMemo(() => {
     if (!crecimientos) return null;
 
     const index = crecimientos.findIndex((c) => c.id == myCrecimiento?.id);
     if (index === -1) {
-      setPodcast(crecimientos[0]);
       return null;
     }
-
-    setPodcast(crecimientos[index]);
 
     const progress = index / (crecimientos.length - 1);
     return progress;
@@ -80,9 +86,19 @@ export const NivelCard = ({ nivel, minOrden }: Props) => {
 
   if (crecimientos?.length) {
     return (
-      <Card className="overflow-hidden border-border/50 hover:shadow-soft transition-shadow">
+      <Card className={cn(
+        "overflow-hidden border-border/50 hover:shadow-soft transition-shadow",
+        !canPlay && "opacity-90 grayscale-[0.5]"
+      )}>
         <CardContent className="p-0">
-          <div className="flex gap-3 p-3">
+          <Link
+            to={canPlay ? `/niveles/${nivel.id}/crecimientos` : "#"}
+            className={cn(
+              "flex gap-3 p-3 transition-colors",
+              canPlay ? "hover:bg-accent/50 cursor-pointer" : "cursor-default"
+            )}
+            onClick={(e) => !canPlay && e.preventDefault()}
+          >
             {/* Cover Image */}
             <div className="relative shrink-0">
               <div className="w-20 h-20 rounded-xl overflow-hidden bg-muted">
@@ -92,15 +108,14 @@ export const NivelCard = ({ nivel, minOrden }: Props) => {
                   className="w-full h-full object-cover"
                 />
               </div>
-              {canPlay && (
-                <Link to={`/niveles/${nivel.id}/crecimientos`}>
-                  <Button
-                    size="icon"
-                    className="absolute inset-0 m-auto w-10 h-10 !rounded-full bg-primary/90 hover:bg-primary shadow-medium"
-                  >
-                    <Play className="w-4 h-4 text-primary-foreground fill-current" />
-                  </Button>
-                </Link>
+              {canPlay ? (
+                <div className="absolute inset-0 m-auto w-10 h-10 flex items-center justify-center rounded-full bg-primary/90 shadow-medium">
+                  <Play className="w-4 h-4 text-primary-foreground fill-current" />
+                </div>
+              ) : (
+                <div className="absolute inset-0 m-auto w-10 h-10 flex items-center justify-center rounded-full bg-muted/90 shadow-medium">
+                  <Lock className="w-4 h-4 text-muted-foreground" />
+                </div>
               )}
             </div>
 
@@ -128,19 +143,19 @@ export const NivelCard = ({ nivel, minOrden }: Props) => {
                   }
                 </span>
                 <div className="flex-1" />
-                {nivel.id == myCrecimiento?.nivel.id || progress ? (
+                {nivel.id == myCrecimiento?.nivel.id || progress || isCompleted ? (
                   podcast?.audio_local ? (
-                    <Check className="w-4 h-4 text-success" />
+                    <Save className="w-4 h-4 text-success" />
                   ) : (
                     <Download className="w-4 h-4 text-muted-foreground" />
                   )
                 ) : null}
               </div>
             </div>
-          </div>
+          </Link>
 
           {/* Progress bar */}
-          {nivel.id == myCrecimiento?.nivel.id || progress ? (
+          {nivel.id == myCrecimiento?.nivel.id || progress || isCompleted ? (
             podcast?.audio_local ? null : (
               <div className="px-3 pb-3">
                 <Progress

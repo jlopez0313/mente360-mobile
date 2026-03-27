@@ -173,7 +173,7 @@ const Crecimientos: React.FC = () => {
     };
   }, []);
 
-  useBackButton(`/niveles/${id}/crecimientos`);
+  useBackButton(`/canales/${nivel?.canal?.id}/niveles`);
 
   if (!nivel) {
     return (
@@ -201,7 +201,7 @@ const Crecimientos: React.FC = () => {
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-4">
           <button onClick={() => history.replace(`/canales/${nivel?.canal?.id}/niveles`)}>
-            <ArrowLeft className="w-6 h-6" />
+            <ArrowLeft className="w-6 h-6 text-foreground" />
           </button>
           <span className="text-sm text-muted-foreground font-medium">
             {community?.comunidad}

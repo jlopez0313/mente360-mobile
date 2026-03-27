@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useEffect, useRef } from "react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import Categorias from "@/database/categorias";
 import { cn } from "@/lib/utils";
@@ -25,10 +26,29 @@ export const CategorySlider = ({
   selectedCategory,
   onSelectCategory,
 }: CategorySliderProps) => {
+  const activeButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    // We use a small timeout to ensure the categories have rendered
+    // and the layout is ready before scrolling
+    const timeoutId = setTimeout(() => {
+      if (activeButtonRef.current) {
+        activeButtonRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+          inline: "center",
+        });
+      }
+    }, 100);
+
+    return () => clearTimeout(timeoutId);
+  }, [selectedCategory, categories]);
+
   return (
     <ScrollArea className="w-full whitespace-nowrap">
       <div className="flex gap-2 pb-2">
         <Button
+          ref={selectedCategory === undefined ? activeButtonRef : null}
           variant={selectedCategory === undefined ? "default" : "outline"}
           size="sm"
           onClick={() => onSelectCategory(undefined)}
@@ -41,9 +61,10 @@ export const CategorySlider = ({
         </Button>
         {categories?.map((category) => {
           const isSelected = selectedCategory === category.id;
-          
+
           return (
             <Button
+              ref={isSelected ? activeButtonRef : null}
               key={category.id}
               variant={isSelected ? "default" : "outline"}
               size="sm"

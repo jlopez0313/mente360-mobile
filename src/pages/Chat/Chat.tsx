@@ -75,7 +75,7 @@ const Lista: React.FC = () => {
                 {isGrupo && <div className="absolute top-1.5 right-5.5 w-2.5 h-2.5 bg-success rounded-full" />}
               </TabsTrigger>
               <TabsTrigger
-                value="community"
+                value="contacts"
                 className="flex-1 gap-1 text-xs px-2"
               >
                 <UserPlus className="w-4 h-4" />

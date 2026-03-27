@@ -66,7 +66,7 @@ export function WeeklyTaskModal({
         onComplete();
       }
 
-      dispatch(setTab("grupos"));
+      dispatch(setTab("groups"));
       history.replace("/chat");
     } catch (error: any) {
       console.log(error);
@@ -106,13 +106,17 @@ export function WeeklyTaskModal({
         </DialogHeader>
 
         {/* Task Content */}
-        <ScrollArea className="max-h-[45vh]">
-          <div className="bg-card rounded-2xl p-5 shadow-card mb-6 border border-border/50">
-            <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-              {currentTask.description}
-            </p>
-          </div>
-        </ScrollArea>
+        {currentTask.description ? (
+          <ScrollArea className="max-h-[45vh]">
+            <div className="bg-card rounded-2xl p-5 shadow-card mb-6 border border-border/50">
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                {currentTask.description}
+              </p>
+            </div>
+          </ScrollArea>
+        ) : (
+          <div className="mb-4" />
+        )}
 
         {/* Due Date */}
         <div className="flex items-center justify-between mb-4 px-1">
@@ -133,16 +137,23 @@ export function WeeklyTaskModal({
             onClick={onConfirmTarea}
             disabled={isCompleted || currentDay != 1}
             className={cn(
-              "w-full !rounded-xl h-12 text-base font-semibold",
+              "w-full !rounded-xl h-12 text-base font-semibold transition-all",
               isCompleted
                 ? "bg-success text-success-foreground"
-                : "gradient-primary text-primary-foreground hover:opacity-90"
+                : currentDay != 1
+                  ? "bg-muted text-muted-foreground border border-border cursor-not-allowed"
+                  : "gradient-primary text-primary-foreground hover:opacity-90 shadow-md"
             )}
           >
             {isCompleted ? (
               <>
                 <CheckCircle2 className="w-5 h-5 mr-2" />
                 Completada
+              </>
+            ) : currentDay != 1 ? (
+              <>
+                <ClipboardList className="w-5 h-5 mr-2 opacity-50" />
+                Se habilitará el domingo
               </>
             ) : (
               "Marcar como completada"
