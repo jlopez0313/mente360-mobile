@@ -3,10 +3,7 @@ import { AppLayout } from "@/components/layout";
 import { ContactDetailModal } from "@/components/Shared/Contact/ContactModal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { NetworkContext } from "@/context/NetworkContext";
-import Canales from "@/database/canales";
-import Comunidades from "@/database/comunidades";
 import Crecimiento from "@/database/crecimientos";
-import Niveles from "@/database/niveles";
 import User from "@/database/user";
 import { destroy } from "@/helpers/musicControls";
 import { useBackButton } from "@/hooks/useBackButton";
@@ -19,20 +16,10 @@ import { useContext, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router-dom";
 
-type Props = {
-  nivel: Niveles | undefined;
-  canal: Canales | undefined;
-  comunidad: Comunidades | undefined;
-};
 
-const formatTime = (seconds: number) => {
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs.toString().padStart(2, "0")}`;
-};
 
 const Crecimientos: React.FC = () => {
-  const { AudioNoWifi, baseURL, status } = useContext(NetworkContext);
+  const { baseURL } = useContext(NetworkContext);
 
   const history = useHistory();
   const { user } = useSelector((state: any) => state.user);
@@ -52,7 +39,7 @@ const Crecimientos: React.FC = () => {
 
   const myCrecimiento = useMemo(() => {
     return user.crecimientos?.find(
-      (c: any) => c.nivel?.canal?.id == nivel?.canal?.id
+      (c: any) => c.nivel?.canales_id == nivel?.canal?.id || c.nivel?.canal?.id == nivel?.canal?.id
     );
   }, [user, nivel]);
 

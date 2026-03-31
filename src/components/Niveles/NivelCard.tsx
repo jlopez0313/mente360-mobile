@@ -27,7 +27,7 @@ export const NivelCard = ({ nivel, minOrden }: Props) => {
   const { user } = useSelector((state: any) => state.user);
   const myCrecimiento = useMemo(() => {
     return user.crecimientos?.find(
-      (c: any) => c.nivel?.canales_id == nivel?.canal?.id
+      (c: any) => c.nivel?.canales_id == nivel?.canal?.id || c.nivel?.canal?.id == nivel?.canal?.id
     );
   }, [user, nivel]);
 
@@ -76,6 +76,13 @@ export const NivelCard = ({ nivel, minOrden }: Props) => {
     const progress = index / (crecimientos.length - 1);
     return progress;
   }, [crecimientos, myCrecimiento]);
+
+  const currentStep = useMemo(() => {
+    if (isCompleted) return crecimientos?.length || 0;
+    if (!crecimientos) return 0;
+    const index = crecimientos.findIndex((c) => c.id == myCrecimiento?.id);
+    return Math.max(0, index);
+  }, [isCompleted, crecimientos, myCrecimiento]);
 
   const isFirstNivel = nivel?.orden === minOrden;
 
@@ -157,11 +164,14 @@ export const NivelCard = ({ nivel, minOrden }: Props) => {
           {/* Progress bar */}
           {nivel.id == myCrecimiento?.nivel.id || progress || isCompleted ? (
             podcast?.audio_local ? null : (
-              <div className="px-3 pb-3">
+              <div className="px-3 pb-3 flex items-center gap-2">
                 <Progress
                   value={(progress ?? (isCompleted ? 1 : 0)) * 100}
-                  className="h-1"
+                  className="h-1 flex-1"
                 />
+                <span className="text-[10px] text-muted-foreground font-medium shrink-0">
+                  {currentStep}/{crecimientos?.length || 0}
+                </span>
               </div>
             )
           ) : null}
