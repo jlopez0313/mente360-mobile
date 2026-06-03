@@ -5,19 +5,19 @@ import { memo, useState } from "react";
 
 const questions = [
   {
-    momento: "A",
+    momento: "ALFA",
     texto:
-      "Tiendo a ser muy activo, sociable y competitivo. Me gusta ser el centro de atención y me siento cómodo destacando sobre los demás. Me gusta estar rodeado de gente y disfruto con la interacción social. Probablemente muchos dirían que soy un poco arrogante, pues me gusta mostrar mis logros y habilidades. Me gusta sentirme ocupado y no me gusta estar solo.",
+      "Tiendes a ir hacia adelante con decisión. Te activas, tomas iniciativa y buscas generar movimiento. Prefieres intervenir antes que quedarte esperando. Sueles confiar en que las cosas se resuelven haciendo, proponiendo o empujando la realidad. A veces puedes parecer intenso, dominante, entusiasta o muy enfocado en avanzar.",
   },
   {
-    momento: "B",
+    momento: "BETA",
     texto:
-      "Tiendo a estar callado y estoy acostumbrado a estar solo. Normalmente no atraigo mucho la atención en el aspecto social, y por lo general procuro no imponerme por la fuerza. No me siento cómodo destacando sobre los demás ni siendo competitivo. Probablemente muchos dirían que tengo algo de soñador, pues disfruto con mi imaginación. Puedo estar bastante a gusto sin pensar que tengo que ser activo todo el tiempo.",
+      "Tiendes a evaluar lo correcto, lo adecuado o lo esperado antes de actuar. Te importa hacer las cosas bien, responder de forma responsable y cuidar el impacto en los demás. Sueles considerar normas, valores o expectativas antes de moverte. A veces puedes exigirte demasiado o cargar con responsabilidades que otros no asumen.",
   },
   {
-    momento: "C",
+    momento: "GAMA",
     texto:
-      "Tiendo a ser muy responsable y entregado. Me siento fatal si no cumplo mis compromisos o no hago lo que se espera de mí. Deseo que los demás sepan que estoy por ellos y que haré todo lo que crea que es mejor por ellos. Con frecuencia hago grandes sacrificios personales por el bien de otros, lo sepan o no lo sepan. No suelo cuidar bien de mí mismo; hago el trabajo que hay que hacer y me relajo (y hago lo que realmente deseo) si me queda tiempo.",
+      "Tiendes a tomar distancia antes de actuar. Observas, analizas o procesas internamente lo que está pasando. Prefieres entender bien la situación antes de intervenir. Sueles ser prudente, reflexivo o reservado. A veces puedes postergar decisiones o parecer desconectado.",
   },
 ];
 

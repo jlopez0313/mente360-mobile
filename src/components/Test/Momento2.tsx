@@ -5,19 +5,19 @@ import { memo, useState } from "react";
 
 const questions = [
   {
-    momento: "X",
+    momento: "ZETA",
     texto:
-      "Soy una persona que normalmente mantiene una actitud positiva y piensa que las cosas se van a resolver para mejor. Suelo entusiasmarme por las cosas y no me cuesta encontrar en qué ocuparme. Me gusta estar con gente y ayudar a otros a ser felices; me agrada compartir con ellos mi bienestar. (No siempre me siento fabulosamente bien, pero trato de que nadie se dé cuenta.) Sin embargo, mantener esta actitud positiva ha significado a veces dejar pasar demasiado tiempo sin ocuparme de mis problemas.",
+      "Intentas mantener una mirada abierta o positiva. Buscas salidas, alternativas, posibilidades o una forma de no quedarte atrapado en lo negativo. Prefieres moverte hacia lo que da aire, alivio o sentido. A veces puedes evitar profundizar en lo doloroso o pasar rápido a otra cosa.",
   },
   {
-    momento: "Y",
+    momento: "EPSILON",
     texto:
-      "Soy una persona que tiene fuertes sentimientos respecto a las cosas, la mayoría de la gente lo nota cuando me siento desgraciado por algo. Sé ser-reservado con los demás, pero soy más sensible de lo que dejo ver. Deseo saber a qué atenerme con los demás y con quiénes y con qué puedo contar; la mayoría de las personas tienen muy claro a qué atenerse conmigo. Cuando estoy alterado por algo deseo que los demás reaccionen y se emocionen tanto como yo. Conozco las reglas, pero no quiero que me digan lo que he de hacer. Quiero decidir por mí mismo.",
+      "Intentas ordenar la situación y resolverla. Analizas, corriges, estructuras o haces lo necesario para que las cosas vuelvan a su lugar. Buscas claridad, control o coherencia. A veces puedes tensarte, volverte rígido o sentir frustración cuando no encuentras solución.",
   },
   {
-    momento: "Z",
+    momento: "OMEGA",
     texto:
-      "Tiendo a controlarme y a ser lógico, me desagrada hacer frente a los sentimientos. Soy eficiente, incluso perfeccionista, y prefiero trabajar solo. Cuando hay problemas o conflictos personales trato de no meter mis sentimientos por medio. Algunos dicen que soy demasiado frío y objetivo, pero no quiero que mis reacciones emocionales me distraigan de lo que realmente me importa. Por lo general, no muestro mis emociones cuando otras personas «me fastidian».",
+      "Vives el malestar con intensidad. Necesitas expresarlo, confrontarlo o reaccionar frente a lo que sientes. Tiendes a defenderte, marcar límites o mostrar lo que está ocurriendo. A veces puedes reaccionar de forma impulsiva o quedarte enganchado en la emoción.",
   },
 ];
 

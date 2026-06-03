@@ -78,11 +78,23 @@ export const Test = () => {
           {resultado?.descripcion}
         </h2>
 
-        <p className="text-muted-foreground mb-8 max-w-sm">
-          Este es tu tipo de personalidad según el Eneagrama. Recuerda que este
-          es un test orientativo y para un análisis más profundo te recomendamos
-          consultar con un profesional.
-        </p>
+        <div className="space-y-4 mb-8 max-w-sm">
+          <div className="space-y-2">
+            <p className="text-muted-foreground text-sm">
+              Este resultado no es definitivo. El eneagrama no describe tu
+              esencia, describe los patrones que has aprendido para adaptarte.
+            </p>
+            <p className="text-muted-foreground text-sm">
+              Tu crecimiento comienza cuando dejas de reaccionar automáticamente
+              y empiezas a elegir conscientemente.
+            </p>
+          </div>
+
+          <p className="text-primary font-semibold text-sm">
+            Ve al Nivel 0 de la comunidad Mente360 y allí busca el audio de tu
+            resultado y sigue detectando cómo te describe.
+          </p>
+        </div>
 
         <div className="w-full max-w-sm space-y-3">
           <Link to="/perfil" className="mb-3 inline-flex w-full">

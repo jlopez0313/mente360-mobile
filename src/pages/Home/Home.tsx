@@ -270,7 +270,13 @@ const Home: React.FC = () => {
           />
 
           {/* Daily Content Grid */}
-          <DailyContentGrid completed={completed} onOpenModal={handleOpenModal} />
+          <DailyContentGrid
+            completed={{
+              ...completed,
+              weeklyTask: weeklyTask?.done === 1,
+            }}
+            onOpenModal={handleOpenModal}
+          />
 
           {/* Daily Audio */}
           <DailyAudioCard />
@@ -302,7 +308,7 @@ const Home: React.FC = () => {
       <WeeklyTaskModal
         open={weeklyTaskOpen}
         onOpenChange={setWeeklyTaskOpen}
-        isCompleted={completed.weeklyTask}
+        isCompleted={weeklyTask?.done === 1}
         onComplete={() => markComplete("weeklyTask")}
       />
 
