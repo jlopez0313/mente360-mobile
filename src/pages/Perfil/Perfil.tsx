@@ -15,6 +15,7 @@ import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 import PerfilComponent from "@/components/Perfil/Perfil";
+import { formatCompleteDate } from "@/helpers/Fechas";
 import { db } from "@/hooks/useDexie";
 import { usePayment } from "@/hooks/usePayment";
 import { updateData } from "@/services/realtime-db";
@@ -122,19 +123,38 @@ const Perfil: React.FC = () => {
                   {user.name}
                 </h2>
 
-                {userEnabled && payment_status != "free" ? (
-                  <Link to="/suscripcion">
+                {userEnabled && (payment_status === "paid" || payment_status === "trial") ? (
+                  <Link to="/suscripcion" className="flex flex-col items-center">
                     <div className="flex items-center gap-1.5 mt-2 px-3 py-1 rounded-full gradient-premium">
                       <Crown className="w-4 h-4 text-premium-foreground" />
                       <span className="text-sm font-semibold text-premium-foreground">
                         Premium
                       </span>
                     </div>
+                    {user.fecha_vencimiento ? (
+                      <span className="text-xs text-muted-foreground mt-1">
+                        Vence: {formatCompleteDate(user.fecha_vencimiento)}
+                      </span>
+                    ) : null}
                   </Link>
                 ) : (
                   <div
                     className={`ion-margin-top ion-margin-bottom ion-text-center`}
                   >
+                    {(payment_status === "expired" ||
+                      payment_status === "canceled" ||
+                      payment_status === "payment_failed") && (
+                      <p className="text-xs text-sos mb-2">
+                        {payment_status === "expired"
+                          ? "Tu suscripción venció"
+                          : payment_status === "canceled"
+                          ? "Tu suscripción fue cancelada"
+                          : "Tu último pago falló"}
+                        {user.fecha_vencimiento
+                          ? ` el ${formatCompleteDate(user.fecha_vencimiento)}`
+                          : ""}
+                      </p>
+                    )}
                     <Link to="/planes">
                       <Button className="!p-2 green-solid-button !rounded-xl">
                         Unete a {import.meta.env.VITE_NAME} Premium{" "}

@@ -22,6 +22,8 @@ export default interface User {
   ref_status: string;
   fecha_pago: string;
   fecha_vencimiento: string;
+  epayco_customer_id?: string;
+  epayco_subscription_id?: string;
   crecimiento: Crecimientos;
   suscripciones: any[];
 }

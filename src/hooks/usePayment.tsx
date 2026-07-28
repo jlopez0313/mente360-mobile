@@ -42,18 +42,28 @@ export const usePayment = () => {
         ? Number(user.has_paid)
         : null;
 
+    const vigente = diasHastaVence !== null && diasHastaVence >= 0;
+    const cobroFallido = user.ref_status === "failed" || user.ref_status === "rejected";
+
     if (!fechaVencimiento) {
       setStatus("free");
-    } else if (user.ref_payco && user.ref_status == "failed") {
+    } else if (vigente) {
+      // Mientras el periodo ya pagado siga vigente, un cobro de renovación
+      // rechazado no le quita acceso todavía (periodo de gracia natural).
+      if (hasPaid === 1) {
+        setStatus("paid");
+      } else if (hasPaid === 0 && user.ref_payco) {
+        // ref_payco presente = hubo un pago/cancelación real de por medio.
+        // Sin él, has_paid=false es solo el valor por defecto de un usuario
+        // en prueba gratuita (ver UsuariosController::trial), no una cancelación.
+        setStatus("canceled");
+      } else {
+        setStatus("trial");
+      }
+    } else if (cobroFallido && user.ref_payco) {
       setStatus("payment_failed");
-    } else if (hasPaid === 1 && user.ref_payco) {
-      setStatus(diasHastaVence! >= 0 ? "paid" : "expired");
-    } else if (hasPaid === 0 && user.ref_payco) {
-      setStatus(diasHastaVence! >= 0 ? "canceled" : "expired");
-    } else if (fechaVencimiento) {
-      setStatus(diasHastaVence! >= 0 ? "trial" : "expired");
     } else {
-      setStatus("free");
+      setStatus("expired");
     }
   }, [user]);
 

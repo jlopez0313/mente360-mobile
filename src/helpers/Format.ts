@@ -1,4 +1,12 @@
-export const formatCurrency = (amount: number) => {
+export const formatCurrency = (amount: number, currency: "COP" | "USD" = "COP") => {
+  if (currency === "USD") {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+    }).format(amount);
+  }
+
   const rounded = Math.floor(amount / 100) * 100;
   return new Intl.NumberFormat("es-CO", {
     style: "currency",

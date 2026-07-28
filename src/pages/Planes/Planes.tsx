@@ -1,12 +1,14 @@
 import logoMente360 from "@/assets/images/logo.png";
 import { AppLayout } from "@/components/layout";
 import { Cancel } from "@/components/Payment/Cancel";
+import { EpaycoCheckoutModal } from "@/components/Payment/EpaycoCheckoutModal";
 import { Button } from "@/components/ui/button";
 import { valorPlan } from "@/database/planes";
 import { formatCurrency } from "@/helpers/Format";
+import { formatCompleteDate } from "@/helpers/Fechas";
+import { getCurrencyForUser, getPlanPrecio } from "@/helpers/Currency";
 import { useToast } from "@/hooks/use-toast";
 import { db } from "@/hooks/useDexie";
-import { useEpayco } from "@/hooks/useEpayco";
 import { usePayment } from "@/hooks/usePayment";
 import { cn } from "@/lib/utils";
 import { updateData } from "@/services/realtime-db";
@@ -32,25 +34,21 @@ const PlanesPage = () => {
   const { toast } = useToast();
   const dispatch = useDispatch();
   const { payment_status } = usePayment();
-  const { onSubscribe } = useEpayco();
 
   const { user } = useSelector((state: any) => state.user);
+  const currency = getCurrencyForUser(user);
 
   const [selectedPlan, setSelectedPlan] = useState<valorPlan | null>(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
-  const [hasActiveSubscription] = useState(true);
+  const [showCheckout, setShowCheckout] = useState(false);
+  const hasActiveSubscription = payment_status === "paid";
 
   const planes = useLiveQuery(() =>
     db.planes.where("key").equals("GENERAL").first()
   );
 
   const handleSubscribe = () => {
-    onSubscribe({
-      precio: selectedPlan?.valor,
-      periodicidad: selectedPlan?.key,
-      titulo: selectedPlan?.descripcion ?? "Plan mensual",
-      comunidad: null,
-    });
+    setShowCheckout(true);
   };
 
   const handleCancelSubscription = async () => {
@@ -94,6 +92,17 @@ const PlanesPage = () => {
         </div>
 
         <div className="flex-1 overflow-y-auto space-y-4 mb-6 px-1 py-2 overfow-y-auto">
+          {hasActiveSubscription && user.fecha_vencimiento ? (
+            <div className="bg-primary/5 rounded-2xl border border-primary/20 p-4">
+              <p className="text-sm text-foreground font-semibold !m-0">
+                Ya tienes un plan activo
+              </p>
+              <p className="text-xs text-muted-foreground !m-0">
+                Vence el {formatCompleteDate(user.fecha_vencimiento)}
+              </p>
+            </div>
+          ) : null}
+
           <h4 className="!m-3 text-xl font-bold text-foreground">
             {" "}
             Con tu plan premium disfrutarás de:{" "}
@@ -139,7 +148,7 @@ const PlanesPage = () => {
                 </div>
                 <div className="text-right shrink-0">
                   <p className="text-xl font-bold text-foreground">
-                    {formatCurrency(Number(plan.valor))}
+                    {formatCurrency(getPlanPrecio(plan, currency), currency)}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {plan.periodo}
@@ -151,18 +160,20 @@ const PlanesPage = () => {
 
           {/* Subscribe Button */}
           {selectedPlan ? (
-            <Button
-              onClick={handleSubscribe}
-              className={cn(
-                "w-full font-semibold py-6 !rounded-xl text-base",
-                selectedPlan?.key === "premium"
-                  ? "gradient-premium text-premium-foreground"
-                  : "gradient-primary text-primary-foreground"
-              )}
-            >
-              <Sparkles className="w-4 h-4 mr-2" />
-              Comienza con tu {selectedPlan?.descripcion}
-            </Button>
+            <>
+              <Button
+                onClick={handleSubscribe}
+                className={cn(
+                  "w-full font-semibold py-6 !rounded-xl text-base",
+                  selectedPlan?.key === "premium"
+                    ? "gradient-premium text-premium-foreground"
+                    : "gradient-primary text-primary-foreground"
+                )}
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                Comienza con tu {selectedPlan?.descripcion}
+              </Button>
+            </>
           ) : null}
 
           {
@@ -195,6 +206,23 @@ const PlanesPage = () => {
         handleCancelSubscription={handleCancelSubscription}
         showCancelModal={showCancelModal}
         setShowCancelModal={setShowCancelModal}
+      />
+
+      <EpaycoCheckoutModal
+        open={showCheckout}
+        onOpenChange={setShowCheckout}
+        plan={
+          selectedPlan
+            ? {
+                precio: String(getPlanPrecio(selectedPlan, currency)),
+                periodicidad: selectedPlan.key,
+                titulo: selectedPlan.descripcion ?? "Plan mensual",
+                comunidad: null,
+                currency,
+              }
+            : null
+        }
+        onSuccess={() => history.replace("/perfil")}
       />
     </AppLayout>
   );

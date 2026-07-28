@@ -64,7 +64,6 @@
     "dexie": "^4.0.11",
     "dexie-react-hooks": "^1.1.7",
     "emoji-picker-react": "^4.12.2",
-    "epayco-sdk-node": "^1.4.2",
     "firebase": "^10.12.3",
     "framer-motion": "^12.7.4",
     "howler": "^2.2.4",

@@ -2,11 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { NetworkContext } from "@/context/NetworkContext";
 import Planes, { valorPlan } from "@/database/planes";
+import { getCurrencyForUser, getPlanPrecio } from "@/helpers/Currency";
 import { formatCurrency } from "@/helpers/Format";
-import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { Check, Crown, Sparkles } from "lucide-react";
 import { useContext, useState } from "react";
+import { useSelector } from "react-redux";
 
 interface CommunityPlanModalProps {
   plan: Planes | undefined;
@@ -23,17 +24,13 @@ export const CommunityPlanModal = ({
   communityName,
   communityLogo,
 }: CommunityPlanModalProps) => {
-  const { toast } = useToast();
   const { baseURL, status, AudioNoWifi } = useContext(NetworkContext);
+  const { user } = useSelector((state: any) => state.user);
+  const currency = getCurrencyForUser(user);
 
   const [selectedPlan, setSelectedPlan] = useState<valorPlan>();
 
   const handleSubscribe = () => {
-    toast({
-      title: "Redirigiendo a pasarela de pago...",
-      description: `${selectedPlan?.descripcion ?? "Plan mensual"
-        } de ${communityName}`,
-    });
     onOpenChange(selectedPlan, false);
   };
 
@@ -95,10 +92,10 @@ export const CommunityPlanModal = ({
                 </div>
                 <div className="text-right">
                   <p className="font-bold text-foreground text-lg">
-                    {formatCurrency(Number(v.valor))}
+                    {formatCurrency(getPlanPrecio(v, currency), currency)}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {v.periodo ?? "USD/año"}
+                    {v.periodo}
                   </p>
                 </div>
               </div>
@@ -108,6 +105,7 @@ export const CommunityPlanModal = ({
           {/* Subscribe Button */}
           <Button
             onClick={handleSubscribe}
+            disabled={!selectedPlan}
             className="w-full gradient-accent text-accent-foreground font-semibold py-6 !rounded-xl"
           >
             <Sparkles className="w-4 h-4 mr-2" />

@@ -5,7 +5,12 @@ export const find = async(payload: {}): Promise<any> => {
     return post('/generate-subscribe-link', payload, { 'Accept': 'application/json', 'Content-type': 'application/json' });
 };
 
-export const getEpaycoLink = async(payload: {}): Promise<any> => {
+export const getEpaycoPublicKey = async(): Promise<any> => {
+    const { get } = await baseApi();
+    return get('/suscripciones/epayco/public-key', { 'Accept': 'application/json' });
+};
+
+export const subscribeEpayco = async(payload: {}): Promise<any> => {
     const { post } = await baseApi();
-    return post('/suscripciones/epayco', payload, { 'Accept': 'application/json', 'Content-type': 'application/json' });
+    return post('/suscripciones/epayco/subscribe', payload, { 'Accept': 'application/json', 'Content-type': 'application/json' });
 };

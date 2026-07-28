@@ -1,92 +1,69 @@
-import { getEpaycoLink } from "@/services/subscribe";
-import { App } from "@capacitor/app";
-import { useEffect } from "react";
+import { getEpaycoPublicKey, subscribeEpayco } from "@/services/subscribe";
 
+export interface EpaycoCardData {
+	number: string;
+	exp_month: string;
+	exp_year: string;
+	cvc: string;
+	card_holder: string;
+}
+
+export interface EpaycoSubscribePayload {
+	precio: string;
+	periodicidad: string;
+	titulo: string;
+	comunidad: any;
+	currency: "COP" | "USD";
+	docType: string;
+	docNumber: string;
+	card: EpaycoCardData;
+}
 
 export const useEpayco = () => {
+	const tokenizeCard = (card: EpaycoCardData, publicKey: string): Promise<string> => {
+		return new Promise((resolve, reject) => {
+			window.ePayco.setPublicKey(publicKey);
 
-	useEffect(() => {
-		const listener = App.addListener('appStateChange', ({ isActive }) => {
-			if (isActive) {
-				// Remove any stuck ePayco modal overlays when app returns to foreground
-				const epaycoElements = document.querySelectorAll('.epayco-modal, .epayco-checkout-modal, #epayco-checkout, #epayco-checkout-global, iframe[src*="epayco"]');
-				epaycoElements.forEach(el => {
-					// We only remove UI elements, not script tags. 
-					if (el.tagName !== 'SCRIPT' && el.parentElement) {
-						(el as HTMLElement).style.display = 'none';
+			window.ePayco.token.create(
+				{
+					"card[number]": card.number,
+					"card[exp_year]": card.exp_year,
+					"card[exp_month]": card.exp_month,
+					"card[cvc]": card.cvc,
+					hasCvv: true,
+				},
+				(error: any, token: any) => {
+					if (error || !token?.id) {
+						reject(error ?? token);
+						return;
 					}
-				});
-			}
+					resolve(token.id);
+				}
+			);
 		});
-
-		return () => {
-			listener.then(l => l.remove());
-		};
-	}, []);
-
-	const getInvoice = () => {
-		const currentDate = new Date();
-		return currentDate.getTime();
-	}
-	/*
-			const epayco = new Epayco({
-					apiKey: 'TU_API_KEY_PUBLICA',
-					privateKey: 'TU_API_KEY_PRIVADA',
-					lang: 'ES',
-					test: true // Cambiar a false en producción
-			});
-	*/
-	const onSubscribe = async (item: any) => {
-		try {
-			const { data } = await getEpaycoLink(item);
-
-			const handler = window.ePayco.checkout.configure({
-				key: data.epayco.public_key,
-				test: data.epayco.test,
-			});
-
-			handler.open({
-				name: import.meta.env.VITE_NAME,
-				description: data.epayco.description,
-				invoice: data.epayco.invoice,
-				currency: data.epayco.currency,
-				amount: Number(item.precio).toFixed(2),
-				tax_base: "0",
-				tax: "0",
-				country: data.epayco.country,
-				lang: "es",
-				external: "false",
-				confirmation: import.meta.env.VITE_BASE_API + "/confirmation",
-				response: import.meta.env.VITE_BASE_BACK + "confirmation", // Also fixing this back to origin + '/thanks' if the user overwrote it... 
-				extra1: data.epayco.extra_1 ?? data.epayco.extra1,
-				extra2: data.epayco.extra_2 ?? data.epayco.extra2,
-				extra3: data.epayco.extra_3 ?? data.epayco.extra3,
-			});
-
-			/*
-			console.log(data.payment_link)
-			await Browser.open({ url: data.payment_link });
-			*/
-			// window.open(data.url, "_blank");
-		} catch (error) {
-			console.log(error);
-		}
 	};
 
-	const checkTransaction = (transactionID: any) => {
-		return new Promise((resolve, reject) => {
-			fetch('https://secure.epayco.co/validation/v1/reference/' + transactionID)
-				.then(json => json.json())
-				.then(data => {
-					resolve(data.data);
-				})
-		})
-	}
+	const onSubscribe = async (item: EpaycoSubscribePayload) => {
+		const { data } = await getEpaycoPublicKey();
 
+		const cardToken = await tokenizeCard(item.card, data.public_key);
+
+		const { data: subscription } = await subscribeEpayco({
+			precio: item.precio,
+			currency: item.currency,
+			titulo: item.titulo,
+			periodicidad: item.periodicidad,
+			comunidad: item.comunidad,
+			card_token: cardToken,
+			card_holder: item.card.card_holder,
+			doc_type: item.docType,
+			doc_number: item.docNumber,
+		});
+
+		return subscription;
+	};
 
 	return {
 		onSubscribe,
-		checkTransaction
-	}
-
-}
+	};
+};

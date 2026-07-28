@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc *)",
+      "Bash(mysql -u root mente360 -e \"SELECT migration FROM migrations ORDER BY id DESC LIMIT 10;\")",
+      "Bash(\"/c/xampp/mysql/bin/mysql.exe\" -u root mente360 -e \"SELECT migration FROM migrations ORDER BY id DESC LIMIT 10;\")",
+      "Bash(composer require *)",
+      "Bash(php -l app/Services/EpaycoService.php)",
+      "Bash(php -l app/Models/User.php)",
+      "Bash(php -l app/Http/Controllers/Api/v1/NivelesController.php)"
+    ]
+  }
+}

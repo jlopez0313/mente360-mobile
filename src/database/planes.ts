@@ -5,7 +5,10 @@ export default interface Planes {
 
 export interface valorPlan {
   key: string;
-  valor: string;
+  precio: {
+    COP: string;
+    USD: string;
+  };
   descripcion: string;
   periodo: string;
 }

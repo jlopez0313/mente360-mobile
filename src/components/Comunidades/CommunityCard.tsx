@@ -2,13 +2,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { EpaycoCheckoutModal, EpaycoCheckoutPlan } from "@/components/Payment/EpaycoCheckoutModal";
 import { NetworkContext } from "@/context/NetworkContext";
 import Comunidades from "@/database/comunidades";
 import { valorPlan } from "@/database/planes";
+import { getCurrencyForUser, getPlanPrecio } from "@/helpers/Currency";
 import { formatCurrency } from "@/helpers/Format";
 import { getYoutubeLink } from "@/helpers/Video";
 import { db } from "@/hooks/useDexie";
-import { useEpayco } from "@/hooks/useEpayco";
 import { usePayment } from "@/hooks/usePayment";
 import { cn } from "@/lib/utils";
 import { useLiveQuery } from "dexie-react-hooks";
@@ -26,13 +27,14 @@ type Props = {
 export const CommunityCard = ({ community }: Props) => {
   const history = useHistory();
   const { userEnabled, payment_status } = usePayment();
-  const { onSubscribe } = useEpayco();
 
   const { AudioNoWifi, baseURL, status } = useContext(NetworkContext);
 
   const { user } = useSelector((state: any) => state.user);
+  const currency = getCurrencyForUser(user);
 
   const [showPlanModal, setShowPlanModal] = useState(false);
+  const [checkoutPlan, setCheckoutPlan] = useState<EpaycoCheckoutPlan | null>(null);
 
   const plan = useLiveQuery(() =>
     db.planes.where("key").equals("COMUNIDAD").first()
@@ -42,57 +44,48 @@ export const CommunityCard = ({ community }: Props) => {
 
   const handleAccess = () => {
     if (hasSuscription) {
-      if (!userEnabled || payment_status == "free") {
-        setShowPlanModal(true);
-      } else {
-        if (user.suscripciones.some((s: any) => s.id == community.id)) {
-          history.replace(`/comunidades/${community.id}/canales`);
-        } else {
-          return;
-        }
-      }
+      history.replace(`/comunidades/${community.id}/canales`);
     } else {
       setShowPlanModal(true);
     }
   };
 
-  const hasSuscription = useMemo(() => {
-    if (
-      !userEnabled ||
-      payment_status == "free" ||
-      !user.suscripciones.some((s: any) => s.id == community.id)
-    ) {
-      return false;
-    } else if (user.suscripciones.some((s: any) => s.id == community.id)) {
-      const fecha_vencimiento = user.suscripciones.find(
-        (s: any) => s.id == community.id
-      )?.pivot?.fecha_vencimiento;
-      if (!fecha_vencimiento) {
-        return null;
-      }
+  const isLeader = community.lider?.id == user.id;
 
-      const fecha = new Date(fecha_vencimiento);
-      const hoy = new Date();
+  const hasSuscription = useMemo((): boolean => {
+    // El líder de la comunidad siempre tiene acceso a la suya, sin necesidad de suscribirse.
+    if (isLeader) {
+      return true;
+    }
 
-      if (fecha < hoy) {
-        return false;
-      }
-    } else if (community.lider.id != user.id) {
+    if (!userEnabled || payment_status == "free") {
       return false;
     }
-    return true;
-  }, [community, user]);
+
+    const suscripcion = user.suscripciones.find(
+      (s: any) => s.id == community.id
+    );
+    if (!suscripcion?.pivot?.fecha_vencimiento) {
+      return false;
+    }
+
+    const fechaVencimiento = new Date(suscripcion.pivot.fecha_vencimiento);
+    const hoy = new Date();
+
+    return fechaVencimiento >= hoy;
+  }, [isLeader, community, user, userEnabled, payment_status]);
 
   const handlePayment = (v: valorPlan | undefined, open: boolean) => {
     setShowPlanModal(open);
 
     if (!v) return;
 
-    onSubscribe({
-      precio: v.valor,
+    setCheckoutPlan({
+      precio: String(getPlanPrecio(v, currency)),
       periodicidad: v.key,
       titulo: v.descripcion ?? "Plan mensual",
       comunidad: community?.id,
+      currency,
     });
   };
 
@@ -195,7 +188,7 @@ export const CommunityCard = ({ community }: Props) => {
                 onClick={handleAccess}
                 className="border-accent text-accent hover:bg-accent hover:text-accent-foreground"
               >
-                {formatCurrency(Number(planMensual?.valor || "0"))} {planMensual?.periodo}
+                {formatCurrency(getPlanPrecio(planMensual, currency), currency)} {planMensual?.periodo}
               </Button>
             )}
           </div>
@@ -208,6 +201,13 @@ export const CommunityCard = ({ community }: Props) => {
         onOpenChange={handlePayment}
         communityName={community.comunidad}
         communityLogo={community?.imagen ?? ""}
+      />
+
+      <EpaycoCheckoutModal
+        open={!!checkoutPlan}
+        onOpenChange={(open) => !open && setCheckoutPlan(null)}
+        plan={checkoutPlan}
+        onSuccess={() => setCheckoutPlan(null)}
       />
     </Card>
   );
