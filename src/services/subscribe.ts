@@ -14,3 +14,8 @@ export const subscribeEpayco = async(payload: {}): Promise<any> => {
     const { post } = await baseApi();
     return post('/suscripciones/epayco/subscribe', payload, { 'Accept': 'application/json', 'Content-type': 'application/json' });
 };
+
+export const cancelEpayco = async(): Promise<any> => {
+    const { post } = await baseApi();
+    return post('/suscripciones/epayco/cancel', {}, { 'Accept': 'application/json' });
+};

@@ -2,10 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { formatCurrency } from "@/helpers/Format";
+import { KEYS, removePreference, setPreference } from "@/helpers/preferences";
 import { useToast } from "@/hooks/use-toast";
 import { useEpayco } from "@/hooks/useEpayco";
 import { CreditCard, Loader2 } from "lucide-react";
 import { useState } from "react";
+import { useSelector } from "react-redux";
 
 export interface EpaycoCheckoutPlan {
 	precio: string;
@@ -25,6 +27,7 @@ interface Props {
 export const EpaycoCheckoutModal = ({ open, onOpenChange, plan, onSuccess }: Props) => {
 	const { toast } = useToast();
 	const { onSubscribe } = useEpayco();
+	const { user } = useSelector((state: any) => state.user);
 
 	const [loading, setLoading] = useState(false);
 	const [cardNumber, setCardNumber] = useState("");
@@ -44,6 +47,7 @@ export const EpaycoCheckoutModal = ({ open, onOpenChange, plan, onSuccess }: Pro
 			setCardHolder("");
 			setDocNumber("");
 			setAcceptTerms(false);
+			setLoading(false);
 		}
 		onOpenChange(isOpen);
 	};
@@ -63,7 +67,7 @@ export const EpaycoCheckoutModal = ({ open, onOpenChange, plan, onSuccess }: Pro
 
 		setLoading(true);
 		try {
-			await onSubscribe({
+			const result = await onSubscribe({
 				precio: plan.precio,
 				periodicidad: plan.periodicidad,
 				titulo: plan.titulo,
@@ -74,24 +78,40 @@ export const EpaycoCheckoutModal = ({ open, onOpenChange, plan, onSuccess }: Pro
 				card: {
 					number: cardNumber.replace(/\s/g, ""),
 					exp_month: expMonth,
-					exp_year: expYear,
+					exp_year: `20${expYear}`,
 					cvc,
 					card_holder: cardHolder,
+					email: user.email,
 				},
 			});
 
-			toast({
-				title: "¡Suscripción creada!",
-				description: "ePayco confirmará el primer cobro en unos instantes.",
-			});
+			if (result?.status === "success") {
+				await removePreference(KEYS.EPAYCO_PENDING_REF);
+				toast({
+					title: "¡Pago aprobado!",
+					description: "Tu suscripción ya está activa.",
+				});
+			} else {
+				// Todavía no hay confirmación de ePayco: guardamos la referencia para
+				// que el listener de Firebase (FirebaseContext) avise con un toast
+				// apenas llegue el resultado real, aunque el usuario ya se haya ido de esta pantalla.
+				if (result?.ref_payco) {
+					await setPreference(KEYS.EPAYCO_PENDING_REF, result.ref_payco);
+				}
+				toast({
+					title: "Pago en proceso",
+					description: "ePayco está confirmando tu pago, te avisaremos cuando esté listo.",
+				});
+			}
 
 			handleOpenChange(false);
 			onSuccess();
-		} catch (error) {
+		} catch (error: any) {
 			console.log(error);
+			const backendMessage = error?.data?.error;
 			toast({
 				title: "No pudimos procesar tu pago",
-				description: "Verifica los datos de tu tarjeta e intenta de nuevo.",
+				description: backendMessage || "Verifica los datos de tu tarjeta e intenta de nuevo.",
 				variant: "destructive",
 			});
 		} finally {

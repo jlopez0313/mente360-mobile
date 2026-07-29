@@ -11,13 +11,11 @@ import { useToast } from "@/hooks/use-toast";
 import { db } from "@/hooks/useDexie";
 import { usePayment } from "@/hooks/usePayment";
 import { cn } from "@/lib/utils";
-import { updateData } from "@/services/realtime-db";
-import { update } from "@/services/user";
-import { setUser } from "@/store/slices/userSlice";
+import { cancelEpayco } from "@/services/subscribe";
 import { useLiveQuery } from "dexie-react-hooks";
 import { ArrowLeft, Check, Sparkles } from "lucide-react";
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useHistory } from "react-router";
 
 const features = [
@@ -32,7 +30,6 @@ const features = [
 const PlanesPage = () => {
   const history = useHistory();
   const { toast } = useToast();
-  const dispatch = useDispatch();
   const { payment_status } = usePayment();
 
   const { user } = useSelector((state: any) => state.user);
@@ -55,16 +52,7 @@ const PlanesPage = () => {
     try {
       setShowCancelModal(false);
 
-      const {
-        data: { data: updated },
-      } = await update({ has_paid: false }, user.id);
-      dispatch(setUser({ ...updated }));
-
-      await updateData(`payments/${user.id}`, {
-        ref_status: "canceled",
-        hora: new Date().toISOString(),
-        has_paid: false,
-      });
+      await cancelEpayco();
 
       history.replace("/perfil");
 
@@ -72,8 +60,13 @@ const PlanesPage = () => {
         title: "Suscripción cancelada",
         description: "Tu suscripción se cancelará al final del período actual",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.log("Error Cancelando", error);
+      toast({
+        title: "No pudimos cancelar tu suscripción",
+        description: error?.data?.error || "Intenta de nuevo en unos minutos.",
+        variant: "destructive",
+      });
     }
   };
 

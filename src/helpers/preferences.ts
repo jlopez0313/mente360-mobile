@@ -11,6 +11,7 @@ export const KEYS = {
   CRECIMIENTOS_PAGE_KEY: 'lastCrecimientoPage',
   DARK_MODE: 'darkMode',
   TOKEN: 'token',
+  EPAYCO_PENDING_REF: 'epaycoPendingRef',
 } as const;
 
 export type PreferenceKey = (typeof KEYS)[keyof typeof KEYS];

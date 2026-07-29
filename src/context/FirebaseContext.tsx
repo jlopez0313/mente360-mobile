@@ -1,3 +1,5 @@
+import { KEYS, getPreference, removePreference } from "@/helpers/preferences";
+import { useToast } from "@/hooks/use-toast";
 import { useNetwork } from "@/hooks/useNetwork";
 import { readData, snapshotToArray } from "@/services/realtime-db";
 import { setUser } from "@/store/slices/userSlice";
@@ -9,10 +11,34 @@ export const FirebaseContext = React.createContext<any>(undefined);
 
 export const FirebaseProvider = ({ children }: any) => {
   const dispatch = useDispatch();
+  const { toast } = useToast();
 
   const { user } = useSelector((state: any) => state.user);
   const network = useNetwork();
   const state = {};
+
+  // Avisa con un toast cuando ePayco confirma (por webhook, fuera del checkout)
+  // un pago que había quedado pendiente — ver EpaycoCheckoutModal.tsx, que guarda
+  // la referencia pendiente ahí mismo cuando el resultado no llega al instante.
+  const notifyIfPendingPaymentResolved = async (data: any) => {
+    const pendingRef = await getPreference(KEYS.EPAYCO_PENDING_REF);
+    if (!pendingRef || data.ref_payco !== pendingRef) return;
+
+    if (data.ref_status === "success") {
+      await removePreference(KEYS.EPAYCO_PENDING_REF);
+      toast({
+        title: "¡Pago confirmado!",
+        description: "Tu suscripción ya está activa.",
+      });
+    } else if (["rejected", "failed", "unknown"].includes(data.ref_status)) {
+      await removePreference(KEYS.EPAYCO_PENDING_REF);
+      toast({
+        title: "Tu pago no pudo confirmarse",
+        description: "Intenta de nuevo desde Planes.",
+        variant: "destructive",
+      });
+    }
+  };
 
   useEffect(() => {
     let unsubscribes: (() => void)[] = [];
@@ -24,6 +50,7 @@ export const FirebaseProvider = ({ children }: any) => {
           const data = snapshot.val();
           if (data) {
             dispatch(setUser(data));
+            notifyIfPendingPaymentResolved(data);
           }
         });
         unsubscribes.push(unsubUser);

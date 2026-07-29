@@ -6,6 +6,7 @@ export interface EpaycoCardData {
 	exp_year: string;
 	cvc: string;
 	card_holder: string;
+	email: string;
 }
 
 export interface EpaycoSubscribePayload {
@@ -24,20 +25,38 @@ export const useEpayco = () => {
 		return new Promise((resolve, reject) => {
 			window.ePayco.setPublicKey(publicKey);
 
+			// El SDK de ePayco genera este identificador con localStorage.setItem(),
+			// cuyo valor de retorno es siempre `undefined`. En la primera llamada de
+			// un dispositivo (localStorage vacío) eso hace que mande `session: undefined`
+			// y falle con "no se encontro el token de sesion". Lo sembramos antes para
+			// que el primer intento real del usuario ya funcione.
+			if (!localStorage.getItem("keyUserIndex")) {
+				const guid = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+					const r = (Math.random() * 16) | 0;
+					const v = c === "x" ? r : (r & 0x3) | 0x8;
+					return v.toString(16);
+				});
+				localStorage.setItem("keyUserIndex", guid);
+			}
+
 			window.ePayco.token.create(
 				{
-					"card[number]": card.number,
-					"card[exp_year]": card.exp_year,
-					"card[exp_month]": card.exp_month,
-					"card[cvc]": card.cvc,
+					card: {
+						number: card.number,
+						exp_year: card.exp_year,
+						exp_month: card.exp_month,
+						cvc: card.cvc,
+						name: card.card_holder,
+						email: card.email,
+					},
 					hasCvv: true,
 				},
 				(error: any, token: any) => {
-					if (error || !token?.id) {
+					if (error || !token) {
 						reject(error ?? token);
 						return;
 					}
-					resolve(token.id);
+					resolve(typeof token === "string" ? token : token.id);
 				}
 			);
 		});
