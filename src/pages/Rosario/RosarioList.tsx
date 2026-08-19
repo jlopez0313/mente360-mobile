@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getRosarios, Rosario } from "@/services/rosarios";
-import { ArrowLeft, Calendar, Heart, MessageCircle, Users } from "lucide-react";
+import { ArrowLeft, Calendar, Heart, MessageCircle, Users, Clock } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 
@@ -27,6 +27,24 @@ export default function RosarioList() {
   };
 
   useEffect(() => { loadData(); }, [activeTab]);
+
+  const formatFechaHora = (fechaStr?: string) => {
+    if (!fechaStr) return null;
+    try {
+      const date = new Date(fechaStr.replace(" ", "T"));
+      if (isNaN(date.getTime())) return fechaStr;
+      return date.toLocaleString("es-CO", {
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      });
+    } catch {
+      return fechaStr;
+    }
+  };
 
   return (
     <AppLayout>
@@ -72,7 +90,7 @@ export default function RosarioList() {
                   <p className="text-center py-12 text-muted-foreground text-sm">Cargando...</p>
                 ) : rosarios.length === 0 ? (
                   <p className="text-center py-12 text-muted-foreground text-sm">
-                    No hay rosarios disponibles.
+                    No hay rosarios disponibles en este momento.
                   </p>
                 ) : (
                   rosarios.map((item) => (
@@ -83,7 +101,15 @@ export default function RosarioList() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-foreground truncate">{item.nombre}</p>
-                          <p className="text-sm text-primary capitalize">Misterios {item.tipo_misterio}</p>
+                          <p className="text-xs text-primary capitalize font-medium">Misterios {item.tipo_misterio}</p>
+
+                          {item.fecha_hora && item.modalidad === "programado" && (
+                            <div className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400 font-semibold mt-0.5">
+                              <Clock className="w-3 h-3 flex-shrink-0" />
+                              <span className="truncate">{formatFechaHora(item.fecha_hora)}</span>
+                            </div>
+                          )}
+
                           <div className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
                             <Users className="w-3 h-3" />
                             <span>{item.participantes_count || 1} personas</span>
@@ -91,10 +117,10 @@ export default function RosarioList() {
                         </div>
                         <Button
                           size="sm"
-                          className="gradient-primary text-primary-foreground !rounded-xl"
+                          className="gradient-primary text-primary-foreground !rounded-xl text-xs font-semibold px-3"
                           onClick={() => history.push(`/rosario/vivo/${item.id}`)}
                         >
-                          Unirme
+                          {item.modalidad === "programado" ? "Ver evento" : "Unirme"}
                         </Button>
                       </CardContent>
                     </Card>

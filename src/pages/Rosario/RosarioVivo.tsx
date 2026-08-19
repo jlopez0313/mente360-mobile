@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { ArrowLeft, Users, Heart, Flame, Search } from "lucide-react";
+import { ArrowLeft, Users, Heart, Flame, Search, Clock } from "lucide-react";
 import { RosaryIcon } from "@/components/Home/RosarioCard";
 import { getRosario, avanzarRosario, reiniciarRosario, unirseRosario, responderAmen, pedirOracion, Rosario } from "@/services/rosarios";
 import { AppLayout } from "@/components/layout";
@@ -140,10 +140,17 @@ export default function RosarioVivo() {
               <div className="min-w-0">
                 <h1 className="text-lg font-bold text-foreground truncate">{rosario.nombre}</h1>
                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                  <span className="flex items-center gap-1 text-primary font-medium">
-                    <span className="w-2 h-2 rounded-full bg-primary animate-pulse inline-block" />
-                    En directo
-                  </span>
+                  {rosario.modalidad === "programado" || rosario.estado === "programado" ? (
+                    <span className="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-semibold">
+                      <Clock className="w-3.5 h-3.5" />
+                      Programado
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1 text-primary font-medium">
+                      <span className="w-2 h-2 rounded-full bg-primary animate-pulse inline-block" />
+                      En directo
+                    </span>
+                  )}
                   <span className="flex items-center gap-1">
                     <Users className="w-3 h-3" />
                     {rosario.participantes_count || rosario.participantes?.length || 0} rezando
