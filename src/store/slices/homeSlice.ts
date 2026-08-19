@@ -7,6 +7,8 @@ const initialState = {
     tarea: {},
     audio: {},
     podcast: {},
+    cadenaDelBien: {},
+    tarjetaDestacada: {},
     currentDay: 0,
     msgSource: ''
 }
@@ -24,6 +26,12 @@ export const homeSlice = createSlice({
         setPodcast: (state, action) => {
             state.podcast = {...action.payload};
         },
+        setCadenaDelBien: (state, action) => {
+            state.cadenaDelBien = {...action.payload};
+        },
+        setTarjetaDestacada: (state, action) => {
+            state.tarjetaDestacada = {...action.payload};
+        },
         setCurrentDay: (state, action) => {
             state.currentDay = action.payload;
         },
@@ -37,6 +45,8 @@ export const {
     setAdmin,
     setPanico,
     setPodcast,
+    setCadenaDelBien,
+    setTarjetaDestacada,
     setMsgSource,
     setCurrentDay,
 } = homeSlice.actions

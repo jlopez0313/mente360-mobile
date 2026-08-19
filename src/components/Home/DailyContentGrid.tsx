@@ -7,6 +7,9 @@ import {
   Moon
 } from "lucide-react";
 
+import { Link } from "react-router-dom";
+import { RosaryIcon } from "./RosarioCard";
+
 interface DailyContentItem {
   id: string;
   title: string;
@@ -64,9 +67,18 @@ export function DailyContentGrid({ completed, onOpenModal }: DailyContentGridPro
 
   return (
     <div className="px-4 pb-4">
-      <h3 className="font-display font-semibold text-lg mb-3 text-foreground">
-        Tu contenido diario
-      </h3>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="font-display font-semibold text-lg text-foreground">
+          Tu contenido diario
+        </h3>
+        <Link
+          to="/rosario"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/40 bg-primary/10 text-primary text-xs font-semibold hover:bg-primary/20 transition-colors"
+        >
+          <RosaryIcon className="w-3.5 h-3.5" />
+          <span>Rezar ahora</span>
+        </Link>
+      </div>
 
       <div className="grid grid-cols-2 gap-3">
         {items.map((item) => {

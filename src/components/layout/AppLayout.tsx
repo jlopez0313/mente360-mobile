@@ -10,11 +10,11 @@ interface AppLayoutProps {
 export function AppLayout({ children, hideNav = false }: AppLayoutProps) {
   return (
     <IonPage>
-      <IonContent fullscreen scrollY={false} className="space-y-4">
-        <div className="h-full flex flex-col bg-background">
+      <IonContent fullscreen scrollY={true} className="space-y-4">
+        <div className="min-h-full flex flex-col bg-background">
           <main className={cn(
               "flex-1 flex flex-col min-h-0",
-              hideNav ? "pb-14" : ""
+              hideNav ? "pb-20" : ""
             )}>
             {children}
           </main>

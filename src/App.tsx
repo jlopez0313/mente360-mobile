@@ -24,6 +24,10 @@ const Registro = lazy(() => import("./pages/Registro/Registro"));
 const Suscripcion = lazy(() => import("./pages/Suscripcion/Suscripcion"));
 const Test = lazy(() => import("./pages/Test/Test"));
 
+const RosarioList = lazy(() => import("./pages/Rosario/RosarioList"));
+const RosarioVivo = lazy(() => import("./pages/Rosario/RosarioVivo"));
+const CrearRosario = lazy(() => import("./pages/Rosario/CrearRosario"));
+
 import { FirebaseProvider } from "./context/FirebaseContext";
 
 /* Core CSS required for Ionic components to work properly */
@@ -85,6 +89,7 @@ const App: React.FC = () => {
                       "/notificaciones",
                       "/musicaterapia",
                       "/chat",
+                      "/rosario",
                     ]}
                   >
                     <TabsLayout />
@@ -158,6 +163,14 @@ const App: React.FC = () => {
 
                   <Route exact path="/recordatorios">
                     <Recordatorios />
+                  </Route>
+
+                  <Route exact path="/rosario/crear">
+                    <CrearRosario />
+                  </Route>
+
+                  <Route exact path="/rosario/vivo/:id">
+                    <RosarioVivo />
                   </Route>
                 </Suspense>
 

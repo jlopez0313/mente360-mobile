@@ -27,6 +27,7 @@ const Comunidades = lazy(() => import("@/pages/Comunidades/Comunidades"));
 const Home = lazy(() => import("@/pages/Home/Home"));
 const Musicaterapia = lazy(() => import("@/pages/Musicaterapia/Musicaterapia"));
 const Notifications = lazy(() => import("@/pages/Notifications/Notifications"));
+const RosarioList = lazy(() => import("@/pages/Rosario/RosarioList"));
 
 const navItems: {
   isEnabled: boolean;
@@ -102,6 +103,9 @@ export const TabsLayout = () => {
               {item.child}
             </Route>
           ))}
+          <Route exact path="/rosario">
+            <RosarioList />
+          </Route>
         </Suspense>
       </IonRouterOutlet>
 

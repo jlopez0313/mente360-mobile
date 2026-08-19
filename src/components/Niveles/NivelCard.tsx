@@ -150,7 +150,7 @@ export const NivelCard = ({ nivel, minOrden }: Props) => {
                   }
                 </span>
                 <div className="flex-1" />
-                {nivel.id == myCrecimiento?.nivel.id || progress || isCompleted ? (
+                {canPlay ? (
                   podcast?.audio_local ? (
                     <Save className="w-4 h-4 text-success" />
                   ) : (
@@ -162,7 +162,7 @@ export const NivelCard = ({ nivel, minOrden }: Props) => {
           </Link>
 
           {/* Progress bar */}
-          {nivel.id == myCrecimiento?.nivel.id || progress || isCompleted ? (
+          {canPlay ? (
             podcast?.audio_local ? null : (
               <div className="px-3 pb-3 flex items-center gap-2">
                 <Progress

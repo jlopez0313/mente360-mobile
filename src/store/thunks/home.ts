@@ -1,7 +1,7 @@
 import { DB, localDB } from "@/helpers/localStore";
 import { db } from "@/hooks/useDexie";
 import { getHome } from "@/services/home";
-import { setAdmin, setPodcast } from "@/store/slices/homeSlice";
+import { setAdmin, setCadenaDelBien, setPodcast, setTarjetaDestacada } from "@/store/slices/homeSlice";
 
 export const getHomeThunk = (): any => {
   return async (dispatch: any) => {
@@ -25,11 +25,21 @@ export const getHomeThunk = (): any => {
     });
 
     const podcast = { done: false };
+    const cadenaDelBien = data.cadena_del_bien ?? {};
+    const tarjetaDestacada = data.tarjeta_destacada ?? {};
 
     const localHome = localDB(DB.HOME);
-    localHome.set({ admin: { ...data.admin }, podcast, showSuccess: false });
+    localHome.set({
+      admin: { ...data.admin },
+      podcast,
+      cadenaDelBien,
+      tarjetaDestacada,
+      showSuccess: false,
+    });
 
     dispatch(setPodcast(podcast));
     dispatch(setAdmin(data.admin));
+    dispatch(setCadenaDelBien(cadenaDelBien));
+    dispatch(setTarjetaDestacada(tarjetaDestacada));
   };
 };

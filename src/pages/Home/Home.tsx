@@ -1,9 +1,12 @@
 import {
+  CadenaDelBienCard,
   DailyAudioCard,
   DailyContentGrid,
   DailyMessageModal,
   EneatipoModal,
+  FeaturedContentCard,
   NightAudioModal,
+  RosarioCard,
   SOSModal,
   TaskProgress,
   WeeklyCalendar,
@@ -28,8 +31,10 @@ import { usePreferences } from "@/hooks/usePreferences";
 import { update } from "@/services/user";
 import {
   setAdmin,
+  setCadenaDelBien,
   setCurrentDay,
   setPodcast,
+  setTarjetaDestacada,
 } from "@/store/slices/homeSlice";
 import { setUser } from "@/store/slices/userSlice";
 import { getHomeThunk } from "@/store/thunks/home";
@@ -44,7 +49,9 @@ const Home: React.FC = () => {
   const [selectedDay, setSelectedDay] = useState(new Date().getDay());
   const { completed, markComplete } = useCompletedItems();
 
-  const { currentDay } = useSelector((state: any) => state.home);
+  const { currentDay, cadenaDelBien, tarjetaDestacada } = useSelector(
+    (state: any) => state.home,
+  );
   const dispatch = useDispatch();
   const history = useHistory();
 
@@ -70,7 +77,7 @@ const Home: React.FC = () => {
   const localData = localHome.get();
 
   const handleOpenModal = (
-    modal: "nightAudio" | "sosEmotional" | "dailyMessage" | "weeklyTask"
+    modal: "nightAudio" | "sosEmotional" | "dailyMessage" | "weeklyTask",
   ) => {
     const isPrincipal = localStorage.getItem("principal");
     if (!isPrincipal) {
@@ -81,7 +88,7 @@ const Home: React.FC = () => {
     switch (modal) {
       case "nightAudio":
         if (!userEnabled || payment_status == "free") {
-          history.push('/planes');
+          history.push("/planes");
           return;
         }
 
@@ -89,7 +96,7 @@ const Home: React.FC = () => {
         break;
       case "sosEmotional":
         if (!userEnabled || payment_status == "free") {
-          history.push('/planes');
+          history.push("/planes");
           return;
         }
 
@@ -100,7 +107,7 @@ const Home: React.FC = () => {
         break;
       case "weeklyTask":
         if (!userEnabled || payment_status == "free") {
-          history.push('/planes');
+          history.push("/planes");
           return;
         }
 
@@ -203,6 +210,8 @@ const Home: React.FC = () => {
           } else {
             dispatch(setPodcast(localData.podcast));
             dispatch(setAdmin(localData.admin));
+            dispatch(setCadenaDelBien(localData.cadenaDelBien ?? {}));
+            dispatch(setTarjetaDestacada(localData.tarjetaDestacada ?? {}));
           }
         }
       } catch (error: any) {
@@ -218,7 +227,6 @@ const Home: React.FC = () => {
 
   return (
     <AppLayout>
-
       <SuccessOverlay show={showSuccess} />
 
       <div className="h-full safe-top flex flex-col">
@@ -259,7 +267,6 @@ const Home: React.FC = () => {
         </header>
 
         <div className="flex-1 overflow-y-auto">
-
           {/* Task Progress */}
           <TaskProgress daysRemaining={currentDay} />
 
@@ -276,6 +283,25 @@ const Home: React.FC = () => {
               weeklyTask: weeklyTask?.done === 1,
             }}
             onOpenModal={handleOpenModal}
+          />
+
+          {/* Cadena del Bien */}
+          <CadenaDelBienCard
+            titulo={cadenaDelBien?.titulo}
+            descripcion={cadenaDelBien?.descripcion}
+            link={cadenaDelBien?.link}
+          />
+
+          {/* Rosario en comunidad */}
+          <RosarioCard />
+
+          {/* Tarjeta destacada (dinámica, oculta si no hay contenido) */}
+          <FeaturedContentCard
+            titulo={tarjetaDestacada?.titulo}
+            descripcion={tarjetaDestacada?.descripcion}
+            tipo={tarjetaDestacada?.tipo}
+            contenido_url={tarjetaDestacada?.contenido_url}
+            link={tarjetaDestacada?.link}
           />
 
           {/* Daily Audio */}
