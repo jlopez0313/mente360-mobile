@@ -83,7 +83,8 @@ export default function RosarioVivo() {
     );
   }
 
-  const pct = rosario.progreso_porcentaje || 0;
+  const pct = rosario.mi_progreso?.progreso_porcentaje ?? 0;
+  const decenaActual = rosario.mi_progreso?.decena_actual ?? 1;
   const radius = 42;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (pct / 100) * circumference;
@@ -142,7 +143,7 @@ export default function RosarioVivo() {
               </div>
               <div className="text-center space-y-1">
                 <p className="text-sm text-primary font-medium capitalize">Misterios {rosario.tipo_misterio}</p>
-                <h2 className="text-2xl font-bold text-foreground">{decenaNombres[rosario.decena_actual] ?? `${rosario.decena_actual}ª decena`}</h2>
+                <h2 className="text-2xl font-bold text-foreground">{decenaNombres[decenaActual] ?? `${decenaActual}ª decena`}</h2>
                 <div className="flex items-center justify-center">
                   <RosaryIcon className="w-4 h-4 text-primary" />
                 </div>
@@ -218,7 +219,7 @@ export default function RosarioVivo() {
           </div>
 
           {/* CTA */}
-          {rosario.estado === 'finalizado' || rosario.progreso_porcentaje >= 100 ? (
+          {pct >= 100 ? (
             <Card className="border-border/50 bg-primary/5">
               <CardContent className="p-4 flex flex-col items-center gap-2 text-center">
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
