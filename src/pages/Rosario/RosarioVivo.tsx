@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { ArrowLeft, Users, Heart, Flame } from "lucide-react";
+import { ArrowLeft, Users, Heart, Flame, Search } from "lucide-react";
 import { RosaryIcon } from "@/components/Home/RosarioCard";
 import { getRosario, avanzarRosario, unirseRosario, responderAmen, pedirOracion, Rosario } from "@/services/rosarios";
 import { AppLayout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
 export default function RosarioVivo() {
@@ -15,6 +17,8 @@ export default function RosarioVivo() {
 
   const [rosario, setRosario] = useState<Rosario | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showMembersModal, setShowMembersModal] = useState(false);
+  const [searchMember, setSearchMember] = useState("");
 
   const fetchDetail = async () => {
     if (!id) return;
@@ -89,6 +93,10 @@ export default function RosarioVivo() {
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (pct / 100) * circumference;
 
+  const filteredParticipantes = (rosario.participantes || []).filter(p =>
+    (p.usuario?.name || "").toLowerCase().includes(searchMember.toLowerCase())
+  );
+
   return (
     <AppLayout hideNav>
       <div className="min-h-full flex flex-col bg-background pb-24">
@@ -115,7 +123,7 @@ export default function RosarioVivo() {
                   </span>
                   <span className="flex items-center gap-1">
                     <Users className="w-3 h-3" />
-                    {rosario.participantes_count || 0} rezando
+                    {rosario.participantes_count || rosario.participantes?.length || 0} rezando
                   </span>
                 </div>
               </div>
@@ -158,6 +166,13 @@ export default function RosarioVivo() {
             <div>
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold text-foreground">Personas rezando ahora</h3>
+                <button
+                  type="button"
+                  onClick={() => setShowMembersModal(true)}
+                  className="text-xs text-primary font-semibold hover:underline"
+                >
+                  Ver todos ({rosario.participantes.length})
+                </button>
               </div>
               <div className="flex items-center gap-2 flex-wrap">
                 {rosario.participantes.slice(0, 6).map((p, i) => (
@@ -169,9 +184,13 @@ export default function RosarioVivo() {
                   </Avatar>
                 ))}
                 {rosario.participantes.length > 6 && (
-                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-xs text-muted-foreground font-bold border-2 border-background">
+                  <button
+                    type="button"
+                    onClick={() => setShowMembersModal(true)}
+                    className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-xs text-muted-foreground font-bold border-2 border-background hover:bg-muted/80 transition-colors"
+                  >
                     +{rosario.participantes.length - 6}
-                  </div>
+                  </button>
                 )}
               </div>
             </div>
@@ -250,6 +269,52 @@ export default function RosarioVivo() {
           )}
         </div>
       </div>
+
+      {/* Sheet Modal para ver todos los participantes */}
+      <Sheet open={showMembersModal} onOpenChange={setShowMembersModal}>
+        <SheetContent side="bottom" className="rounded-t-2xl max-h-[80vh] flex flex-col p-0">
+          <SheetHeader className="px-4 pt-4 pb-2 border-b border-border/50">
+            <SheetTitle className="text-base font-bold flex items-center gap-2">
+              <Users className="w-5 h-5 text-primary" />
+              Personas rezando ({rosario.participantes?.length || 0})
+            </SheetTitle>
+          </SheetHeader>
+
+          <div className="p-4 pb-2">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar participante..."
+                value={searchMember}
+                onChange={(e) => setSearchMember(e.target.value)}
+                className="pl-9 bg-card border-border"
+              />
+            </div>
+          </div>
+
+          <div className="overflow-y-auto flex-1 p-4 space-y-3">
+            {filteredParticipantes.length === 0 ? (
+              <p className="text-center py-6 text-xs text-muted-foreground">No se encontraron participantes</p>
+            ) : (
+              filteredParticipantes.map((p, i) => (
+                <div key={i} className="flex items-center gap-3 p-2 rounded-xl hover:bg-muted/50 transition-colors">
+                  <Avatar className="w-10 h-10">
+                    <AvatarImage src="" alt={p.usuario?.name} />
+                    <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
+                      {p.usuario?.name?.slice(0, 2).toUpperCase() ?? "??"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground truncate">{p.usuario?.name || "Usuario"}</p>
+                    <p className="text-xs text-muted-foreground truncate">{p.usuario?.email || "Unido en oración"}</p>
+                  </div>
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" title="Rezando ahora" />
+                </div>
+              ))
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
     </AppLayout>
   );
 }
