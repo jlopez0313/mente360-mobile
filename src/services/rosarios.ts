@@ -11,9 +11,11 @@ export interface Rosario {
   privacidad: 'publico' | 'familia' | 'comunidad';
   permitir_unirse: boolean;
   estado: 'en_vivo' | 'programado' | 'finalizado' | 'borrador';
-  decena_actual: number;
-  progreso_porcentaje: number;
   participantes_count?: number;
+  mi_progreso?: {
+    decena_actual: number;
+    progreso_porcentaje: number;
+  };
   creador?: {
     id: number;
     name: string;

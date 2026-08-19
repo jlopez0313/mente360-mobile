@@ -218,16 +218,35 @@ export default function RosarioVivo() {
           </div>
 
           {/* CTA */}
-          <Button
-            onClick={handleAvanzar}
-            className="w-full gradient-primary text-primary-foreground !rounded-xl h-12 gap-2"
-          >
-            <RosaryIcon className="w-5 h-5" />
-            <div className="flex flex-col text-left leading-tight">
-              <span className="font-bold text-sm">Continuar rezando</span>
-              <span className="text-[10px] opacity-90">Ir a la siguiente decena</span>
-            </div>
-          </Button>
+          {rosario.estado === 'finalizado' || rosario.progreso_porcentaje >= 100 ? (
+            <Card className="border-border/50 bg-primary/5">
+              <CardContent className="p-4 flex flex-col items-center gap-2 text-center">
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                  <RosaryIcon className="w-6 h-6 text-primary" />
+                </div>
+                <p className="font-bold text-foreground">¡Rosario completado!</p>
+                <p className="text-xs text-muted-foreground">Has rezado las 5 decenas. Dios te bendiga.</p>
+                <Button
+                  variant="outline"
+                  className="w-full !rounded-xl mt-1"
+                  onClick={() => history.replace('/rosario')}
+                >
+                  Volver a rosarios
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <Button
+              onClick={handleAvanzar}
+              className="w-full gradient-primary text-primary-foreground !rounded-xl h-12 gap-2"
+            >
+              <RosaryIcon className="w-5 h-5" />
+              <div className="flex flex-col text-left leading-tight">
+                <span className="font-bold text-sm">Continuar rezando</span>
+                <span className="text-[10px] opacity-90">Ir a la siguiente decena</span>
+              </div>
+            </Button>
+          )}
         </div>
       </div>
     </AppLayout>
