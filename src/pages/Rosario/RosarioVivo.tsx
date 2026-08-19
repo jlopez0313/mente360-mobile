@@ -2,13 +2,14 @@ import { useState, useEffect } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { ArrowLeft, Users, Heart, Flame, Search } from "lucide-react";
 import { RosaryIcon } from "@/components/Home/RosarioCard";
-import { getRosario, avanzarRosario, unirseRosario, responderAmen, pedirOracion, Rosario } from "@/services/rosarios";
+import { getRosario, avanzarRosario, reiniciarRosario, unirseRosario, responderAmen, pedirOracion, Rosario } from "@/services/rosarios";
 import { AppLayout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
+import { RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 
 export default function RosarioVivo() {
@@ -44,6 +45,28 @@ export default function RosarioVivo() {
       toast.success("¡Has avanzado a la siguiente decena!");
     } catch {
       toast.error("No se pudo avanzar.");
+    }
+  };
+
+  const handleReiniciar = async () => {
+    if (!rosario) return;
+    try {
+      const res = await reiniciarRosario(rosario.id);
+      if (res?.data) {
+        setRosario(res.data);
+      } else {
+        setRosario({
+          ...rosario,
+          mi_progreso: { decena_actual: 1, progreso_porcentaje: 0 }
+        });
+      }
+      toast.success("Rosario reiniciado, ¡puedes volver a rezar!");
+    } catch {
+      setRosario({
+        ...rosario,
+        mi_progreso: { decena_actual: 1, progreso_porcentaje: 0 }
+      });
+      toast.success("Rosario reiniciado, ¡puedes volver a rezar!");
     }
   };
 
@@ -240,19 +263,30 @@ export default function RosarioVivo() {
           {/* CTA */}
           {pct >= 100 ? (
             <Card className="border-border/50 bg-primary/5">
-              <CardContent className="p-4 flex flex-col items-center gap-2 text-center">
+              <CardContent className="p-4 flex flex-col items-center gap-3 text-center">
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                   <RosaryIcon className="w-6 h-6 text-primary" />
                 </div>
-                <p className="font-bold text-foreground">¡Rosario completado!</p>
-                <p className="text-xs text-muted-foreground">Has rezado las 5 decenas. Dios te bendiga.</p>
-                <Button
-                  variant="outline"
-                  className="w-full !rounded-xl mt-1"
-                  onClick={() => history.replace('/rosario')}
-                >
-                  Volver a rosarios
-                </Button>
+                <div>
+                  <p className="font-bold text-foreground text-base">¡Rosario completado!</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Has rezado las 5 decenas. Dios te bendiga.</p>
+                </div>
+                <div className="w-full flex flex-col gap-2 mt-1">
+                  <Button
+                    onClick={handleReiniciar}
+                    className="w-full gradient-primary text-primary-foreground !rounded-xl h-11 gap-2 font-bold"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                    Reiniciar rosario
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full !rounded-xl h-10 font-semibold"
+                    onClick={() => history.replace('/rosario')}
+                  >
+                    Volver a rosarios
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ) : (

@@ -8,8 +8,8 @@ export interface Rosario {
   tipo_misterio: 'gozosos' | 'dolorosos' | 'gloriosos' | 'luminosos';
   modalidad: 'ahora' | 'programado';
   fecha_hora?: string;
-  privacidad: 'publico' | 'familia' | 'comunidad';
-  permitir_unirse: boolean;
+  privacidad: 'publico' | 'comunidad';
+  comunidad_ids?: number[];
   estado: 'en_vivo' | 'programado' | 'finalizado' | 'borrador';
   participantes_count?: number;
   mi_progreso?: {
@@ -58,6 +58,12 @@ export const unirseRosario = async (id: number | string) => {
 export const avanzarRosario = async (id: number | string) => {
   const api = await baseApi();
   const response = await api.post(`/rosarios/${id}/avanzar`, {});
+  return response.data;
+};
+
+export const reiniciarRosario = async (id: number | string) => {
+  const api = await baseApi();
+  const response = await api.post(`/rosarios/${id}/reiniciar`, {});
   return response.data;
 };
 
