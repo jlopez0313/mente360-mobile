@@ -6,6 +6,8 @@ const baseURL = import.meta.env.VITE_BASE_API;
 const getHeaders = async (customHeaders: Record<string, string> = {}) => {
     const token = await getPreference(KEYS.TOKEN);
     return {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
         Authorization: token ? `Bearer ${token}` : '',
         ...customHeaders,
     };
