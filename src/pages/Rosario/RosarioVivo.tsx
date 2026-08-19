@@ -37,8 +37,32 @@ export default function RosarioVivo() {
 
   useEffect(() => { fetchDetail(); }, [id]);
 
+  const formatFechaHora = (fechaStr?: string) => {
+    if (!fechaStr) return null;
+    try {
+      const date = new Date(fechaStr.replace(" ", "T"));
+      if (isNaN(date.getTime())) return fechaStr;
+      return date.toLocaleString("es-CO", {
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      });
+    } catch {
+      return fechaStr;
+    }
+  };
+
+  const isProgramado = rosario ? (rosario.modalidad === "programado" || rosario.estado === "programado") : false;
+
   const handleAvanzar = async () => {
     if (!rosario) return;
+    if (isProgramado) {
+      toast.error("Este rosario está programado y aún no ha comenzado.");
+      return;
+    }
     try {
       const res = await avanzarRosario(rosario.id);
       if (res?.data) setRosario(res.data);
@@ -188,6 +212,54 @@ export default function RosarioVivo() {
                 <p className="font-semibold text-sm text-foreground">Padrenuestro / 10 Avemarías</p>
                 <p className="text-xs text-muted-foreground">Meditemos el misterio y recemos con fe y devoción.</p>
               </div>
+
+              {/* CTA */}
+              {pct >= 100 ? (
+                <div className="w-full flex flex-col items-center gap-3 text-center pt-3 border-t border-border/40">
+                  <p className="font-bold text-foreground text-base">¡Rosario completado!</p>
+                  <p className="text-xs text-muted-foreground -mt-2">Has rezado las 5 decenas. Dios te bendiga.</p>
+                  <div className="w-full flex flex-col gap-2 mt-1">
+                    <Button
+                      onClick={handleReiniciar}
+                      className="w-full gradient-primary text-primary-foreground !rounded-xl h-11 gap-2 font-bold"
+                    >
+                      <RotateCcw className="w-4 h-4" />
+                      Reiniciar rosario
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full !rounded-xl h-10 font-semibold text-xs"
+                      onClick={() => history.replace('/rosario')}
+                    >
+                      Volver a rosarios
+                    </Button>
+                  </div>
+                </div>
+              ) : isProgramado ? (
+                <Button
+                  disabled
+                  className="w-full bg-muted/80 text-muted-foreground !rounded-xl h-12 gap-2 mt-1 cursor-not-allowed border border-border/50 opacity-90"
+                >
+                  <Clock className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+                  <div className="flex flex-col text-left leading-tight min-w-0">
+                    <span className="font-bold text-sm text-foreground">Evento programado</span>
+                    <span className="text-[10px] text-muted-foreground truncate">
+                      {rosario.fecha_hora ? `Disponible: ${formatFechaHora(rosario.fecha_hora)}` : "El evento aún no ha comenzado"}
+                    </span>
+                  </div>
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleAvanzar}
+                  className="w-full gradient-primary text-primary-foreground !rounded-xl h-12 gap-2 mt-1"
+                >
+                  <RosaryIcon className="w-5 h-5" />
+                  <div className="flex flex-col text-left leading-tight">
+                    <span className="font-bold text-sm">Continuar rezando</span>
+                    <span className="text-[10px] opacity-90">Ir a la siguiente decena</span>
+                  </div>
+                </Button>
+              )}
             </CardContent>
           </Card>
 
@@ -266,48 +338,6 @@ export default function RosarioVivo() {
               </CardContent>
             </Card>
           </div>
-
-          {/* CTA */}
-          {pct >= 100 ? (
-            <Card className="border-border/50 bg-primary/5">
-              <CardContent className="p-4 flex flex-col items-center gap-3 text-center">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  <RosaryIcon className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <p className="font-bold text-foreground text-base">¡Rosario completado!</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Has rezado las 5 decenas. Dios te bendiga.</p>
-                </div>
-                <div className="w-full flex flex-col gap-2 mt-1">
-                  <Button
-                    onClick={handleReiniciar}
-                    className="w-full gradient-primary text-primary-foreground !rounded-xl h-11 gap-2 font-bold"
-                  >
-                    <RotateCcw className="w-4 h-4" />
-                    Reiniciar rosario
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full !rounded-xl h-10 font-semibold"
-                    onClick={() => history.replace('/rosario')}
-                  >
-                    Volver a rosarios
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <Button
-              onClick={handleAvanzar}
-              className="w-full gradient-primary text-primary-foreground !rounded-xl h-12 gap-2"
-            >
-              <RosaryIcon className="w-5 h-5" />
-              <div className="flex flex-col text-left leading-tight">
-                <span className="font-bold text-sm">Continuar rezando</span>
-                <span className="text-[10px] opacity-90">Ir a la siguiente decena</span>
-              </div>
-            </Button>
-          )}
         </div>
       </div>
 
