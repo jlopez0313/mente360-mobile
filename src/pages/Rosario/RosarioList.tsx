@@ -1,12 +1,12 @@
-import { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
-import { ArrowLeft, Settings, Users, Calendar, Heart, MessageCircle } from "lucide-react";
 import { RosaryIcon } from "@/components/Home/RosarioCard";
-import { getRosarios, Rosario } from "@/services/rosarios";
 import { AppLayout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getRosarios, Rosario } from "@/services/rosarios";
+import { ArrowLeft, Calendar, Heart, MessageCircle, Users } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
 
 export default function RosarioList() {
   const history = useHistory();
@@ -45,13 +45,6 @@ export default function RosarioList() {
               <h1 className="text-xl font-bold text-foreground">Rosario en comunidad</h1>
               <p className="text-sm text-muted-foreground">Ora con otros, en vivo o por una intención</p>
             </div>
-            <button
-              type="button"
-              onClick={() => history.push("/configuracion")}
-              className="p-2 -mr-2 hover:bg-muted rounded-full transition-colors"
-            >
-              <Settings className="w-5 h-5 text-muted-foreground" />
-            </button>
           </div>
         </div>
 

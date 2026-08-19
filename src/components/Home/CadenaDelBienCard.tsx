@@ -30,9 +30,9 @@ export function CadenaDelBienCard({ titulo, descripcion, link }: CadenaDelBienCa
           </div>
 
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-foreground leading-tight">{titulo}</p>
+            <p className="font-heading font-bold text-base text-foreground">{titulo}</p>
             {descripcion && (
-              <p className="text-sm text-muted-foreground line-clamp-2">{descripcion}</p>
+              <p className="text-xs text-muted-foreground line-clamp-2">{descripcion}</p>
             )}
           </div>
 

@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react";
 import { ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { getRosarios } from "@/services/rosarios";
 
 export function RosaryIcon({ className = "w-6 h-6" }: { className?: string }) {
   return (
@@ -12,11 +14,21 @@ export function RosaryIcon({ className = "w-6 h-6" }: { className?: string }) {
   );
 }
 
-interface RosarioCardProps {
-  rezandoCount?: number;
-}
+export function RosarioCard() {
+  const [totalRezando, setTotalRezando] = useState<number | undefined>(undefined);
 
-export function RosarioCard({ rezandoCount = 38 }: RosarioCardProps) {
+  useEffect(() => {
+    getRosarios("ahora")
+      .then((res) => {
+        if (res?.total_rezando !== undefined) {
+          setTotalRezando(res.total_rezando);
+        }
+      })
+      .catch(() => {
+        // sin dato, no mostrar
+      });
+  }, []);
+
   return (
     <div className="px-4 pb-4">
       <Link
@@ -36,12 +48,14 @@ export function RosarioCard({ rezandoCount = 38 }: RosarioCardProps) {
             <p className="text-xs text-muted-foreground line-clamp-1">
               Únete a personas que están rezando ahora
             </p>
-            <div className="inline-flex items-center gap-1.5 mt-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[11px] font-semibold text-primary">
-                {rezandoCount} rezando ahora
-              </span>
-            </div>
+            {totalRezando !== undefined && totalRezando > 0 && (
+              <div className="inline-flex items-center gap-1.5 mt-1">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[11px] font-semibold text-primary">
+                  {totalRezando} rezando ahora
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
