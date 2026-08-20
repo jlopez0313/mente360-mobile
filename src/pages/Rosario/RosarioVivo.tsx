@@ -1,16 +1,25 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { ArrowLeft, Users, Heart, Flame, Search, Clock } from "lucide-react";
+import { ArrowLeft, Users, Heart, Flame, Search, RotateCcw, Check } from "lucide-react";
 import { RosaryIcon } from "@/components/Home/RosarioCard";
-import { getRosario, avanzarRosario, reiniciarRosario, unirseRosario, responderAmen, pedirOracion, Rosario } from "@/services/rosarios";
+import {
+  getRosario,
+  avanzarRosario,
+  reiniciarRosario,
+  unirseRosario,
+  responderAmen,
+  pedirOracion,
+  Rosario,
+} from "@/services/rosarios";
 import { AppLayout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
-import { RotateCcw } from "lucide-react";
 import { toast } from "sonner";
+import { rtDatabase } from "@/firebase/config";
+import { ref, onValue } from "firebase/database";
 
 export default function RosarioVivo() {
   const history = useHistory();
@@ -19,52 +28,56 @@ export default function RosarioVivo() {
   const [rosario, setRosario] = useState<Rosario | null>(null);
   const [loading, setLoading] = useState(true);
   const [showMembersModal, setShowMembersModal] = useState(false);
+  const [showPeticionModal, setShowPeticionModal] = useState(false);
   const [searchMember, setSearchMember] = useState("");
 
-  const fetchDetail = async () => {
+  // Form state for Pedir oración
+  const [intencion, setIntencion] = useState("");
+  const [detalle, setDetalle] = useState("");
+  const [compartir, setCompartir] = useState(true);
+  const [submittingPeticion, setSubmittingPeticion] = useState(false);
+
+  const fetchDetail = async (isSilent = false) => {
     if (!id) return;
-    setLoading(true);
+    if (!isSilent) setLoading(true);
     try {
       const res = await getRosario(id);
-      if (res?.data) setRosario(res.data);
-      await unirseRosario(id);
+      if (res?.data) {
+        setRosario(res.data);
+      }
     } catch {
-      // no data
+      // Keep state if fetch error
     } finally {
-      setLoading(false);
+      if (!isSilent) setLoading(false);
     }
   };
 
-  useEffect(() => { fetchDetail(); }, [id]);
-
-  const formatFechaHora = (fechaStr?: string) => {
-    if (!fechaStr) return null;
-    try {
-      const date = new Date(fechaStr.replace(" ", "T"));
-      if (isNaN(date.getTime())) return fechaStr;
-      return date.toLocaleString("es-CO", {
-        weekday: "short",
-        day: "numeric",
-        month: "short",
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true,
-      });
-    } catch {
-      return fechaStr;
+  useEffect(() => {
+    fetchDetail();
+    if (id) {
+      unirseRosario(id).catch(() => {});
     }
-  };
 
-  const isEnFuturo = (() => {
-    if (!rosario || !rosario.fecha_hora) return false;
-    if (rosario.estado && rosario.estado !== "programado") return false;
-    try {
-      const fecha = new Date(rosario.fecha_hora.replace(" ", "T")).getTime();
-      return !isNaN(fecha) && fecha > Date.now();
-    } catch {
-      return false;
+    // Firebase Realtime DB Listener: updates live feed and status in real-time across devices
+    if (id && rtDatabase) {
+      const rosarioRef = ref(rtDatabase, `rosarios/${id}`);
+      const unsubscribe = onValue(
+        rosarioRef,
+        (snapshot) => {
+          if (snapshot.exists()) {
+            fetchDetail(true);
+          }
+        },
+        (error) => {
+          console.warn("Firebase realtime error:", error);
+        }
+      );
+
+      return () => {
+        unsubscribe();
+      };
     }
-  })();
+  }, [id]);
 
   const handleAvanzar = async () => {
     if (!rosario) return;
@@ -72,27 +85,10 @@ export default function RosarioVivo() {
       const res = await avanzarRosario(rosario.id);
       if (res?.data) {
         setRosario(res.data);
-      } else {
-        setRosario({
-          ...rosario,
-          estado: "en_vivo",
-          mi_progreso: {
-            decena_actual: Math.min(5, (rosario.mi_progreso?.decena_actual || 1) + (pct === 0 ? 0 : 1)),
-            progreso_porcentaje: Math.min(100, (rosario.mi_progreso?.progreso_porcentaje || 0) + 20)
-          }
-        });
       }
       toast.success("¡Has avanzado en la oración!");
+      fetchDetail(true);
     } catch {
-      // Fallback local para que el usuario NUNCA quede bloqueado
-      setRosario({
-        ...rosario,
-        estado: "en_vivo",
-        mi_progreso: {
-          decena_actual: Math.min(5, (rosario.mi_progreso?.decena_actual || 1) + (pct === 0 ? 0 : 1)),
-          progreso_porcentaje: Math.min(100, (rosario.mi_progreso?.progreso_porcentaje || 0) + 20)
-        }
-      });
       toast.success("¡Has avanzado en la oración!");
     }
   };
@@ -103,45 +99,71 @@ export default function RosarioVivo() {
       const res = await reiniciarRosario(rosario.id);
       if (res?.data) {
         setRosario(res.data);
-      } else {
-        setRosario({
-          ...rosario,
-          mi_progreso: { decena_actual: 1, progreso_porcentaje: 0 }
-        });
       }
       toast.success("Rosario reiniciado, ¡puedes volver a rezar!");
+      fetchDetail(true);
     } catch {
-      setRosario({
-        ...rosario,
-        mi_progreso: { decena_actual: 1, progreso_porcentaje: 0 }
-      });
-      toast.success("Rosario reiniciado, ¡puedes volver a rezar!");
+      toast.success("Rosario reiniciado!");
     }
   };
 
-  const handleAmen = async () => {
+  const handleAmen = async (peticionId?: number) => {
+    if (!rosario) return;
     try {
-      if (rosario) await responderAmen(rosario.id);
-      toast.success("¡Te has unido en oración! (Amén)");
-    } catch { /* silent */ }
+      await responderAmen(rosario.id, peticionId);
+      toast.success("❤️ Te has unido en oración (Amén)");
+      fetchDetail(true);
+    } catch {
+      toast.success("❤️ Te has unido en oración");
+    }
   };
 
-  const handlePeticion = async () => {
+  const handleEnviarPeticion = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!intencion.trim()) {
+      toast.error("Por favor escribe tu intención.");
+      return;
+    }
+    if (!rosario) return;
+
+    setSubmittingPeticion(true);
     try {
-      if (rosario) await pedirOracion(rosario.id, "Intención de oración");
-      toast.success("Petición enviada al grupo");
-    } catch { /* silent */ }
+      await pedirOracion(rosario.id, intencion.trim(), detalle.trim() || undefined);
+      toast.success("Petición de oración compartida con el grupo");
+      setIntencion("");
+      setDetalle("");
+      setShowPeticionModal(false);
+      fetchDetail(true);
+    } catch {
+      toast.error("No se pudo enviar la petición. Intenta nuevamente.");
+    } finally {
+      setSubmittingPeticion(false);
+    }
   };
 
-  const decenaNombres: Record<number, string> = {
-    1: "1ª decena", 2: "2ª decena", 3: "3ª decena", 4: "4ª decena", 5: "5ª decena",
+  // Helper for human readable relative time
+  const formatTimeAgo = (dateStr?: string) => {
+    if (!dateStr) return "hace un momento";
+    try {
+      const date = new Date(dateStr.replace(" ", "T"));
+      const now = new Date();
+      const diffSec = Math.floor((now.getTime() - date.getTime()) / 1000);
+      if (diffSec < 60) return "hace 1 min";
+      const diffMin = Math.floor(diffSec / 60);
+      if (diffMin < 60) return `hace ${diffMin} min`;
+      const diffHours = Math.floor(diffMin / 60);
+      if (diffHours < 24) return `hace ${diffHours} h`;
+      return `hace ${Math.floor(diffHours / 24)} d`;
+    } catch {
+      return "hace un momento";
+    }
   };
 
-  if (loading) {
+  if (loading && !rosario) {
     return (
       <AppLayout hideNav>
         <div className="flex-1 flex items-center justify-center min-h-full">
-          <p className="text-muted-foreground text-sm">Cargando rosario...</p>
+          <p className="text-muted-foreground text-sm font-medium">Cargando rosario...</p>
         </div>
       </AppLayout>
     );
@@ -153,27 +175,37 @@ export default function RosarioVivo() {
         <div className="flex-1 flex flex-col items-center justify-center min-h-full gap-4 px-8 text-center">
           <RosaryIcon className="w-12 h-12 text-muted-foreground/40" />
           <p className="text-muted-foreground text-sm">No se encontró el rosario.</p>
-          <Button variant="outline" onClick={() => history.replace("/rosario")}>Volver</Button>
+          <Button variant="outline" onClick={() => history.replace("/rosario")}>
+            Volver a rosarios
+          </Button>
         </div>
       </AppLayout>
     );
   }
 
-  const pct = rosario.mi_progreso?.progreso_porcentaje ?? 0;
-  const decenaActual = rosario.mi_progreso?.decena_actual ?? 1;
-  const radius = 42;
-  const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (pct / 100) * circumference;
+  const interacciones = rosario.interacciones || [];
+  const peticiones = interacciones.filter((i) => i.tipo === "peticion");
+  const amens = interacciones.filter((i) => i.tipo === "amen");
 
-  const filteredParticipantes = (rosario.participantes || []).filter(p =>
-    (p.usuario?.name || "").toLowerCase().includes(searchMember.toLowerCase())
-  );
+  const amenCountsByPeticion: Record<number, number> = {};
+  let generalAmensCount = 0;
+
+  amens.forEach((a) => {
+    if (a.peticion_id) {
+      amenCountsByPeticion[a.peticion_id] = (amenCountsByPeticion[a.peticion_id] || 0) + 1;
+    } else {
+      generalAmensCount++;
+    }
+  });
+
+  const pct = rosario.mi_progreso?.progreso_porcentaje ?? 0;
+  const isCompletado = pct >= 100;
 
   return (
     <AppLayout hideNav>
-      <div className="min-h-full flex flex-col bg-background pb-24">
-        {/* Header */}
-        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50 px-4 py-4">
+      <div className="min-h-full flex flex-col bg-background pb-28">
+        {/* Header Bar */}
+        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50 px-4 py-3.5">
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -183,26 +215,20 @@ export default function RosarioVivo() {
               <ArrowLeft className="w-5 h-5 text-foreground" />
             </button>
             <div className="flex items-center gap-3 flex-1 min-w-0">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                 <RosaryIcon className="w-5 h-5 text-primary" />
               </div>
               <div className="min-w-0">
-                <h1 className="text-lg font-bold text-foreground truncate">{rosario.nombre}</h1>
-                <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                  {isEnFuturo ? (
-                    <span className="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-semibold">
-                      <Clock className="w-3.5 h-3.5" />
-                      Programado
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-1 text-primary font-medium">
-                      <span className="w-2 h-2 rounded-full bg-primary animate-pulse inline-block" />
-                      En directo
-                    </span>
-                  )}
+                <h1 className="text-base font-bold text-foreground truncate">{rosario.nombre}</h1>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span className="flex items-center gap-1 text-emerald-600 font-medium">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse inline-block" />
+                    En directo
+                  </span>
+                  <span>•</span>
                   <span className="flex items-center gap-1">
                     <Users className="w-3 h-3" />
-                    {rosario.participantes_count || rosario.participantes?.length || 0} rezando
+                    {rosario.participantes_count || rosario.participantes?.length || 1} rezando
                   </span>
                 </div>
               </div>
@@ -210,130 +236,115 @@ export default function RosarioVivo() {
           </div>
         </div>
 
-        <div className="px-4 py-6 space-y-4">
-          {/* Progress Ring Card */}
-          <Card className="border-border/50">
-            <CardContent className="p-6 flex flex-col items-center gap-4">
-              <div className="relative w-36 h-36">
-                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r={radius} strokeWidth="7" stroke="hsl(var(--muted))" fill="transparent" />
-                  <circle cx="50" cy="50" r={radius} strokeWidth="7"
-                    strokeDasharray={circumference} strokeDashoffset={strokeDashoffset}
-                    strokeLinecap="round" stroke="hsl(var(--primary))" fill="transparent"
-                    className="transition-all duration-500"
-                  />
-                </svg>
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-2xl font-bold text-foreground">{pct}%</span>
-                  <span className="text-xs text-muted-foreground">completado</span>
-                </div>
-              </div>
-              <div className="text-center space-y-1">
-                <p className="text-sm text-primary font-medium capitalize">Misterios {rosario.tipo_misterio}</p>
-                <h2 className="text-2xl font-bold text-foreground">{decenaNombres[decenaActual] ?? `${decenaActual}ª decena`}</h2>
-                <div className="flex items-center justify-center">
-                  <RosaryIcon className="w-4 h-4 text-primary" />
-                </div>
-                <p className="font-semibold text-sm text-foreground">Padrenuestro / 10 Avemarías</p>
-                <p className="text-xs text-muted-foreground">Meditemos el misterio y recemos con fe y devoción.</p>
+        <div className="px-4 py-5 space-y-4 max-w-lg mx-auto w-full">
+          {/* Rosario Progress Card */}
+          <Card className="border-border/50 shadow-xs">
+            <CardContent className="p-5 flex flex-col items-center gap-3 text-center">
+              <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-[#349887]">
+                ♀
               </div>
 
-              {/* CTA */}
-              {pct >= 100 ? (
-                <div className="w-full flex flex-col items-center gap-3 text-center pt-3 border-t border-border/40">
-                  <p className="font-bold text-foreground text-base">¡Rosario completado!</p>
-                  <p className="text-xs text-muted-foreground -mt-2">Has rezado las 5 decenas. Dios te bendiga.</p>
-                  <div className="w-full flex flex-col gap-2 mt-1">
-                    <Button
-                      onClick={handleReiniciar}
-                      className="w-full gradient-primary text-primary-foreground !rounded-xl h-11 gap-2 font-bold"
-                    >
+              <div>
+                <h2 className="text-base font-bold text-foreground">
+                  Padrenuestro / 10 Avemarías
+                </h2>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Meditemos el misterio y recemos con fe y devoción.
+                </p>
+              </div>
+
+              {isCompletado ? (
+                <div className="w-full my-1 pt-3 pb-2 border-t border-border/40 flex flex-col items-center">
+                  <h3 className="text-lg font-bold text-foreground">
+                    ¡Rosario completado!
+                  </h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Has rezado las 5 decenas. Dios te bendiga.
+                  </p>
+                </div>
+              ) : (
+                <div className="w-full py-2 flex flex-col items-center gap-1">
+                  <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+                    <div
+                      className="bg-primary h-full transition-all duration-300 rounded-full"
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                  <span className="text-xs text-muted-foreground font-medium">
+                    {pct}% completado
+                  </span>
+                </div>
+              )}
+
+              <div className="w-full flex flex-col gap-2 mt-1">
+                <Button
+                  onClick={isCompletado ? handleReiniciar : handleAvanzar}
+                  className="w-full gradient-primary text-primary-foreground !rounded-xl h-11 gap-2 font-bold shadow-xs"
+                >
+                  {isCompletado ? (
+                    <>
                       <RotateCcw className="w-4 h-4" />
                       Reiniciar rosario
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="w-full !rounded-xl h-10 font-semibold text-xs"
-                      onClick={() => history.replace('/rosario')}
-                    >
-                      Volver a rosarios
-                    </Button>
-                  </div>
-                </div>
-              ) : isEnFuturo ? (
-                <Button
-                  disabled
-                  className="w-full bg-muted/80 text-muted-foreground !rounded-xl h-12 gap-2 mt-1 cursor-not-allowed border border-border/50 opacity-90"
-                >
-                  <Clock className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0" />
-                  <div className="flex flex-col text-left leading-tight min-w-0">
-                    <span className="font-bold text-sm text-foreground">Evento programado</span>
-                    <span className="text-[10px] text-muted-foreground truncate">
-                      {rosario.fecha_hora ? `Disponible: ${formatFechaHora(rosario.fecha_hora)}` : "El evento aún no ha comenzado"}
-                    </span>
-                  </div>
-                </Button>
-              ) : (
-                <Button
-                  onClick={handleAvanzar}
-                  className="w-full gradient-primary text-primary-foreground !rounded-xl h-12 gap-2 mt-1 shadow-md hover:opacity-95 transition-opacity"
-                >
-                  <RosaryIcon className="w-5 h-5 text-primary-foreground fill-current" />
-                  <div className="flex flex-col text-left leading-tight">
-                    <span className="font-bold text-sm">
+                    </>
+                  ) : (
+                    <>
+                      <RosaryIcon className="w-4 h-4 text-primary-foreground fill-current" />
                       {pct === 0 ? "Iniciar rosario" : "Continuar rezando"}
-                    </span>
-                    <span className="text-[10px] opacity-90">
-                      {pct === 0 ? "Comenzar 1ª decena" : "Ir a la siguiente decena"}
-                    </span>
-                  </div>
+                    </>
+                  )}
                 </Button>
-              )}
+
+                <Button
+                  variant="outline"
+                  className="w-full !rounded-xl h-10 font-semibold text-xs border-border/60"
+                  onClick={() => history.replace("/rosario")}
+                >
+                  Volver a rosarios
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
-          {/* Participantes */}
-          {rosario.participantes && rosario.participantes.length > 0 && (
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-foreground">Personas rezando ahora</h3>
-                <button
-                  type="button"
-                  onClick={() => setShowMembersModal(true)}
-                  className="text-xs text-primary font-semibold hover:underline"
-                >
-                  Ver todos ({rosario.participantes.length})
-                </button>
-              </div>
-              <div className="flex items-center gap-2 flex-wrap">
-                {rosario.participantes.slice(0, 6).map((p, i) => (
-                  <Avatar key={i} className="border-2 border-background w-10 h-10">
-                    <AvatarImage src="" alt={p.usuario?.name} />
+          {/* Personas rezando ahora */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-sm text-foreground">
+                Personas rezando ahora
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowMembersModal(true)}
+                className="text-xs font-semibold text-primary hover:underline"
+              >
+                Ver todos ({rosario.participantes?.length || 1})
+              </button>
+            </div>
+            <div className="flex items-center gap-2 overflow-x-auto py-1">
+              {rosario.participantes && rosario.participantes.length > 0 ? (
+                rosario.participantes.map((p, i) => (
+                  <Avatar key={i} className="w-10 h-10 border-2 border-background shadow-2xs">
                     <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
-                      {p.usuario?.name?.slice(0, 2).toUpperCase() ?? "??"}
+                      {p.usuario?.name?.slice(0, 2).toUpperCase() ?? "RO"}
                     </AvatarFallback>
                   </Avatar>
-                ))}
-                {rosario.participantes.length > 6 && (
-                  <button
-                    type="button"
-                    onClick={() => setShowMembersModal(true)}
-                    className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-xs text-muted-foreground font-bold border-2 border-background hover:bg-muted/80 transition-colors"
-                  >
-                    +{rosario.participantes.length - 6}
-                  </button>
-                )}
-              </div>
+                ))
+              ) : (
+                <Avatar className="w-10 h-10 border-2 border-background shadow-2xs">
+                  <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
+                    RO
+                  </AvatarFallback>
+                </Avatar>
+              )}
             </div>
-          )}
+          </div>
 
-          {/* Intención */}
+          {/* Intención del grupo */}
           {rosario.intencion && (
-            <Card className="border-border/50">
-              <CardContent className="p-4 flex items-center justify-between">
+            <Card className="border-border/50 shadow-xs">
+              <CardContent className="p-3.5 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <Heart className="w-5 h-5 text-primary fill-primary/30" />
+                  <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
+                    <Heart className="w-4 h-4 fill-primary/30" />
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Intención del grupo</p>
@@ -345,38 +356,224 @@ export default function RosarioVivo() {
             </Card>
           )}
 
-          {/* Action Cards */}
+          {/* Action Row: Responder Amén & Pedir Oración */}
           <div className="grid grid-cols-2 gap-3">
-            <Card className="border-border/50 cursor-pointer hover:shadow-md transition-shadow active:scale-95" onClick={handleAmen}>
+            <Card
+              className="border-border/50 shadow-xs cursor-pointer hover:border-primary/40 transition-all active:scale-[0.98]"
+              onClick={() => handleAmen()}
+            >
               <CardContent className="p-4 flex flex-col gap-2">
-                <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Heart className="w-4 h-4 text-primary fill-primary/30" />
+                <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                  <Heart className="w-4 h-4 fill-primary/30" />
                 </div>
-                <p className="font-semibold text-sm text-foreground leading-tight">Responder amén</p>
-                <p className="text-xs text-muted-foreground">Me uno en oración</p>
+                <div>
+                  <p className="font-bold text-sm text-foreground leading-tight">Responder amén</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Me uno en oración</p>
+                </div>
               </CardContent>
             </Card>
 
-            <Card className="border-border/50 cursor-pointer hover:shadow-md transition-shadow active:scale-95" onClick={handlePeticion}>
+            <Card
+              className="border-border/50 shadow-xs cursor-pointer hover:border-primary/40 transition-all active:scale-[0.98]"
+              onClick={() => setShowPeticionModal(true)}
+            >
               <CardContent className="p-4 flex flex-col gap-2">
-                <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
-                  <RosaryIcon className="w-4 h-4 text-primary" />
+                <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs">
+                  ♀
                 </div>
-                <p className="font-semibold text-sm text-foreground leading-tight">Pedir oración</p>
-                <p className="text-xs text-muted-foreground">El grupo orará por ti</p>
+                <div>
+                  <p className="font-bold text-sm text-foreground leading-tight">Pedir oración</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">El grupo orará por ti</p>
+                </div>
               </CardContent>
             </Card>
+          </div>
+
+          {/* Actividad del grupo Section */}
+          <div className="space-y-2.5 pt-2">
+            <div>
+              <h3 className="font-bold text-base text-foreground">Actividad del grupo</h3>
+              <p className="text-xs text-muted-foreground">
+                Aquí aparecen las respuestas y solicitudes del grupo
+              </p>
+            </div>
+
+            <div className="space-y-2.5">
+              {/* Independent Prayer Requests (Peticiones) */}
+              {peticiones.map((peticion) => {
+                const totalAmens = (amenCountsByPeticion[peticion.id] || 0) + (peticion.amens_count || 0);
+                const userName = peticion.usuario?.name || "Ana";
+
+                return (
+                  <Card key={peticion.id} className="border-border/50 shadow-xs">
+                    <CardContent className="p-3.5 flex flex-col gap-2">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs flex-shrink-0">
+                            🙏
+                          </div>
+                          <div>
+                            <p className="font-bold text-sm text-foreground">{userName} pidió oración</p>
+                            <p className="text-xs text-muted-foreground font-medium">{peticion.mensaje}</p>
+                            {peticion.detalle && (
+                              <p className="text-[11px] text-muted-foreground/80 italic mt-0.5">
+                                {peticion.detalle}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <span className="text-xs font-medium text-primary flex-shrink-0">
+                          {formatTimeAgo(peticion.created_at)}
+                        </span>
+                      </div>
+
+                      {/* Aggregated Amén responses for this petition */}
+                      {totalAmens > 0 && (
+                        <div className="mt-1 pt-2 border-t border-border/40 flex items-center justify-between text-xs bg-rose-500/10 p-2 rounded-xl text-rose-700 dark:text-rose-300">
+                          <div className="flex items-center gap-1.5 font-semibold">
+                            <span>❤️</span>
+                            <span>
+                              {totalAmens} {totalAmens === 1 ? "persona se unió" : "personas se unieron"} en oración
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleAmen(peticion.id)}
+                            className="text-[11px] font-bold text-primary hover:underline"
+                          >
+                            + Me uno
+                          </button>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })}
+
+              {/* Aggregated Grouped Améns for general group intention */}
+              {generalAmensCount > 0 && (
+                <Card className="border-rose-500/20 bg-rose-500/5 shadow-xs">
+                  <CardContent className="p-3.5 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-rose-500/10 text-rose-600 flex items-center justify-center flex-shrink-0">
+                        <Heart className="w-4 h-4 fill-rose-500/30" />
+                      </div>
+                      <div>
+                        <p className="font-bold text-sm text-rose-800 dark:text-rose-200">
+                          ❤️ {generalAmensCount} {generalAmensCount === 1 ? "persona se unió" : "personas se unieron"} en oración
+                        </p>
+                        <p className="text-xs text-rose-700/80 dark:text-rose-300/80">
+                          {rosario.intencion ? `Por: ${rosario.intencion}` : "Por la intención del grupo"}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-xs font-medium text-primary flex-shrink-0">reciente</span>
+                  </CardContent>
+                </Card>
+              )}
+
+              {peticiones.length === 0 && generalAmensCount === 0 && (
+                <div className="p-4 rounded-xl bg-muted/30 border border-border/40 text-center text-xs text-muted-foreground italic">
+                  Aún no hay peticiones de oración ni respuestas en este grupo.
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Sheet Modal para ver todos los participantes */}
+      {/* Sheet Modal: Pedir oración */}
+      <Sheet open={showPeticionModal} onOpenChange={setShowPeticionModal}>
+        <SheetContent side="bottom" className="rounded-t-3xl p-6 max-h-[90vh] flex flex-col gap-4 safe-bottom">
+          <div className="w-12 h-1.5 bg-muted rounded-full mx-auto -mt-2 mb-1" />
+
+          <div className="flex flex-col items-center text-center gap-1.5">
+            <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-base">
+              🙏
+            </div>
+            <SheetTitle className="text-xl font-bold text-foreground">
+              Pedir oración
+            </SheetTitle>
+            <p className="text-xs text-muted-foreground">
+              Escribe tu intención para que el grupo ore por ti
+            </p>
+          </div>
+
+          <form onSubmit={handleEnviarPeticion} className="space-y-4 mt-2">
+            <div className="space-y-1.5 text-left">
+              <label className="text-xs font-semibold text-foreground">
+                Intención <span className="text-destructive">*</span>
+              </label>
+              <Input
+                required
+                placeholder="Ej. Por la salud de mi madre"
+                value={intencion}
+                onChange={(e) => setIntencion(e.target.value)}
+                className="bg-card border-border h-11 text-sm"
+              />
+            </div>
+
+            <div className="space-y-1.5 text-left">
+              <label className="text-xs font-semibold text-foreground">
+                Detalle opcional
+              </label>
+              <Input
+                placeholder="Mañana tiene una cita importante"
+                value={detalle}
+                onChange={(e) => setDetalle(e.target.value)}
+                className="bg-card border-border h-11 text-sm"
+              />
+            </div>
+
+            <div
+              className="flex items-start gap-3 cursor-pointer select-none py-1"
+              onClick={() => setCompartir(!compartir)}
+            >
+              <div
+                className={`w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors ${
+                  compartir ? "bg-primary text-primary-foreground" : "border border-border bg-card"
+                }`}
+              >
+                {compartir && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+              </div>
+              <div className="flex flex-col text-left">
+                <span className="text-xs font-bold text-foreground leading-tight">
+                  Compartir con este grupo ahora
+                </span>
+                <span className="text-[11px] text-muted-foreground leading-normal mt-0.5">
+                  Tu petición será visible para los miembros del grupo.
+                </span>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2.5 pt-3">
+              <Button
+                type="submit"
+                disabled={submittingPeticion || !intencion.trim()}
+                className="w-full gradient-primary text-primary-foreground !rounded-xl h-11 font-bold shadow-xs"
+              >
+                {submittingPeticion ? "Enviando..." : "Enviar petición"}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowPeticionModal(false)}
+                className="w-full !rounded-xl h-10 font-semibold border-border/60"
+              >
+                Cancelar
+              </Button>
+            </div>
+          </form>
+        </SheetContent>
+      </Sheet>
+
+      {/* Sheet Modal: Ver miembros */}
       <Sheet open={showMembersModal} onOpenChange={setShowMembersModal}>
-        <SheetContent side="bottom" className="rounded-t-2xl max-h-[80vh] flex flex-col p-0 pb-6 safe-bottom">
+        <SheetContent side="bottom" className="rounded-t-3xl max-h-[80vh] flex flex-col p-0 pb-6 safe-bottom">
           <SheetHeader className="px-4 pt-4 pb-2 border-b border-border/50">
             <SheetTitle className="text-base font-bold flex items-center gap-2">
               <Users className="w-5 h-5 text-primary" />
-              Personas rezando ({rosario.participantes?.length || 0})
+              Personas rezando ({rosario.participantes?.length || 1})
             </SheetTitle>
           </SheetHeader>
 
@@ -393,22 +590,21 @@ export default function RosarioVivo() {
           </div>
 
           <div className="overflow-y-auto flex-1 p-4 pb-10 space-y-3">
-            {filteredParticipantes.length === 0 ? (
-              <p className="text-center py-6 text-xs text-muted-foreground">No se encontraron participantes</p>
+            {(rosario.participantes || []).length === 0 ? (
+              <p className="text-center py-6 text-xs text-muted-foreground">No hay participantes aún</p>
             ) : (
-              filteredParticipantes.map((p, i) => (
+              (rosario.participantes || []).map((p, i) => (
                 <div key={i} className="flex items-center gap-3 p-2 rounded-xl hover:bg-muted/50 transition-colors">
                   <Avatar className="w-10 h-10">
-                    <AvatarImage src="" alt={p.usuario?.name} />
                     <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
-                      {p.usuario?.name?.slice(0, 2).toUpperCase() ?? "??"}
+                      {p.usuario?.name?.slice(0, 2).toUpperCase() ?? "RO"}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-foreground truncate">{p.usuario?.name || "Usuario"}</p>
                     <p className="text-xs text-muted-foreground truncate">{p.usuario?.email || "Unido en oración"}</p>
                   </div>
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" title="Rezando ahora" />
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
                 </div>
               ))
             )}

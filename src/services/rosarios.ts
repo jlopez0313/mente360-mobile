@@ -1,5 +1,23 @@
 import { baseApi } from './api';
 
+export interface RosarioInteraccion {
+  id: number;
+  rosario_id: number;
+  peticion_id?: number | null;
+  user_id: number;
+  tipo: 'amen' | 'peticion';
+  mensaje?: string;
+  detalle?: string;
+  created_at?: string;
+  usuario?: {
+    id: number;
+    name: string;
+    email: string;
+  };
+  amens_count?: number;
+  amens?: RosarioInteraccion[];
+}
+
 export interface Rosario {
   id: number;
   user_id: number;
@@ -29,6 +47,7 @@ export interface Rosario {
       email: string;
     };
   }>;
+  interacciones?: RosarioInteraccion[];
 }
 
 export const getRosarios = async (tab: 'ahora' | 'programados' | 'intenciones' = 'ahora') => {
@@ -67,14 +86,14 @@ export const reiniciarRosario = async (id: number | string) => {
   return response.data;
 };
 
-export const responderAmen = async (id: number | string) => {
+export const responderAmen = async (id: number | string, peticionId?: number) => {
   const api = await baseApi();
-  const response = await api.post(`/rosarios/${id}/amen`, {});
+  const response = await api.post(`/rosarios/${id}/amen`, { peticion_id: peticionId });
   return response.data;
 };
 
-export const pedirOracion = async (id: number | string, mensaje?: string) => {
+export const pedirOracion = async (id: number | string, intencion: string, detalle?: string) => {
   const api = await baseApi();
-  const response = await api.post(`/rosarios/${id}/peticion`, { mensaje });
+  const response = await api.post(`/rosarios/${id}/peticion`, { intencion, detalle });
   return response.data;
 };
