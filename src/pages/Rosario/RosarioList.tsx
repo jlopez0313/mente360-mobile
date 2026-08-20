@@ -46,6 +46,17 @@ export default function RosarioList() {
     }
   };
 
+  const isEnFuturo = (item: Rosario) => {
+    if (!item.fecha_hora) return false;
+    if (item.estado && item.estado !== "programado") return false;
+    try {
+      const fecha = new Date(item.fecha_hora.replace(" ", "T")).getTime();
+      return !isNaN(fecha) && fecha > Date.now();
+    } catch {
+      return false;
+    }
+  };
+
   return (
     <AppLayout>
       <div className="min-h-full flex flex-col">
@@ -120,7 +131,7 @@ export default function RosarioList() {
                           className="gradient-primary text-primary-foreground !rounded-xl text-xs font-semibold px-3"
                           onClick={() => history.push(`/rosario/vivo/${item.id}`)}
                         >
-                          {item.modalidad === "programado" ? "Ver evento" : "Unirme"}
+                          {isEnFuturo(item) ? "Ver evento" : "Unirme"}
                         </Button>
                       </CardContent>
                     </Card>

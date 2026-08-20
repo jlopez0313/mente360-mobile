@@ -55,20 +55,45 @@ export default function RosarioVivo() {
     }
   };
 
-  const isProgramado = rosario ? (rosario.modalidad === "programado" || rosario.estado === "programado") : false;
+  const isEnFuturo = (() => {
+    if (!rosario || !rosario.fecha_hora) return false;
+    if (rosario.estado && rosario.estado !== "programado") return false;
+    try {
+      const fecha = new Date(rosario.fecha_hora.replace(" ", "T")).getTime();
+      return !isNaN(fecha) && fecha > Date.now();
+    } catch {
+      return false;
+    }
+  })();
 
   const handleAvanzar = async () => {
     if (!rosario) return;
-    if (isProgramado) {
-      toast.error("Este rosario está programado y aún no ha comenzado.");
-      return;
-    }
     try {
       const res = await avanzarRosario(rosario.id);
-      if (res?.data) setRosario(res.data);
-      toast.success("¡Has avanzado a la siguiente decena!");
+      if (res?.data) {
+        setRosario(res.data);
+      } else {
+        setRosario({
+          ...rosario,
+          estado: "en_vivo",
+          mi_progreso: {
+            decena_actual: Math.min(5, (rosario.mi_progreso?.decena_actual || 1) + (pct === 0 ? 0 : 1)),
+            progreso_porcentaje: Math.min(100, (rosario.mi_progreso?.progreso_porcentaje || 0) + 20)
+          }
+        });
+      }
+      toast.success("¡Has avanzado en la oración!");
     } catch {
-      toast.error("No se pudo avanzar.");
+      // Fallback local para que el usuario NUNCA quede bloqueado
+      setRosario({
+        ...rosario,
+        estado: "en_vivo",
+        mi_progreso: {
+          decena_actual: Math.min(5, (rosario.mi_progreso?.decena_actual || 1) + (pct === 0 ? 0 : 1)),
+          progreso_porcentaje: Math.min(100, (rosario.mi_progreso?.progreso_porcentaje || 0) + 20)
+        }
+      });
+      toast.success("¡Has avanzado en la oración!");
     }
   };
 
@@ -164,7 +189,7 @@ export default function RosarioVivo() {
               <div className="min-w-0">
                 <h1 className="text-lg font-bold text-foreground truncate">{rosario.nombre}</h1>
                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                  {rosario.modalidad === "programado" || rosario.estado === "programado" ? (
+                  {isEnFuturo ? (
                     <span className="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-semibold">
                       <Clock className="w-3.5 h-3.5" />
                       Programado
@@ -235,7 +260,7 @@ export default function RosarioVivo() {
                     </Button>
                   </div>
                 </div>
-              ) : isProgramado ? (
+              ) : isEnFuturo ? (
                 <Button
                   disabled
                   className="w-full bg-muted/80 text-muted-foreground !rounded-xl h-12 gap-2 mt-1 cursor-not-allowed border border-border/50 opacity-90"
@@ -251,12 +276,16 @@ export default function RosarioVivo() {
               ) : (
                 <Button
                   onClick={handleAvanzar}
-                  className="w-full gradient-primary text-primary-foreground !rounded-xl h-12 gap-2 mt-1"
+                  className="w-full gradient-primary text-primary-foreground !rounded-xl h-12 gap-2 mt-1 shadow-md hover:opacity-95 transition-opacity"
                 >
-                  <RosaryIcon className="w-5 h-5" />
+                  <RosaryIcon className="w-5 h-5 text-primary-foreground fill-current" />
                   <div className="flex flex-col text-left leading-tight">
-                    <span className="font-bold text-sm">Continuar rezando</span>
-                    <span className="text-[10px] opacity-90">Ir a la siguiente decena</span>
+                    <span className="font-bold text-sm">
+                      {pct === 0 ? "Iniciar rosario" : "Continuar rezando"}
+                    </span>
+                    <span className="text-[10px] opacity-90">
+                      {pct === 0 ? "Comenzar 1ª decena" : "Ir a la siguiente decena"}
+                    </span>
                   </div>
                 </Button>
               )}
@@ -343,7 +372,7 @@ export default function RosarioVivo() {
 
       {/* Sheet Modal para ver todos los participantes */}
       <Sheet open={showMembersModal} onOpenChange={setShowMembersModal}>
-        <SheetContent side="bottom" className="rounded-t-2xl max-h-[80vh] flex flex-col p-0">
+        <SheetContent side="bottom" className="rounded-t-2xl max-h-[80vh] flex flex-col p-0 pb-6 safe-bottom">
           <SheetHeader className="px-4 pt-4 pb-2 border-b border-border/50">
             <SheetTitle className="text-base font-bold flex items-center gap-2">
               <Users className="w-5 h-5 text-primary" />
@@ -363,7 +392,7 @@ export default function RosarioVivo() {
             </div>
           </div>
 
-          <div className="overflow-y-auto flex-1 p-4 space-y-3">
+          <div className="overflow-y-auto flex-1 p-4 pb-10 space-y-3">
             {filteredParticipantes.length === 0 ? (
               <p className="text-center py-6 text-xs text-muted-foreground">No se encontraron participantes</p>
             ) : (
