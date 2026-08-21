@@ -1,7 +1,8 @@
+import { IonScrollContext } from "@/components/layout";
 import { db } from "@/hooks/useDexie";
 import { setListAudios } from "@/store/slices/audioSlice";
 import { useLiveQuery } from "dexie-react-hooks";
-import { forwardRef, memo } from "react";
+import { forwardRef, memo, useContext } from "react";
 import { useDispatch } from "react-redux";
 import { Virtuoso } from 'react-virtuoso';
 import { AudioCard } from "./AudioCard";
@@ -17,6 +18,7 @@ export const TrackList = memo(({
 }: TrackListProps) => {
 
   const dispatch = useDispatch();
+  const scrollElement = useContext(IonScrollContext);
 
   const tracks = useLiveQuery(async () => {
     let collection = db.clips.orderBy("titulo");
@@ -39,7 +41,6 @@ export const TrackList = memo(({
     return lista;
   }, [selectedCategory, searchQuery]);
 
-
   if (!tracks || tracks?.length === 0) {
     return (
       <div className="text-center py-12">
@@ -49,9 +50,10 @@ export const TrackList = memo(({
   }
 
   return (
-    <div className="h-full pb-24 space-y-3">
+    <div className="pb-24">
       <Virtuoso
         key={`${selectedCategory}-${searchQuery}`}
+        customScrollParent={scrollElement ?? undefined}
         components={{
           List: forwardRef((props, ref) => (
             <div
@@ -61,7 +63,6 @@ export const TrackList = memo(({
             />
           )),
         }}
-        style={{ height: "100%" }}
         totalCount={tracks.length}
         itemContent={(index) => {
           const track = tracks[index];

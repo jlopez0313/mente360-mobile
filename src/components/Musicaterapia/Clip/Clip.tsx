@@ -106,7 +106,7 @@ export const Clip = () => {
             disabled={listAudios?.length <= 1}
             className="w-12 h-12"
           >
-            <SkipBack className="w-6 h-6" />
+            <SkipBack className="w-6 h-6 text-foreground" />
           </Button>
 
           <Button
@@ -128,7 +128,7 @@ export const Clip = () => {
             disabled={listAudios?.length <= 1}
             className="w-12 h-12"
           >
-            <SkipForward className="w-6 h-6" />
+            <SkipForward className="w-6 h-6 text-foreground" />
           </Button>
         </div>
       </div>

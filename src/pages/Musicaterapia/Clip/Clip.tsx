@@ -20,7 +20,7 @@ const Clip: React.FC = () => {
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-4">
           <Button variant="ghost" size="icon" onClick={() => history.replace('/musicaterapia')}>
-            <ChevronLeft className="w-6 h-6" />
+            <ChevronLeft className="w-6 h-6 text-foreground" />
           </Button>
           <span className="text-sm text-muted-foreground font-medium">
             Musicoterapia
@@ -33,7 +33,7 @@ const Clip: React.FC = () => {
             {activeTrack?.audio_local ? (
               <Check className="w-5 h-5 text-success" />
             ) : (
-              <Download className="w-5 h-5" />
+              <Download className="w-5 h-5 text-foreground" />
             )}
           </Button>
         </div>

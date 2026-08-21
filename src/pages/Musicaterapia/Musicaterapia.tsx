@@ -88,7 +88,7 @@ const Musicaterapia: React.FC = () => {
 
         {/* Content */}
         <div className="px-4 py-6 flex-1">
-          <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4 h-full">
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4 h-full flex flex-col min-h-0">
             <TabsList className="w-full grid grid-cols-2 bg-muted/50">
               <TabsTrigger value="clips" className="gap-2">
                 <Music className="w-4 h-4" />
@@ -100,7 +100,7 @@ const Musicaterapia: React.FC = () => {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="clips" className="space-y-2 mt-0 h-full">
+            <TabsContent value="clips" className="space-y-2 mt-0 h-full flex flex-col min-h-0">
               {/* Categories */}
               <CategorySlider
                 categories={categories}
@@ -115,7 +115,7 @@ const Musicaterapia: React.FC = () => {
               />
             </TabsContent>
 
-            <TabsContent value="favorites" className="space-y-2 mt-0 h-full">
+            <TabsContent value="favorites" className="space-y-2 mt-0 h-full flex flex-col min-h-0">
               <FavoritesList
                 searchQuery={searchQuery}
               />

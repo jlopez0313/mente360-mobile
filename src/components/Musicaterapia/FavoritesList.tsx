@@ -1,9 +1,10 @@
+import { IonScrollContext } from "@/components/layout";
 import Playlist from "@/database/playlist";
 import { db } from "@/hooks/useDexie";
 import { setListAudios } from "@/store/slices/audioSlice";
 import { useLiveQuery } from "dexie-react-hooks";
 import { Heart } from "lucide-react";
-import { forwardRef, memo } from "react";
+import { forwardRef, memo, useContext } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Virtuoso } from "react-virtuoso";
 import { AudioCard } from "./AudioCard";
@@ -17,6 +18,7 @@ export const FavoritesList = memo(({
 }: FavoritesListProps) => {
 
   const dispatch = useDispatch();
+  const scrollElement = useContext(IonScrollContext);
 
   const { user } = useSelector((state: any) => state.user);
 
@@ -56,7 +58,7 @@ export const FavoritesList = memo(({
   }
 
   return (
-    <div className="h-full pb-24 space-y-3">
+    <div className="pb-24">
       <p className="text-sm text-muted-foreground mb-4">
         {playlist?.length} {playlist?.length === 1 ? "audio" : "audios"} en
         favoritos
@@ -64,6 +66,7 @@ export const FavoritesList = memo(({
 
       <Virtuoso
         key={searchQuery}
+        customScrollParent={scrollElement ?? undefined}
         components={{
           List: forwardRef((props, ref) => (
             <div
@@ -73,12 +76,9 @@ export const FavoritesList = memo(({
             />
           )),
         }}
-        style={{ height: "100%" }}
         totalCount={playlist?.length}
         itemContent={(index) => {
           const track = playlist ? playlist[index].clip : null;
-
-          console.log('track', track);
 
           if (!track) {
             return null;
