@@ -38,7 +38,8 @@ export const EpaycoCheckoutModal = ({ open, onOpenChange, plan, onSuccess }: Pro
 	const [expMonth, setExpMonth] = useState("");
 	const [expYear, setExpYear] = useState("");
 	const [cvc, setCvc] = useState("");
-	const [cardHolder, setCardHolder] = useState("");
+	const defaultDocType = user?.country && user.country !== "CO" ? "PP" : "CC";
+	const [docType, setDocType] = useState<string>(defaultDocType);
 	const [docNumber, setDocNumber] = useState("");
 	const [acceptTerms, setAcceptTerms] = useState(false);
 
@@ -49,6 +50,7 @@ export const EpaycoCheckoutModal = ({ open, onOpenChange, plan, onSuccess }: Pro
 			setExpYear("");
 			setCvc("");
 			setCardHolder("");
+			setDocType(defaultDocType);
 			setDocNumber("");
 			setAcceptTerms(false);
 			setStatusState("form");
@@ -64,7 +66,7 @@ export const EpaycoCheckoutModal = ({ open, onOpenChange, plan, onSuccess }: Pro
 		expYear.length === 2 &&
 		cvc.length >= 3 &&
 		cardHolder.trim().length >= 5 &&
-		docNumber.trim().length >= 5 &&
+		docNumber.trim().length >= 4 &&
 		acceptTerms;
 
 	const handleComplete = () => {
@@ -85,7 +87,7 @@ export const EpaycoCheckoutModal = ({ open, onOpenChange, plan, onSuccess }: Pro
 				titulo: plan.titulo,
 				comunidad: plan.comunidad,
 				currency: plan.currency,
-				docType: "CC",
+				docType: docType || "CC",
 				docNumber,
 				card: {
 					number: cardNumber.replace(/\s/g, ""),
@@ -312,12 +314,34 @@ export const EpaycoCheckoutModal = ({ open, onOpenChange, plan, onSuccess }: Pro
 									onChange={(e) => setCvc(e.target.value.replace(/[^\d]/g, ""))}
 								/>
 							</div>
-							<Input
-								placeholder="Número de cédula"
-								inputMode="numeric"
-								value={docNumber}
-								onChange={(e) => setDocNumber(e.target.value.replace(/[^\d]/g, ""))}
-							/>
+							<div className="flex gap-2">
+								<select
+									value={docType}
+									onChange={(e) => setDocType(e.target.value)}
+									className="h-10 rounded-md border border-input bg-background px-2 py-2 text-xs font-semibold ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 shrink-0 text-foreground cursor-pointer"
+								>
+									<option value="CC">CC</option>
+									<option value="CE">CE</option>
+									<option value="PP">PAS / DNI</option>
+								</select>
+								<Input
+									placeholder={
+										docType === "CC"
+											? "Número de cédula"
+											: docType === "CE"
+											? "Cédula de extranjería"
+											: "Documento o Pasaporte"
+									}
+									inputMode={docType === "PP" ? "text" : "numeric"}
+									value={docNumber}
+									onChange={(e) =>
+										setDocNumber(
+											docType === "PP" ? e.target.value : e.target.value.replace(/[^\d]/g, "")
+										)
+									}
+									className="flex-1"
+								/>
+							</div>
 
 							<label className="flex items-start gap-2 text-xs text-muted-foreground cursor-pointer">
 								<input
