@@ -85,10 +85,37 @@ export default function RosarioVivo() {
       const res = await avanzarRosario(rosario.id);
       if (res?.data) {
         setRosario(res.data);
+      } else {
+        setRosario((prev) => {
+          if (!prev) return null;
+          const currentPct = prev.mi_progreso?.progreso_porcentaje ?? 0;
+          const nextPct = Math.min(currentPct + 20, 100);
+          const nextDecena = Math.min(Math.floor(nextPct / 20) + (nextPct % 20 > 0 ? 1 : 0), 5);
+          return {
+            ...prev,
+            mi_progreso: {
+              progreso_porcentaje: nextPct,
+              decena_actual: nextDecena || 1,
+            },
+          };
+        });
       }
       toast.success("¡Has avanzado en la oración!");
       fetchDetail(true);
     } catch {
+      setRosario((prev) => {
+        if (!prev) return null;
+        const currentPct = prev.mi_progreso?.progreso_porcentaje ?? 0;
+        const nextPct = Math.min(currentPct + 20, 100);
+        const nextDecena = Math.min(Math.floor(nextPct / 20) + (nextPct % 20 > 0 ? 1 : 0), 5);
+        return {
+          ...prev,
+          mi_progreso: {
+            progreso_porcentaje: nextPct,
+            decena_actual: nextDecena || 1,
+          },
+        };
+      });
       toast.success("¡Has avanzado en la oración!");
     }
   };
@@ -99,10 +126,17 @@ export default function RosarioVivo() {
       const res = await reiniciarRosario(rosario.id);
       if (res?.data) {
         setRosario(res.data);
+      } else {
+        setRosario((prev) =>
+          prev ? { ...prev, mi_progreso: { decena_actual: 1, progreso_porcentaje: 0 } } : null
+        );
       }
       toast.success("Rosario reiniciado, ¡puedes volver a rezar!");
       fetchDetail(true);
     } catch {
+      setRosario((prev) =>
+        prev ? { ...prev, mi_progreso: { decena_actual: 1, progreso_porcentaje: 0 } } : null
+      );
       toast.success("Rosario reiniciado!");
     }
   };
@@ -159,6 +193,24 @@ export default function RosarioVivo() {
     }
   };
 
+  const getDecenaLabel = (pct: number, decenaActual?: number) => {
+    const labels = [
+      "Primera decena",
+      "Segunda decena",
+      "Tercera decena",
+      "Cuarta decena",
+      "Quinta decena",
+    ];
+    if (decenaActual && decenaActual >= 1 && decenaActual <= 5) {
+      return labels[decenaActual - 1];
+    }
+    if (pct <= 20) return labels[0];
+    if (pct <= 40) return labels[1];
+    if (pct <= 60) return labels[2];
+    if (pct <= 80) return labels[3];
+    return labels[4];
+  };
+
   if (loading && !rosario) {
     return (
       <AppLayout hideNav>
@@ -203,9 +255,9 @@ export default function RosarioVivo() {
 
   return (
     <AppLayout hideNav>
-      <div className="min-h-full flex flex-col bg-background pb-28">
+      <div className="h-full flex flex-col bg-background">
         {/* Header Bar */}
-        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50 px-4 py-3.5">
+        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50 px-4 py-3.5 safe-top">
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -236,7 +288,8 @@ export default function RosarioVivo() {
           </div>
         </div>
 
-        <div className="px-4 py-5 space-y-4 max-w-lg mx-auto w-full">
+        <div className="flex-1 overflow-auto">
+          <div className="px-4 pt-5 pb-8 space-y-4 max-w-lg mx-auto w-full">
           {/* Rosario Progress Card */}
           <Card className="border-border/50 shadow-xs">
             <CardContent className="p-5 flex flex-col items-center gap-3 text-center">
@@ -263,15 +316,15 @@ export default function RosarioVivo() {
                   </p>
                 </div>
               ) : (
-                <div className="w-full py-2 flex flex-col items-center gap-1">
-                  <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+                <div className="w-full py-2 flex flex-col items-center gap-1.5">
+                  <div className="w-full bg-muted/80 rounded-full h-2.5 overflow-hidden p-0.5 border border-border/30">
                     <div
-                      className="bg-primary h-full transition-all duration-300 rounded-full"
+                      className="bg-primary h-full transition-all duration-500 ease-out rounded-full shadow-xs"
                       style={{ width: `${pct}%` }}
                     />
                   </div>
-                  <span className="text-xs text-muted-foreground font-medium">
-                    {pct}% completado
+                  <span className="text-xs font-semibold text-primary">
+                    {getDecenaLabel(pct, rosario.mi_progreso?.decena_actual)}
                   </span>
                 </div>
               )}
@@ -398,7 +451,29 @@ export default function RosarioVivo() {
               </p>
             </div>
 
-            <div className="space-y-2.5">
+            <div className="max-h-[340px] overflow-y-auto space-y-2.5 pr-1 scrollbar-thin">
+              {/* Aggregated Grouped Améns for general group intention - UNIONES FIRST */}
+              {generalAmensCount > 0 && (
+                <Card className="border-rose-500/20 bg-rose-500/5 shadow-xs">
+                  <CardContent className="p-3.5 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-rose-500/10 text-rose-600 flex items-center justify-center flex-shrink-0">
+                        <Heart className="w-4 h-4 fill-rose-500/30" />
+                      </div>
+                      <div>
+                        <p className="font-bold text-sm text-rose-800 dark:text-rose-200">
+                          ❤️ {generalAmensCount} {generalAmensCount === 1 ? "persona se unió" : "personas se unieron"} en oración
+                        </p>
+                        <p className="text-xs text-rose-700/80 dark:text-rose-300/80">
+                          {rosario.intencion ? `Por: ${rosario.intencion}` : "Por la intención del grupo"}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-xs font-medium text-primary flex-shrink-0">reciente</span>
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Independent Prayer Requests (Peticiones) */}
               {peticiones.map((peticion) => {
                 const totalAmens = (amenCountsByPeticion[peticion.id] || 0) + (peticion.amens_count || 0);
@@ -450,28 +525,6 @@ export default function RosarioVivo() {
                 );
               })}
 
-              {/* Aggregated Grouped Améns for general group intention */}
-              {generalAmensCount > 0 && (
-                <Card className="border-rose-500/20 bg-rose-500/5 shadow-xs">
-                  <CardContent className="p-3.5 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-rose-500/10 text-rose-600 flex items-center justify-center flex-shrink-0">
-                        <Heart className="w-4 h-4 fill-rose-500/30" />
-                      </div>
-                      <div>
-                        <p className="font-bold text-sm text-rose-800 dark:text-rose-200">
-                          ❤️ {generalAmensCount} {generalAmensCount === 1 ? "persona se unió" : "personas se unieron"} en oración
-                        </p>
-                        <p className="text-xs text-rose-700/80 dark:text-rose-300/80">
-                          {rosario.intencion ? `Por: ${rosario.intencion}` : "Por la intención del grupo"}
-                        </p>
-                      </div>
-                    </div>
-                    <span className="text-xs font-medium text-primary flex-shrink-0">reciente</span>
-                  </CardContent>
-                </Card>
-              )}
-
               {peticiones.length === 0 && generalAmensCount === 0 && (
                 <div className="p-4 rounded-xl bg-muted/30 border border-border/40 text-center text-xs text-muted-foreground italic">
                   Aún no hay peticiones de oración ni respuestas en este grupo.
@@ -479,12 +532,19 @@ export default function RosarioVivo() {
               )}
             </div>
           </div>
+          </div>
         </div>
+
+
       </div>
 
       {/* Sheet Modal: Pedir oración */}
       <Sheet open={showPeticionModal} onOpenChange={setShowPeticionModal}>
-        <SheetContent side="bottom" className="rounded-t-3xl p-6 max-h-[90vh] flex flex-col gap-4 safe-bottom">
+        <SheetContent
+          side="bottom"
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          className="rounded-t-3xl p-6 max-h-[90vh] flex flex-col gap-4 safe-bottom"
+        >
           <div className="w-12 h-1.5 bg-muted rounded-full mx-auto -mt-2 mb-1" />
 
           <div className="flex flex-col items-center text-center gap-1.5">
@@ -569,7 +629,11 @@ export default function RosarioVivo() {
 
       {/* Sheet Modal: Ver miembros */}
       <Sheet open={showMembersModal} onOpenChange={setShowMembersModal}>
-        <SheetContent side="bottom" className="rounded-t-3xl max-h-[80vh] flex flex-col p-0 pb-6 safe-bottom">
+        <SheetContent
+          side="bottom"
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          className="rounded-t-3xl max-h-[80vh] flex flex-col p-0 pb-6 safe-bottom"
+        >
           <SheetHeader className="px-4 pt-4 pb-2 border-b border-border/50">
             <SheetTitle className="text-base font-bold flex items-center gap-2">
               <Users className="w-5 h-5 text-primary" />

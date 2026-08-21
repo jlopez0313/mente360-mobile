@@ -2,41 +2,56 @@ import { KEYS, getPreference, removePreference } from "@/helpers/preferences";
 import { useToast } from "@/hooks/use-toast";
 import { useNetwork } from "@/hooks/useNetwork";
 import { readData, snapshotToArray } from "@/services/realtime-db";
+import { getNotifications } from "@/store/thunks/notifications";
 import { setUser } from "@/store/slices/userSlice";
 import { onValue } from "firebase/database";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 export const FirebaseContext = React.createContext<any>(undefined);
 
 export const FirebaseProvider = ({ children }: any) => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<any>();
   const { toast } = useToast();
 
   const { user } = useSelector((state: any) => state.user);
   const network = useNetwork();
   const state = {};
 
-  // Avisa con un toast cuando ePayco confirma (por webhook, fuera del checkout)
-  // un pago que había quedado pendiente — ver EpaycoCheckoutModal.tsx, que guarda
-  // la referencia pendiente ahí mismo cuando el resultado no llega al instante.
-  const notifyIfPendingPaymentResolved = async (data: any) => {
+  const lastPaymentHoraRef = useRef<string | null>(null);
+
+  // Avisa con un toast cuando ePayco o el backend confirman o rechazan un pago
+  const handlePaymentNotification = async (data: any) => {
+    if (!data || !data.ref_status) return;
+
+    // Evitar procesar el mismo evento repetidamente
+    if (data.hora && data.hora === lastPaymentHoraRef.current) return;
+    lastPaymentHoraRef.current = data.hora || String(Date.now());
+
     const pendingRef = await getPreference(KEYS.EPAYCO_PENDING_REF);
-    if (!pendingRef || data.ref_payco !== pendingRef) return;
+    const isMatchingPending = pendingRef && data.ref_payco === pendingRef;
+
+    const nombreComunidad = data.comunidad_nombre || "la comunidad";
 
     if (data.ref_status === "success") {
-      await removePreference(KEYS.EPAYCO_PENDING_REF);
+      if (isMatchingPending) {
+        await removePreference(KEYS.EPAYCO_PENDING_REF);
+      }
       toast({
         title: "¡Pago confirmado!",
-        description: "Tu suscripción ya está activa.",
+        description: `Tu suscripción a ${nombreComunidad} ya está activa.`,
       });
+      dispatch(getNotifications());
     } else if (["rejected", "failed", "unknown"].includes(data.ref_status)) {
-      await removePreference(KEYS.EPAYCO_PENDING_REF);
+      if (isMatchingPending) {
+        await removePreference(KEYS.EPAYCO_PENDING_REF);
+      }
       toast({
-        title: "Tu pago no pudo confirmarse",
-        description: "Intenta de nuevo desde Planes.",
+        title: "Pago no procesado",
+        description: `El pago de tu suscripción a ${nombreComunidad} no pudo completarse.`,
         variant: "destructive",
       });
+      dispatch(getNotifications());
     }
   };
 
@@ -50,7 +65,9 @@ export const FirebaseProvider = ({ children }: any) => {
           const data = snapshot.val();
           if (data) {
             dispatch(setUser(data));
-            notifyIfPendingPaymentResolved(data);
+            if (data.ref_status && data.ref_payco) {
+              handlePaymentNotification(data);
+            }
           }
         });
         unsubscribes.push(unsubUser);
@@ -60,6 +77,7 @@ export const FirebaseProvider = ({ children }: any) => {
           const data = snapshot.val();
           if (data) {
             dispatch(setUser(data));
+            handlePaymentNotification(data);
           }
         });
         unsubscribes.push(unsubPayment);
@@ -83,6 +101,8 @@ export const FirebaseProvider = ({ children }: any) => {
                   id: item.id,
                   users_id: user.id,
                   precio: item.precio,
+                  ref_status: item.ref_status,
+                  ref_payco: item.ref_payco,
                 },
                 updated_at: null,
               };

@@ -10,8 +10,6 @@ import { getCurrencyForUser, getPlanPrecio } from "@/helpers/Currency";
 import { formatCurrency } from "@/helpers/Format";
 import { getYoutubeLink } from "@/helpers/Video";
 import { db } from "@/hooks/useDexie";
-import { usePayment } from "@/hooks/usePayment";
-import { cn } from "@/lib/utils";
 import { useLiveQuery } from "dexie-react-hooks";
 import { ChevronRight, Crown, Users } from "lucide-react";
 import { useContext, useMemo, useState } from "react";
@@ -26,7 +24,6 @@ type Props = {
 
 export const CommunityCard = ({ community }: Props) => {
   const history = useHistory();
-  const { userEnabled, payment_status } = usePayment();
 
   const { AudioNoWifi, baseURL, status } = useContext(NetworkContext);
 
@@ -58,11 +55,7 @@ export const CommunityCard = ({ community }: Props) => {
       return true;
     }
 
-    if (!userEnabled || payment_status == "free") {
-      return false;
-    }
-
-    const suscripcion = user.suscripciones.find(
+    const suscripcion = user?.suscripciones?.find(
       (s: any) => s.id == community.id
     );
     if (!suscripcion?.pivot?.fecha_vencimiento) {
@@ -71,9 +64,10 @@ export const CommunityCard = ({ community }: Props) => {
 
     const fechaVencimiento = new Date(suscripcion.pivot.fecha_vencimiento);
     const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
 
     return fechaVencimiento >= hoy;
-  }, [isLeader, community, user, userEnabled, payment_status]);
+  }, [isLeader, community?.id, user?.suscripciones]);
 
   const handlePayment = (v: valorPlan | undefined, open: boolean) => {
     setShowPlanModal(open);
