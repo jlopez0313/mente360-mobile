@@ -38,6 +38,7 @@ export const EpaycoCheckoutModal = ({ open, onOpenChange, plan, onSuccess }: Pro
 	const [expMonth, setExpMonth] = useState("");
 	const [expYear, setExpYear] = useState("");
 	const [cvc, setCvc] = useState("");
+	const [cardHolder, setCardHolder] = useState("");
 	const defaultDocType = user?.country && user.country !== "CO" ? "PP" : "CC";
 	const [docType, setDocType] = useState<string>(defaultDocType);
 	const [docNumber, setDocNumber] = useState("");
