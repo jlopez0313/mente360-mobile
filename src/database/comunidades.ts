@@ -8,4 +8,5 @@ export default interface Comunidades {
   descripcion: string;
   lider: User;
   suscritos: User[];
+  es_principal?: boolean;
 }

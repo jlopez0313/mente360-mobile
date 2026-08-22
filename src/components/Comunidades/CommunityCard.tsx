@@ -34,7 +34,8 @@ export const CommunityCard = ({ community }: Props) => {
   const [checkoutPlan, setCheckoutPlan] = useState<EpaycoCheckoutPlan | null>(null);
 
   const plan = useLiveQuery(() =>
-    db.planes.where("key").equals("COMUNIDAD").first()
+    db.planes.where("key").equals(community.es_principal ? "GENERAL" : "COMUNIDAD").first(),
+    [community.es_principal]
   );
 
   const planMensual = plan?.valor.find((v: valorPlan) => v.key === "MES");
