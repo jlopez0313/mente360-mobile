@@ -18,7 +18,7 @@ export const GuidedNightAlternativeStep: React.FC<Props> = ({
 
   const displayList =
     audios && audios.length > 0
-      ? audios.slice(0, 5)
+      ? audios.slice(0, 3)
       : [
           {
             id: 1,

@@ -133,6 +133,19 @@ const Configuracion: React.FC = () => {
                 </div>
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
               </Link>
+
+              <div
+                role="button"
+                tabIndex={0}
+                onClick={() => setShowMusicPrefs(true)}
+                className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors cursor-pointer"
+              >
+                <div className="flex items-center gap-3">
+                  <Music className="w-5 h-5 text-primary" />
+                  <span className="text-foreground">Preferencias de música</span>
+                </div>
+                <ChevronRight className="w-5 h-5 text-muted-foreground" />
+              </div>
             </div>
           </div>
 
@@ -325,6 +338,20 @@ const Configuracion: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <MusicPreferencesModal
+        isOpen={showMusicPrefs}
+        initialPreferences={preferences}
+        onClose={() => setShowMusicPrefs(false)}
+        onSave={(genres) => {
+          savePreferences(genres);
+          setShowMusicPrefs(false);
+          toast({
+            title: "Preferencias guardadas",
+            description: "Actualizamos tus géneros de música.",
+          });
+        }}
+      />
     </AppLayout>
   );
 };

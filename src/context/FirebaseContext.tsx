@@ -2,6 +2,7 @@ import { KEYS, getPreference, removePreference } from "@/helpers/preferences";
 import { useToast } from "@/hooks/use-toast";
 import { useNetwork } from "@/hooks/useNetwork";
 import { readData, snapshotToArray } from "@/services/realtime-db";
+import { find as findUser } from "@/services/user";
 import { getNotifications } from "@/store/thunks/notifications";
 import { setUser } from "@/store/slices/userSlice";
 import { onValue } from "firebase/database";
@@ -20,22 +21,32 @@ export const FirebaseProvider = ({ children }: any) => {
 
   const lastPaymentHoraRef = useRef<string | null>(null);
 
-  // Avisa con un toast cuando ePayco o el backend confirman o rechazan un pago
+  // Avisa con un toast SOLO cuando el pago que el usuario dejó pendiente
+  // (EPAYCO_PENDING_REF) se confirma o se rechaza. Sin ref pendiente no hace
+  // nada: así un `ref_status: "success"` viejo no dispara el toast en cada
+  // refresco.
   const handlePaymentNotification = async (data: any) => {
     if (!data || !data.ref_status) return;
 
-    // Evitar procesar el mismo evento repetidamente
-    if (data.hora && data.hora === lastPaymentHoraRef.current) return;
-    lastPaymentHoraRef.current = data.hora || String(Date.now());
-
     const pendingRef = await getPreference(KEYS.EPAYCO_PENDING_REF);
     const isMatchingPending = pendingRef && data.ref_payco === pendingRef;
+    if (!isMatchingPending) return;
+
+    // Evitar procesar el mismo evento pendiente dos veces en esta sesión
+    const eventKey = `${data.ref_payco}|${data.hora || ""}`;
+    if (eventKey === lastPaymentHoraRef.current) return;
+    lastPaymentHoraRef.current = eventKey;
 
     const nombreComunidad = data.comunidad_nombre || "la comunidad";
 
     if (data.ref_status === "success") {
-      if (isMatchingPending) {
-        await removePreference(KEYS.EPAYCO_PENDING_REF);
+      await removePreference(KEYS.EPAYCO_PENDING_REF);
+      // Traer el estado real del usuario desde la API (no confiar en el blob de RTDB)
+      try {
+        const { data: fresh } = await findUser(user.id);
+        if (fresh?.data) dispatch(setUser(fresh.data));
+      } catch (e) {
+        console.error("No se pudo refrescar el usuario tras el pago:", e);
       }
       toast({
         title: "¡Pago confirmado!",
@@ -43,9 +54,7 @@ export const FirebaseProvider = ({ children }: any) => {
       });
       dispatch(getNotifications());
     } else if (["rejected", "failed", "unknown"].includes(data.ref_status)) {
-      if (isMatchingPending) {
-        await removePreference(KEYS.EPAYCO_PENDING_REF);
-      }
+      await removePreference(KEYS.EPAYCO_PENDING_REF);
       toast({
         title: "Pago no procesado",
         description: `El pago de tu suscripción a ${nombreComunidad} no pudo completarse.`,
@@ -60,6 +69,8 @@ export const FirebaseProvider = ({ children }: any) => {
 
     const checkPayment = () => {
       if (network.status && user?.id) {
+        // users/{id}: espejo en vivo del usuario (incluye estado de suscripción).
+        // Es la fuente que refleja cambios hechos en el backend / RTDB.
         const userRef = readData("users/" + user.id);
         const unsubUser = onValue(userRef, (snapshot) => {
           const data = snapshot.val();
@@ -72,11 +83,13 @@ export const FirebaseProvider = ({ children }: any) => {
         });
         unsubscribes.push(unsubUser);
 
+        // payments/{id} es un blob de evento de pago, NO estado de usuario:
+        // solo lo usamos para el aviso, nunca para setUser (mergearlo pisaba
+        // has_paid / fecha_vencimiento con datos de un intento viejo).
         const paymentRef = readData("payments/" + user.id);
         const unsubPayment = onValue(paymentRef, (snapshot) => {
           const data = snapshot.val();
           if (data) {
-            dispatch(setUser(data));
             handlePaymentNotification(data);
           }
         });

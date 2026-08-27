@@ -1,4 +1,5 @@
 import Avatar from "@/assets/images/load-avatar.png";
+import { MusicPreferencesModal } from "@/components/GuidedDay/MusicPreferencesModal";
 import { AppLayout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,6 +9,7 @@ import {
   ChevronRight,
   Crown,
   Mail,
+  Music,
   Phone,
   User,
 } from "lucide-react";
@@ -17,6 +19,7 @@ import { Link } from "react-router-dom";
 import PerfilComponent from "@/components/Perfil/Perfil";
 import { formatCompleteDate } from "@/helpers/Fechas";
 import { db } from "@/hooks/useDexie";
+import { useMusicPreferences } from "@/hooks/useMusicPreferences";
 import { usePayment } from "@/hooks/usePayment";
 import { updateData } from "@/services/realtime-db";
 import { update } from "@/services/user";
@@ -34,6 +37,9 @@ const Perfil: React.FC = () => {
   const { userEnabled, payment_status } = usePayment();
 
   const generos = useLiveQuery(() => db.generos.toArray());
+
+  const { preferences, savePreferences } = useMusicPreferences();
+  const [showMusicPrefs, setShowMusicPrefs] = useState(false);
 
   const fileRef = useRef<any>(null);
   const [photo, setPhoto] = useState("");
@@ -266,6 +272,30 @@ const Perfil: React.FC = () => {
                     </p>
                   </div>
                 </div>
+
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setShowMusicPrefs(true)}
+                  className="flex items-center gap-3 p-4 cursor-pointer active:bg-muted/40 transition-colors"
+                >
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Music className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-muted-foreground">
+                      Preferencias de música
+                    </p>
+                    <p className="font-medium text-foreground truncate">
+                      {preferences.length > 0
+                        ? `${preferences.length} género${
+                            preferences.length === 1 ? "" : "s"
+                          } seleccionado${preferences.length === 1 ? "" : "s"}`
+                        : "Sin definir"}
+                    </p>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                </div>
               </div>
             </div>
 
@@ -298,9 +328,20 @@ const Perfil: React.FC = () => {
                 </div>
               </div>
             </div>
+
           </div>
         </div>
       </div>
+
+      <MusicPreferencesModal
+        isOpen={showMusicPrefs}
+        initialPreferences={preferences}
+        onClose={() => setShowMusicPrefs(false)}
+        onSave={(genres) => {
+          savePreferences(genres);
+          setShowMusicPrefs(false);
+        }}
+      />
     </AppLayout>
   );
 };

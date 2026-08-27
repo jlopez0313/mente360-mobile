@@ -6,10 +6,20 @@ import { GuidedNightReflectionStep } from "@/components/Night/GuidedNight/Guided
 import { NightPlayerModal } from "@/components/Night/NightPlayerModal";
 import { useBackButton } from "@/hooks/useBackButton";
 import { db } from "@/hooks/useDexie";
+import { useNightFavorites } from "@/hooks/useNightFavorites";
 import { useLiveQuery } from "dexie-react-hooks";
 import { ArrowLeft } from "lucide-react";
 import React, { useMemo, useState } from "react";
 import { useHistory } from "react-router-dom";
+
+const shuffle = <T,>(arr: T[]): T[] => {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+};
 
 const GuidedNightPage: React.FC = () => {
   const history = useHistory();
@@ -21,6 +31,9 @@ const GuidedNightPage: React.FC = () => {
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [isPlayerOpen, setIsPlayerOpen] = useState<boolean>(false);
   const [selectedAudio, setSelectedAudio] = useState<any>(null);
+  const [alternativeAudios, setAlternativeAudios] = useState<any[]>([]);
+
+  const { favoriteIds } = useNightFavorites();
 
   // Categorías y audios de noche desde Dexie
   const nightCategories = useLiveQuery(() => db.categorias_noche.toArray());
@@ -50,6 +63,28 @@ const GuidedNightPage: React.FC = () => {
   }, [categoryAudios]);
 
   const activeAudioToPlay = selectedAudio || recommendedAudio;
+
+  // "Ver otra opción": hasta 2 favoritos al azar + relleno con audios de noche
+  // hasta completar 3 (0 favs → 3 audios, 1 → 2, 2+ → 1).
+  const buildAlternatives = () => {
+    const list: any[] = availableAudios;
+    if (!list.length) return [];
+    const byId = new Map(list.map((a) => [a.id, a]));
+    const favAudios = shuffle(
+      favoriteIds.map((id) => byId.get(id)).filter(Boolean) as any[]
+    ).slice(0, 2);
+    const chosen = new Set(favAudios.map((a) => a.id));
+    const fillers = shuffle(list.filter((a) => !chosen.has(a.id))).slice(
+      0,
+      Math.max(0, 3 - favAudios.length)
+    );
+    return [...favAudios, ...fillers];
+  };
+
+  const handleSeeOther = () => {
+    setAlternativeAudios(buildAlternatives());
+    setStep(3.5);
+  };
 
   const handleBack = () => {
     if (step === 3.5) {
@@ -127,14 +162,14 @@ const GuidedNightPage: React.FC = () => {
               setSelectedAudio(recommendedAudio);
               setIsPlayerOpen(true);
             }}
-            onSeeOther={() => setStep(3.5)}
+            onSeeOther={handleSeeOther}
             onLater={() => history.push("/home")}
           />
         )}
 
         {step === 3.5 && (
           <GuidedNightAlternativeStep
-            audios={categoryAudios}
+            audios={alternativeAudios}
             onSelectAudio={(aud) => {
               setSelectedAudio(aud);
               setIsPlayerOpen(true);

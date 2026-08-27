@@ -3,7 +3,7 @@ import { db } from "@/hooks/useDexie";
 import { cn } from "@/lib/utils";
 import { useLiveQuery } from "dexie-react-hooks";
 import { ArrowLeft, Music } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const MAX_GENRES = 3;
 
@@ -21,6 +21,13 @@ export const MusicPreferencesModal: React.FC<MusicPreferencesModalProps> = ({
   onSave,
 }) => {
   const [selected, setSelected] = useState<(number | string)[]>(initialPreferences);
+
+  // Re-sincroniza la selección con las preferencias actuales cada vez que se abre
+  // (permite editar desde Perfil/Configuración, no solo el primer alta).
+  useEffect(() => {
+    if (isOpen) setSelected(initialPreferences);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   // Mismas categorías que Musicoterapia (db.categorias).
   const categories = useLiveQuery(() =>

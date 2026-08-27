@@ -12,4 +12,8 @@ export default interface AudiosNoche {
   orden?: number;
   created_at?: string;
   updated_at?: string;
+  // Solo en la app (descarga offline)
+  audio_local?: string;
+  imagen_local?: string;
+  downloaded?: number;
 }

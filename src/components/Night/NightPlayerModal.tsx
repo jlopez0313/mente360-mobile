@@ -1,6 +1,8 @@
 import { Slider } from "@/components/ui/slider";
 import { NetworkContext } from "@/context/NetworkContext";
 import { useAudio } from "@/hooks/useAudio";
+import { db } from "@/hooks/useDexie";
+import { useNightFavorites } from "@/hooks/useNightFavorites";
 import { cn } from "@/lib/utils";
 import {
   ArrowLeft,
@@ -12,8 +14,17 @@ import {
   Play,
   RotateCcw,
   RotateCw,
+  Share2,
 } from "lucide-react";
 import React, { useContext, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+
+function fmtRemaining(ms: number) {
+  const total = Math.max(0, Math.round(ms / 1000));
+  const m = Math.floor(total / 60);
+  const s = total % 60;
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
 
 interface NightPlayerModalProps {
   isOpen: boolean;
@@ -36,12 +47,19 @@ export const NightPlayerModal: React.FC<NightPlayerModalProps> = ({
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const [isRestMode, setIsRestMode] = useState(false);
-  const [sleepTimerMinutes, setSleepTimerMinutes] = useState<number | null>(null);
+  const [sleepEndsAt, setSleepEndsAt] = useState<number | null>(null);
+  const [, setTick] = useState(0);
   const [showTimerMenu, setShowTimerMenu] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
+  const [localSrc, setLocalSrc] = useState<string | null>(null);
+
+  const { isFavorite, toggleFavorite } = useNightFavorites();
+
+  const isDownloaded = !!audioItem?.audio_local;
+  const isLiked = isFavorite(audioItem?.id);
 
   const audioSrc =
-    status && audioItem?.audio ? `${baseURL}${audioItem.audio}` : "";
+    localSrc ||
+    (status && audioItem?.audio ? `${baseURL}${audioItem.audio}` : "");
 
   const {
     progress,
@@ -54,6 +72,10 @@ export const NightPlayerModal: React.FC<NightPlayerModalProps> = ({
     onPause,
     onPlay,
     onLoad,
+    downloadAudio,
+    deleteAudio,
+    getDownloadedAudio,
+    onShareLink,
   } = useAudio(
     audioRef,
     () => {
@@ -61,6 +83,21 @@ export const NightPlayerModal: React.FC<NightPlayerModalProps> = ({
     },
     false
   );
+
+  // Resolver ruta local si el audio está descargado
+  useEffect(() => {
+    let cancelled = false;
+    if (audioItem?.audio_local) {
+      getDownloadedAudio(audioItem.audio_local).then((uri: string) => {
+        if (!cancelled) setLocalSrc(uri || null);
+      });
+    } else {
+      setLocalSrc(null);
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, [audioItem?.audio_local]);
 
   // Auto-play on open
   useEffect(() => {
@@ -71,18 +108,58 @@ export const NightPlayerModal: React.FC<NightPlayerModalProps> = ({
     } else {
       onPause();
       setIsRestMode(false);
+      setSleepEndsAt(null);
     }
   }, [isOpen]);
 
-  // Sleep timer effect
+  // Sleep timer: cuenta regresiva; al llegar a 0 pausa el audio
   useEffect(() => {
-    if (!sleepTimerMinutes) return;
-    const timer = setTimeout(() => {
-      onPause();
-      setSleepTimerMinutes(null);
-    }, sleepTimerMinutes * 60 * 1000);
-    return () => clearTimeout(timer);
-  }, [sleepTimerMinutes]);
+    if (!sleepEndsAt) return;
+    const id = setInterval(() => {
+      if (Date.now() >= sleepEndsAt) {
+        onPause();
+        setSleepEndsAt(null);
+      } else {
+        setTick((t) => t + 1);
+      }
+    }, 1000);
+    return () => clearInterval(id);
+  }, [sleepEndsAt]);
+
+  const sleepRemainingMs = sleepEndsAt ? sleepEndsAt - Date.now() : 0;
+
+  const toggleFav = () => toggleFavorite(audioItem?.id);
+
+  const onToggleDownload = async () => {
+    if (!audioItem?.id) return;
+    try {
+      if (isDownloaded) {
+        await deleteAudio(audioItem.audio_local);
+        await db.audios_noche.update(audioItem.id, {
+          audio_local: "",
+          imagen_local: "",
+          downloaded: 0,
+        });
+        toast.success("Eliminado de descargas");
+      } else {
+        const ruta = await downloadAudio(
+          `${baseURL}${audioItem.audio}`,
+          `noche_${audioItem.id}`
+        );
+        if (ruta) {
+          await db.audios_noche.update(audioItem.id, {
+            audio_local: ruta,
+            imagen_local: audioItem.imagen,
+            downloaded: 1,
+          });
+          toast.success("Descargado para offline");
+        }
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error("No se pudo descargar el audio");
+    }
+  };
 
   const handleSeekOffset = (seconds: number) => {
     if (audioRef.current) {
@@ -164,8 +241,9 @@ export const NightPlayerModal: React.FC<NightPlayerModalProps> = ({
           </div>
 
           <button
-            onClick={() => setIsLiked(!isLiked)}
-            className="p-2 text-zinc-400 hover:text-white active:scale-90 transition-transform"
+            onClick={toggleFav}
+            disabled={!audioItem?.id}
+            className="p-2 text-zinc-400 hover:text-white active:scale-90 transition-transform disabled:opacity-40"
           >
             <Heart
               className={cn(
@@ -223,51 +301,86 @@ export const NightPlayerModal: React.FC<NightPlayerModalProps> = ({
 
         {/* Secondary Tool Icons */}
         <div className="flex items-center justify-around w-full max-w-xs text-zinc-400 text-[11px] mb-8">
-          <button className="flex flex-col items-center gap-1 hover:text-white">
+          <button
+            onClick={onToggleDownload}
+            disabled={!audioItem?.id}
+            className={cn(
+              "flex flex-col items-center gap-1 hover:text-white disabled:opacity-40",
+              isDownloaded ? "text-amber-300" : ""
+            )}
+          >
             <Download className="w-5 h-5" />
-            <span>Descargar</span>
+            <span>{isDownloaded ? "Descargado" : "Descargar"}</span>
           </button>
 
           <button
             onClick={() => setShowTimerMenu(!showTimerMenu)}
             className={cn(
               "flex flex-col items-center gap-1 hover:text-white transition-colors",
-              sleepTimerMinutes ? "text-amber-300 font-semibold" : ""
+              sleepEndsAt ? "text-amber-300 font-semibold" : ""
             )}
           >
             <Clock className="w-5 h-5" />
-            <span>{sleepTimerMinutes ? `${sleepTimerMinutes} min` : "Temporizador"}</span>
+            <span>
+              {sleepEndsAt ? fmtRemaining(sleepRemainingMs) : "Temporizador"}
+            </span>
           </button>
 
           <button
-            onClick={() => setIsLiked(!isLiked)}
-            className="flex flex-col items-center gap-1 hover:text-white"
+            onClick={toggleFav}
+            disabled={!audioItem?.id}
+            className="flex flex-col items-center gap-1 hover:text-white disabled:opacity-40"
           >
             <Heart className={cn("w-5 h-5", isLiked ? "text-rose-500 fill-rose-500" : "")} />
             <span>Favorito</span>
+          </button>
+
+          <button
+            onClick={() => audioItem?.id && onShareLink(audioItem.id)}
+            disabled={!audioItem?.id}
+            className="flex flex-col items-center gap-1 hover:text-white disabled:opacity-40"
+          >
+            <Share2 className="w-5 h-5" />
+            <span>Compartir</span>
           </button>
         </div>
 
         {/* Sleep timer preset dropdown */}
         {showTimerMenu && (
           <div className="w-full max-w-xs bg-zinc-900 border border-zinc-700 rounded-2xl p-3 mb-6 grid grid-cols-4 gap-2 text-xs">
-            {[15, 30, 45, 60].map((mins) => (
+            {[15, 30, 45, 60].map((mins) => {
+              const active =
+                sleepEndsAt != null &&
+                Math.round(sleepRemainingMs / 60000) === mins;
+              return (
+                <button
+                  key={mins}
+                  onClick={() => {
+                    setSleepEndsAt(Date.now() + mins * 60 * 1000);
+                    setShowTimerMenu(false);
+                  }}
+                  className={cn(
+                    "!py-2 !rounded-xl text-center font-semibold transition-colors",
+                    active
+                      ? "bg-amber-400 text-zinc-950"
+                      : "bg-zinc-800 text-zinc-200 hover:bg-zinc-700"
+                  )}
+                >
+                  {mins} m
+                </button>
+              );
+            })}
+            {sleepEndsAt != null && (
               <button
-                key={mins}
                 onClick={() => {
-                  setSleepTimerMinutes(mins);
+                  setSleepEndsAt(null);
                   setShowTimerMenu(false);
                 }}
-                className={cn(
-                  "!py-2 !rounded-xl text-center font-semibold transition-colors",
-                  sleepTimerMinutes === mins
-                    ? "bg-amber-400 text-zinc-950"
-                    : "bg-zinc-800 text-zinc-200 hover:bg-zinc-700"
-                )}
+                className="col-span-4 !py-2 !rounded-xl text-center font-semibold bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
               >
-                {mins} m
+                Cancelar temporizador
               </button>
-            ))}
+            )}
           </div>
         )}
       </div>

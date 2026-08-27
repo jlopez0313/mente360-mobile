@@ -5,6 +5,7 @@ import { NetworkContext } from "@/context/NetworkContext";
 import { useAudio } from "@/hooks/useAudio";
 import { db } from "@/hooks/useDexie";
 import { cn } from "@/lib/utils";
+import { dislike, like } from "@/services/likes";
 import { useLiveQuery } from "dexie-react-hooks";
 import {
   Download,
@@ -17,6 +18,8 @@ import {
   SkipForward,
 } from "lucide-react";
 import React, { useContext, useMemo, useRef, useState } from "react";
+import { useSelector } from "react-redux";
+import { toast } from "sonner";
 
 interface GuidedDayMusicStepProps {
   preferences: (number | string)[];
@@ -43,11 +46,11 @@ const GuidedDayMusicStepInner: React.FC<GuidedDayMusicStepProps> = ({
   onComplete,
 }) => {
   const { baseURL, status } = useContext(NetworkContext);
+  const { user } = useSelector((state: any) => state.user);
   // Sub-phases: 'intro' (4) | 'selected' (5) | 'playing' (6)
   const [subPhase, setSubPhase] = useState<"intro" | "selected" | "playing">(
     "intro",
   );
-  const [isLiked, setIsLiked] = useState(false);
 
   // Pick a clip matching preferences or random
   const allClips = useLiveQuery(() => db.clips.toArray());
@@ -88,6 +91,9 @@ const GuidedDayMusicStepInner: React.FC<GuidedDayMusicStepProps> = ({
     onPause,
     onPlay,
     onLoad,
+    downloadAudio,
+    deleteAudio,
+    onShareLink,
   } = useAudio(
     audioRef,
     () => {
@@ -95,6 +101,72 @@ const GuidedDayMusicStepInner: React.FC<GuidedDayMusicStepProps> = ({
     },
     false,
   );
+
+  // ── Favorito (likes: API + db.likes, igual que Musicoterapia) ──
+  const myLike = useLiveQuery(async () => {
+    if (!selectedClip || !user?.id) return undefined;
+    return db.likes
+      .where("users_id")
+      .equals(user.id)
+      .and((l: any) => l.clips_id === selectedClip.id)
+      .first();
+  }, [user?.id, selectedClip?.id]);
+  const isLiked = !!myLike;
+
+  const onToggleLike = async () => {
+    const clipId = selectedClip?.id;
+    if (clipId == null || !user?.id) return;
+    try {
+      if (myLike) {
+        await dislike(myLike.id ?? 0);
+        await db.likes.where("id").equals(myLike.id ?? 0).delete();
+      } else {
+        const payload = { clips_id: clipId, users_id: user.id };
+        const {
+          data: { data: added },
+        } = await like(payload);
+        await db.likes.add({ ...payload, id: added.id });
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error("No se pudo actualizar el favorito");
+    }
+  };
+
+  // ── Descargar (offline: archivo en dispositivo + flags en db.clips) ──
+  const isDownloaded = !!(selectedClip as any)?.audio_local;
+
+  const onToggleDownload = async () => {
+    const clipId = selectedClip?.id;
+    if (clipId == null || !selectedClip) return;
+    try {
+      if (isDownloaded) {
+        await deleteAudio((selectedClip as any).audio_local);
+        await db.clips.update(clipId, {
+          audio_local: "",
+          imagen_local: "",
+          downloaded: 0,
+        } as any);
+        toast.success("Eliminado de descargas");
+      } else {
+        const ruta = await downloadAudio(
+          `${baseURL}${selectedClip.audio}`,
+          `audio_${clipId}`,
+        );
+        if (ruta) {
+          await db.clips.update(clipId, {
+            audio_local: ruta,
+            imagen_local: selectedClip.imagen,
+            downloaded: 1,
+          } as any);
+          toast.success("Descargado para offline");
+        }
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error("No se pudo descargar el audio");
+    }
+  };
 
   const title = selectedClip?.titulo || "A cada segundo";
   const genre = selectedClip?.categoria?.categoria || "Pop";
@@ -181,8 +253,9 @@ const GuidedDayMusicStepInner: React.FC<GuidedDayMusicStepProps> = ({
           {/* Action icons: Favorito | Descargar | Compartir */}
           <div className="flex items-center justify-center gap-8 text-muted-foreground mb-4">
             <button
-              onClick={() => setIsLiked(!isLiked)}
-              className="flex flex-col items-center gap-1 text-[11px] hover:text-foreground"
+              onClick={onToggleLike}
+              disabled={!selectedClip}
+              className="flex flex-col items-center gap-1 text-[11px] hover:text-foreground disabled:opacity-40"
             >
               <Heart
                 className={cn(
@@ -193,12 +266,22 @@ const GuidedDayMusicStepInner: React.FC<GuidedDayMusicStepProps> = ({
               <span>Favorito</span>
             </button>
 
-            <button className="flex flex-col items-center gap-1 text-[11px] hover:text-foreground">
-              <Download className="w-5 h-5" />
-              <span>Descargar</span>
+            <button
+              onClick={onToggleDownload}
+              disabled={!selectedClip}
+              className="flex flex-col items-center gap-1 text-[11px] hover:text-foreground disabled:opacity-40"
+            >
+              <Download
+                className={cn("w-5 h-5", isDownloaded ? "text-primary" : "")}
+              />
+              <span>{isDownloaded ? "Descargado" : "Descargar"}</span>
             </button>
 
-            <button className="flex flex-col items-center gap-1 text-[11px] hover:text-foreground">
+            <button
+              onClick={() => selectedClip && onShareLink(selectedClip.id)}
+              disabled={!selectedClip}
+              className="flex flex-col items-center gap-1 text-[11px] hover:text-foreground disabled:opacity-40"
+            >
               <Share2 className="w-5 h-5" />
               <span>Compartir</span>
             </button>
