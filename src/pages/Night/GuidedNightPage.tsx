@@ -9,7 +9,7 @@ import { db } from "@/hooks/useDexie";
 import { useNightFavorites } from "@/hooks/useNightFavorites";
 import { useLiveQuery } from "dexie-react-hooks";
 import { ArrowLeft } from "lucide-react";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 
 const shuffle = <T,>(arr: T[]): T[] => {
@@ -35,32 +35,44 @@ const GuidedNightPage: React.FC = () => {
 
   const { favoriteIds } = useNightFavorites();
 
-  // Categorías y audios de noche desde Dexie
+  // Categorías y audios de noche desde Dexie (sincronizados de la API).
   const nightCategories = useLiveQuery(() => db.categorias_noche.toArray());
-  const allNightAudios = useLiveQuery(() => db.audios_noche.toArray());
-  const fallbackAudios = useLiveQuery(() => db.audios.toArray());
+  const availableAudios =
+    useLiveQuery(() => db.audios_noche.toArray()) ?? [];
 
-  const availableAudios = useMemo(() => {
-    if (allNightAudios && allNightAudios.length > 0) return allNightAudios;
-    if (fallbackAudios && fallbackAudios.length > 0) return fallbackAudios;
-    return [];
-  }, [allNightAudios, fallbackAudios]);
-
-  // Audios de la categoría elegida (o todos si no hay match)
-  const categoryAudios = useMemo(() => {
-    if (!categoryId) return availableAudios;
+  // Audios de una categoría (o todos si no hay id / no hay match)
+  const audiosForCategory = (id: number | null): any[] => {
+    if (!id) return availableAudios;
     const match = availableAudios.filter(
       (a: any) =>
-        a.categorias_noche_id === categoryId || a.categoria?.id === categoryId
+        a.categorias_noche_id === id || a.categoria?.id === id
     );
     return match.length > 0 ? match : availableAudios;
-  }, [availableAudios, categoryId]);
+  };
 
-  // Audio recomendado: uno de la categoría (aleatorio), o el primero disponible
-  const recommendedAudio = useMemo(() => {
-    if (!categoryAudios || categoryAudios.length === 0) return null;
-    return categoryAudios[Math.floor(Math.random() * categoryAudios.length)];
-  }, [categoryAudios]);
+  // La recomendación se elige UNA vez (al pasar al paso 3), no en cada render,
+  // así no cambia sola mientras el usuario la mira.
+  const [recommendedAudio, setRecommendedAudio] = useState<any>(null);
+
+  const pickRecommendation = (id: number | null) => {
+    const pool = audiosForCategory(id);
+    if (!pool.length) return null;
+    return pool[Math.floor(Math.random() * pool.length)];
+  };
+
+  const goToRecommendation = (id: number | null) => {
+    setCategoryId(id);
+    setRecommendedAudio(pickRecommendation(id));
+    setStep(3);
+  };
+
+  // Si al pasar al paso 3 los audios aún no estaban en Dexie, elegir apenas lleguen.
+  useEffect(() => {
+    if (step === 3 && !recommendedAudio && availableAudios.length) {
+      setRecommendedAudio(pickRecommendation(categoryId));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step, availableAudios.length]);
 
   const activeAudioToPlay = selectedAudio || recommendedAudio;
 
@@ -147,11 +159,8 @@ const GuidedNightPage: React.FC = () => {
           <GuidedNightEmotionStep
             categories={nightCategories}
             initialCategoryId={categoryId}
-            onContinue={(id) => {
-              setCategoryId(id);
-              setStep(3);
-            }}
-            onSkip={() => setStep(3)}
+            onContinue={(id) => goToRecommendation(id)}
+            onSkip={() => goToRecommendation(null)}
           />
         )}
 

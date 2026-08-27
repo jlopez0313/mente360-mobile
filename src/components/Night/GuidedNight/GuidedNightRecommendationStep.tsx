@@ -18,10 +18,8 @@ export const GuidedNightRecommendationStep: React.FC<Props> = ({
 }) => {
   const { baseURL, status, AudioNoWifi } = useContext(NetworkContext);
 
-  const title = audio?.titulo || "Descansar sin anticipar";
-  const desc =
-    audio?.descripcion ||
-    "Suelta la necesidad de controlar el mañana y permite que tu mente se aquiete.";
+  const title = audio?.titulo ?? "";
+  const desc = audio?.descripcion ?? "";
   const duration = audio?.duracion as string | undefined;
   const coverUrl =
     status && audio?.imagen ? `${baseURL}${audio.imagen}` : AudioNoWifi;
@@ -33,7 +31,12 @@ export const GuidedNightRecommendationStep: React.FC<Props> = ({
           Para esta noche te recomendamos
         </h1>
 
-        {/* Recommended Card */}
+        {!audio ? (
+          <p className="text-sm text-muted-foreground text-center py-10">
+            No hay audios de noche disponibles todavía.
+          </p>
+        ) : (
+        /* Recommended Card */
         <div className="bg-card rounded-2xl p-4 border border-border/80 shadow-card flex gap-4 items-start mb-6">
           <div className="w-20 h-20 rounded-2xl overflow-hidden bg-muted flex-shrink-0 relative shadow-sm">
             <img src={coverUrl} alt={title} className="w-full h-full object-cover" />
@@ -55,23 +58,27 @@ export const GuidedNightRecommendationStep: React.FC<Props> = ({
 
             <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
               {duration && (
-                <>
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3 h-3" />
-                    <span>{duration}</span>
-                  </span>
-                  <span>•</span>
-                </>
+                <span className="flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  <span>{duration}</span>
+                </span>
               )}
-              <span className="text-primary font-medium">Hipnosis sanadora</span>
+              {duration && audio?.categoria?.nombre && <span>•</span>}
+              {audio?.categoria?.nombre && (
+                <span className="text-primary font-medium">
+                  {audio.categoria.nombre}
+                </span>
+              )}
             </div>
           </div>
         </div>
+        )}
       </div>
 
       <div className="mt-auto pt-6 flex flex-col gap-4">
         <Button
           onClick={onPlay}
+          disabled={!audio}
           className="w-full h-12 !rounded-2xl bg-primary text-primary-foreground font-bold hover:bg-primary/90 text-sm shadow-md flex items-center justify-center gap-2"
         >
           <Play className="w-4 h-4 fill-current" />

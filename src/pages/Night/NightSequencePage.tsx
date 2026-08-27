@@ -19,7 +19,7 @@ const NightSequencePage: React.FC = () => {
 
   const [isPlayerOpen, setIsPlayerOpen] = useState(false);
 
-  const audioTitle = currentAudio?.titulo || "Aprender a soltar";
+  const audioTitle = currentAudio?.titulo ?? "";
   const description = (currentAudio as any)?.descripcion as string | undefined;
   const duration = (currentAudio as any)?.duracion as string | undefined;
   const coverUrl =
@@ -27,7 +27,8 @@ const NightSequencePage: React.FC = () => {
       ? `${baseURL}${currentAudio.imagen}`
       : AudioNoWifi;
 
-  const progressPercent = Math.round((currentDayIndex / totalDays) * 100);
+  const progressPercent =
+    totalDays > 0 ? Math.round((currentDayIndex / totalDays) * 100) : 0;
 
   return (
     <AppLayout>
@@ -51,6 +52,12 @@ const NightSequencePage: React.FC = () => {
             Cada noche un paso más en tu camino.
           </p>
 
+          {!currentAudio ? (
+            <p className="text-sm text-muted-foreground text-center py-12">
+              No hay audios de noche disponibles todavía.
+            </p>
+          ) : (
+          <>
           {/* Tu avance actual */}
           <div className="bg-[#0B1536] text-white rounded-3xl p-5 mb-6 shadow-card">
             <p className="text-[11px] text-slate-400 mb-1">Tu avance actual</p>
@@ -120,6 +127,8 @@ const NightSequencePage: React.FC = () => {
               Escucha tu audio cada noche y permite que el cambio se integre.
             </p>
           </div>
+          </>
+          )}
         </div>
 
         {/* Audio Player Modal */}

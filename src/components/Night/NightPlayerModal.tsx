@@ -172,7 +172,7 @@ export const NightPlayerModal: React.FC<NightPlayerModalProps> = ({
 
   if (!isOpen) return null;
 
-  const title = audioItem?.titulo || "Aprender a soltar";
+  const title = audioItem?.titulo ?? "";
   const coverUrl =
     status && audioItem?.imagen
       ? `${baseURL}${audioItem.imagen}`
@@ -235,8 +235,12 @@ export const NightPlayerModal: React.FC<NightPlayerModalProps> = ({
               {title}
             </h2>
             <p className="text-xs text-zinc-400">
-              {dayIndex ? `Día ${dayIndex} de ${totalDays} • ` : ""}Hipnosis
-              sanadora
+              {[
+                dayIndex ? `Día ${dayIndex} de ${totalDays}` : null,
+                audioItem?.categoria?.nombre || null,
+              ]
+                .filter(Boolean)
+                .join(" • ")}
             </p>
           </div>
 

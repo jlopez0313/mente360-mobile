@@ -16,32 +16,7 @@ export const GuidedNightAlternativeStep: React.FC<Props> = ({
   const history = useHistory();
   const { baseURL, status, AudioNoWifi } = useContext(NetworkContext);
 
-  const displayList =
-    audios && audios.length > 0
-      ? audios.slice(0, 3)
-      : [
-          {
-            id: 1,
-            titulo: "Soltar el control",
-            descripcion:
-              "Deja de intentar resolverlo todo y entrega lo que no depende de ti.",
-            duracion: "24 min",
-          },
-          {
-            id: 2,
-            titulo: "Aceptar lo que no puedes cambiar hoy",
-            descripcion:
-              "Encuentra paz al aceptar tu día tal como fue y soltar cargas pendientes.",
-            duracion: "31 min",
-          },
-          {
-            id: 3,
-            titulo: "Sanar la preocupación",
-            descripcion:
-              "Libera la mente del exceso de pensamientos y recobra calma.",
-            duracion: "20 min",
-          },
-        ];
+  const displayList = (audios ?? []).slice(0, 3);
 
   return (
     <div className="flex-1 flex flex-col justify-between pt-2 pb-4">
@@ -54,6 +29,11 @@ export const GuidedNightAlternativeStep: React.FC<Props> = ({
         </p>
 
         {/* Audios List */}
+        {displayList.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-8">
+            No hay otros audios de noche disponibles.
+          </p>
+        ) : (
         <div className="space-y-3">
           {displayList.map((item: any) => {
             const coverUrl =
@@ -81,18 +61,24 @@ export const GuidedNightAlternativeStep: React.FC<Props> = ({
                   <h3 className="text-xs font-bold font-display text-foreground mb-0.5 line-clamp-1">
                     {item.titulo}
                   </h3>
-                  <p className="text-[11px] text-muted-foreground line-clamp-2 leading-relaxed mb-1">
-                    {item.descripcion || "Meditación nocturna guiada para descansar."}
-                  </p>
+                  {item.descripcion && (
+                    <p className="text-[11px] text-muted-foreground line-clamp-2 leading-relaxed mb-1">
+                      {item.descripcion}
+                    </p>
+                  )}
                   <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
                     {item.duracion && (
                       <>
                         <Clock className="w-3 h-3" />
                         <span>{item.duracion}</span>
-                        <span>•</span>
                       </>
                     )}
-                    <span className="text-primary font-medium">Hipnosis sanadora</span>
+                    {item.duracion && item.categoria?.nombre && <span>•</span>}
+                    {item.categoria?.nombre && (
+                      <span className="text-primary font-medium">
+                        {item.categoria.nombre}
+                      </span>
+                    )}
                   </div>
                 </div>
                </Card>
@@ -100,6 +86,7 @@ export const GuidedNightAlternativeStep: React.FC<Props> = ({
             );
           })}
         </div>
+        )}
       </div>
 
       <div className="mt-auto pt-6 text-center">
