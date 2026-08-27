@@ -1,15 +1,19 @@
+import {
+    getAllAudiosNoche,
+    getAllCategoriasNoche,
+} from "@/services/audiosNoche";
 import { all as getAllCanales } from "@/services/canales";
 import { all as getAllCategorias } from "@/services/categorias";
 import {
-  all as getAllClips,
-  trashed as getTrashedClips,
-  json as jsonClips,
+    all as getAllClips,
+    trashed as getTrashedClips,
+    json as jsonClips,
 } from "@/services/clips";
 import { all as getAllComunidades } from "@/services/comunidades";
 import { all as getAllConstants } from "@/services/constants";
 import {
-  all as getAllCrecimientos,
-  json as jsonCrecimientos,
+    all as getAllCrecimientos,
+    json as jsonCrecimientos,
 } from "@/services/crecimientos";
 import { all as getAllNiveles } from "@/services/niveles";
 import { all as getAllPlaylist } from "@/services/playlist";
@@ -32,9 +36,11 @@ const initSync = "2024-01-01T00:00:00Z";
 async function syncSimpleTable(
   fetchFn: (from: string) => Promise<{ data: { data: any[] } }>,
   bulkPutFn: (items: any[]) => Promise<unknown>,
-  fromDate: string
+  fromDate: string,
 ) {
-  const { data: { data } } = await fetchFn(fromDate);
+  const {
+    data: { data },
+  } = await fetchFn(fromDate);
   if (!data.length) return;
   await bulkPutFn(data);
 }
@@ -74,7 +80,11 @@ export const useGlobalSync = () => {
   const syncNiveles = async () => {
     try {
       const lastSync = await getPreference(keys.SYNC_KEY);
-      await syncSimpleTable(getAllNiveles, (data) => db.niveles.bulkPut(data), lastSync ?? initSync);
+      await syncSimpleTable(
+        getAllNiveles,
+        (data) => db.niveles.bulkPut(data),
+        lastSync ?? initSync,
+      );
     } catch (error) {
       console.error("Error syncNiveles:", error);
     }
@@ -84,7 +94,11 @@ export const useGlobalSync = () => {
   const syncComunidades = async () => {
     try {
       const lastSync = await getPreference(keys.SYNC_KEY);
-      await syncSimpleTable(getAllComunidades, (data) => db.comunidades.bulkPut(data), lastSync ?? initSync);
+      await syncSimpleTable(
+        getAllComunidades,
+        (data) => db.comunidades.bulkPut(data),
+        lastSync ?? initSync,
+      );
     } catch (error) {
       console.error("Error syncComunidades:", error);
     }
@@ -94,7 +108,11 @@ export const useGlobalSync = () => {
   const syncCanales = async () => {
     try {
       const lastSync = await getPreference(keys.SYNC_KEY);
-      await syncSimpleTable(getAllCanales, (data) => db.canales.bulkPut(data), lastSync ?? initSync);
+      await syncSimpleTable(
+        getAllCanales,
+        (data) => db.canales.bulkPut(data),
+        lastSync ?? initSync,
+      );
     } catch (error) {
       console.error("Error syncCanales:", error);
     }
@@ -104,7 +122,11 @@ export const useGlobalSync = () => {
   const syncProgramas = async () => {
     try {
       const lastSync = await getPreference(keys.SYNC_KEY);
-      await syncSimpleTable(getAllProgramas, (data) => db.programas.bulkPut(data), lastSync ?? initSync);
+      await syncSimpleTable(
+        getAllProgramas,
+        (data) => db.programas.bulkPut(data),
+        lastSync ?? initSync,
+      );
     } catch (error) {
       console.error("Error syncProgramas:", error);
     }
@@ -112,12 +134,11 @@ export const useGlobalSync = () => {
 
   // Crecimientos
   const syncCrecimientos = async () => {
-
     const lastSync = await getPreference(keys.SYNC_KEY);
     const fromDate = lastSync ?? undefined;
 
     let page = parseInt(
-      (await getPreference(keys.CRECIMIENTOS_PAGE_KEY)) ?? "1"
+      (await getPreference(keys.CRECIMIENTOS_PAGE_KEY)) ?? "1",
     );
     let hasMore = true;
 
@@ -184,9 +205,41 @@ export const useGlobalSync = () => {
   const syncCategorias = async () => {
     try {
       const lastSync = await getPreference(keys.SYNC_KEY);
-      await syncSimpleTable(getAllCategorias, (data) => db.categorias.bulkPut(data), lastSync ?? initSync);
+      await syncSimpleTable(
+        getAllCategorias,
+        (data) => db.categorias.bulkPut(data),
+        lastSync ?? initSync,
+      );
     } catch (error) {
       console.error("Error syncCategorias:", error);
+    }
+  };
+
+  // Categorías de Noche
+  const syncCategoriasNoche = async () => {
+    try {
+      const lastSync = await getPreference(keys.SYNC_KEY);
+      await syncSimpleTable(
+        getAllCategoriasNoche,
+        (data) => db.categorias_noche.bulkPut(data),
+        lastSync ?? initSync,
+      );
+    } catch (error) {
+      console.error("Error syncCategoriasNoche:", error);
+    }
+  };
+
+  // Audios de Noche
+  const syncAudiosNoche = async () => {
+    try {
+      const lastSync = await getPreference(keys.SYNC_KEY);
+      await syncSimpleTable(
+        (from) => getAllAudiosNoche("", from),
+        (data) => db.audios_noche.bulkPut(data),
+        lastSync ?? initSync,
+      );
+    } catch (error) {
+      console.error("Error syncAudiosNoche:", error);
     }
   };
 
@@ -213,7 +266,7 @@ export const useGlobalSync = () => {
       await db.playlist.bulkPut(
         data.map((item: any) => {
           return { id: item.id, clip: item.clip, users_id: item.user?.id };
-        })
+        }),
       );
     } catch (error) {
       console.error("Error syncPlaylist:", error);
@@ -314,7 +367,6 @@ export const useGlobalSync = () => {
 
   // Clips Eliminados
   const syncClipsTrashed = async () => {
-
     const lastSync = await getPreference(keys.SYNC_KEY);
     const fromDate = lastSync ?? initSync;
 
@@ -349,6 +401,8 @@ export const useGlobalSync = () => {
           syncComunidades(),
           syncCanales(),
           syncCategorias(),
+          syncCategoriasNoche(),
+          syncAudiosNoche(),
           syncPlaylist(),
           syncProgramas(),
         ]);

@@ -49,7 +49,7 @@ export function DailyContentGrid({ completed, onOpenModal }: DailyContentGridPro
     },
     {
       id: "nightAudio",
-      title: "Audio noche",
+      title: "Mi noche",
       icon: Moon,
       color: "night",
       gradientClass: "gradient-night",

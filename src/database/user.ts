@@ -24,6 +24,6 @@ export default interface User {
   fecha_vencimiento: string;
   epayco_customer_id?: string;
   epayco_subscription_id?: string;
-  crecimiento: Crecimientos;
+  music_preferences?: string[];
   suscripciones: any[];
 }

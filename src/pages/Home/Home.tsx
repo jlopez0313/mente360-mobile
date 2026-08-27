@@ -9,12 +9,13 @@ import {
   RosarioCard,
   SOSModal,
   TaskProgress,
-  WeeklyCalendar,
   WeeklyTaskModal,
 } from "@/components/Home";
+import { GuidedDayCard } from "@/components/GuidedDay/GuidedDayCard";
 import { AppLayout } from "@/components/layout";
 import { useContext, useEffect, useState } from "react";
 
+import { useGuidedDay } from "@/hooks/useGuidedDay";
 import { Settings } from "lucide-react";
 import { Link, useHistory } from "react-router-dom";
 
@@ -46,8 +47,8 @@ import { useDispatch, useSelector } from "react-redux";
 const Home: React.FC = () => {
   const { getPreference, setPreference, keys } = usePreferences();
 
-  const [selectedDay, setSelectedDay] = useState(new Date().getDay());
   const { completed, markComplete } = useCompletedItems();
+  const { completedSteps, isCompleted: isGuidedDayCompleted } = useGuidedDay();
 
   const { currentDay, cadenaDelBien, tarjetaDestacada } = useSelector(
     (state: any) => state.home,
@@ -92,7 +93,7 @@ const Home: React.FC = () => {
           return;
         }
 
-        setNightAudioOpen(true);
+        history.push("/mi-noche");
         break;
       case "sosEmotional":
         if (!userEnabled || payment_status == "free") {
@@ -267,14 +268,14 @@ const Home: React.FC = () => {
         </header>
 
         <div className="flex-1 overflow-y-auto">
+          {/* Guided Day Card */}
+          <GuidedDayCard
+            completedSteps={completedSteps}
+            isCompleted={isGuidedDayCompleted}
+          />
+
           {/* Task Progress */}
           <TaskProgress daysRemaining={currentDay} />
-
-          {/* Weekly Calendar */}
-          <WeeklyCalendar
-            selectedDay={selectedDay}
-            onSelectDay={setSelectedDay}
-          />
 
           {/* Daily Content Grid */}
           <DailyContentGrid

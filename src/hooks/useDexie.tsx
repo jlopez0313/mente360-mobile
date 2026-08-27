@@ -16,6 +16,10 @@ import Tareas from "@/database/tareas";
 import User from "@/database/user";
 import UsuariosClips from "@/database/usuarios_clips";
 
+import AudiosNoche from "@/database/audios_noche";
+import CategoriasNoche from "@/database/categorias_noche";
+import DiaGuiadoProgreso from "@/database/dia_guiado";
+import NocheSecuencia from "@/database/noche_secuencia";
 import Notificaciones from "@/database/notificaciones";
 import Programas from "@/database/programas";
 import Dexie, { Table } from "dexie";
@@ -40,6 +44,10 @@ export class Mente360DB extends Dexie {
   tareas!: Table<Tareas, number>;
   usuarios_clips!: Table<UsuariosClips, number>;
   user!: Table<User, number>;
+  dia_guiado!: Table<DiaGuiadoProgreso, number>;
+  noche_secuencia!: Table<NocheSecuencia, number>;
+  categorias_noche!: Table<CategoriasNoche, number>;
+  audios_noche!: Table<AudiosNoche, number>;
 
   constructor() {
     super("Mente360DB");
@@ -65,7 +73,14 @@ export class Mente360DB extends Dexie {
     });
 
     this.version(4).stores({
-      notificaciones: "id, user_id, isRead, isDeleted, created_at"
+      notificaciones: "id, user_id, isRead, isDeleted, created_at",
+    });
+
+    this.version(5).stores({
+      dia_guiado: "++id,date",
+      noche_secuencia: "++id,date,dayIndex",
+      categorias_noche: "++id,nombre",
+      audios_noche: "++id,categorias_noche_id,titulo",
     });
   }
 }

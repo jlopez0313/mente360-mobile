@@ -331,3 +331,20 @@ input[type="month"]::-webkit-datetime-edit {
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+/* ===============================
+   IONIC BUTTON RADIUS FIX
+   Ionic's normalize.css ships `button { border-radius: 0 }` as an *unlayered*
+   rule, which (per CSS cascade layers) beats Tailwind's layered `rounded-*`
+   utilities regardless of specificity. Plain <button> elements therefore render
+   square even with `rounded-full` / `rounded-2xl`. These unlayered rules load
+   after Ionic and restore the intended radius. Only raw <button> is affected —
+   Ionic's own components use <ion-*> custom elements (shadow DOM), untouched.
+================================ */
+button[class*="rounded-full"] { border-radius: 9999px; }
+button[class*="rounded-3xl"]  { border-radius: calc(var(--radius, 1rem) + 12px); }
+button[class*="rounded-2xl"]  { border-radius: calc(var(--radius, 1rem) + 8px); }
+button[class*="rounded-xl"]   { border-radius: calc(var(--radius, 1rem) + 4px); }
+button[class*="rounded-lg"]   { border-radius: var(--radius, 1rem); }
+button[class*="rounded-md"]   { border-radius: calc(var(--radius, 1rem) - 4px); }
+button[class*="rounded-sm"]   { border-radius: calc(var(--radius, 1rem) - 8px); }

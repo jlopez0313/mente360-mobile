@@ -28,6 +28,11 @@ const RosarioList = lazy(() => import("./pages/Rosario/RosarioList"));
 const RosarioVivo = lazy(() => import("./pages/Rosario/RosarioVivo"));
 const CrearRosario = lazy(() => import("./pages/Rosario/CrearRosario"));
 
+const GuidedDayPage = lazy(() => import("./pages/GuidedDay/GuidedDayPage"));
+const NightMenuPage = lazy(() => import("./pages/Night/NightMenuPage"));
+const NightSequencePage = lazy(() => import("./pages/Night/NightSequencePage"));
+const GuidedNightPage = lazy(() => import("./pages/Night/GuidedNightPage"));
+
 import { FirebaseProvider } from "./context/FirebaseContext";
 
 /* Core CSS required for Ionic components to work properly */
@@ -171,6 +176,22 @@ const App: React.FC = () => {
 
                   <Route exact path="/rosario/vivo/:id">
                     <RosarioVivo />
+                  </Route>
+
+                  <Route exact path="/dia-guiado">
+                    <GuidedDayPage />
+                  </Route>
+
+                  <Route exact path="/mi-noche">
+                    <NightMenuPage />
+                  </Route>
+
+                  <Route exact path="/mi-noche/secuencia">
+                    <NightSequencePage />
+                  </Route>
+
+                  <Route exact path="/mi-noche/guiada">
+                    <GuidedNightPage />
                   </Route>
                 </Suspense>
 
