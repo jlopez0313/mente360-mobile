@@ -1,3 +1,4 @@
+import { Card } from "@/components/ui/card";
 import { NetworkContext } from "@/context/NetworkContext";
 import { ChevronRight, Clock, Play } from "lucide-react";
 import React, { useContext } from "react";
@@ -62,8 +63,9 @@ export const GuidedNightAlternativeStep: React.FC<Props> = ({
               <button
                 key={item.id}
                 onClick={() => onSelectAudio(item)}
-                className="w-full text-left bg-card rounded-2xl p-3.5 border border-border/80 shadow-sm hover:shadow-card active:scale-[0.98] transition-all flex items-center gap-3 group"
+                className="w-full text-left rounded-2xl active:scale-[0.98] transition-transform group"
               >
+               <Card className="rounded-2xl p-3.5 border-border/80 shadow-sm hover:shadow-card transition-shadow flex items-center gap-3">
                 <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-muted flex-shrink-0">
                   <img
                     src={coverUrl}
@@ -83,12 +85,17 @@ export const GuidedNightAlternativeStep: React.FC<Props> = ({
                     {item.descripcion || "Meditación nocturna guiada para descansar."}
                   </p>
                   <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-                    <Clock className="w-3 h-3" />
-                    <span>{item.duracion || "20 min"}</span>
-                    <span>•</span>
+                    {item.duracion && (
+                      <>
+                        <Clock className="w-3 h-3" />
+                        <span>{item.duracion}</span>
+                        <span>•</span>
+                      </>
+                    )}
                     <span className="text-primary font-medium">Hipnosis sanadora</span>
                   </div>
                 </div>
+               </Card>
               </button>
             );
           })}

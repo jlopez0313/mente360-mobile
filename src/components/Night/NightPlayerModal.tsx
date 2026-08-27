@@ -19,7 +19,7 @@ interface NightPlayerModalProps {
   isOpen: boolean;
   onClose: () => void;
   audioItem: any;
-  dayIndex: number;
+  dayIndex?: number;
   totalDays?: number;
   onCompleted?: () => void;
 }
@@ -158,7 +158,8 @@ export const NightPlayerModal: React.FC<NightPlayerModalProps> = ({
               {title}
             </h2>
             <p className="text-xs text-zinc-400">
-              Día {dayIndex} de {totalDays} • Hipnosis sanadora
+              {dayIndex ? `Día ${dayIndex} de ${totalDays} • ` : ""}Hipnosis
+              sanadora
             </p>
           </div>
 

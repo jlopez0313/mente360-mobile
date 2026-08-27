@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import { GuidedDayLockedStep } from "@/components/GuidedDay/steps/GuidedDayLockedStep";
 import { NetworkContext } from "@/context/NetworkContext";
 import { useAudio } from "@/hooks/useAudio";
 import { db } from "@/hooks/useDexie";
@@ -20,9 +21,24 @@ import React, { useContext, useMemo, useRef, useState } from "react";
 interface GuidedDayMusicStepProps {
   preferences: (number | string)[];
   onComplete: () => void;
+  locked?: boolean;
 }
 
 export const GuidedDayMusicStep: React.FC<GuidedDayMusicStepProps> = ({
+  preferences,
+  onComplete,
+  locked = false,
+}) => {
+  if (locked) {
+    return <GuidedDayLockedStep label="La música de hoy" onSkip={onComplete} />;
+  }
+
+  return (
+    <GuidedDayMusicStepInner preferences={preferences} onComplete={onComplete} />
+  );
+};
+
+const GuidedDayMusicStepInner: React.FC<GuidedDayMusicStepProps> = ({
   preferences,
   onComplete,
 }) => {

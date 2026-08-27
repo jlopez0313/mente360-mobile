@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import { GuidedDayLockedStep } from "@/components/GuidedDay/steps/GuidedDayLockedStep";
 import { NetworkContext } from "@/context/NetworkContext";
 import { useAudio } from "@/hooks/useAudio";
 import { db } from "@/hooks/useDexie";
@@ -11,9 +12,27 @@ import { useSelector } from "react-redux";
 interface GuidedDayAudioStepProps {
   onContinue: () => void;
   onSkip?: () => void;
+  locked?: boolean;
 }
 
 export const GuidedDayAudioStep: React.FC<GuidedDayAudioStepProps> = ({
+  onContinue,
+  onSkip,
+  locked = false,
+}) => {
+  if (locked) {
+    return (
+      <GuidedDayLockedStep
+        label="El audio de hoy"
+        onSkip={onSkip || onContinue}
+      />
+    );
+  }
+
+  return <GuidedDayAudioStepInner onContinue={onContinue} onSkip={onSkip} />;
+};
+
+const GuidedDayAudioStepInner: React.FC<GuidedDayAudioStepProps> = ({
   onContinue,
   onSkip,
 }) => {

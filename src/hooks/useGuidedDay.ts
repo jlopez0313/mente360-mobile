@@ -1,8 +1,6 @@
 import { db } from "@/hooks/useDexie";
-import { update } from "@/services/user";
-import { setUser } from "@/store/slices/userSlice";
+import { useMusicPreferences } from "@/hooks/useMusicPreferences";
 import { useCallback, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 
 const GUIDED_DAY_DATE_KEY = "mente360_guided_day_date";
 const GUIDED_DAY_STATE_KEY = "mente360_guided_day_state";
@@ -19,8 +17,11 @@ export function getTodayStr(): string {
 }
 
 export function useGuidedDay() {
-  const dispatch = useDispatch();
-  const { user } = useSelector((state: any) => state.user);
+  const {
+    preferences,
+    hasPreferences: hasMusicPreferences,
+    savePreferences: saveMusicPreferences,
+  } = useMusicPreferences();
 
   const [state, setState] = useState<GuidedDayState>(() => {
     const today = getTodayStr();
@@ -39,21 +40,6 @@ export function useGuidedDay() {
       isCompleted: false,
     };
   });
-
-  // Load preferences (Category IDs or names)
-  const preferences: (number | string)[] =
-    user?.music_preferences ||
-    (() => {
-      try {
-        return JSON.parse(
-          localStorage.getItem("mente360_music_preferences") || "[]",
-        );
-      } catch {
-        return [];
-      }
-    })();
-
-  const hasMusicPreferences = preferences && preferences.length > 0;
 
   // Sync with local storage and Dexie on mount / date change
   useEffect(() => {
@@ -156,27 +142,6 @@ export function useGuidedDay() {
       return updated;
     });
   }, []);
-
-  const saveMusicPreferences = useCallback(
-    async (genres: (number | string)[]) => {
-      localStorage.setItem(
-        "mente360_music_preferences",
-        JSON.stringify(genres),
-      );
-
-      if (user?.id) {
-        try {
-          const { data } = await update({ music_preferences: genres }, user.id);
-          if (data?.data) {
-            dispatch(setUser(data.data));
-          }
-        } catch (e) {
-          console.error("Error saving music preferences:", e);
-        }
-      }
-    },
-    [user, dispatch],
-  );
 
   return {
     state,

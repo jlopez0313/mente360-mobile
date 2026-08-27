@@ -1,6 +1,9 @@
 import { AppLayout } from "@/components/layout";
+import { Card } from "@/components/ui/card";
 import { useBackButton } from "@/hooks/useBackButton";
-import { useIonAlert } from "@ionic/react";
+import { db } from "@/hooks/useDexie";
+import { cn } from "@/lib/utils";
+import { useLiveQuery } from "dexie-react-hooks";
 import {
   ArrowLeft,
   ChevronRight,
@@ -12,21 +15,91 @@ import {
 import React from "react";
 import { useHistory } from "react-router-dom";
 
+const HIPNOSIS_CATEGORY_KEY = "hipnosis";
+
+interface NightOption {
+  key: string;
+  title: string;
+  description: string;
+  icon: React.ElementType;
+  onClick: () => void;
+  cardClass: string;
+  iconWrapClass: string;
+  titleClass: string;
+  descClass: string;
+  chevronClass: string;
+}
+
 const NightMenuPage: React.FC = () => {
   const history = useHistory();
-  const [presentAlert] = useIonAlert();
 
   useBackButton("/home");
 
-  const handleGuidedNightClick = () => {
-    presentAlert({
-      header: "Mi noche guiada",
-      subHeader: "Próximamente disponible",
-      message:
-        "Estamos preparando audios exclusivos de hipnosis sanadora personalizados para cada emoción y estado de ánimo.",
-      buttons: ["Entendido"],
-    });
+  // Categoría "hipnosis sanadoras" de Musicoterapia (si no existe, no mostramos la card)
+  const hipnosisCategory = useLiveQuery(async () => {
+    const cats = await db.categorias.toArray();
+    return (
+      cats.find((c) =>
+        (c.categoria || "").toLowerCase().includes(HIPNOSIS_CATEGORY_KEY)
+      ) ?? null
+    );
+  });
+
+  const goToHipnosis = () => {
+    if (!hipnosisCategory?.id) return;
+    sessionStorage.setItem(
+      "musicaterapia_category",
+      String(hipnosisCategory.id)
+    );
+    sessionStorage.setItem("musicaterapia_tab", "clips");
+    sessionStorage.removeItem("musicaterapia_search");
+    history.push("/musicaterapia");
   };
+
+  const options: NightOption[] = [
+    {
+      key: "secuencia",
+      title: "Mi secuencia nocturna",
+      description:
+        "Continúa tu serie de audios de noche. Cada día un paso más en tu camino.",
+      icon: ListOrdered,
+      onClick: () => history.push("/mi-noche/secuencia"),
+      cardClass: "bg-[#0B1536] border-white/10",
+      iconWrapClass: "bg-white text-[#0B1536]",
+      titleClass: "text-white",
+      descClass: "text-white/65",
+      chevronClass: "text-white/45",
+    },
+    {
+      key: "guiada",
+      title: "Mi noche guiada",
+      description:
+        "Cierra tu día, cuéntanos cómo te sientes y recibe un audio recomendado para esta noche.",
+      icon: Sparkles,
+      onClick: () => history.push("/mi-noche/guiada"),
+      cardClass: "bg-[#5B4394] border-white/10",
+      iconWrapClass: "bg-white text-[#5B4394]",
+      titleClass: "text-white",
+      descClass: "text-white/65",
+      chevronClass: "text-white/45",
+    },
+    ...(hipnosisCategory
+      ? [
+          {
+            key: "explorar",
+            title: "Explorar hipnosis sanadoras",
+            description: "Ver todos los audios disponibles en Musicoterapia",
+            icon: Music,
+            onClick: goToHipnosis,
+            cardClass: "bg-card border-border/60",
+            iconWrapClass: "bg-primary/10 text-primary",
+            titleClass: "text-foreground",
+            descClass: "text-muted-foreground",
+            chevronClass: "text-muted-foreground/70",
+          } as NightOption,
+        ]
+      : []),
+  ];
 
   return (
     <AppLayout>
@@ -60,64 +133,48 @@ const NightMenuPage: React.FC = () => {
 
           {/* Cards */}
           <div className="flex flex-col gap-4">
-            {/* Mi secuencia nocturna */}
-            <button
-              onClick={() => history.push("/mi-noche/secuencia")}
-              className="w-full text-left bg-[#0B1536] !rounded-3xl p-4 shadow-card hover:shadow-elevated active:scale-[0.98] transition-all flex items-center gap-3.5 group"
-            >
-              <div className="w-11 h-11 rounded-full bg-white flex items-center justify-center text-[#0B1536] flex-shrink-0">
-                <ListOrdered className="w-[22px] h-[22px]" />
-              </div>
-              <div className="flex-1 min-w-0 pr-1">
-                <h2 className="text-[15px] font-bold font-display text-white leading-tight mb-1">
-                  Mi secuencia nocturna
-                </h2>
-                <p className="text-xs text-white/65 leading-snug">
-                  Continúa tu serie de audios de noche. Cada día un paso más en tu
-                  camino.
-                </p>
-              </div>
-              <ChevronRight className="w-4 h-4 text-white/45 flex-shrink-0 group-hover:translate-x-0.5 transition-transform" />
-            </button>
-
-            {/* Mi noche guiada */}
-            <button
-              onClick={() => history.push("/mi-noche/guiada")}
-              className="w-full text-left bg-[#5B4394] !rounded-3xl p-4 shadow-card hover:shadow-elevated active:scale-[0.98] transition-all flex items-center gap-3.5 group"
-            >
-              <div className="w-11 h-11 rounded-full bg-white flex items-center justify-center text-[#5B4394] flex-shrink-0">
-                <Sparkles className="w-[22px] h-[22px]" />
-              </div>
-              <div className="flex-1 min-w-0 pr-1">
-                <h2 className="text-[15px] font-bold font-display text-white leading-tight mb-1">
-                  Mi noche guiada
-                </h2>
-                <p className="text-xs text-white/65 leading-snug">
-                  Cierra tu día, cuéntanos cómo te sientes y recibe un audio
-                  recomendado para esta noche.
-                </p>
-              </div>
-              <ChevronRight className="w-4 h-4 text-white/45 flex-shrink-0 group-hover:translate-x-0.5 transition-transform" />
-            </button>
-
-            {/* Explorar hipnosis sanadoras */}
-            <button
-              onClick={() => history.push("/musicaterapia")}
-              className="w-full text-left bg-card !rounded-3xl p-4 border border-border/60 shadow-card hover:shadow-elevated active:scale-[0.98] transition-all flex items-center gap-3.5 group"
-            >
-              <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
-                <Music className="w-[22px] h-[22px]" />
-              </div>
-              <div className="flex-1 min-w-0 pr-1">
-                <h2 className="text-[15px] font-bold font-display text-foreground leading-tight mb-1">
-                  Explorar hipnosis sanadoras
-                </h2>
-                <p className="text-xs text-muted-foreground leading-snug">
-                  Ver todos los audios disponibles en Musicoterapia
-                </p>
-              </div>
-              <ChevronRight className="w-4 h-4 text-muted-foreground/70 flex-shrink-0 group-hover:translate-x-0.5 transition-transform" />
-            </button>
+            {options.map((opt) => {
+              const Icon = opt.icon;
+              return (
+                <button
+                  key={opt.key}
+                  onClick={opt.onClick}
+                  className="w-full text-left rounded-3xl active:scale-[0.98] transition-transform"
+                >
+                  <Card
+                    className={cn(
+                      "rounded-3xl p-4 shadow-card flex items-center gap-3.5",
+                      opt.cardClass
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        "w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0",
+                        opt.iconWrapClass
+                      )}
+                    >
+                      <Icon className="w-[22px] h-[22px]" />
+                    </div>
+                    <div className="flex-1 min-w-0 pr-1">
+                      <h2
+                        className={cn(
+                          "text-[15px] font-bold font-display leading-tight mb-1",
+                          opt.titleClass
+                        )}
+                      >
+                        {opt.title}
+                      </h2>
+                      <p className={cn("text-xs leading-snug", opt.descClass)}>
+                        {opt.description}
+                      </p>
+                    </div>
+                    <ChevronRight
+                      className={cn("w-4 h-4 flex-shrink-0", opt.chevronClass)}
+                    />
+                  </Card>
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>

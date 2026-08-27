@@ -6,6 +6,7 @@ import { GuidedDayCompletedStep } from "@/components/GuidedDay/steps/GuidedDayCo
 import { GuidedDayMessageStep } from "@/components/GuidedDay/steps/GuidedDayMessageStep";
 import { GuidedDayMusicStep } from "@/components/GuidedDay/steps/GuidedDayMusicStep";
 import { useGuidedDay } from "@/hooks/useGuidedDay";
+import { usePayment } from "@/hooks/usePayment";
 import { useIonAlert } from "@ionic/react";
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
@@ -13,6 +14,10 @@ import { useHistory } from "react-router-dom";
 const GuidedDayPage: React.FC = () => {
   const history = useHistory();
   const [presentAlert] = useIonAlert();
+
+  // Audio y Música son premium: sin plan activo se muestra el paywall.
+  const { userEnabled, payment_status } = usePayment();
+  const contentLocked = !userEnabled || payment_status === "free";
 
   const {
     completedSteps,
@@ -32,7 +37,7 @@ const GuidedDayPage: React.FC = () => {
   // Only prompt for music preferences when the user actually reaches step 3,
   // not on the first entry to "Mi día guiado".
   const [showPreferencesModal, setShowPreferencesModal] = useState<boolean>(
-    initialStep === 3 && !hasMusicPreferences
+    initialStep === 3 && !hasMusicPreferences && !contentLocked
   );
 
   const handleBack = () => {
@@ -56,7 +61,7 @@ const GuidedDayPage: React.FC = () => {
       stepId === currentStep
     ) {
       setActiveStep(stepId);
-      if (stepId === 3 && !hasMusicPreferences) {
+      if (stepId === 3 && !hasMusicPreferences && !contentLocked) {
         setShowPreferencesModal(true);
       }
     }
@@ -70,7 +75,8 @@ const GuidedDayPage: React.FC = () => {
   const handleCompleteAudio = () => {
     completeStep(2);
     // If user has no music preferences yet, show modal before step 3
-    if (!hasMusicPreferences) {
+    // (skip it for locked users — they won't get to the music player anyway)
+    if (!hasMusicPreferences && !contentLocked) {
       setShowPreferencesModal(true);
     }
     setActiveStep(3);
@@ -112,6 +118,7 @@ const GuidedDayPage: React.FC = () => {
           <GuidedDayAudioStep
             onContinue={handleCompleteAudio}
             onSkip={handleCompleteAudio}
+            locked={contentLocked}
           />
         )}
 
@@ -119,6 +126,7 @@ const GuidedDayPage: React.FC = () => {
           <GuidedDayMusicStep
             preferences={preferences}
             onComplete={handleCompleteMusic}
+            locked={contentLocked}
           />
         )}
 

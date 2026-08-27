@@ -112,14 +112,6 @@ const NightSequencePage: React.FC = () => {
             <span>Escuchar ahora</span>
           </Button>
 
-          <Button
-            variant="outline"
-            onClick={() => history.push("/musicaterapia")}
-            className="w-full h-11 mt-3 !rounded-2xl !border-border/70 text-primary font-semibold text-sm hover:bg-primary/5"
-          >
-            Ver próximos audios
-          </Button>
-
           {/* Nota motivacional */}
           <div className="mt-8 bg-muted/50 rounded-2xl p-4 border border-border/40 flex items-start gap-3">
             <Info className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />

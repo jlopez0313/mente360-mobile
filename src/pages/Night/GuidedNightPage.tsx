@@ -18,11 +18,12 @@ const GuidedNightPage: React.FC = () => {
   // Step state: 1 (Reflection), 2 (Emotion), 3 (Recommendation), 3.5 (Alternative List)
   const [step, setStep] = useState<number>(1);
   const [reflection, setReflection] = useState<string>("");
-  const [emotion, setEmotion] = useState<string>("Ansiedad");
+  const [categoryId, setCategoryId] = useState<number | null>(null);
   const [isPlayerOpen, setIsPlayerOpen] = useState<boolean>(false);
   const [selectedAudio, setSelectedAudio] = useState<any>(null);
 
-  // Load night audios from Dexie
+  // Categorías y audios de noche desde Dexie
+  const nightCategories = useLiveQuery(() => db.categorias_noche.toArray());
   const allNightAudios = useLiveQuery(() => db.audios_noche.toArray());
   const fallbackAudios = useLiveQuery(() => db.audios.toArray());
 
@@ -32,21 +33,21 @@ const GuidedNightPage: React.FC = () => {
     return [];
   }, [allNightAudios, fallbackAudios]);
 
-  // Recommended audio based on emotion or random
+  // Audios de la categoría elegida (o todos si no hay match)
+  const categoryAudios = useMemo(() => {
+    if (!categoryId) return availableAudios;
+    const match = availableAudios.filter(
+      (a: any) =>
+        a.categorias_noche_id === categoryId || a.categoria?.id === categoryId
+    );
+    return match.length > 0 ? match : availableAudios;
+  }, [availableAudios, categoryId]);
+
+  // Audio recomendado: uno de la categoría (aleatorio), o el primero disponible
   const recommendedAudio = useMemo(() => {
-    if (!availableAudios || availableAudios.length === 0) return null;
-    if (emotion) {
-      const match = availableAudios.filter(
-        (a: any) =>
-          a.titulo?.toLowerCase().includes(emotion.toLowerCase()) ||
-          a.descripcion?.toLowerCase().includes(emotion.toLowerCase())
-      );
-      if (match.length > 0) {
-        return match[Math.floor(Math.random() * match.length)];
-      }
-    }
-    return availableAudios[0];
-  }, [availableAudios, emotion]);
+    if (!categoryAudios || categoryAudios.length === 0) return null;
+    return categoryAudios[Math.floor(Math.random() * categoryAudios.length)];
+  }, [categoryAudios]);
 
   const activeAudioToPlay = selectedAudio || recommendedAudio;
 
@@ -65,7 +66,8 @@ const GuidedNightPage: React.FC = () => {
 
   return (
     <AppLayout>
-      <div className="h-full safe-top safe-bottom flex flex-col bg-background px-5 py-4 overflow-y-auto">
+      <div className="min-h-full flex flex-col bg-background safe-top safe-bottom">
+       <div className="flex-1 flex flex-col px-5 pt-4 pb-4">
         {/* Header with Step Indicator */}
         <div className="flex items-center justify-between mb-4 border-b border-border/40 pb-3">
           <button
@@ -108,9 +110,10 @@ const GuidedNightPage: React.FC = () => {
 
         {step === 2 && (
           <GuidedNightEmotionStep
-            initialEmotion={emotion}
-            onContinue={(emo) => {
-              setEmotion(emo);
+            categories={nightCategories}
+            initialCategoryId={categoryId}
+            onContinue={(id) => {
+              setCategoryId(id);
               setStep(3);
             }}
             onSkip={() => setStep(3)}
@@ -120,7 +123,6 @@ const GuidedNightPage: React.FC = () => {
         {step === 3 && (
           <GuidedNightRecommendationStep
             audio={recommendedAudio}
-            emotion={emotion}
             onPlay={() => {
               setSelectedAudio(recommendedAudio);
               setIsPlayerOpen(true);
@@ -132,7 +134,7 @@ const GuidedNightPage: React.FC = () => {
 
         {step === 3.5 && (
           <GuidedNightAlternativeStep
-            audios={availableAudios}
+            audios={categoryAudios}
             onSelectAudio={(aud) => {
               setSelectedAudio(aud);
               setIsPlayerOpen(true);
@@ -150,6 +152,7 @@ const GuidedNightPage: React.FC = () => {
             history.push("/home");
           }}
         />
+       </div>
       </div>
     </AppLayout>
   );

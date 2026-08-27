@@ -50,11 +50,11 @@ export const GuidedNightReflectionStep: React.FC<Props> = ({
         </div>
       </div>
 
-      <div className="mt-auto pt-6 flex flex-col items-center gap-3">
+      <div className="mt-auto pt-8 flex flex-col items-center gap-5">
         <button
           onClick={onSkip}
           type="button"
-          className="text-xs text-primary font-semibold hover:underline"
+          className="text-xs text-primary font-semibold hover:underline py-1"
         >
           Saltar por ahora
         </button>

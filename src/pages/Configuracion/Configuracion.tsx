@@ -1,8 +1,10 @@
+import { MusicPreferencesModal } from "@/components/GuidedDay/MusicPreferencesModal";
 import { AppLayout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { db } from "@/hooks/useDexie";
+import { useMusicPreferences } from "@/hooks/useMusicPreferences";
 import { usePreferences } from "@/hooks/usePreferences";
 import { Browser } from "@capacitor/browser";
 import { useLiveQuery } from "dexie-react-hooks";
@@ -16,6 +18,7 @@ import {
   FileText,
   LogOut,
   Moon,
+  Music,
   Shield,
   Sun,
   Users
@@ -48,6 +51,9 @@ const Configuracion: React.FC = () => {
   }, [pushNotifications]);
 
   const { removePreference, keys } = usePreferences();
+
+  const { preferences, savePreferences } = useMusicPreferences();
+  const [showMusicPrefs, setShowMusicPrefs] = useState(false);
 
   const handleLogout = async () => {
     localStorage.removeItem("home");
