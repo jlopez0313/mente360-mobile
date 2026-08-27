@@ -19,23 +19,24 @@ export const FirebaseProvider = ({ children }: any) => {
   const network = useNetwork();
   const state = {};
 
-  const lastPaymentHoraRef = useRef<string | null>(null);
+  // refs de pago ya avisados en esta sesión (evita doble toast cuando el
+  // backend escribe a la vez en users/{id} y payments/{id}).
+  const handledRefsRef = useRef<Set<string>>(new Set());
 
   // Avisa con un toast SOLO cuando el pago que el usuario dejó pendiente
-  // (EPAYCO_PENDING_REF) se confirma o se rechaza. Sin ref pendiente no hace
-  // nada: así un `ref_status: "success"` viejo no dispara el toast en cada
-  // refresco.
+  // (EPAYCO_PENDING_REF) se confirma o se rechaza, y UNA sola vez por ref.
+  // Sin ref pendiente no hace nada: así un `ref_status: "success"` viejo no
+  // dispara el toast en cada refresco.
   const handlePaymentNotification = async (data: any) => {
-    if (!data || !data.ref_status) return;
+    if (!data || !data.ref_status || !data.ref_payco) return;
+
+    // Guard síncrono ANTES de cualquier await: el primer listener "reclama"
+    // el ref; el segundo (que corre un microtask después) sale acá.
+    if (handledRefsRef.current.has(data.ref_payco)) return;
+    handledRefsRef.current.add(data.ref_payco);
 
     const pendingRef = await getPreference(KEYS.EPAYCO_PENDING_REF);
-    const isMatchingPending = pendingRef && data.ref_payco === pendingRef;
-    if (!isMatchingPending) return;
-
-    // Evitar procesar el mismo evento pendiente dos veces en esta sesión
-    const eventKey = `${data.ref_payco}|${data.hora || ""}`;
-    if (eventKey === lastPaymentHoraRef.current) return;
-    lastPaymentHoraRef.current = eventKey;
+    if (data.ref_payco !== pendingRef) return; // no es el pago que dejamos pendiente
 
     const nombreComunidad = data.comunidad_nombre || "la comunidad";
 
