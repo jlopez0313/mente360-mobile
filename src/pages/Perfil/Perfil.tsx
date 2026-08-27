@@ -4,6 +4,7 @@ import { AppLayout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import {
   ArrowLeft,
+  BookText,
   Calendar,
   Camera,
   ChevronRight,
@@ -292,6 +293,24 @@ const Perfil: React.FC = () => {
                             preferences.length === 1 ? "" : "s"
                           } seleccionado${preferences.length === 1 ? "" : "s"}`
                         : "Sin definir"}
+                    </p>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                </div>
+
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => history.push("/diario")}
+                  className="flex items-center gap-3 p-4 cursor-pointer active:bg-muted/40 transition-colors"
+                >
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <BookText className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-muted-foreground">Mi diario</p>
+                    <p className="font-medium text-foreground truncate">
+                      Tus cierres de día
                     </p>
                   </div>
                   <ChevronRight className="w-5 h-5 text-muted-foreground flex-shrink-0" />

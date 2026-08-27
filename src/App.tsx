@@ -32,6 +32,7 @@ const GuidedDayPage = lazy(() => import("./pages/GuidedDay/GuidedDayPage"));
 const NightMenuPage = lazy(() => import("./pages/Night/NightMenuPage"));
 const NightSequencePage = lazy(() => import("./pages/Night/NightSequencePage"));
 const GuidedNightPage = lazy(() => import("./pages/Night/GuidedNightPage"));
+const DiarioPage = lazy(() => import("./pages/Diario/Diario"));
 
 import { FirebaseProvider } from "./context/FirebaseContext";
 
@@ -192,6 +193,10 @@ const App: React.FC = () => {
 
                   <Route exact path="/mi-noche/guiada">
                     <GuidedNightPage />
+                  </Route>
+
+                  <Route exact path="/diario">
+                    <DiarioPage />
                   </Route>
                 </Suspense>
 

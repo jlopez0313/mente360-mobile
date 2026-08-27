@@ -5,6 +5,7 @@ import { GuidedNightRecommendationStep } from "@/components/Night/GuidedNight/Gu
 import { GuidedNightReflectionStep } from "@/components/Night/GuidedNight/GuidedNightReflectionStep";
 import { NightPlayerModal } from "@/components/Night/NightPlayerModal";
 import { useBackButton } from "@/hooks/useBackButton";
+import { useDiario } from "@/hooks/useDiario";
 import { db } from "@/hooks/useDexie";
 import { useNightFavorites } from "@/hooks/useNightFavorites";
 import { useLiveQuery } from "dexie-react-hooks";
@@ -34,6 +35,7 @@ const GuidedNightPage: React.FC = () => {
   const [alternativeAudios, setAlternativeAudios] = useState<any[]>([]);
 
   const { favoriteIds } = useNightFavorites();
+  const { upsertToday } = useDiario();
 
   // Categorías y audios de noche desde Dexie (sincronizados de la API).
   const nightCategories = useLiveQuery(() => db.categorias_noche.toArray());
@@ -60,10 +62,16 @@ const GuidedNightPage: React.FC = () => {
     return pool[Math.floor(Math.random() * pool.length)];
   };
 
-  const goToRecommendation = (id: number | null) => {
+  const goToRecommendation = (id: number | null, nombre?: string) => {
     setCategoryId(id);
-    setRecommendedAudio(pickRecommendation(id));
+    const rec = pickRecommendation(id);
+    setRecommendedAudio(rec);
     setStep(3);
+    upsertToday({
+      categoria_noche_id: id,
+      estado_emocional: nombre ?? null,
+      audio_recomendado_id: rec?.id ?? null,
+    });
   };
 
   // Si al pasar al paso 3 los audios aún no estaban en Dexie, elegir apenas lleguen.
@@ -149,6 +157,7 @@ const GuidedNightPage: React.FC = () => {
             initialValue={reflection}
             onContinue={(text) => {
               setReflection(text);
+              if (text.trim()) upsertToday({ texto_cierre_dia: text.trim() });
               setStep(2);
             }}
             onSkip={() => setStep(2)}
@@ -159,7 +168,7 @@ const GuidedNightPage: React.FC = () => {
           <GuidedNightEmotionStep
             categories={nightCategories}
             initialCategoryId={categoryId}
-            onContinue={(id) => goToRecommendation(id)}
+            onContinue={(id, nombre) => goToRecommendation(id, nombre)}
             onSkip={() => goToRecommendation(null)}
           />
         )}
@@ -169,6 +178,8 @@ const GuidedNightPage: React.FC = () => {
             audio={recommendedAudio}
             onPlay={() => {
               setSelectedAudio(recommendedAudio);
+              if (recommendedAudio?.id)
+                upsertToday({ audio_escuchado_id: recommendedAudio.id });
               setIsPlayerOpen(true);
             }}
             onSeeOther={handleSeeOther}
@@ -181,6 +192,7 @@ const GuidedNightPage: React.FC = () => {
             audios={alternativeAudios}
             onSelectAudio={(aud) => {
               setSelectedAudio(aud);
+              if (aud?.id) upsertToday({ audio_escuchado_id: aud.id });
               setIsPlayerOpen(true);
             }}
           />
