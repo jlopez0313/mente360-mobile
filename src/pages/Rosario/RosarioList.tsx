@@ -114,7 +114,10 @@ export default function RosarioList() {
                           <p className="font-medium text-foreground truncate">{item.nombre}</p>
                           <p className="text-xs text-primary capitalize font-medium">Misterios {item.tipo_misterio}</p>
 
-                          {item.fecha_hora && item.modalidad === "programado" && (
+                          {/* Solo mostramos la fecha programada si el evento aún
+                              está en el futuro. Si ya empezó (está en "Ahora"),
+                              no tiene sentido mostrar la programación pasada. */}
+                          {isEnFuturo(item) && (
                             <div className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400 font-semibold mt-0.5">
                               <Clock className="w-3 h-3 flex-shrink-0" />
                               <span className="truncate">{formatFechaHora(item.fecha_hora)}</span>
