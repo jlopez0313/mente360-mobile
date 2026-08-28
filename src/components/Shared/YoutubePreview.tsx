@@ -1,7 +1,7 @@
 import { getYoutubeVideoId, goToYoutube } from "@/helpers/Video";
 import { cn } from "@/lib/utils";
 import { Browser } from "@capacitor/browser";
-import { ExternalLink, Play } from "lucide-react";
+import { ExternalLink, Play, X } from "lucide-react";
 import React, { useState } from "react";
 
 interface Props {
@@ -45,15 +45,38 @@ export const YoutubePreview: React.FC<Props> = ({
 
   if (playing && id) {
     return (
-      <div className={cn("absolute inset-0 w-full h-full bg-black", className)}>
+      // z-20: por encima del badge/logo de la card, para que TODA el área del
+      // video reciba los toques (controles de YouTube).
+      // isolation + translateZ: fuerza una capa propia y evita el bug de iOS
+      // WKWebView donde un <iframe> recortado por overflow:hidden + border-radius
+      // deja de recibir eventos táctiles.
+      <div
+        className={cn("absolute inset-0 z-20 w-full h-full bg-black", className)}
+        style={{ isolation: "isolate" }}
+      >
         <iframe
           className="w-full h-full"
-          src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&playsinline=1&rel=0&modestbranding=1`}
+          style={{ transform: "translateZ(0)", willChange: "transform" }}
+          src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&playsinline=1&rel=0&modestbranding=1&enablejsapi=1`}
           title="Video de YouTube"
           allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
           allowFullScreen
           frameBorder="0"
         />
+
+        {/* Cerrar: desmonta el iframe => detiene la reproducción y vuelve a la miniatura */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            setPlaying(false);
+          }}
+          aria-label="Cerrar video"
+          className="absolute top-1.5 left-1.5 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-black/60 text-white active:scale-95"
+        >
+          <X className="h-4 w-4" />
+        </button>
+
         {/* Salida al reproductor nativo por si el embed falla */}
         <button
           type="button"
