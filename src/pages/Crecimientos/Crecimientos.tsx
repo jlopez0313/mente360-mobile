@@ -187,8 +187,11 @@ const Crecimientos: React.FC = () => {
       <div className="h-full bg-gradient-to-b from-primary/5 to-background flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-4">
-          <button onClick={() => history.replace(`/canales/${nivel?.canal?.id}/niveles`)}>
-            <ArrowLeft className="w-6 h-6 text-foreground" />
+          <button
+            onClick={() => history.replace(`/canales/${nivel?.canal?.id}/niveles`)}
+            className="w-9 h-9 -ml-1.5 shrink-0 rounded-full flex items-center justify-center text-foreground hover:bg-muted active:scale-95 transition-all"
+          >
+            <ArrowLeft className="w-5 h-5 text-foreground" />
           </button>
           <span className="text-sm text-muted-foreground font-medium">
             {community?.comunidad}

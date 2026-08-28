@@ -37,7 +37,7 @@ const NightSequencePage: React.FC = () => {
         <div className="px-4 pt-3">
           <button
             onClick={() => history.replace("/mi-noche")}
-            className="w-9 h-9 -ml-1.5 rounded-full flex items-center justify-center text-foreground hover:bg-muted active:scale-95 transition-all"
+            className="w-9 h-9 -ml-1.5 shrink-0 rounded-full flex items-center justify-center text-foreground hover:bg-muted active:scale-95 transition-all"
           >
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </button>
