@@ -81,7 +81,7 @@ export default function CrearRosario() {
     <AppLayout hideNav>
       <div className="min-h-full flex flex-col bg-background">
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50 px-4 py-4">
+        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50 safe-top px-4 py-4">
           <div className="flex items-center gap-3">
             <button
               type="button"

@@ -13,7 +13,7 @@ const Comunidades = () => {
     <AppLayout>
       <div className="h-full bg-background flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50 px-4 py-4 space-y-4">
+        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50 safe-top px-4 py-4 space-y-4">
           <div className="flex items-center gap-3">
             <img
               src={Logo}

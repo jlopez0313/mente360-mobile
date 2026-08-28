@@ -62,7 +62,7 @@ const Niveles: React.FC = () => {
     <AppLayout hideNav>
       <div className="h-full bg-background flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50 px-4 py-4">
+        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50 safe-top px-4 py-4">
           <div className="flex items-center gap-3">
             <button
               onClick={() =>
@@ -71,7 +71,7 @@ const Niveles: React.FC = () => {
                 )
               }
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-5 h-5 text-foreground" />
             </button>
             <div className="min-w-0">
               <h1 className="text-lg font-heading font-bold text-foreground truncate">

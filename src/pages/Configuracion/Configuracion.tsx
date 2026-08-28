@@ -73,7 +73,7 @@ const Configuracion: React.FC = () => {
   return (
     <AppLayout hideNav>
       <div className="h-full bg-background flex flex-col px-4 py-6">
-        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50">
+        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50 safe-top">
           {/* Header */}
           <div className="flex items-center gap-3 mb-6">
             <button

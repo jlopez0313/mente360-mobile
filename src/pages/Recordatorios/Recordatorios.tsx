@@ -185,7 +185,7 @@ export default function Recordatorios() {
     <AppLayout>
       <div className="h-full flex flex-col bg-background">
         {/* Header */}
-        <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg border-b border-border/50">
+        <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg border-b border-border/50 safe-top">
           <div className="flex items-center justify-between px-4 py-3">
             <button
               onClick={() => history.replace("/configuracion")}

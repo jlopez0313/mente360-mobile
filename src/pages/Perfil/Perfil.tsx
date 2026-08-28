@@ -85,7 +85,7 @@ const Perfil: React.FC = () => {
     <AppLayout hideNav>
       <div className="h-full flex flex-col bg-background">
         {/* Header */}
-        <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg border-b border-border/50">
+        <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg border-b border-border/50 safe-top">
           <div className="flex items-center justify-between px-4 py-3">
             <button onClick={() => history.replace("/home")} className="p-2 -ml-2 hover:bg-muted rounded-full">
               <ArrowLeft className="w-5 h-5 text-foreground" />

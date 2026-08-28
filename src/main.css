@@ -214,12 +214,18 @@
 }
 
 @layer utilities {
+  /* Dentro de <ion-content> el env(safe-area-inset-*) puede devolver 0 en iOS;
+     Ionic expone el inset real en --ion-safe-area-*. Preferimos esa y caemos
+     a env() (y a 0) cuando no está. */
   .safe-bottom {
-    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-bottom: var(
+      --ion-safe-area-bottom,
+      env(safe-area-inset-bottom, 0px)
+    );
   }
 
   .safe-top {
-    padding-top: env(safe-area-inset-top, 0px);
+    padding-top: var(--ion-safe-area-top, env(safe-area-inset-top, 0px));
   }
 
   .glass {
