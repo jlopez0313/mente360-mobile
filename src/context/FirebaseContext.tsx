@@ -2,9 +2,10 @@ import { KEYS, getPreference, removePreference } from "@/helpers/preferences";
 import { useToast } from "@/hooks/use-toast";
 import { useNetwork } from "@/hooks/useNetwork";
 import { readData, snapshotToArray } from "@/services/realtime-db";
-import { find as findUser } from "@/services/user";
+import { find as findUser, heartbeat } from "@/services/user";
 import { getNotifications } from "@/store/thunks/notifications";
 import { setUser } from "@/store/slices/userSlice";
+import { App as CapacitorApp } from "@capacitor/app";
 import { onValue } from "firebase/database";
 import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -134,6 +135,35 @@ export const FirebaseProvider = ({ children }: any) => {
 
     return () => {
       unsubscribes.forEach((unsub) => unsub());
+    };
+  }, [user?.id, network.status]);
+
+  // Registra el "último acceso": al abrir la app (cuando ya hay usuario y red)
+  // y cada vez que la app vuelve del background. El backend hace throttle.
+  useEffect(() => {
+    if (!user?.id || !network.status) return;
+
+    const ping = () => {
+      heartbeat().catch(() => {
+        /* silencioso: no es crítico */
+      });
+    };
+
+    ping();
+
+    let listener: any;
+    CapacitorApp.addListener("appStateChange", ({ isActive }) => {
+      if (isActive) ping();
+    })
+      .then((l) => {
+        listener = l;
+      })
+      .catch(() => {
+        /* fuera de Capacitor (web): sin listener */
+      });
+
+    return () => {
+      listener?.remove?.();
     };
   }, [user?.id, network.status]);
 

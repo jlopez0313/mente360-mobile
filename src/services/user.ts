@@ -29,3 +29,11 @@ export const trial = async(): Promise<any> => {
     const { get } = await baseApi();
     return get('/usuarios/trial');
 };
+
+// Registra el "último acceso" del usuario (last_seen_at). El backend hace
+// throttle, así que se puede llamar sin miedo cada vez que la app se abre
+// o vuelve del background.
+export const heartbeat = async(): Promise<any> => {
+    const { get } = await baseApi();
+    return get('/heartbeat');
+};
