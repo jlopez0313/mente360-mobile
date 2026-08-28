@@ -1,8 +1,8 @@
 import { getYoutubeVideoId, goToYoutube } from "@/helpers/Video";
 import { cn } from "@/lib/utils";
 import { Browser } from "@capacitor/browser";
-import { Play } from "lucide-react";
-import React from "react";
+import { ExternalLink, Play } from "lucide-react";
+import React, { useState } from "react";
 
 interface Props {
   /** URL o ID del video de YouTube. */
@@ -13,23 +13,27 @@ interface Props {
 }
 
 /**
- * Miniatura de un video de YouTube con botón de play. Al tocar abre el video
- * en el navegador del sistema / app de YouTube.
+ * Video de YouTube inline con patrón "facade": primero se ve la miniatura
+ * con un botón de play; al tocarlo se monta el <iframe> con autoplay.
  *
- * Reemplaza al <iframe> embebido: dentro del WebView de Capacitor el player
- * embebido falla con "Error 153 / Video player configuration error" (el origin
- * capacitor://localhost no es válido para YouTube, y la validación es más
- * estricta en algunas regiones como EE.UU.).
+ * Se usa youtube-nocookie.com + playsinline=1: dentro del WebView de
+ * Capacitor el embed normal de youtube.com puede fallar con "Error 153"
+ * (el origin capacitor://localhost no es válido y la validación es más
+ * estricta en algunas regiones, p. ej. EE.UU.). El dominio nocookie y
+ * montar el iframe recién con el gesto del usuario lo evita en la mayoría
+ * de casos.
  */
 export const YoutubePreview: React.FC<Props> = ({
   video,
   fallback,
   className,
 }) => {
+  const [playing, setPlaying] = useState(false);
   const id = getYoutubeVideoId(video ?? "");
   const thumb = id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : fallback;
 
-  const open = async () => {
+  const openExternal = async (e?: React.MouseEvent) => {
+    e?.stopPropagation();
     if (!video) return;
     const url = goToYoutube(video);
     try {
@@ -39,10 +43,34 @@ export const YoutubePreview: React.FC<Props> = ({
     }
   };
 
+  if (playing && id) {
+    return (
+      <div className={cn("absolute inset-0 w-full h-full bg-black", className)}>
+        <iframe
+          className="w-full h-full"
+          src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&playsinline=1&rel=0&modestbranding=1`}
+          title="Video de YouTube"
+          allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+          allowFullScreen
+          frameBorder="0"
+        />
+        {/* Salida al reproductor nativo por si el embed falla */}
+        <button
+          type="button"
+          onClick={openExternal}
+          className="absolute bottom-1.5 right-1.5 z-10 flex items-center gap-1 rounded-md bg-black/60 px-2 py-1 text-[10px] font-semibold text-white"
+        >
+          <ExternalLink className="w-3 h-3" />
+          YouTube
+        </button>
+      </div>
+    );
+  }
+
   return (
     <button
       type="button"
-      onClick={open}
+      onClick={() => (id ? setPlaying(true) : openExternal())}
       className={cn(
         "group absolute inset-0 block w-full h-full bg-black",
         className
