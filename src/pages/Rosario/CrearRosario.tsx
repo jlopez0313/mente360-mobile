@@ -91,7 +91,7 @@ export default function CrearRosario() {
               <ArrowLeft className="w-5 h-5 text-foreground" />
             </button>
             <div className="flex-1">
-              <h1 className="text-xl font-bold text-foreground">Crear rosario</h1>
+              <h1 className="text-xl font-bold text-foreground leading-none">Crear rosario</h1>
             </div>
           </div>
         </div>

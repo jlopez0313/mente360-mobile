@@ -45,7 +45,7 @@ const Suscripcion = () => {
             >
               <ArrowLeft className="w-5 h-5 text-foreground" />
             </button>
-            <h1 className="text-xl font-bold text-foreground !m-0">
+            <h1 className="text-xl font-bold text-foreground !m-0 leading-none">
               Mis Suscripciones
             </h1>
           </div>

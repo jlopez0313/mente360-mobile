@@ -193,7 +193,7 @@ export default function Recordatorios() {
             >
               <ArrowLeft className="w-5 h-5 text-foreground" />
             </button>
-            <h1 className="font-display font-semibold text-lg text-foreground">Mis Recordatorios</h1>
+            <h1 className="font-display font-semibold text-lg text-foreground leading-none">Mis Recordatorios</h1>
             <Dialog open={addReminderOpen} onOpenChange={setAddReminderOpen}>
               <DialogTrigger asChild>
                 <Button variant="ghost" size="sm" className="text-primary">

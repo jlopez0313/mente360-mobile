@@ -75,7 +75,7 @@ const Niveles: React.FC = () => {
               <ArrowLeft className="w-5 h-5 text-foreground" />
             </button>
             <div className="min-w-0">
-              <h1 className="text-lg font-heading font-bold text-foreground truncate">
+              <h1 className="text-lg font-heading font-bold text-foreground truncate leading-none">
                 {channel?.canal}
               </h1>
               <p className="text-xs text-muted-foreground">

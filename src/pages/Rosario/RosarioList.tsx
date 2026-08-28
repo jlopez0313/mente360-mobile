@@ -71,7 +71,7 @@ export default function RosarioList() {
               <ArrowLeft className="w-5 h-5 text-foreground" />
             </button>
             <div className="flex-1">
-              <h1 className="text-xl font-bold text-foreground">Rosario en comunidad</h1>
+              <h1 className="text-xl font-bold text-foreground leading-none">Rosario en comunidad</h1>
               <p className="text-sm text-muted-foreground">Ora con otros, en vivo o por una intención</p>
             </div>
           </div>

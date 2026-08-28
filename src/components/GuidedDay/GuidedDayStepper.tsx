@@ -34,7 +34,7 @@ export const GuidedDayStepper: React.FC<GuidedDayStepperProps> = ({
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
 
-        <h1 className="text-base font-bold font-display text-foreground">
+        <h1 className="text-base font-bold font-display text-foreground leading-none">
           Mi día guiado
         </h1>
 

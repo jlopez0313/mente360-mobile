@@ -70,7 +70,7 @@ export default function SelectCommunityPage() {
             <button onClick={() => history.replace('/configuracion')} className="w-9 h-9 -ml-1.5 shrink-0 rounded-full flex items-center justify-center text-foreground hover:bg-muted active:scale-95 transition-all">
               <ArrowLeft className="w-5 h-5 text-foreground" />
             </button>
-            <h1 className="font-display font-semibold text-lg text-foreground">Comunidad Principal</h1>
+            <h1 className="font-display font-semibold text-lg text-foreground leading-none">Comunidad Principal</h1>
             <div className="w-9" />
           </div>
         </header>
