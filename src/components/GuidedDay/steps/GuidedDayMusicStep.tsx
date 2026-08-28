@@ -45,7 +45,7 @@ const GuidedDayMusicStepInner: React.FC<GuidedDayMusicStepProps> = ({
   preferences,
   onComplete,
 }) => {
-  const { baseURL, status } = useContext(NetworkContext);
+  const { baseURL, status, AudioNoWifi } = useContext(NetworkContext);
   const { user } = useSelector((state: any) => state.user);
   // Sub-phases: 'intro' (4) | 'selected' (5) | 'playing' (6)
   const [subPhase, setSubPhase] = useState<"intro" | "selected" | "playing">(
@@ -168,12 +168,13 @@ const GuidedDayMusicStepInner: React.FC<GuidedDayMusicStepProps> = ({
     }
   };
 
-  const title = selectedClip?.titulo || "A cada segundo";
-  const genre = selectedClip?.categoria?.categoria || "Pop";
+  const title = selectedClip?.titulo ?? "";
+  const genre = selectedClip?.categoria?.categoria ?? "";
+  const clipDuration = (selectedClip as any)?.duracion as string | undefined;
   const coverUrl =
     status && selectedClip?.imagen
       ? `${baseURL}${selectedClip.imagen}`
-      : "https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=500&auto=format&fit=crop&q=60";
+      : AudioNoWifi;
 
   const handleStartPlaying = () => {
     setSubPhase("playing");
@@ -248,7 +249,9 @@ const GuidedDayMusicStepInner: React.FC<GuidedDayMusicStepProps> = ({
           <h3 className="text-lg font-bold font-display text-foreground mb-1">
             {title}
           </h3>
-          <p className="text-xs text-muted-foreground mb-6">{genre} • 02:42</p>
+          <p className="text-xs text-muted-foreground mb-6">
+            {[genre, clipDuration].filter(Boolean).join(" • ")}
+          </p>
 
           {/* Action icons: Favorito | Descargar | Compartir */}
           <div className="flex items-center justify-center gap-8 text-muted-foreground mb-4">
@@ -342,8 +345,8 @@ const GuidedDayMusicStepInner: React.FC<GuidedDayMusicStepProps> = ({
             className="w-full"
           />
           <div className="flex justify-between text-xs text-muted-foreground mt-2">
-            <span>{currentTime || "01:28"}</span>
-            <span>{duration || "02:42"}</span>
+            <span>{currentTime || "00:00"}</span>
+            <span>{duration || "00:00"}</span>
           </div>
         </div>
 

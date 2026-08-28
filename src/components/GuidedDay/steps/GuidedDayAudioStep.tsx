@@ -86,13 +86,10 @@ const GuidedDayAudioStepInner: React.FC<GuidedDayAudioStepProps> = ({
     }
   };
 
-  const title = podcast?.titulo || "El miedo: la alerta que pide herramientas";
-  const subtitle =
-    (podcast?.nivel as any)?.nivel || "Nivel nueve. Inteligencia emocional";
+  const title = podcast?.titulo ?? "";
+  const subtitle = (podcast?.nivel as any)?.nivel ?? "";
   const coverUrl =
-    status && podcast?.imagen
-      ? `${baseURL}${podcast.imagen}`
-      : AudioNoWifi;
+    status && podcast?.imagen ? `${baseURL}${podcast.imagen}` : AudioNoWifi;
 
   return (
     <div className="flex-1 flex flex-col justify-between px-6 py-4 overflow-y-auto">
@@ -123,7 +120,7 @@ const GuidedDayAudioStepInner: React.FC<GuidedDayAudioStepProps> = ({
           />
           <div className="flex justify-between text-xs text-muted-foreground mt-2">
             <span>{currentTime || "00:00"}</span>
-            <span>{duration || "10:56"}</span>
+            <span>{duration || "00:00"}</span>
           </div>
         </div>
 

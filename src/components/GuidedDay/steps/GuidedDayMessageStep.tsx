@@ -13,9 +13,7 @@ export const GuidedDayMessageStep: React.FC<GuidedDayMessageStepProps> = ({
 }) => {
   const dailyMessage = useLiveQuery(() => db.mensajes.toCollection().first());
 
-  const messageText =
-    dailyMessage?.mensaje ||
-    "El miedo puede avisarte de un peligro, pero no tiene por qué decidir por ti.";
+  const messageText = dailyMessage?.mensaje ?? "";
 
   return (
     <div className="flex-1 flex flex-col justify-between px-6 py-6 overflow-y-auto">
@@ -31,9 +29,15 @@ export const GuidedDayMessageStep: React.FC<GuidedDayMessageStepProps> = ({
 
         {/* Message quote card */}
         <div className="w-full bg-card rounded-3xl p-6 shadow-card border border-border/50 text-center mb-6">
-          <p className="text-foreground text-lg leading-relaxed font-medium">
-            {messageText}
-          </p>
+          {messageText ? (
+            <p className="text-foreground text-lg leading-relaxed font-medium">
+              {messageText}
+            </p>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              No hay mensaje del día disponible.
+            </p>
+          )}
         </div>
       </div>
 
