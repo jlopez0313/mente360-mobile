@@ -191,6 +191,9 @@ const GuidedDayMusicStepInner: React.FC<GuidedDayMusicStepProps> = ({
     }
   };
 
+  // Sin clips sincronizados: no hay música que ofrecer, se salta el paso.
+  const noMusic = !!allClips && allClips.length === 0;
+
   // Subphase 1: Intro (Pantalla 4)
   if (subPhase === "intro") {
     return (
@@ -200,17 +203,24 @@ const GuidedDayMusicStepInner: React.FC<GuidedDayMusicStepProps> = ({
             <Music className="w-10 h-10 text-primary" />
           </div>
 
-          <h2 className="text-xl font-bold font-display text-foreground max-w-[280px] mb-3 leading-snug">
-            Ahora deja que la música acompañe lo que acabas de trabajar.
-          </h2>
-
-          <p className="text-sm text-muted-foreground max-w-[240px]">
-            Hemos elegido una canción especial para ti.
-          </p>
+          {noMusic ? (
+            <p className="text-sm text-muted-foreground max-w-[260px] leading-relaxed">
+              No hay música disponible para hoy.
+            </p>
+          ) : (
+            <>
+              <h2 className="text-xl font-bold font-display text-foreground max-w-[280px] mb-3 leading-snug">
+                Ahora deja que la música acompañe lo que acabas de trabajar.
+              </h2>
+              <p className="text-sm text-muted-foreground max-w-[240px]">
+                Hemos elegido una canción especial para ti.
+              </p>
+            </>
+          )}
         </div>
 
         <Button
-          onClick={() => setSubPhase("selected")}
+          onClick={() => (noMusic ? onComplete() : setSubPhase("selected"))}
           className="w-full h-12 shrink-0 !rounded-2xl bg-primary text-primary-foreground font-bold hover:bg-primary/90 text-sm shadow-md"
         >
           Continuar

@@ -91,6 +91,27 @@ const GuidedDayAudioStepInner: React.FC<GuidedDayAudioStepProps> = ({
   const coverUrl =
     status && podcast?.imagen ? `${baseURL}${podcast.imagen}` : AudioNoWifi;
 
+  // Sin crecimiento / sin audio: no hay reproductor que mostrar.
+  const hasAudio = !!podcast?.audio;
+
+  if (!hasAudio) {
+    return (
+      <div className="flex-1 flex flex-col px-6 py-8">
+        <div className="flex-1 flex flex-col items-center justify-center text-center">
+          <p className="text-sm text-muted-foreground max-w-[260px] leading-relaxed">
+            No hay un audio disponible para hoy.
+          </p>
+        </div>
+        <Button
+          onClick={onContinue}
+          className="w-full h-12 shrink-0 !rounded-2xl bg-primary text-primary-foreground font-bold hover:bg-primary/90 text-sm shadow-md"
+        >
+          Continuar
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="flex-1 flex flex-col justify-between px-6 py-4 overflow-y-auto">
       <div className="flex flex-col items-center text-center mt-2">
