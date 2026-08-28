@@ -178,24 +178,6 @@ export const NightPlayerModal: React.FC<NightPlayerModalProps> = ({
       ? `${baseURL}${audioItem.imagen}`
       : AudioNoWifi;
 
-  // Full black Rest Mode screen
-  if (isRestMode) {
-    return (
-      <div
-        onClick={() => setIsRestMode(false)}
-        className="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center cursor-pointer select-none text-zinc-700 hover:text-zinc-500 transition-colors p-6 text-center safe-top safe-bottom"
-      >
-        <Moon className="w-10 h-10 mb-4 opacity-40 animate-pulse-soft" />
-        <p className="text-xs tracking-widest uppercase">
-          Modo descanso activo
-        </p>
-        <p className="text-[10px] mt-2 opacity-50">
-          Toca la pantalla en cualquier lugar para despertar los controles
-        </p>
-      </div>
-    );
-  }
-
   return (
     <div className="fixed inset-0 z-50 bg-gradient-to-b from-[#090e1a] via-[#0d1627] to-[#060b14] text-white flex flex-col safe-top safe-bottom overflow-y-auto">
      <div className="flex-1 flex flex-col px-6 pt-4 pb-7">
@@ -414,6 +396,22 @@ export const NightPlayerModal: React.FC<NightPlayerModalProps> = ({
           if (onCompleted) onCompleted();
         }}
       />
+
+      {/* Modo descanso: overlay negro, NO desmonta el <audio> (sigue sonando) */}
+      {isRestMode && (
+        <div
+          onClick={() => setIsRestMode(false)}
+          className="fixed inset-0 z-[60] bg-black flex flex-col items-center justify-center cursor-pointer select-none text-zinc-700 hover:text-zinc-500 transition-colors p-6 text-center safe-top safe-bottom"
+        >
+          <Moon className="w-10 h-10 mb-4 opacity-40 animate-pulse-soft" />
+          <p className="text-xs tracking-widest uppercase">
+            Modo descanso activo
+          </p>
+          <p className="text-[10px] mt-2 opacity-50">
+            Toca la pantalla en cualquier lugar para despertar los controles
+          </p>
+        </div>
+      )}
     </div>
   );
 };

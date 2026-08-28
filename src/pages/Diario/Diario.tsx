@@ -26,7 +26,7 @@ const DiarioPage: React.FC = () => {
   return (
     <AppLayout>
       <div className="min-h-full flex flex-col bg-background safe-top safe-bottom">
-        <div className="px-4 pt-3">
+        <div className="px-4 pt-3 shrink-0">
           <button
             onClick={() => history.replace("/perfil")}
             className="w-9 h-9 -ml-1.5 rounded-full flex items-center justify-center text-foreground hover:bg-muted active:scale-95 transition-all"
@@ -35,7 +35,7 @@ const DiarioPage: React.FC = () => {
           </button>
         </div>
 
-        <div className="flex-1 w-full max-w-md mx-auto px-4 pt-2 pb-10">
+        <div className="flex-1 flex flex-col w-full max-w-md mx-auto px-4 pt-2 pb-[calc(env(safe-area-inset-bottom,0px)+3rem)]">
           <h1 className="text-xl font-bold font-display text-foreground mb-1">
             Mi diario
           </h1>
@@ -44,7 +44,7 @@ const DiarioPage: React.FC = () => {
           </p>
 
           {entries.length === 0 ? (
-            <div className="flex flex-col items-center text-center py-16">
+            <div className="flex-1 flex flex-col items-center justify-center text-center">
               <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                 <BookText className="w-8 h-8 text-primary" />
               </div>
