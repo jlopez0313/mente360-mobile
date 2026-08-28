@@ -31,7 +31,7 @@ const Test: React.FC = () => {
             >
               <ArrowLeft className="w-5 h-5 text-foreground" />
             </button>
-            <h1 className="font-display font-semibold text-lg text-foreground leading-none">
+            <h1 className="font-display font-semibold text-lg text-foreground">
               Test de Eneagrama
             </h1>
             <div className="w-9" />

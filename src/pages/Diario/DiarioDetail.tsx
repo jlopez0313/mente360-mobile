@@ -60,7 +60,7 @@ const DiarioDetailPage: React.FC = () => {
             >
               <ArrowLeft className="w-5 h-5 text-foreground" />
             </button>
-            <h1 className="font-display font-semibold text-lg text-foreground leading-none">
+            <h1 className="font-display font-semibold text-lg text-foreground">
               Entrada del diario
             </h1>
           </div>

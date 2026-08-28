@@ -81,7 +81,7 @@ const PlanesPage = () => {
           >
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </button>
-          <h1 className="text-xl font-bold text-foreground leading-none">Elige tu plan</h1>
+          <h1 className="text-xl font-bold text-foreground">Elige tu plan</h1>
         </div>
 
         <div className="flex-1 overflow-y-auto space-y-4 mb-6 px-1 py-2 overfow-y-auto">
