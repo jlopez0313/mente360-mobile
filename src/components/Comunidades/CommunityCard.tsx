@@ -8,7 +8,7 @@ import Comunidades from "@/database/comunidades";
 import { valorPlan } from "@/database/planes";
 import { getCurrencyForUser, getPlanPrecio } from "@/helpers/Currency";
 import { formatCurrency } from "@/helpers/Format";
-import { getYoutubeLink } from "@/helpers/Video";
+import { YoutubePreview } from "@/components/Shared/YoutubePreview";
 import { db } from "@/hooks/useDexie";
 import { useLiveQuery } from "dexie-react-hooks";
 import { ChevronRight, Crown, Users } from "lucide-react";
@@ -90,21 +90,7 @@ export const CommunityCard = ({ community }: Props) => {
         {/* Header with image */}
         <div className="relative h-40 bg-gradient-to-r from-primary/20 to-secondary/20">
           {status ? (
-            <iframe
-              className="w-full h-full object-cover"
-              src={getYoutubeLink(community?.video)}
-              title="YouTube video player"
-              allowFullScreen
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-              }}
-            ></iframe>
+            <YoutubePreview video={community?.video} fallback={AudioNoWifi} />
           ) : (
             <img
               src={AudioNoWifi}

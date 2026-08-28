@@ -4,7 +4,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { NetworkContext } from "@/context/NetworkContext";
-import { getYoutubeLink, goToYoutube } from "@/helpers/Video";
+import { YoutubePreview } from "@/components/Shared/YoutubePreview";
+import { goToYoutube } from "@/helpers/Video";
 import { useBackButton } from "@/hooks/useBackButton";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/hooks/useDexie";
@@ -42,21 +43,7 @@ const Canales: React.FC = () => {
         {/* Header Image */}
         <div className="relative h-50 bg-gradient-primary">
           {status ? (
-            <iframe
-              className="w-full h-full object-cover"
-              src={getYoutubeLink(community?.video)}
-              title="YouTube video player"
-              allowFullScreen
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-              }}
-            ></iframe>
+            <YoutubePreview video={community?.video} fallback={AudioNoWifi} />
           ) : (
             <img
               src={AudioNoWifi}
