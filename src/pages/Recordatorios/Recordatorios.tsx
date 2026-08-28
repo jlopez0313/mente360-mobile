@@ -186,7 +186,7 @@ export default function Recordatorios() {
       <div className="h-full flex flex-col bg-background">
         {/* Header */}
         <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg border-b border-border/50 safe-top">
-          <div className="flex items-center justify-between px-4 py-3">
+          <div className="flex items-center gap-2 px-4 py-3">
             <button
               onClick={() => history.replace("/configuracion")}
               className="w-9 h-9 -ml-1.5 shrink-0 rounded-full flex items-center justify-center text-foreground hover:bg-muted active:scale-95 transition-all"
@@ -196,7 +196,7 @@ export default function Recordatorios() {
             <h1 className="font-display font-semibold text-lg text-foreground">Mis Recordatorios</h1>
             <Dialog open={addReminderOpen} onOpenChange={setAddReminderOpen}>
               <DialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="text-primary">
+                <Button variant="ghost" size="sm" className="text-primary ml-auto">
                   <Plus className="w-4 h-4 mr-1" />
                   Agregar
                 </Button>

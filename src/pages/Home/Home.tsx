@@ -233,7 +233,7 @@ const Home: React.FC = () => {
 
       <div className="h-full safe-top flex flex-col">
         {/* Header */}
-        <header className="px-4 pt-4 pb-2 flex items-center justify-between">
+        <header className="px-4 pt-1 pb-2 flex items-center justify-between">
           <div className="flex items-center gap-3 mb-4">
             <Link to="/perfil">
               <img

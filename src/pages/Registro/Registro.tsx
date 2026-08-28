@@ -6,7 +6,7 @@ const Registro: React.FC = () => {
   return (
     <AppLayout>
       <div className="min-h-screen bg-background flex flex-col">
-        <header className="p-4">
+        <header className="p-4 safe-top">
         </header>
         
         <RegistroComponent />

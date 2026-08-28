@@ -104,7 +104,7 @@ export default function OnboardingPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <header className="p-4 flex items-center justify-between">
+      <header className="p-4 safe-top flex items-center justify-between">
         <img src={logo} alt="Mente 360" className="w-10 object-contain" />
         <button
           onClick={handleSkip}
@@ -167,7 +167,7 @@ export default function OnboardingPage() {
       </div>
 
       {/* Navigation */}
-      <div className="p-6 flex items-center gap-3">
+      <div className="p-6 safe-bottom flex items-center gap-3">
         {currentStep > 0 && (
           <Button
             variant="outline"

@@ -121,10 +121,10 @@ const GuidedNightPage: React.FC = () => {
 
   return (
     <AppLayout>
-      <div className="min-h-full flex flex-col bg-background safe-top safe-bottom">
-       <div className="flex-1 flex flex-col px-5 pt-4 pb-[calc(env(safe-area-inset-bottom,0px)+2rem)]">
+      <div className="min-h-full flex flex-col bg-background safe-top">
+       <div className="flex-1 flex flex-col px-5 pt-4 pb-[calc(var(--ion-safe-area-bottom,env(safe-area-inset-bottom,0px))+2rem)]">
         {/* Header with Step Indicator */}
-        <div className="flex items-center justify-between mb-4 border-b border-border/40 pb-3">
+        <div className="flex items-center gap-2 mb-4 border-b border-border/40 pb-3">
           <button
             onClick={handleBack}
             className="w-9 h-9 -ml-1.5 shrink-0 rounded-full flex items-center justify-center text-foreground hover:bg-muted active:scale-95 transition-all"
@@ -132,13 +132,11 @@ const GuidedNightPage: React.FC = () => {
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </button>
 
-          <div className="text-center">
-            <span className="text-xs font-semibold text-foreground font-display">
-              Mi noche guiada
-            </span>
-          </div>
+          <h1 className="text-base font-bold font-display text-foreground">
+            Mi noche guiada
+          </h1>
 
-          <span className="text-xs font-bold text-muted-foreground w-9 text-right font-display">
+          <span className="text-xs font-bold text-muted-foreground ml-auto shrink-0 font-display">
             {stepDisplay}
           </span>
         </div>

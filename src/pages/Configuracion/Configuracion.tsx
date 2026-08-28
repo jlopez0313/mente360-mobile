@@ -72,10 +72,9 @@ const Configuracion: React.FC = () => {
 
   return (
     <AppLayout hideNav>
-      <div className="h-full bg-background flex flex-col px-4 py-6">
-        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50 safe-top">
-          {/* Header */}
-          <div className="flex items-center gap-3 mb-6">
+      <div className="min-h-full flex flex-col bg-background">
+        <header className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50 px-4 py-3.5 safe-top">
+          <div className="flex items-center gap-2">
             <button
               onClick={() => history.replace('/home')}
               className="w-9 h-9 -ml-1.5 shrink-0 rounded-full flex items-center justify-center text-foreground hover:bg-muted active:scale-95 transition-all"
@@ -84,9 +83,9 @@ const Configuracion: React.FC = () => {
             </button>
             <h1 className="text-xl font-bold text-foreground">Configuración</h1>
           </div>
-        </div>
+        </header>
 
-        <div className="flex-1 overflow-y-auto px-1 py-4 space-y-6">
+        <div className="flex-1 px-4 py-4 space-y-6">
           {/* Profile Section */}
           <div className="bg-card rounded-2xl border border-border overflow-hidden">
             <div className="px-4 py-3 bg-muted/50">
@@ -272,7 +271,7 @@ const Configuracion: React.FC = () => {
             </div>
 
             <div className="divide-y divide-border">
-              {enlaces?.map((enlace, index) => {
+              {enlaces?.map((enlace) => {
                 const Icon =
                   (LucideIcons as any)[enlace.icon] || LucideIcons.Link;
                 return (

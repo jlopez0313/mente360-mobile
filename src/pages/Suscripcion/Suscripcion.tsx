@@ -35,23 +35,22 @@ const Suscripcion = () => {
 
   return (
     <AppLayout>
-      <div className="h-full bg-background flex flex-col px-4 py-6">
-        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50 safe-top">
-          {/* Header */}
-          <div className="flex items-center gap-3 mb-6">
+      <div className="min-h-full flex flex-col bg-background">
+        <header className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50 px-4 py-3.5 safe-top">
+          <div className="flex items-center gap-2">
             <button
               onClick={() => history.go(-1)}
               className="w-9 h-9 -ml-1.5 shrink-0 rounded-full flex items-center justify-center text-foreground hover:bg-muted active:scale-95 transition-all"
             >
               <ArrowLeft className="w-5 h-5 text-foreground" />
             </button>
-            <h1 className="text-xl font-bold text-foreground !m-0">
+            <h1 className="text-xl font-bold text-foreground">
               Mis Suscripciones
             </h1>
           </div>
-        </div>
+        </header>
 
-        <div className="flex-1 overflow-y-auto px-1 py-4 space-y-6">
+        <div className="flex-1 px-4 py-4 space-y-6">
           {userEnabled && payment_status != "free" ? (
             <div className="bg-gradient-to-r from-premium/10 to-premium/5 rounded-2xl p-4 border border-premium/20">
               <div className="flex items-center gap-3">

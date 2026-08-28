@@ -32,7 +32,7 @@ const NightSequencePage: React.FC = () => {
 
   return (
     <AppLayout>
-      <div className="min-h-full flex flex-col bg-background safe-top safe-bottom">
+      <div className="min-h-full flex flex-col bg-background safe-top">
         {/* Back */}
         <div className="px-4 pt-3">
           <button
@@ -44,7 +44,7 @@ const NightSequencePage: React.FC = () => {
         </div>
 
         {/* Content */}
-        <div className="flex-1 w-full max-w-md mx-auto px-4 pt-2 pb-[calc(env(safe-area-inset-bottom,0px)+3rem)]">
+        <div className="flex-1 w-full max-w-md mx-auto px-4 pt-2 pb-[calc(var(--ion-safe-area-bottom,env(safe-area-inset-bottom,0px))+3rem)]">
           <h1 className="text-xl font-bold font-display text-foreground mb-1">
             Mi secuencia nocturna
           </h1>

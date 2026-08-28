@@ -24,7 +24,7 @@ const Test: React.FC = () => {
     <AppLayout hideNav>
       <div className="h-full flex flex-col bg-background">
         <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg border-b border-border/50 safe-top">
-          <div className="flex items-center justify-between px-4 py-3">
+          <div className="flex items-center gap-2 px-4 py-3">
             <button
               onClick={() => history.go(-1)}
               className="w-9 h-9 -ml-1.5 shrink-0 rounded-full flex items-center justify-center text-foreground hover:bg-muted active:scale-95 transition-all"
@@ -34,7 +34,6 @@ const Test: React.FC = () => {
             <h1 className="font-display font-semibold text-lg text-foreground">
               Test de Eneagrama
             </h1>
-            <div className="w-9" />
           </div>
         </header>
 

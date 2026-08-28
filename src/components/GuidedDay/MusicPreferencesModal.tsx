@@ -55,15 +55,16 @@ export const MusicPreferencesModal: React.FC<MusicPreferencesModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 bg-background flex flex-col safe-top safe-bottom">
       {/* Header */}
-      <div className="px-4 py-3 flex items-center justify-between border-b border-border/40">
+      <div className="px-4 py-3 flex items-center gap-2 border-b border-border/40">
         <button
           onClick={onClose}
           className="w-9 h-9 -ml-1.5 shrink-0 rounded-full flex items-center justify-center text-foreground hover:bg-muted active:scale-95 transition-all"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
-        <h2 className="text-sm font-semibold text-foreground">Preferencias de música</h2>
-        <div className="w-9" />
+        <h2 className="text-lg font-display font-semibold text-foreground">
+          Preferencias de música
+        </h2>
       </div>
 
       {/* Content */}

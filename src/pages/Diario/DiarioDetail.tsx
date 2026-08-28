@@ -66,7 +66,7 @@ const DiarioDetailPage: React.FC = () => {
           </div>
         </header>
 
-        <div className="flex-1 w-full max-w-md mx-auto px-4 pt-4 pb-[calc(env(safe-area-inset-bottom,0px)+3rem)] safe-bottom">
+        <div className="flex-1 w-full max-w-md mx-auto px-4 pt-4 pb-[calc(var(--ion-safe-area-bottom,env(safe-area-inset-bottom,0px))+3rem)]">
           {!entry ? (
             <p className="text-sm text-muted-foreground text-center py-16">
               No se encontró la entrada.

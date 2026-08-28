@@ -218,14 +218,20 @@
      Ionic expone el inset real en --ion-safe-area-*. Preferimos esa y caemos
      a env() (y a 0) cuando no está. */
   .safe-bottom {
-    padding-bottom: var(
-      --ion-safe-area-bottom,
-      env(safe-area-inset-bottom, 0px)
+    padding-bottom: max(
+      0px,
+      var(--ion-safe-area-bottom, env(safe-area-inset-bottom, 0px))
     );
   }
 
+  /* Todos los headers deben tener un padding-top base (aunque el dispositivo no
+     tenga notch); en dispositivos con notch se agranda con el inset real.
+     Usamos max() para no dejarlos pegados arriba nunca. */
   .safe-top {
-    padding-top: var(--ion-safe-area-top, env(safe-area-inset-top, 0px));
+    padding-top: max(
+      1rem,
+      calc(var(--ion-safe-area-top, env(safe-area-inset-top, 0px)) + 0.25rem)
+    );
   }
 
   .glass {

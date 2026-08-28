@@ -26,7 +26,7 @@ export const GuidedDayStepper: React.FC<GuidedDayStepperProps> = ({
   return (
     <div className="w-full bg-background pt-3 pb-2 px-4 border-b border-border/40">
       {/* Top bar with back and title */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center gap-2 mb-4">
         <button
           onClick={onBack}
           className="w-9 h-9 -ml-1.5 shrink-0 rounded-full flex items-center justify-center text-foreground hover:bg-muted active:scale-95 transition-all"
@@ -40,7 +40,7 @@ export const GuidedDayStepper: React.FC<GuidedDayStepperProps> = ({
 
         <button
           onClick={onInfoClick}
-          className="w-9 h-9 rounded-full flex items-center justify-center text-muted-foreground hover:bg-muted active:scale-95 transition-all"
+          className="w-9 h-9 ml-auto shrink-0 rounded-full flex items-center justify-center text-muted-foreground hover:bg-muted active:scale-95 transition-all"
         >
           <Info className="w-5 h-5" />
         </button>

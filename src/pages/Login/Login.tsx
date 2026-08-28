@@ -29,7 +29,7 @@ const Login: React.FC = () => {
     <AppLayout>
       <div className="min-h-full pb-24 bg-background flex flex-col">
         {/* Header */}
-        <header className="p-4">
+        <header className="p-4 safe-top">
           {mode !== "login" && (
             <button
               onClick={() => switchMode("login")}
