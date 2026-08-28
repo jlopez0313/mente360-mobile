@@ -68,16 +68,17 @@ const DiarioPage: React.FC = () => {
                   meta.push(`Mañana: ${FEEDBACK_LABEL[e.feedback_manana]}`);
 
                 return (
-                  <div
+                  <button
                     key={e.id}
-                    className="bg-card rounded-2xl p-4 border border-border/60 shadow-card"
+                    onClick={() => history.push(`/diario/${e.id}`)}
+                    className="w-full text-left bg-card rounded-2xl p-4 border border-border/60 shadow-card active:scale-[0.98] transition-transform"
                   >
                     <p className="text-xs font-bold text-primary uppercase tracking-wide mb-1.5">
                       {formatFecha(e.fecha)}
                     </p>
 
                     {e.texto_cierre_dia ? (
-                      <p className="text-sm text-foreground leading-relaxed mb-2">
+                      <p className="text-sm text-foreground leading-relaxed mb-2 line-clamp-2">
                         {e.texto_cierre_dia}
                       </p>
                     ) : (
@@ -91,7 +92,7 @@ const DiarioPage: React.FC = () => {
                         {meta.join(" · ")}
                       </p>
                     )}
-                  </div>
+                  </button>
                 );
               })}
             </div>

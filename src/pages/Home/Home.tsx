@@ -13,6 +13,7 @@ import {
 } from "@/components/Home";
 import { GuidedDayCard } from "@/components/GuidedDay/GuidedDayCard";
 import { AppLayout } from "@/components/layout";
+import { NightMorningFeedback } from "@/components/Night/NightMorningFeedback";
 import { useContext, useEffect, useState } from "react";
 
 import { useGuidedDay } from "@/hooks/useGuidedDay";
@@ -268,6 +269,9 @@ const Home: React.FC = () => {
         </header>
 
         <div className="flex-1 overflow-y-auto">
+          {/* ¿Cómo amaneciste? (feedback del cierre de anoche) */}
+          <NightMorningFeedback />
+
           {/* Guided Day Card */}
           <GuidedDayCard
             completedSteps={completedSteps}

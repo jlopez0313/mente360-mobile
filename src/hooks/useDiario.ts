@@ -1,11 +1,17 @@
-import Diario from "@/database/diario";
+import Diario, { FeedbackManana } from "@/database/diario";
 import { db } from "@/hooks/useDexie";
 import { getDiario, upsertDiario } from "@/services/diario";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useCallback, useEffect } from "react";
 import { useSelector } from "react-redux";
 
-const todayStr = () => new Date().toISOString().split("T")[0];
+const toDateStr = (d: Date) => d.toISOString().split("T")[0];
+const todayStr = () => toDateStr(new Date());
+const yesterdayStr = () => {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return toDateStr(d);
+};
 
 type DiarioPatch = Partial<
   Pick<
@@ -36,6 +42,7 @@ export function useDiario() {
     }, [userId]) ?? [];
 
   const todayEntry = entries.find((e) => e.fecha === todayStr()) ?? null;
+  const yesterdayEntry = entries.find((e) => e.fecha === yesterdayStr()) ?? null;
 
   // Sync inicial desde el server
   useEffect(() => {
@@ -55,12 +62,11 @@ export function useDiario() {
     };
   }, [userId]);
 
-  const upsertToday = useCallback(
-    async (patch: DiarioPatch) => {
+  const upsert = useCallback(
+    async (fecha: string, patch: DiarioPatch) => {
       if (!userId) return;
-      const fecha = todayStr();
 
-      const rowsForToday = () =>
+      const rowsFor = () =>
         db.diario
           .where("users_id")
           .equals(userId)
@@ -68,7 +74,7 @@ export function useDiario() {
           .toArray();
 
       // Escritura local optimista
-      const existing = (await rowsForToday())[0];
+      const existing = (await rowsFor())[0];
       if (existing?.id != null) {
         await db.diario.update(existing.id, patch as any);
       } else {
@@ -85,7 +91,7 @@ export function useDiario() {
         const { data } = await upsertDiario({ fecha, ...patch });
         const saved = data?.data ?? data;
         if (saved?.id) {
-          const stale = (await rowsForToday())
+          const stale = (await rowsFor())
             .map((r) => r.id)
             .filter((id) => id !== saved.id);
           if (stale.length) await db.diario.bulkDelete(stale);
@@ -98,5 +104,15 @@ export function useDiario() {
     [userId]
   );
 
-  return { entries, todayEntry, upsertToday };
+  const upsertToday = useCallback(
+    (patch: DiarioPatch) => upsert(todayStr(), patch),
+    [upsert]
+  );
+
+  const setYesterdayFeedback = useCallback(
+    (value: FeedbackManana) => upsert(yesterdayStr(), { feedback_manana: value }),
+    [upsert]
+  );
+
+  return { entries, todayEntry, yesterdayEntry, upsertToday, setYesterdayFeedback };
 }
