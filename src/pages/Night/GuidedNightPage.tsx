@@ -122,7 +122,7 @@ const GuidedNightPage: React.FC = () => {
   return (
     <AppLayout>
       <div className="min-h-full flex flex-col bg-background safe-top">
-       <div className="flex-1 flex flex-col px-5 pt-4 pb-[calc(var(--ion-safe-area-bottom,env(safe-area-inset-bottom,0px))+2rem)]">
+       <div className="flex-1 flex flex-col px-5 pt-1 pb-[calc(var(--ion-safe-area-bottom,env(safe-area-inset-bottom,0px))+2rem)]">
         {/* Header with Step Indicator */}
         <div className="flex items-center gap-2 mb-4 border-b border-border/40 pb-3">
           <button

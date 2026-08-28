@@ -243,7 +243,7 @@ const Grupo: React.FC = () => {
     <AppLayout>
       <div className="h-full bg-background flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-card border-b border-border px-4 py-3 safe-top">
+        <div className="sticky top-0 z-10 bg-card border-b border-border px-4 py-3.5 safe-top">
           <div className="flex items-center gap-3">
             <Link to={`/chat/`} replace={true}>
               <Button variant="ghost" size="icon">

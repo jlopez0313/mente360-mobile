@@ -34,7 +34,7 @@ const NightSequencePage: React.FC = () => {
     <AppLayout>
       <div className="min-h-full flex flex-col bg-background safe-top">
         {/* Back */}
-        <div className="px-4 pt-3">
+        <div className="px-4 pt-1">
           <button
             onClick={() => history.replace("/mi-noche")}
             className="w-9 h-9 -ml-1.5 shrink-0 rounded-full flex items-center justify-center text-foreground hover:bg-muted active:scale-95 transition-all"

@@ -24,7 +24,7 @@ export const GuidedDayStepper: React.FC<GuidedDayStepperProps> = ({
   ];
 
   return (
-    <div className="w-full bg-background pt-3 pb-2 px-4 border-b border-border/40">
+    <div className="w-full bg-background pt-1 pb-2 px-4 border-b border-border/40">
       {/* Top bar with back and title */}
       <div className="flex items-center gap-2 mb-4">
         <button

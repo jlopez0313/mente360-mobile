@@ -65,8 +65,8 @@ export default function SelectCommunityPage() {
   return (
     <AppLayout hideNav>
       <div className="min-h-screen overflow-y-auto bg-background">
-        <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg border-b border-border/50 safe-top">
-          <div className="flex items-center gap-2 px-4 py-3">
+        <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg border-b border-border/50">
+          <div className="flex items-center gap-2 px-4 py-3.5 safe-top">
             <button onClick={() => history.replace('/configuracion')} className="w-9 h-9 -ml-1.5 shrink-0 rounded-full flex items-center justify-center text-foreground hover:bg-muted active:scale-95 transition-all">
               <ArrowLeft className="w-5 h-5 text-foreground" />
             </button>

@@ -104,7 +104,7 @@ const NightMenuPage: React.FC = () => {
   return (
     <AppLayout>
       <div className="min-h-full bg-background safe-top overflow-x-hidden">
-        <div className="mx-auto w-full max-w-md px-6 pt-4 pb-[calc(var(--ion-safe-area-bottom,env(safe-area-inset-bottom,0px))+3rem)]">
+        <div className="mx-auto w-full max-w-md px-6 pt-1 pb-[calc(var(--ion-safe-area-bottom,env(safe-area-inset-bottom,0px))+3rem)]">
           {/* Back */}
           <button
             onClick={() => history.replace("/home")}
