@@ -43,7 +43,11 @@ import "@ionic/react/css/core.css";
 /* Basic CSS for apps built with Ionic */
 import "@ionic/react/css/normalize.css";
 import "@ionic/react/css/structure.css";
-import "@ionic/react/css/typography.css";
+/* typography.css se omite a proposito: sus reglas SIN CAPA para h1-h6
+   (margin-top:20px, font-size:1.625rem, font-weight:500, line-height:1.2)
+   ganaban por cascade-layer a las utilidades de Tailwind (text-*, font-*,
+   leading-*) y descentraban los titulos junto al boton de volver.
+   El reset de Preflight + nuestro @layer base cubren lo necesario. */
 
 /* Optional CSS utils that can be commented out */
 import "@ionic/react/css/display.css";
