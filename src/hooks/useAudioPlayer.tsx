@@ -12,7 +12,8 @@ import {
     setAudioSrc,
     setGlobalAudio,
     setGlobalPos,
-    setIsGlobalPlaying
+    setIsGlobalPlaying,
+    setListAudios
 } from "@/store/slices/audioSlice";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useContext, useEffect, useRef, useState } from "react";
@@ -151,12 +152,31 @@ export const useAudioPlayer = (track: Clips | null, idx?: number, isGlobal: bool
     // ===============================
     // PLAYBACK CONTROL
     // ===============================
+    // Garantiza que exista una cola reproducible en Redux para que el
+    // auto-avance (onEnded -> goToNext en Toast) tenga a dónde ir. Si la cola
+    // ya contiene este track, se respeta (puede venir de Favoritos o de una
+    // búsqueda filtrada); si no, se arma con los clips de su misma categoría.
+    const ensureQueue = async (trackToPlay: Clips) => {
+        const already = listAudios?.some((a: Clips) => a.id === trackToPlay.id);
+        if (already) return;
+
+        const catId = (trackToPlay as any)?.categoria?.id;
+        const base = db.clips.orderBy("titulo");
+        const queue = catId
+            ? await base.filter((c: any) => c.categoria?.id === catId).toArray()
+            : await base.toArray();
+
+        if (queue.length) dispatch(setListAudios(queue));
+    };
+
     const onTogglePlay = async () => {
         if (isPlaying) {
             if (isGlobal) dispatch(setIsGlobalPlaying(false));
             audioPause();
         } else {
             if (isGlobal) {
+                await ensureQueue(activeTrack);
+
                 if (activeTrack.audio_local) {
                     const localPath = resolvedLocalSrc || await getDownloadedAudio(activeTrack.audio_local);
                     dispatch(setAudioSrc(localPath));

@@ -5,6 +5,7 @@ import Clips from "@/database/clips";
 import { startBackground } from "@/helpers/background";
 import { create, destroy, updateTrack } from "@/helpers/musicControls";
 import { useAudio } from "@/hooks/useAudio";
+import { db } from "@/hooks/useDexie";
 import { cn } from "@/lib/utils";
 import {
   selectAudioSrc,
@@ -15,7 +16,8 @@ import {
   setAudioSrc,
   setGlobalAudio,
   setGlobalPos,
-  setIsGlobalPlaying
+  setIsGlobalPlaying,
+  setListAudios
 } from "@/store/slices/audioSlice";
 import { Pause, Play, SkipBack, SkipForward, Star, X } from "lucide-react";
 import { useContext, useEffect, useRef } from "react";
@@ -92,8 +94,28 @@ export const Toast = () => {
   // ──────────────────────────────────────────────────────────────────
   // Always reads from refs → never stale
   // ──────────────────────────────────────────────────────────────────
-  const goToPrev = async () => {
+  // Si la cola de Redux quedó vacía (p. ej. la lista se desmontó o un resync
+  // de clips la limpió), la reconstruimos con los clips de la misma categoría
+  // del track actual, para que el auto-avance nunca se quede sin lista.
+  const resolveQueue = async (): Promise<Clips[]> => {
     const audios = listAudiosRef.current;
+    if (audios && audios.length > 0) return audios;
+
+    const current = globalAudioRef.current;
+    const catId = (current as any)?.categoria?.id;
+    if (!catId) return [];
+
+    const rebuilt = await db.clips
+      .orderBy("titulo")
+      .filter((c: any) => c.categoria?.id === catId)
+      .toArray();
+
+    if (rebuilt.length) dispatch(setListAudios(rebuilt));
+    return rebuilt;
+  };
+
+  const goToPrev = async () => {
+    const audios = await resolveQueue();
     const current = globalAudioRef.current;
     if (!audios || audios.length === 0) return;
     const currentIdx = audios.findIndex((a: Clips) => a.id === current?.id);
@@ -103,7 +125,7 @@ export const Toast = () => {
   };
 
   const goToNext = async () => {
-    const audios = listAudiosRef.current;
+    const audios = await resolveQueue();
     const current = globalAudioRef.current;
     if (!audios || audios.length === 0) return;
     const currentIdx = audios.findIndex((a: Clips) => a.id === current?.id);
