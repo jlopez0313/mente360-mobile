@@ -57,7 +57,7 @@ const Canales: React.FC = () => {
             onClick={() => history.replace("/comunidades")}
             variant="ghost"
             size="icon"
-            className="absolute top-4 left-4 bg-background/80 backdrop-blur-sm hover:bg-background"
+            className="absolute left-4 top-[calc(var(--ion-safe-area-top,env(safe-area-inset-top,0px))+1rem)] bg-background/80 backdrop-blur-sm hover:bg-background"
           >
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </Button>

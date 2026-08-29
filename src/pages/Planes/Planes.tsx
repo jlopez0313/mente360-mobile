@@ -72,9 +72,9 @@ const PlanesPage = () => {
 
   return (
     <AppLayout hideNav>
-      <div className="h-full flex flex-col bg-background px-4 py-6">
+      <div className="h-full flex flex-col bg-background px-4 pb-6">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-2">
+        <div className="flex items-center gap-3 mb-2 py-3 safe-top">
           <button
             onClick={() => history.replace('/configuracion')}
             className="w-9 h-9 -ml-1.5 shrink-0 rounded-full flex items-center justify-center text-foreground hover:bg-muted active:scale-95 transition-all"

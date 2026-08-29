@@ -18,7 +18,7 @@ const Clip: React.FC = () => {
     <AppLayout hideNav>
       <div className="min-h-screen bg-gradient-to-b from-primary/10 via-background to-background flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-4">
+        <div className="flex items-center justify-between px-4 py-4 safe-top">
           <Button variant="ghost" size="icon" onClick={() => history.replace('/musicaterapia')}>
             <ChevronLeft className="w-6 h-6 text-foreground" />
           </Button>

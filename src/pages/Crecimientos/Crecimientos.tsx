@@ -186,7 +186,7 @@ const Crecimientos: React.FC = () => {
     <AppLayout hideNav>
       <div className="h-full bg-gradient-to-b from-primary/5 to-background flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-4">
+        <div className="flex items-center justify-between px-4 py-4 safe-top">
           <button
             onClick={() => history.replace(`/canales/${nivel?.canal?.id}/niveles`)}
             className="w-9 h-9 -ml-1.5 shrink-0 rounded-full flex items-center justify-center text-foreground hover:bg-muted active:scale-95 transition-all"
