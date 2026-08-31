@@ -32,22 +32,24 @@ const NightSequencePage: React.FC = () => {
 
   return (
     <AppLayout>
-      <div className="min-h-full flex flex-col bg-background safe-top">
-        {/* Back */}
-        <div className="px-4 pt-1">
-          <button
-            onClick={() => history.replace("/mi-noche")}
-            className="w-9 h-9 -ml-1.5 shrink-0 rounded-full flex items-center justify-center text-foreground hover:bg-muted active:scale-95 transition-all"
-          >
-            <ArrowLeft className="w-5 h-5 text-foreground" />
-          </button>
-        </div>
+      <div className="min-h-full flex flex-col bg-background">
+        {/* Header estándar: back + título en la misma fila */}
+        <header className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50 px-4 py-3.5 safe-top">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => history.replace("/mi-noche")}
+              className="w-9 h-9 -ml-1.5 shrink-0 rounded-full flex items-center justify-center text-foreground hover:bg-muted active:scale-95 transition-all"
+            >
+              <ArrowLeft className="w-5 h-5 text-foreground" />
+            </button>
+            <h1 className="text-xl font-bold text-foreground">
+              Mi secuencia nocturna
+            </h1>
+          </div>
+        </header>
 
         {/* Content */}
-        <div className="flex-1 w-full max-w-md mx-auto px-4 pt-2 pb-[calc(var(--ion-safe-area-bottom,env(safe-area-inset-bottom,0px))+3rem)]">
-          <h1 className="text-xl font-bold font-display text-foreground mb-1">
-            Mi secuencia nocturna
-          </h1>
+        <div className="flex-1 w-full max-w-md mx-auto px-4 pt-4 pb-[calc(var(--ion-safe-area-bottom,env(safe-area-inset-bottom,0px))+3rem)]">
           <p className="text-sm text-muted-foreground mb-6">
             Cada noche un paso más en tu camino.
           </p>
