@@ -15,7 +15,12 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 
+// Datos del tap de una notificación recibido ANTES de que la app terminara de
+// arrancar (arranque en frío). prepareApp lo consume al decidir la ruta.
 let pendingNotificationData: any = null;
+// true cuando prepareApp ya decidió la ruta inicial: a partir de aquí los taps
+// navegan al instante en vez de quedarse guardados.
+let appRouted = false;
 
 const Splash = () => {
   const history = useHistory();
@@ -24,6 +29,24 @@ const Splash = () => {
 
   const { payment_status } = usePayment();
   const { keys, getPreference } = usePreferences();
+
+  // Ruta destino según el payload de la notificación. Devuelve true si navegó.
+  const routeFromNotification = (data: any): boolean => {
+    if (!data) return false;
+    if (data.is_general) {
+      history.replace("/notificaciones");
+      return true;
+    }
+    if (data.room) {
+      history.replace("/chat/" + data.room);
+      return true;
+    }
+    if (data.grupo) {
+      history.replace("/grupo/" + data.grupo);
+      return true;
+    }
+    return false;
+  };
 
   const makeLocalNotification = async (notification: any) => {
     await LocalNotifications.schedule({
@@ -41,9 +64,47 @@ const Splash = () => {
     });
   };
 
-  const initializeFCM = async () => {
-    PushNotifications.removeAllListeners();
+  // Tap en una notificación (push del sistema o local). Si la app ya arrancó,
+  // navega al chat/grupo al instante; si aún no, guarda el dato para que
+  // prepareApp lo use al elegir la ruta inicial.
+  const onNotificationTap = (data: any) => {
+    pendingNotificationData = data;
 
+    if (data?.is_general) {
+      dispatch(setGeneral(true));
+    } else if (data?.room) {
+      dispatch(setRoom(true));
+    } else if (data?.grupo) {
+      dispatch(setGrupo(true));
+    }
+
+    if (appRouted) {
+      routeFromNotification(data);
+      pendingNotificationData = null;
+    }
+
+    dispatch(getNotifications());
+  };
+
+  const registerTapListeners = async () => {
+    await PushNotifications.addListener(
+      "pushNotificationActionPerformed",
+      (notification) => {
+        console.log("Push action performed:", notification);
+        onNotificationTap(notification.notification.data);
+      }
+    );
+
+    await LocalNotifications.addListener(
+      "localNotificationActionPerformed",
+      (notification) => {
+        console.log("Local notification action performed:", notification);
+        onNotificationTap(notification.notification.extra);
+      }
+    );
+  };
+
+  const initializeFCM = async () => {
     const permission = await PushNotifications.requestPermissions();
     if (permission.receive === "granted") {
       PushNotifications.register();
@@ -53,13 +114,13 @@ const Splash = () => {
       console.log("Token FCM:", token.value);
     });
 
+    // App en primer plano: FCM no muestra la notificación del sistema, así que
+    // la programamos como local para que el usuario la vea y pueda tocarla.
     PushNotifications.addListener(
       "pushNotificationReceived",
       async (notification) => {
         const { data } = notification;
         console.log("Push notification received:", data);
-
-        // await Haptics.vibrate({ duration: 900 });
 
         await makeLocalNotification(notification);
 
@@ -74,26 +135,14 @@ const Splash = () => {
         dispatch(getNotifications());
       }
     );
-
-    PushNotifications.addListener(
-      "pushNotificationActionPerformed",
-      (notification) => {
-        const { data } = notification.notification;
-        console.log("Push notification action performed:", notification);
-        pendingNotificationData = data;
-      }
-    );
   };
 
   const initializeLocalNotifications = async () => {
-    LocalNotifications.removeAllListeners();
-
     LocalNotifications.addListener(
       "localNotificationReceived",
       (notification) => {
         const { extra } = notification;
-        console.log("Local notification action received:", notification);
-        // alert( "Notification action: " + JSON.stringify(notification) );
+        console.log("Local notification received:", notification);
 
         if (extra.is_general) {
           dispatch(setGeneral(true));
@@ -101,25 +150,6 @@ const Splash = () => {
           dispatch(setRoom(true));
         } else if (extra.grupo) {
           dispatch(setGrupo(true));
-        }
-
-        dispatch(getNotifications());
-      }
-    );
-
-    LocalNotifications.addListener(
-      "localNotificationActionPerformed",
-      (notification) => {
-        const { extra } = notification.notification;
-        console.log("Local notification action performed:", notification);
-        // alert( "Notification action: " + JSON.stringify(notification) );
-
-        if (extra.is_general) {
-          history.replace("/notificaciones");
-        } else if (extra.room) {
-          history.replace("/chat/" + extra.room);
-        } else if (extra.grupo) {
-          history.replace("/grupo/" + extra.grupo);
         }
 
         dispatch(getNotifications());
@@ -135,6 +165,13 @@ const Splash = () => {
       initialized = true;
 
       try {
+        // Limpiamos listeners previos y registramos YA los de "tap": si la app
+        // arrancó por tocar una notificación con la app cerrada, el evento
+        // llega en los primeros ms y no queremos perderlo.
+        await PushNotifications.removeAllListeners();
+        await LocalNotifications.removeAllListeners();
+        await registerTapListeners();
+
         await new Promise((res) => setTimeout(res, 400));
 
         const token = await getPreference(keys.TOKEN);
@@ -142,6 +179,7 @@ const Splash = () => {
 
         if (!token) {
           history.replace("/login");
+          appRouted = true;
           return;
         }
 
@@ -152,26 +190,22 @@ const Splash = () => {
         const now = new Date();
         now.setHours(0, 0, 0, 0);
 
+        // Ventana corta para que un tap de arranque en frío alcance a llegar
+        // al listener antes de decidir la ruta.
+        if (!pendingNotificationData) {
+          await new Promise((res) => setTimeout(res, 350));
+        }
+
         if (payment_status === "free" && diferenciaEnDias(now, lastDate) > 0) {
           history.replace("/welcome");
+        } else if (routeFromNotification(pendingNotificationData)) {
+          pendingNotificationData = null;
+          dispatch(getNotifications());
         } else {
-          if (pendingNotificationData) {
-            const data = pendingNotificationData;
-
-            if (data.is_general) {
-              history.replace("/notificaciones");
-            } else if (data.room) {
-              history.replace("/chat/" + data.room);
-            } else if (data.grupo) {
-              history.replace("/grupo/" + data.grupo);
-            }
-
-            pendingNotificationData = null;
-            dispatch(getNotifications());
-          } else {
-            history.replace("/home");
-          }
+          history.replace("/home");
         }
+
+        appRouted = true;
 
         setTimeout(async () => {
           console.log("Initializing FCM...");

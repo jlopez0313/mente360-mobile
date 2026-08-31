@@ -1,7 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Send, Smile, X } from "lucide-react";
+import { useEffect, useRef } from "react";
+
+// Altura máxima antes de que la caja empiece a hacer scroll (~5 líneas).
+const MAX_TEXTAREA_HEIGHT = 120;
 
 interface ChatInputProps {
     replyTo: any;
@@ -28,6 +31,19 @@ export const ChatInput = ({
     setShowEmojiModal,
     disabled = false,
 }: ChatInputProps) => {
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+    // Auto-crecer con el contenido hasta MAX_TEXTAREA_HEIGHT; a partir de ahí,
+    // scroll interno (estilo WhatsApp).
+    useEffect(() => {
+        const ta = textareaRef.current;
+        if (!ta) return;
+        ta.style.height = "auto";
+        const next = Math.min(ta.scrollHeight, MAX_TEXTAREA_HEIGHT);
+        ta.style.height = `${next}px`;
+        ta.style.overflowY = ta.scrollHeight > MAX_TEXTAREA_HEIGHT ? "auto" : "hidden";
+    }, [newMessage]);
+
     return (
         <div className="sticky bottom-0 z-10 bg-card border-t border-border px-4 py-3 safe-bottom w-full">
             {disabled ? (
@@ -60,19 +76,27 @@ export const ChatInput = ({
                         </div>
                     )}
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-end gap-2">
                         <div className="flex-1 relative">
-                            <Input
+                            <textarea
+                                ref={textareaRef}
+                                rows={1}
                                 placeholder="Escribe un mensaje..."
                                 value={newMessage}
                                 onChange={onCheckInput}
                                 onKeyPress={handleKeyPress}
-                                className="pr-10 bg-background border-border"
+                                className={cn(
+                                    "block w-full resize-none bg-background !border border-input !rounded-md",
+                                    "px-3 py-2 pr-10 text-base !text-foreground leading-5",
+                                    "max-h-[120px] ring-offset-background placeholder:text-muted-foreground",
+                                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                                    "disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                                )}
                             />
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground hover:text-foreground"
+                                className="absolute right-1 bottom-1 h-8 w-8 text-muted-foreground hover:text-foreground"
                                 onClick={() => setShowEmojiModal(true)}
                             >
                                 <Smile className="w-4 h-4" />
