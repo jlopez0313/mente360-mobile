@@ -239,12 +239,19 @@ export const useAudio: any = (audio: any, onConfirm: any = () => { }, options: {
   };
 
   const onEnd = async () => {
+    // Pausamos el <audio> directamente SIN despachar setIsGlobalPlaying(false).
+    // Si soltamos ese flip aquí (en el flush del evento onEnded) y luego
+    // handleNextPrev lo vuelve a poner true en otro commit, el auto-avance
+    // dispara un onPlay() en paralelo al load() del cambio de fuente y el
+    // play() se aborta -> salta de pista pero no suena. Dejando isGlobalPlaying
+    // en true, el salto sigue el mismo camino único que el botón "Siguiente".
     if (audio.current) {
       audio.current.currentTime = audio.current.duration;
+      audio.current.pause();
+      toggle(false, audio.current.currentTime || 0);
     }
     setIsPlaying(false);
 
-    onPause();
     onConfirm();
   };
 
@@ -284,6 +291,11 @@ export const useAudio: any = (audio: any, onConfirm: any = () => { }, options: {
         dispatch(setIsGlobalPlaying(true));
       }
     } catch (error: any) {
+      // play() interrumpido por un load()/pause() inmediato al cambiar de
+      // pista: no es un fallo real; si apagamos el estado aquí matamos el
+      // auto-avance.
+      if (error?.name === "AbortError") return;
+
       console.error(error);
       console.log("Error Chrome cannot play sound without user interaction first");
 

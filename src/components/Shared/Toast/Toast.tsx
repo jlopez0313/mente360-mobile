@@ -155,10 +155,9 @@ export const Toast = () => {
       dispatch(setAudioSrc(baseURL + track.audio));
     }
 
-    // Explicitly load the new source to reset internal browser state
-    if (audioRef.current) {
-      audioRef.current.load();
-    }
+    // El load() lo dispara el efecto "Source Change detection" de useAudio con
+    // el src YA aplicado al DOM. Llamarlo aquí corría sobre el src viejo (aún
+    // sin re-render) y solo servía para abortar la carga siguiente.
 
     dispatch(setGlobalPos(index));
     dispatch(setGlobalAudio(track));

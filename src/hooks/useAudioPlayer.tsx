@@ -44,6 +44,7 @@ export const useAudioPlayer = (track: Clips | null, idx?: number, isGlobal: bool
         duration,
         buffer,
         currentTime,
+        real_duration,
         isPlaying: localIsPlaying,
         onPause: audioPause,
         onPlay: audioPlay,
@@ -198,52 +199,66 @@ export const useAudioPlayer = (track: Clips | null, idx?: number, isGlobal: bool
         }
     };
 
-    const goToPrev = async () => {
-        if (listAudios.length === 0) return;
+    // Pausa segura (no togglea): la usa el temporizador de apagado del player.
+    const pause = () => {
+        if (isGlobal) dispatch(setIsGlobalPlaying(false));
+        audioPause();
+    };
 
-        // Dynamically find current index in the potentially filtered list
-        const currentIdx = listAudios.findIndex((a: Clips) => a.id === globalAudio?.id);
+    // Mismo criterio que Toast.resolveQueue: si Redux perdió la cola (saliste de
+    // la lista, Favoritos vacío la limpió, etc.) la reconstruimos con los clips
+    // de la categoría de la pista actual, y si no hay categoría, con todos. Así
+    // el next/prev del player grande nunca se queda sin lista.
+    const resolveQueue = async (): Promise<Clips[]> => {
+        if (listAudios && listAudios.length > 0) return listAudios;
 
-        // If current audio not found in list, start from the end
-        const prevIdx = currentIdx <= 0 ? listAudios.length - 1 : currentIdx - 1;
+        const current = activeTrack || globalAudio;
+        const catId = (current as any)?.categoria?.id;
+        const base = db.clips.orderBy("titulo");
+        const rebuilt = catId
+            ? await base.filter((c: any) => c.categoria?.id === catId).toArray()
+            : await base.toArray();
 
-        const prev = listAudios[prevIdx];
-        if (!prev) return;
+        if (rebuilt.length) dispatch(setListAudios(rebuilt));
+        return rebuilt;
+    };
 
-        dispatch(setGlobalPos(prevIdx));
-
-        if (prev.audio_local) {
-            const audioBlob = await getDownloadedAudio(prev.audio_local);
+    // Cambia a la pista dada y deja el estado global reproduciendo. Mismo orden
+    // de dispatch que Toast.handleNextPrev para que el <audio> del Toast (único
+    // con elemento real) reaccione igual venga del mini-player o del grande.
+    const playTrackAt = async (index: number, track: Clips) => {
+        if (track.audio_local) {
+            const audioBlob = await getDownloadedAudio(track.audio_local);
             dispatch(setAudioSrc(audioBlob));
         } else {
-            dispatch(setAudioSrc(baseURL + prev.audio));
+            dispatch(setAudioSrc(baseURL + track.audio));
         }
 
-        dispatch(setGlobalAudio(prev));
+        dispatch(setGlobalPos(index));
+        dispatch(setGlobalAudio(track));
+        dispatch(setIsGlobalPlaying(true));
+    };
+
+    const goToPrev = async () => {
+        const audios = await resolveQueue();
+        if (!audios || audios.length === 0) return;
+
+        const currentIdx = audios.findIndex((a: Clips) => a.id === globalAudio?.id);
+        const prevIdx = currentIdx <= 0 ? audios.length - 1 : currentIdx - 1;
+
+        const prev = audios[prevIdx];
+        if (prev) await playTrackAt(prevIdx, prev);
     };
 
     const goToNext = async () => {
-        if (listAudios.length === 0) return;
+        const audios = await resolveQueue();
+        if (!audios || audios.length === 0) return;
 
-        // Dynamically find current index in the potentially filtered list
-        const currentIdx = listAudios.findIndex((a: Clips) => a.id === globalAudio?.id);
+        const currentIdx = audios.findIndex((a: Clips) => a.id === globalAudio?.id);
+        const nextIdx = (currentIdx === -1 || currentIdx === audios.length - 1) ? 0 : currentIdx + 1;
 
-        // If current audio not found in list, start from the beginning
-        const nextIdx = (currentIdx === -1 || currentIdx === listAudios.length - 1) ? 0 : currentIdx + 1;
-
-        const next = listAudios[nextIdx];
-        if (!next) return;
-
-        dispatch(setGlobalPos(nextIdx));
-
-        if (next.audio_local) {
-            const audioBlob = await getDownloadedAudio(next.audio_local);
-            dispatch(setAudioSrc(audioBlob));
-        } else {
-            dispatch(setAudioSrc(baseURL + next.audio));
-        }
-
-        dispatch(setGlobalAudio(next));
+        const next = audios[nextIdx];
+        if (next) await playTrackAt(nextIdx, next);
     };
 
     const getAudioSrc = () => {
@@ -271,6 +286,7 @@ export const useAudioPlayer = (track: Clips | null, idx?: number, isGlobal: bool
         duration,
         currentTime,
         buffer,
+        real_duration,
         onToggleLike,
         handleTogglePlaylist,
         onShareLink,
@@ -278,6 +294,7 @@ export const useAudioPlayer = (track: Clips | null, idx?: number, isGlobal: bool
         onTogglePlay,
         onPlay: audioPlay,
         onPause: audioPause,
+        pause,
         onLoad,
         goToPrev,
         goToNext,

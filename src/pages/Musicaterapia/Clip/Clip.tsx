@@ -1,16 +1,13 @@
-
 import { AppLayout } from "@/components/layout";
 import { Clip as ClipComponent } from "@/components/Musicaterapia/Clip/Clip";
 import { Button } from "@/components/ui/button";
-import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { useBackButton } from "@/hooks/useBackButton";
-import { Check, ChevronLeft, Download } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { useHistory } from "react-router-dom";
 
 const Clip: React.FC = () => {
 
   const history = useHistory();
-  const { activeTrack, onToggleDownload } = useAudioPlayer(null);
 
   useBackButton('/musicaterapia')
 
@@ -25,17 +22,7 @@ const Clip: React.FC = () => {
           <span className="text-sm text-muted-foreground font-medium">
             Musicoterapia
           </span>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onToggleDownload('crecimientos')}
-          >
-            {activeTrack?.audio_local ? (
-              <Check className="w-5 h-5 text-success" />
-            ) : (
-              <Download className="w-5 h-5 text-foreground" />
-            )}
-          </Button>
+          <div className="w-10" />
         </div>
         <ClipComponent />
       </div>
