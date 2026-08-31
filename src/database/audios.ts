@@ -5,9 +5,6 @@ export default interface Audios {
   imagen: string;
   audio: string;
   done: number;
-  // secuencia nocturna
-  asignado?: boolean;
-  escuchado?: boolean;
   // descarga offline
   audio_local?: string;
   imagen_local?: string;

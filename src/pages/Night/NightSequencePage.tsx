@@ -14,8 +14,7 @@ const NightSequencePage: React.FC = () => {
 
   useBackButton("/mi-noche");
 
-  const { currentDayIndex, totalDays, currentAudio, markDayCompleted } =
-    useNightRoutine();
+  const { currentAudio } = useNightRoutine();
 
   const [isPlayerOpen, setIsPlayerOpen] = useState(false);
 
@@ -26,9 +25,6 @@ const NightSequencePage: React.FC = () => {
     status && currentAudio?.imagen
       ? `${baseURL}${currentAudio.imagen}`
       : AudioNoWifi;
-
-  const progressPercent =
-    totalDays > 0 ? Math.round((currentDayIndex / totalDays) * 100) : 0;
 
   return (
     <AppLayout>
@@ -59,83 +55,63 @@ const NightSequencePage: React.FC = () => {
               No hay audios de noche disponibles todavía.
             </p>
           ) : (
-          <>
-          {/* Tu avance actual */}
-          <div className="bg-[#0B1536] text-white rounded-3xl p-5 mb-6 shadow-card">
-            <p className="text-[11px] text-slate-400 mb-1">Tu avance actual</p>
-            <h2 className="text-base font-bold font-display text-white mb-1">
-              {audioTitle}
-            </h2>
-            {totalDays > 0 && (
-              <>
-                <p className="text-xs text-slate-300 mb-3">
-                  Día {currentDayIndex} de {totalDays}
-                </p>
+            <>
+              <div className="bg-[#0B1536] text-white rounded-3xl p-6 mb-6 shadow-card">
+                <h2 className="text-lg font-bold font-display text-white text-center">
+                  {audioTitle}
+                </h2>
+              </div>
 
-                <div className="w-full h-1.5 bg-white/15 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-primary rounded-full transition-all duration-500"
-                    style={{ width: `${progressPercent}%` }}
+              <h3 className="text-xs font-bold text-muted-foreground mb-3 uppercase tracking-wider">
+                Esta noche te corresponde
+              </h3>
+
+              <div className="bg-card rounded-2xl p-4 border border-border/60 shadow-card flex items-center gap-4 mb-4">
+                <div className="relative w-16 h-16 rounded-2xl overflow-hidden bg-muted flex-shrink-0">
+                  <img
+                    src={coverUrl}
+                    alt={audioTitle}
+                    className="w-full h-full object-cover"
                   />
                 </div>
-              </>
-            )}
-          </div>
 
-          {/* Esta noche te corresponde */}
-          <h3 className="text-xs font-bold text-muted-foreground mb-3 uppercase tracking-wider">
-            Esta noche te corresponde
-          </h3>
-
-          <div className="bg-card rounded-2xl p-4 border border-border/60 shadow-card flex items-center gap-4 mb-4">
-            <div className="relative w-16 h-16 rounded-2xl overflow-hidden bg-muted flex-shrink-0">
-              <img
-                src={coverUrl}
-                alt={audioTitle}
-                className="w-full h-full object-cover"
-              />
-            </div>
-
-            <div className="flex-1 min-w-0">
-              {totalDays > 0 && (
-                <p className="text-[11px] text-primary font-bold">
-                  Día {currentDayIndex}
-                </p>
-              )}
-              <h4 className="text-sm font-bold font-display text-foreground truncate">
-                {audioTitle}
-              </h4>
-              {description && (
-                <p className="text-[11px] text-muted-foreground line-clamp-1 mb-1">
-                  {description}
-                </p>
-              )}
-              {duration && (
-                <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                  <Clock className="w-3 h-3" />
-                  <span>{duration}</span>
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-sm font-bold font-display text-foreground truncate">
+                    {audioTitle}
+                  </h4>
+                  {description && (
+                    <p className="text-[11px] text-muted-foreground line-clamp-2 mb-1">
+                      {description}
+                    </p>
+                  )}
+                  {duration && (
+                    <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                      <Clock className="w-3 h-3" />
+                      <span>{duration}</span>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          </div>
+              </div>
 
-          <Button
-            onClick={() => setIsPlayerOpen(true)}
-            className="w-full h-12 !rounded-2xl bg-primary text-primary-foreground font-bold hover:bg-primary/90 text-sm shadow-md flex items-center justify-center gap-2"
-          >
-            <Play className="w-4 h-4 fill-current" />
-            <span>Escuchar ahora</span>
-          </Button>
+              <Button
+                onClick={() => setIsPlayerOpen(true)}
+                className="w-full h-12 !rounded-2xl bg-primary text-primary-foreground font-bold hover:bg-primary/90 text-sm shadow-md flex items-center justify-center gap-2"
+              >
+                <Play className="w-4 h-4 fill-current" />
+                <span>Escuchar ahora</span>
+              </Button>
 
-          {/* Nota motivacional */}
-          <div className="mt-8 bg-muted/50 rounded-2xl p-4 border border-border/40 flex items-start gap-3">
-            <Info className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              <strong className="text-foreground">La constancia transforma.</strong>{" "}
-              Escucha tu audio cada noche y permite que el cambio se integre.
-            </p>
-          </div>
-          </>
+              {/* Nota motivacional */}
+              <div className="mt-8 bg-muted/50 rounded-2xl p-4 border border-border/40 flex items-start gap-3">
+                <Info className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  <strong className="text-foreground">
+                    La constancia transforma.
+                  </strong>{" "}
+                  Escucha tu audio cada noche y permite que el cambio se integre.
+                </p>
+              </div>
+            </>
           )}
         </div>
 
@@ -145,12 +121,7 @@ const NightSequencePage: React.FC = () => {
           onClose={() => setIsPlayerOpen(false)}
           audioItem={currentAudio}
           collection="audios"
-          dayIndex={currentDayIndex}
-          totalDays={totalDays}
-          onCompleted={() => {
-            markDayCompleted();
-            setIsPlayerOpen(false);
-          }}
+          onCompleted={() => setIsPlayerOpen(false)}
         />
       </div>
     </AppLayout>
