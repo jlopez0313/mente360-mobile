@@ -18,7 +18,8 @@ export const Interno = ({ roomID, setReplyTo, initialMessageId }: any) => {
     setPendingScrollId,
   } = useChat({
     basePath: roomID ? `rooms/${roomID}` : "",
-    initialMessageId: initialMessageId
+    initialMessageId: initialMessageId,
+    userId: user?.id,
   });
 
   return (

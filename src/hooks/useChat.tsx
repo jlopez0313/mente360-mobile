@@ -6,17 +6,30 @@ interface UseChatProps {
     basePath: string; // "rooms/ROOMID" or "grupos/GRUPOID"
     withUsers?: boolean; // If true, listen to global "users" ref
     initialMessageId?: string | null;
+    userId?: string | number | null; // id del usuario actual (para el auto-scroll)
 }
 
 const PAGINATION_LIMIT = 20;
+// A cuántos px del fondo seguimos considerando que el usuario "está al final".
+const NEAR_BOTTOM_PX = 140;
 
-export const useChat = ({ basePath, withUsers = false, initialMessageId = null }: UseChatProps) => {
+export const useChat = ({ basePath, withUsers = false, initialMessageId = null, userId = null }: UseChatProps) => {
+    const userIdRef = useRef(userId);
+    userIdRef.current = userId;
+
     const chatListRef = useRef<HTMLDivElement | null>(null);
     const topSentinelRef = useRef<HTMLDivElement | null>(null);
 
     const loadingMore = useRef(false);
     const hasMore = useRef(true);
     const firstLoad = useRef(true);
+    // Hasta este instante, los child_added son del lote inicial (Firebase los
+    // reemite al enganchar el listener): no dispares auto-scroll con ellos.
+    const readyAt = useRef(0);
+    // Mientras esté true, la vista se mantiene pegada al último mensaje (entra
+    // a la sala, envía/recibe, crece la caja de texto o se abre el teclado).
+    // Pasa a false si el usuario sube a leer historial.
+    const stickToBottom = useRef(true);
 
     const [messages, setMessages] = useState<any[]>([]);
     const [usuarios, setUsuarios] = useState<any[]>([]);
@@ -24,10 +37,27 @@ export const useChat = ({ basePath, withUsers = false, initialMessageId = null }
     const [pendingScrollId, setPendingScrollId] = useState<string | null>(null);
     const [popoverEvent, setPopoverEvent] = useState<{ top: number; left: number; } | null>(null);
 
+    const isNearBottom = () => {
+        const c = chatListRef.current;
+        if (!c) return true;
+        return c.scrollHeight - c.scrollTop - c.clientHeight < NEAR_BOTTOM_PX;
+    };
+
     const scrollToBottom = () => {
         const container = chatListRef.current;
         if (!container) return;
         container.scrollTop = container.scrollHeight;
+    };
+
+    // El alto del contenido cambia DESPUÉS de pintar (avatares, previews de
+    // respuesta, imágenes, reacciones), así que reintentamos unas cuantas veces
+    // para terminar de verdad en el fondo.
+    const pinToBottom = () => {
+        scrollToBottom();
+        requestAnimationFrame(scrollToBottom);
+        setTimeout(scrollToBottom, 60);
+        setTimeout(scrollToBottom, 200);
+        setTimeout(scrollToBottom, 450);
     };
 
     const onScrollToMessage = async (msg: any) => {
@@ -91,6 +121,11 @@ export const useChat = ({ basePath, withUsers = false, initialMessageId = null }
     useEffect(() => {
         if (!basePath) return;
 
+        firstLoad.current = true;
+        hasMore.current = true;
+        readyAt.current = Date.now() + 1200;
+        stickToBottom.current = !initialMessageId;
+
         let unsubUsuarios: any = null;
         if (withUsers) {
             unsubUsuarios = onValue(readData("users"), (snapshot) => {
@@ -100,11 +135,6 @@ export const useChat = ({ basePath, withUsers = false, initialMessageId = null }
 
         const loadInitial = async () => {
             if (initialMessageId) {
-                // If we have an initial message, load messages around it or from it
-                // To keep it simple, we'll load from the start of that message's room/node 
-                // up to the latest or at least a good chunk.
-                // For now, let's load the latest 100 messages if initialMessageId is present
-                // and then scroll to it.
                 const baseQuery = await queryTo(`${basePath}/messages`, {
                     orderBy: "date",
                     limit: 100, // Load a larger chunk to ensure the message is there
@@ -113,7 +143,7 @@ export const useChat = ({ basePath, withUsers = false, initialMessageId = null }
                 const snapshot = await getQuery(baseQuery);
                 const initialMessages = snapshotToArray(snapshot.val());
                 setMessages(initialMessages);
-                
+
                 // Trigger scroll to the specific message
                 setPendingScrollId(initialMessageId);
             } else {
@@ -125,7 +155,8 @@ export const useChat = ({ basePath, withUsers = false, initialMessageId = null }
                 const snapshot = await getQuery(baseQuery);
                 const initialMessages = snapshotToArray(snapshot.val());
                 setMessages(initialMessages);
-                requestAnimationFrame(scrollToBottom);
+                // Al entrar a la sala: al último mensaje.
+                pinToBottom();
             }
             firstLoad.current = false;
         };
@@ -145,12 +176,18 @@ export const useChat = ({ basePath, withUsers = false, initialMessageId = null }
                 return [...prev, newMsg];
             });
 
-            const container = chatListRef.current;
-            if (!container) return;
+            // Durante/justo después de la carga inicial lo maneja loadInitial().
+            if (firstLoad.current || Date.now() < readyAt.current) return;
 
-            const isAtBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 50;
-            if (isAtBottom) {
-                requestAnimationFrame(scrollToBottom);
+            // Mensaje propio -> siempre al final. Recibido -> solo si el usuario
+            // ya estaba al final (si subió a leer historial, no lo arrastramos).
+            const isMine =
+                userIdRef.current != null &&
+                String(newMsg.user) === String(userIdRef.current);
+
+            if (isMine || isNearBottom()) {
+                stickToBottom.current = true;
+                pinToBottom();
             }
         });
 
@@ -191,6 +228,34 @@ export const useChat = ({ basePath, withUsers = false, initialMessageId = null }
         setTimeout(() => el.classList.remove("bg-yellow-200/60"), 800);
         setPendingScrollId(null);
     }, [messages, pendingScrollId]);
+
+    // 4. Mantener el "pegado al fondo" según dónde esté el usuario, y volver a
+    //    pegarlo cuando el contenedor cambie de alto (caja de texto que crece,
+    //    teclado que se abre/cierra).
+    useEffect(() => {
+        const container = chatListRef.current;
+        if (!container) return;
+
+        const onScroll = () => {
+            if (loadingMore.current) return;
+            stickToBottom.current = isNearBottom();
+        };
+        container.addEventListener("scroll", onScroll, { passive: true });
+
+        let ro: ResizeObserver | null = null;
+        if (typeof ResizeObserver !== "undefined") {
+            ro = new ResizeObserver(() => {
+                if (loadingMore.current) return;
+                if (stickToBottom.current) scrollToBottom();
+            });
+            ro.observe(container);
+        }
+
+        return () => {
+            container.removeEventListener("scroll", onScroll);
+            ro?.disconnect();
+        };
+    }, []);
 
     return {
         chatListRef,

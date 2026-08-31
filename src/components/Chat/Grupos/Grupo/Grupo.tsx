@@ -20,7 +20,8 @@ export const Grupo = ({ grupoID, setReplyTo, initialMessageId }: any) => {
   } = useChat({
     basePath: grupoID ? `grupos/${grupoID}` : "",
     withUsers: true,
-    initialMessageId: initialMessageId
+    initialMessageId: initialMessageId,
+    userId: user?.id,
   });
 
   return (
