@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Send, Smile, X } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 
-// Altura máxima antes de que la caja empiece a hacer scroll (~5 líneas).
+// Alto de una línea (igual que el <Input> anterior) y tope antes de hacer
+// scroll interno (~5 líneas).
+const MIN_TEXTAREA_HEIGHT = 40;
 const MAX_TEXTAREA_HEIGHT = 120;
 
 interface ChatInputProps {
@@ -33,19 +35,23 @@ export const ChatInput = ({
 }: ChatInputProps) => {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-    // Auto-crecer con el contenido hasta MAX_TEXTAREA_HEIGHT; a partir de ahí,
-    // scroll interno (estilo WhatsApp).
-    useEffect(() => {
+    // Auto-crecer con el contenido: desde una línea (MIN) hasta MAX; a partir
+    // de ahí, scroll interno (estilo WhatsApp). useLayoutEffect para que no se
+    // vea el salto de alto en el primer render.
+    useLayoutEffect(() => {
         const ta = textareaRef.current;
         if (!ta) return;
         ta.style.height = "auto";
-        const next = Math.min(ta.scrollHeight, MAX_TEXTAREA_HEIGHT);
+        const next = Math.min(
+            Math.max(ta.scrollHeight, MIN_TEXTAREA_HEIGHT),
+            MAX_TEXTAREA_HEIGHT
+        );
         ta.style.height = `${next}px`;
         ta.style.overflowY = ta.scrollHeight > MAX_TEXTAREA_HEIGHT ? "auto" : "hidden";
     }, [newMessage]);
 
     return (
-        <div className="sticky bottom-0 z-10 bg-card border-t border-border px-4 py-3 safe-bottom w-full">
+        <div className="sticky bottom-0 z-10 bg-card border-t border-border w-full px-4 pt-3 pb-[max(0.75rem,var(--ion-safe-area-bottom,env(safe-area-inset-bottom,0px)))]">
             {disabled ? (
                 <div className="flex justify-center items-center gap-2">
                     <i> No puedes enviar mensajes </i>
@@ -87,8 +93,8 @@ export const ChatInput = ({
                                 onKeyPress={handleKeyPress}
                                 className={cn(
                                     "block w-full resize-none bg-background !border border-input !rounded-md",
-                                    "px-3 py-2 pr-10 text-base !text-foreground leading-5",
-                                    "max-h-[120px] ring-offset-background placeholder:text-muted-foreground",
+                                    "px-3 py-2.5 pr-10 text-base !text-foreground leading-5",
+                                    "min-h-[40px] max-h-[120px] ring-offset-background placeholder:text-muted-foreground",
                                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                                     "disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
                                 )}
