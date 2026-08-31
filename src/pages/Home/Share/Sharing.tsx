@@ -77,7 +77,7 @@ const Sharing: React.FC = () => {
       <div className="flex items-center justify-center min-h-screen bg-muted/20 p-3">
         <div
           id="content"
-          className="w-full max-w-[380px] rounded-xl border border-accent/10 shadow-xl overflow-hidden"
+          className="w-full max-w-[380px] rounded-xl border border-primary/10 shadow-xl overflow-hidden"
           style={{
             backgroundColor: '#ffffff', // Force white background for the image
             padding: '24px'
@@ -86,7 +86,7 @@ const Sharing: React.FC = () => {
           {/* Internal structure for the image */}
           <div className="flex flex-col gap-6" style={{ color: '#1a1a1a' }}> {/* Force dark text */}
             {/* Contextual Header inside the capture */}
-            <div className="flex items-center gap-2" style={{ color: 'hsl(var(--accent))' }}>
+            <div className="flex items-center gap-2" style={{ color: 'hsl(var(--primary))' }}>
               {msgSource === 'mensaje' ? (
                 <MessageCircle className="w-5 h-5" />
               ) : (
@@ -99,13 +99,13 @@ const Sharing: React.FC = () => {
 
             {/* Main Message Section */}
             <div
-              className="rounded-xl p-6 border border-accent/20"
-              style={{ backgroundColor: '#fffbeb', borderColor: '#fce484ff' }}
+              className="rounded-xl p-6 border border-primary/20"
+              style={{ backgroundColor: 'hsl(174 42% 96%)', borderColor: 'hsl(174 42% 80%)' }}
             >
               <p className="text-lg leading-relaxed italic font-medium" style={{ color: '#1a1a1a' }}>
                 {msgSource === "mensaje" ? mensaje?.mensaje : panico?.texto}
               </p>
-              <p className="mt-4 font-bold text-right text-sm" style={{ color: 'hsl(var(--accent))' }}>
+              <p className="mt-4 font-bold text-right text-sm" style={{ color: 'hsl(var(--primary))' }}>
                 - Mente 360
               </p>
             </div>

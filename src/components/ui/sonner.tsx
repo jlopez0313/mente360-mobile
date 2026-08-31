@@ -6,10 +6,18 @@ type ToasterProps = React.ComponentProps<typeof Sonner>;
 const Toaster = ({ ...props }: ToasterProps) => {
   const { theme = "system" } = useTheme();
 
+  // Safe-area: los toasts salen arriba y despegados del notch / status bar.
+  // Preferimos el inset real de Ionic y caemos a env() (y a 0) si no está.
+  const topOffset =
+    "calc(var(--ion-safe-area-top, env(safe-area-inset-top, 0px)) + 0.75rem)";
+
   return (
     <Sonner
       theme={theme as ToasterProps["theme"]}
       className="toaster group"
+      position="top-center"
+      offset={{ top: topOffset }}
+      mobileOffset={{ top: topOffset }}
       toastOptions={{
         classNames: {
           toast:
