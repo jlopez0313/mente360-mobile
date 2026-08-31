@@ -2,6 +2,7 @@ import { AppLayout } from "@/components/layout";
 import { Card } from "@/components/ui/card";
 import { useBackButton } from "@/hooks/useBackButton";
 import { db } from "@/hooks/useDexie";
+import { useRequirePlan } from "@/hooks/useRequirePlan";
 import { cn } from "@/lib/utils";
 import { useLiveQuery } from "dexie-react-hooks";
 import {
@@ -34,6 +35,7 @@ const NightMenuPage: React.FC = () => {
   const history = useHistory();
 
   useBackButton("/home");
+  useRequirePlan();
 
   // Categoría "hipnosis sanadoras" de Musicoterapia (si no existe, no mostramos la card)
   const hipnosisCategory = useLiveQuery(async () => {

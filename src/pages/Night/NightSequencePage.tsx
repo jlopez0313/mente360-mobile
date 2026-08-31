@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { NetworkContext } from "@/context/NetworkContext";
 import { useBackButton } from "@/hooks/useBackButton";
 import { useNightRoutine } from "@/hooks/useNightRoutine";
+import { useRequirePlan } from "@/hooks/useRequirePlan";
 import { ArrowLeft, Clock, Info, Play } from "lucide-react";
 import React, { useContext, useState } from "react";
 import { useHistory } from "react-router-dom";
@@ -13,6 +14,7 @@ const NightSequencePage: React.FC = () => {
   const { baseURL, status, AudioNoWifi } = useContext(NetworkContext);
 
   useBackButton("/mi-noche");
+  useRequirePlan();
 
   const { currentAudio } = useNightRoutine();
 

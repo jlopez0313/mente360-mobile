@@ -8,6 +8,7 @@ import { useBackButton } from "@/hooks/useBackButton";
 import { useDiario } from "@/hooks/useDiario";
 import { db } from "@/hooks/useDexie";
 import { useNightFavorites } from "@/hooks/useNightFavorites";
+import { useRequirePlan } from "@/hooks/useRequirePlan";
 import { useLiveQuery } from "dexie-react-hooks";
 import { ArrowLeft } from "lucide-react";
 import React, { useEffect, useState } from "react";
@@ -25,6 +26,7 @@ const shuffle = <T,>(arr: T[]): T[] => {
 const GuidedNightPage: React.FC = () => {
   const history = useHistory();
   useBackButton("/mi-noche");
+  useRequirePlan();
 
   // Step state: 1 (Reflection), 2 (Emotion), 3 (Recommendation), 3.5 (Alternative List)
   const [step, setStep] = useState<number>(1);
