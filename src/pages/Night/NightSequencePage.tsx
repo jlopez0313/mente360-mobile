@@ -66,16 +66,20 @@ const NightSequencePage: React.FC = () => {
             <h2 className="text-base font-bold font-display text-white mb-1">
               {audioTitle}
             </h2>
-            <p className="text-xs text-slate-300 mb-3">
-              Día {currentDayIndex} de {totalDays}
-            </p>
+            {totalDays > 0 && (
+              <>
+                <p className="text-xs text-slate-300 mb-3">
+                  Día {currentDayIndex} de {totalDays}
+                </p>
 
-            <div className="w-full h-1.5 bg-white/15 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-primary rounded-full transition-all duration-500"
-                style={{ width: `${progressPercent}%` }}
-              />
-            </div>
+                <div className="w-full h-1.5 bg-white/15 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-primary rounded-full transition-all duration-500"
+                    style={{ width: `${progressPercent}%` }}
+                  />
+                </div>
+              </>
+            )}
           </div>
 
           {/* Esta noche te corresponde */}
@@ -93,9 +97,11 @@ const NightSequencePage: React.FC = () => {
             </div>
 
             <div className="flex-1 min-w-0">
-              <p className="text-[11px] text-primary font-bold">
-                Día {currentDayIndex}
-              </p>
+              {totalDays > 0 && (
+                <p className="text-[11px] text-primary font-bold">
+                  Día {currentDayIndex}
+                </p>
+              )}
               <h4 className="text-sm font-bold font-display text-foreground truncate">
                 {audioTitle}
               </h4>
@@ -138,6 +144,7 @@ const NightSequencePage: React.FC = () => {
           isOpen={isPlayerOpen}
           onClose={() => setIsPlayerOpen(false)}
           audioItem={currentAudio}
+          collection="audios"
           dayIndex={currentDayIndex}
           totalDays={totalDays}
           onCompleted={() => {

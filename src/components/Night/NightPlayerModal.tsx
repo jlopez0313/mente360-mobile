@@ -33,6 +33,8 @@ interface NightPlayerModalProps {
   dayIndex?: number;
   totalDays?: number;
   onCompleted?: () => void;
+  /** Tabla Dexie donde persistir el flag de descarga offline. */
+  collection?: "audios" | "audios_noche";
 }
 
 export const NightPlayerModal: React.FC<NightPlayerModalProps> = ({
@@ -42,6 +44,7 @@ export const NightPlayerModal: React.FC<NightPlayerModalProps> = ({
   dayIndex,
   totalDays = 21,
   onCompleted,
+  collection = "audios_noche",
 }) => {
   const { baseURL, status, AudioNoWifi } = useContext(NetworkContext);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -135,7 +138,7 @@ export const NightPlayerModal: React.FC<NightPlayerModalProps> = ({
     try {
       if (isDownloaded) {
         await deleteAudio(audioItem.audio_local);
-        await db.audios_noche.update(audioItem.id, {
+        await db[collection].update(audioItem.id, {
           audio_local: "",
           imagen_local: "",
           downloaded: 0,
@@ -147,7 +150,7 @@ export const NightPlayerModal: React.FC<NightPlayerModalProps> = ({
           `noche_${audioItem.id}`
         );
         if (ruta) {
-          await db.audios_noche.update(audioItem.id, {
+          await db[collection].update(audioItem.id, {
             audio_local: ruta,
             imagen_local: audioItem.imagen,
             downloaded: 1,
