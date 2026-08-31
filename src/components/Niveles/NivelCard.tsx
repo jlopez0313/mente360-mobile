@@ -9,11 +9,16 @@ import { BookmarkCheck, Download, Lock, Play, Save } from "lucide-react";
 import { useContext, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 import { Progress } from "../ui/progress";
 
 interface Props {
   nivel: Niveles;
   minOrden: number | null;
+  /** true solo en la primera tarjeta bloqueada, para mostrar el aviso. */
+  showUnlockHint?: boolean;
+  /** nombre del nivel que la persona debe completar para avanzar. */
+  currentLevelName?: string | null;
 }
 
 const formatDuration = (seconds: number) => {
@@ -21,7 +26,12 @@ const formatDuration = (seconds: number) => {
   return `${mins} min`;
 };
 
-export const NivelCard = ({ nivel, minOrden }: Props) => {
+export const NivelCard = ({
+  nivel,
+  minOrden,
+  showUnlockHint,
+  currentLevelName,
+}: Props) => {
   const { baseURL, AudioNoWifi, status } = useContext(NetworkContext);
 
   const { user } = useSelector((state: any) => state.user);
@@ -91,6 +101,10 @@ export const NivelCard = ({ nivel, minOrden }: Props) => {
     nivel.id == myCrecimiento?.nivel.id ||
     isCompleted;
 
+  const unlockMessage = currentLevelName
+    ? `Termina un audio de "${currentLevelName}" para desbloquear este nivel.`
+    : "Termina un audio del nivel anterior para desbloquear este nivel.";
+
   if (crecimientos?.length) {
     return (
       <Card className={cn(
@@ -104,7 +118,12 @@ export const NivelCard = ({ nivel, minOrden }: Props) => {
               "flex gap-3 p-3 transition-colors",
               canPlay ? "hover:bg-accent/50 cursor-pointer" : "cursor-default"
             )}
-            onClick={(e) => !canPlay && e.preventDefault()}
+            onClick={(e) => {
+              if (!canPlay) {
+                e.preventDefault();
+                toast.info(unlockMessage);
+              }
+            }}
           >
             {/* Cover Image */}
             <div className="relative shrink-0">
@@ -174,6 +193,16 @@ export const NivelCard = ({ nivel, minOrden }: Props) => {
                 </span>
               </div>
             )
+          ) : null}
+
+          {/* Aviso de desbloqueo: solo en la primera tarjeta bloqueada */}
+          {!canPlay && showUnlockHint ? (
+            <div className="flex items-start gap-2 px-3 pb-3 -mt-0.5">
+              <Lock className="w-3.5 h-3.5 text-muted-foreground mt-0.5 shrink-0" />
+              <p className="text-[11px] text-muted-foreground leading-snug !m-0">
+                {unlockMessage}
+              </p>
+            </div>
           ) : null}
         </CardContent>
       </Card>

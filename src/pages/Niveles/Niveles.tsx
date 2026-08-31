@@ -8,7 +8,7 @@ import { db } from "@/hooks/useDexie";
 import { useLiveQuery } from "dexie-react-hooks";
 import { ArrowLeft } from "lucide-react";
 import { useEffect, useMemo } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const Niveles: React.FC = () => {
   const baseURL = import.meta.env.VITE_BASE_BACK;
@@ -16,6 +16,7 @@ const Niveles: React.FC = () => {
   const { id } = useParams<any>();
   const dispatch = useDispatch();
   const history = useHistory();
+  const { user } = useSelector((state: any) => state.user);
 
   const channel = useLiveQuery(() =>
     db.canales.where("id").equals(Number(id)).first()
@@ -34,6 +35,25 @@ const Niveles: React.FC = () => {
     () => Math.min(...(niveles?.map((n: any) => n.orden) ?? [])),
     [niveles]
   );
+
+  // Nivel "actual" del usuario en este canal: el de su registro de crecimiento,
+  // o el primero (minOrden) si aún no tiene registro. Todo lo que esté por
+  // encima de ese orden está bloqueado hasta terminar un audio del actual.
+  const { firstLockedId, currentLevelName } = useMemo(() => {
+    const ordered = [...(niveles ?? [])].sort(
+      (a: any, b: any) => a.orden - b.orden
+    );
+    const myCrec = user?.crecimientos?.find(
+      (c: any) => c.nivel?.canales_id == Number(id)
+    );
+    const currentOrden = myCrec ? myCrec.nivel?.orden : minOrden;
+    const current = ordered.find((n: any) => n.orden === currentOrden);
+    const firstLocked = ordered.find((n: any) => n.orden > currentOrden);
+    return {
+      firstLockedId: firstLocked?.id ?? null,
+      currentLevelName: current?.nivel ?? null,
+    };
+  }, [niveles, user, id, minOrden]);
 
   const goToLider = () => {
     if (channel?.comunidad?.lider?.id)
@@ -89,7 +109,13 @@ const Niveles: React.FC = () => {
         <div className="px-4 py-6 space-y-4 overflow-y-auto">
           {niveles?.length ? (
             niveles?.map((nivel, idx) => (
-              <NivelCard minOrden={minOrden} key={idx} nivel={nivel} />
+              <NivelCard
+                minOrden={minOrden}
+                key={idx}
+                nivel={nivel}
+                showUnlockHint={nivel.id === firstLockedId}
+                currentLevelName={currentLevelName}
+              />
             ))
           ) : (
             <div className="text-center py-12">
