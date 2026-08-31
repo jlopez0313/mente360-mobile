@@ -30,6 +30,8 @@ import { db } from "@/hooks/useDexie";
 import { useGlobalSync } from "@/hooks/useGlobalSync";
 import { usePayment } from "@/hooks/usePayment";
 import { usePreferences } from "@/hooks/usePreferences";
+import { usePrincipalReminder } from "@/hooks/usePrincipalReminder";
+import { useRequirePrincipal } from "@/hooks/useRequirePrincipal";
 import { update } from "@/services/user";
 import {
   setAdmin,
@@ -50,6 +52,10 @@ const Home: React.FC = () => {
 
   const { completed, markComplete } = useCompletedItems();
   const { completedSteps, isCompleted: isGuidedDayCompleted } = useGuidedDay();
+
+  // Recuerda elegir/confirmar la comunidad principal al entrar al Home.
+  usePrincipalReminder();
+  const requirePrincipal = useRequirePrincipal();
 
   const { currentDay, cadenaDelBien, tarjetaDestacada } = useSelector(
     (state: any) => state.home,
@@ -81,11 +87,7 @@ const Home: React.FC = () => {
   const handleOpenModal = (
     modal: "nightAudio" | "sosEmotional" | "dailyMessage" | "weeklyTask",
   ) => {
-    const isPrincipal = localStorage.getItem("principal");
-    if (!isPrincipal) {
-      history.push("/seleccionar-comunidad");
-      return;
-    }
+    if (!requirePrincipal()) return;
 
     switch (modal) {
       case "nightAudio":

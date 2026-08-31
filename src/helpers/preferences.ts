@@ -12,6 +12,8 @@ export const KEYS = {
   DARK_MODE: 'darkMode',
   TOKEN: 'token',
   EPAYCO_PENDING_REF: 'epaycoPendingRef',
+  PRINCIPAL_REMINDER_KEY: 'lastPrincipalReminder',
+  PRINCIPAL_CONFIRM_KEY: 'lastPrincipalConfirm',
 } as const;
 
 export type PreferenceKey = (typeof KEYS)[keyof typeof KEYS];

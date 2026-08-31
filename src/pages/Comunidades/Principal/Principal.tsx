@@ -1,6 +1,7 @@
 import { AppLayout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { NetworkContext } from "@/context/NetworkContext";
+import { KEYS, removePreference } from "@/helpers/preferences";
 import { useBackButton } from "@/hooks/useBackButton";
 import { db } from "@/hooks/useDexie";
 import { cn } from "@/lib/utils";
@@ -32,8 +33,12 @@ export default function SelectCommunityPage() {
 
   const [selectedCommunity, setSelectedCommunity] = useState<number>(0);
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (!selectedCommunity) return;
     localStorage.setItem("principal", selectedCommunity.toString());
+    // Forzar que el Home vuelva a pedir tareas/contenido con la nueva comunidad
+    // en la próxima visita (si no, el gate diario lo dejaría con lo de antes).
+    await removePreference(KEYS.HOME_SYNC_KEY);
     toast.success(`Recuerda que tu próxima tarea será asignada en ${currentDay} días`);
     // history.go(-1);
   };
@@ -131,6 +136,7 @@ export default function SelectCommunityPage() {
           {misComunidades?.length > 0 && (
             <Button
               onClick={handleSave}
+              disabled={!selectedCommunity}
               className="w-full mt-8 gradient-primary text-primary-foreground !rounded-xl"
             >
               Guardar selección
