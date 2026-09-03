@@ -37,3 +37,12 @@ export const heartbeat = async(): Promise<any> => {
     const { get } = await baseApi();
     return get('/heartbeat');
 };
+
+// Elimina la cuenta del usuario autenticado (menú de Configuración). Requiere
+// reingresar la contraseña. El backend hace soft delete + anonimización del PII
+// + cancelación de la suscripción en ePayco; el borrado físico definitivo lo hace
+// un cron tras el periodo de gracia.
+export const deleteAccount = async(password: string): Promise<any> => {
+    const { post } = await baseApi();
+    return post('/usuarios/eliminar-cuenta', { password }, { 'Content-type': 'application/json' });
+};

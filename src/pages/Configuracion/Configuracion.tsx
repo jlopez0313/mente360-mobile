@@ -21,8 +21,10 @@ import {
   Music,
   Shield,
   Sun,
+  Trash2,
   Users
 } from "lucide-react";
+import DeleteAccountDialog from "./DeleteAccountDialog";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router";
@@ -54,8 +56,9 @@ const Configuracion: React.FC = () => {
 
   const { preferences, savePreferences } = useMusicPreferences();
   const [showMusicPrefs, setShowMusicPrefs] = useState(false);
+  const [showDeleteAccount, setShowDeleteAccount] = useState(false);
 
-  const handleLogout = async () => {
+  const clearSession = async () => {
     localStorage.removeItem("home");
     localStorage.removeItem("onboarding");
 
@@ -63,10 +66,24 @@ const Configuracion: React.FC = () => {
     await removePreference(keys.HOME_SYNC_KEY);
 
     history.replace("/login", { replace: true });
+  };
+
+  const handleLogout = async () => {
+    await clearSession();
 
     toast({
       title: "Sesión cerrada",
       description: "Has cerrado sesión exitosamente",
+    });
+  };
+
+  const handleAccountDeleted = async () => {
+    setShowDeleteAccount(false);
+    await clearSession();
+
+    toast({
+      title: "Cuenta eliminada",
+      description: "Tu cuenta y tu información han sido eliminadas",
     });
   };
 
@@ -315,15 +332,27 @@ const Configuracion: React.FC = () => {
               </h2>
             </div>
 
-            <div className="p-4">
+            <div className="divide-y divide-border">
               <Button
                 variant="ghost"
                 onClick={handleLogout}
-                className="w-full justify-between text-sos hover:text-sos hover:bg-sos/10"
+                className="w-full justify-between text-sos hover:text-sos hover:bg-sos/10 !rounded-none"
               >
                 <div className="flex items-center gap-3">
                   <LogOut className="w-5 h-5" />
                   <span>Cerrar sesión</span>
+                </div>
+                <ChevronRight className="w-5 h-5" />
+              </Button>
+
+              <Button
+                variant="ghost"
+                onClick={() => setShowDeleteAccount(true)}
+                className="w-full justify-between text-destructive hover:text-destructive hover:bg-destructive/10 !rounded-none"
+              >
+                <div className="flex items-center gap-3">
+                  <Trash2 className="w-5 h-5" />
+                  <span>Eliminar cuenta</span>
                 </div>
                 <ChevronRight className="w-5 h-5" />
               </Button>
@@ -350,6 +379,12 @@ const Configuracion: React.FC = () => {
             description: "Actualizamos tus géneros de música.",
           });
         }}
+      />
+
+      <DeleteAccountDialog
+        open={showDeleteAccount}
+        onOpenChange={setShowDeleteAccount}
+        onDeleted={handleAccountDeleted}
       />
     </AppLayout>
   );
