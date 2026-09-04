@@ -1,5 +1,6 @@
 import { AppLayout } from "@/components/layout";
 import { Item } from "@/components/Notifications/Item";
+import { TipCard } from "@/components/Shared/Onboarding/TipCard";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { db } from "@/hooks/useDexie";
@@ -88,6 +89,8 @@ const Notifications = () => {
 
         {/* Notifications List */}
         <div className="flex-1 overflow-y-auto space-y-3 px-4 py-6">
+          <TipCard tipKey="notificaciones" />
+
           {notificaciones.length === 0 ? (
             <div className="text-center py-12">
               <Bell className="w-12 h-12 text-muted-foreground/50 mx-auto mb-3" />

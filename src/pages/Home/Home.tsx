@@ -6,6 +6,7 @@ import {
   EneatipoModal,
   FeaturedContentCard,
   NightAudioModal,
+  PrimerosPasos,
   RosarioCard,
   SOSModal,
   TaskProgress,
@@ -271,6 +272,9 @@ const Home: React.FC = () => {
         </header>
 
         <div className="flex-1 overflow-y-auto">
+          {/* Primeros pasos (checklist de onboarding, se oculta sola al completarse) */}
+          <PrimerosPasos />
+
           {/* ¿Cómo amaneciste? (feedback del cierre de anoche) */}
           <NightMorningFeedback />
 

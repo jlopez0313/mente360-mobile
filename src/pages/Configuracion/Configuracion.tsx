@@ -5,6 +5,7 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { db } from "@/hooks/useDexie";
 import { useMusicPreferences } from "@/hooks/useMusicPreferences";
+import { resetOnboardingTips } from "@/hooks/useOnboardingTips";
 import { usePreferences } from "@/hooks/usePreferences";
 import { Browser } from "@capacitor/browser";
 import { useLiveQuery } from "dexie-react-hooks";
@@ -16,6 +17,7 @@ import {
   CreditCard,
   ExternalLink,
   FileText,
+  HelpCircle,
   LogOut,
   Moon,
   Music,
@@ -84,6 +86,18 @@ const Configuracion: React.FC = () => {
     toast({
       title: "Cuenta eliminada",
       description: "Tu cuenta y tu información han sido eliminadas",
+    });
+  };
+
+  // Reaparecen las tarjetas de "primeros pasos" (Home) y los tips contextuales
+  // de cada sección, por si se descartaron sin querer o simplemente se quieren
+  // repasar. Ver src/hooks/useOnboardingTips.ts.
+  const handleResetTips = async () => {
+    await resetOnboardingTips();
+
+    toast({
+      title: "Guías reiniciadas",
+      description: "Volverán a aparecer al entrar a cada sección",
     });
   };
 
@@ -159,6 +173,19 @@ const Configuracion: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <Music className="w-5 h-5 text-primary" />
                   <span className="text-foreground">Preferencias de música</span>
+                </div>
+                <ChevronRight className="w-5 h-5 text-muted-foreground" />
+              </div>
+
+              <div
+                role="button"
+                tabIndex={0}
+                onClick={handleResetTips}
+                className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors cursor-pointer"
+              >
+                <div className="flex items-center gap-3">
+                  <HelpCircle className="w-5 h-5 text-primary" />
+                  <span className="text-foreground">Reiniciar guías de la app</span>
                 </div>
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
               </div>

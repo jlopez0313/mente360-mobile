@@ -1,4 +1,5 @@
 import { AppLayout } from "@/components/layout";
+import { TipCard } from "@/components/Shared/Onboarding/TipCard";
 import { Card } from "@/components/ui/card";
 import { useBackButton } from "@/hooks/useBackButton";
 import { useHipnosisCategory } from "@/hooks/useHipnosisCategory";
@@ -111,6 +112,8 @@ const NightMenuPage: React.FC = () => {
               Elige cómo quieres vivir tu experiencia esta noche.
             </p>
           </div>
+
+          <TipCard tipKey="mi-noche" className="mb-6" />
 
           {/* Cards */}
           <div className="flex flex-col gap-4">
