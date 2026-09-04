@@ -8,6 +8,7 @@ import {
   setRoom,
 } from "@/store/slices/notificationSlice";
 import { getNotifications } from "@/store/thunks/notifications";
+import { Capacitor } from "@capacitor/core";
 import { LocalNotifications } from "@capacitor/local-notifications";
 import { PushNotifications } from "@capacitor/push-notifications";
 import { SplashScreen } from "@capacitor/splash-screen";
@@ -164,14 +165,25 @@ const Splash = () => {
       if (initialized) return;
       initialized = true;
 
-      try {
-        // Limpiamos listeners previos y registramos YA los de "tap": si la app
-        // arrancó por tocar una notificación con la app cerrada, el evento
-        // llega en los primeros ms y no queremos perderlo.
-        await PushNotifications.removeAllListeners();
-        await LocalNotifications.removeAllListeners();
-        await registerTapListeners();
+      // PushNotifications/LocalNotifications no existen en navegador (solo en
+      // la app nativa) — antes esto tiraba una excepción que el catch de abajo
+      // se tragaba sin navegar a ningún lado, dejando el splash en blanco para
+      // siempre al correr en web. Se aísla y se salta en web para que el resto
+      // de prepareApp (login/ruta inicial) siga corriendo pase lo que pase acá.
+      if (Capacitor.isNativePlatform()) {
+        try {
+          // Limpiamos listeners previos y registramos YA los de "tap": si la app
+          // arrancó por tocar una notificación con la app cerrada, el evento
+          // llega en los primeros ms y no queremos perderlo.
+          await PushNotifications.removeAllListeners();
+          await LocalNotifications.removeAllListeners();
+          await registerTapListeners();
+        } catch (error) {
+          console.log("Splash: fallo al preparar listeners de notificaciones", error);
+        }
+      }
 
+      try {
         await new Promise((res) => setTimeout(res, 400));
 
         const token = await getPreference(keys.TOKEN);
@@ -207,15 +219,26 @@ const Splash = () => {
 
         appRouted = true;
 
-        setTimeout(async () => {
-          console.log("Initializing FCM...");
-          await initializeFCM();
+        if (Capacitor.isNativePlatform()) {
+          setTimeout(async () => {
+            console.log("Initializing FCM...");
+            await initializeFCM();
 
-          console.log("Initializing Local Notifications...");
-          await initializeLocalNotifications();
-        }, 600);
+            console.log("Initializing Local Notifications...");
+            await initializeLocalNotifications();
+          }, 600);
+        }
       } catch (error) {
         console.log("Splash Error", error);
+
+        // Fallback: aunque algo inesperado falle acá, no dejar la app trabada
+        // en el splash en blanco — se manda a login y de ahí el usuario
+        // retoma normalmente (si tenía sesión, sigue teniendo el token guardado).
+        await SplashScreen.hide().catch(() => {});
+        if (!appRouted) {
+          history.replace("/login");
+          appRouted = true;
+        }
       }
     };
 
