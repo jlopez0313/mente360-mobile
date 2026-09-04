@@ -325,7 +325,7 @@ export const NightPlayerModal: React.FC<NightPlayerModalProps> = ({
           </button>
 
           <button
-            onClick={() => audioItem?.id && onShareLink(audioItem.id)}
+            onClick={() => audioItem?.id && onShareLink(audioItem.id, "noche")}
             disabled={!audioItem?.id}
             className="flex flex-col items-center gap-1 hover:text-white disabled:opacity-40"
           >

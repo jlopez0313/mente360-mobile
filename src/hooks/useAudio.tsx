@@ -146,11 +146,16 @@ export const useAudio: any = (audio: any, onConfirm: any = () => { }, options: {
     }
   };
 
-  const onShareLink = async (id: any) => {
+  // "noche": audios de la tabla audios_noche (NightPlayerModal), que necesitan su
+  // propia ruta pública (/audios-noche/{id}) porque el backend resuelve /audios/{id}
+  // contra la tabla `clips`. El resto (musicoterapia, día guiado) sí vive en `clips`.
+  const onShareLink = async (id: any, tipo: "dia" | "noche" = "dia") => {
+    const path = tipo === "noche" ? "audios-noche" : "audios";
+
     await Share.share({
       title: `¡Tienes que escuchar esto en ${import.meta.env.VITE_NAME}!`,
       text: "Esta canción está transformando mi día. Escúchalo también. ¡Se que te va a encantar!",
-      url: baseURL + "audios/" + btoa(id),
+      url: baseURL + path + "/" + btoa(id),
       dialogTitle: `Invita a tus amigos a escuchar esta canción y descubrir ${import.meta.env.VITE_NAME
         }.`,
     });

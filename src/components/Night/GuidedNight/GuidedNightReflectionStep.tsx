@@ -31,7 +31,7 @@ export const GuidedNightReflectionStep: React.FC<Props> = ({
             value={reflection}
             onChange={(e) => setReflection(e.target.value.slice(0, maxChars))}
             placeholder="Escribe aquí..."
-            className="w-full h-32 bg-transparent text-sm text-foreground placeholder:text-muted-foreground/60 resize-none outline-none"
+            className="w-full h-32 bg-transparent text-sm !text-foreground placeholder:!text-muted-foreground/60 resize-none outline-none"
           />
           <div className="text-right text-[11px] text-muted-foreground">
             {reflection.length}/{maxChars}
