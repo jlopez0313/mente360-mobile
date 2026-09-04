@@ -1,10 +1,9 @@
 import { AppLayout } from "@/components/layout";
 import { Card } from "@/components/ui/card";
 import { useBackButton } from "@/hooks/useBackButton";
-import { db } from "@/hooks/useDexie";
+import { useHipnosisCategory } from "@/hooks/useHipnosisCategory";
 import { useRequirePlan } from "@/hooks/useRequirePlan";
 import { cn } from "@/lib/utils";
-import { useLiveQuery } from "dexie-react-hooks";
 import {
   ArrowLeft,
   ChevronRight,
@@ -15,8 +14,6 @@ import {
 } from "lucide-react";
 import React from "react";
 import { useHistory } from "react-router-dom";
-
-const HIPNOSIS_CATEGORY_KEY = "hipnosis";
 
 interface NightOption {
   key: string;
@@ -38,25 +35,7 @@ const NightMenuPage: React.FC = () => {
   useRequirePlan();
 
   // Categoría "hipnosis sanadoras" de Musicoterapia (si no existe, no mostramos la card)
-  const hipnosisCategory = useLiveQuery(async () => {
-    const cats = await db.categorias.toArray();
-    return (
-      cats.find((c) =>
-        (c.categoria || "").toLowerCase().includes(HIPNOSIS_CATEGORY_KEY)
-      ) ?? null
-    );
-  });
-
-  const goToHipnosis = () => {
-    if (!hipnosisCategory?.id) return;
-    sessionStorage.setItem(
-      "musicaterapia_category",
-      String(hipnosisCategory.id)
-    );
-    sessionStorage.setItem("musicaterapia_tab", "clips");
-    sessionStorage.removeItem("musicaterapia_search");
-    history.push("/musicaterapia");
-  };
+  const { hipnosisCategory, goToHipnosis } = useHipnosisCategory();
 
   const options: NightOption[] = [
     {

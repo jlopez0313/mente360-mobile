@@ -1,8 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { NetworkContext } from "@/context/NetworkContext";
+import { useHipnosisCategory } from "@/hooks/useHipnosisCategory";
 import { ChevronRight, Clock, Play } from "lucide-react";
 import React, { useContext } from "react";
-import { useHistory } from "react-router-dom";
 
 interface Props {
   audios: any[];
@@ -13,8 +13,8 @@ export const GuidedNightAlternativeStep: React.FC<Props> = ({
   audios,
   onSelectAudio,
 }) => {
-  const history = useHistory();
   const { baseURL, status, AudioNoWifi } = useContext(NetworkContext);
+  const { goToHipnosis } = useHipnosisCategory();
 
   const displayList = (audios ?? []).slice(0, 3);
 
@@ -91,7 +91,7 @@ export const GuidedNightAlternativeStep: React.FC<Props> = ({
 
       <div className="mt-auto pt-6 text-center">
         <button
-          onClick={() => history.push("/musicaterapia")}
+          onClick={goToHipnosis}
           className="inline-flex items-center gap-1 text-xs text-primary font-bold hover:underline"
         >
           <span>Ver todos los audios de Hipnosis sanadoras</span>
