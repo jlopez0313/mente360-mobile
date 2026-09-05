@@ -30,6 +30,18 @@ export const trial = async(): Promise<any> => {
     return get('/usuarios/trial');
 };
 
+// Guarda lo que captura el onboarding de primera vez. Payload parcial: la
+// pantalla de temas manda { temas, tiempo_diario }; el cierre del flujo (o un
+// "Saltar") manda { completed: true }. Devuelve el usuario actualizado.
+export const saveOnboarding = async(payload: {
+    temas?: string[];
+    tiempo_diario?: number | null;
+    completed?: boolean;
+}): Promise<any> => {
+    const { post } = await baseApi();
+    return post('/usuarios/onboarding', payload, { 'Content-type': 'application/json' });
+};
+
 // Registra el "último acceso" del usuario (last_seen_at). El backend hace
 // throttle, así que se puede llamar sin miedo cada vez que la app se abre
 // o vuelve del background.

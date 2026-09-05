@@ -1,5 +1,4 @@
 import { AppLayout } from "@/components/layout";
-import { diferenciaEnDias } from "@/helpers/Fechas";
 import { usePayment } from "@/hooks/usePayment";
 import { usePreferences } from "@/hooks/usePreferences";
 import {
@@ -13,7 +12,7 @@ import { LocalNotifications } from "@capacitor/local-notifications";
 import { PushNotifications } from "@capacitor/push-notifications";
 import { SplashScreen } from "@capacitor/splash-screen";
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 
 // Datos del tap de una notificación recibido ANTES de que la app terminara de
@@ -28,8 +27,11 @@ const Splash = () => {
 
   const dispatch = useDispatch();
 
-  const { payment_status } = usePayment();
+  // Mantiene el estado de pago sincronizado al arrancar (efecto del hook).
+  usePayment();
   const { keys, getPreference } = usePreferences();
+
+  const { user } = useSelector((s: any) => s.user);
 
   // Ruta destino según el payload de la notificación. Devuelve true si navegó.
   const routeFromNotification = (data: any): boolean => {
@@ -195,21 +197,16 @@ const Splash = () => {
           return;
         }
 
-        const lastDateStr =
-          (await getPreference(keys.HOME_SYNC_KEY)) ?? "2024-01-01T00:00:00Z";
-
-        const lastDate = new Date(lastDateStr);
-        const now = new Date();
-        now.setHours(0, 0, 0, 0);
-
         // Ventana corta para que un tap de arranque en frío alcance a llegar
         // al listener antes de decidir la ruta.
         if (!pendingNotificationData) {
           await new Promise((res) => setTimeout(res, 350));
         }
 
-        if (payment_status === "free" && diferenciaEnDias(now, lastDate) > 0) {
-          history.replace("/welcome");
+        // Onboarding de primera vez: si nunca lo completó, va al flujo en vez
+        // de a Home. Se puede saltar desde ahí.
+        if (!user?.onboarding_completed_at) {
+          history.replace("/onboarding");
         } else if (routeFromNotification(pendingNotificationData)) {
           pendingNotificationData = null;
           dispatch(getNotifications());

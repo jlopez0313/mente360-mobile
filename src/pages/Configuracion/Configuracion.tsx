@@ -16,6 +16,7 @@ import {
   CreditCard,
   ExternalLink,
   FileText,
+  HelpCircle,
   LogOut,
   Moon,
   Music,
@@ -162,6 +163,17 @@ const Configuracion: React.FC = () => {
                 </div>
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
               </div>
+
+              <Link
+                to="/onboarding"
+                className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <HelpCircle className="w-5 h-5 text-primary" />
+                  <span className="text-foreground">Ver introducción de nuevo</span>
+                </div>
+                <ChevronRight className="w-5 h-5 text-muted-foreground" />
+              </Link>
             </div>
           </div>
 

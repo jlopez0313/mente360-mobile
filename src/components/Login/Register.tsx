@@ -93,15 +93,15 @@ const Register = ({ isLoading, setIsLoading, switchMode }: Props) => {
       await db.user.put(data.user);
       dispatch(setUser(data.user));
 
-      setTimeout(() => {
-        history.replace("/registro");
-      }, 1000);
-
       toast({
         title: "¡Cuenta creada!",
         description: "Tu cuenta ha sido creada exitosamente",
       });
-      history.replace("/onboarding");
+
+      // Va a completar el perfil; desde ahí sigue al onboarding.
+      setTimeout(() => {
+        history.replace("/registro");
+      }, 1000);
     } catch (error: any) {
       toast({
         title: "Error",

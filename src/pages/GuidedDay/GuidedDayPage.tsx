@@ -5,10 +5,12 @@ import { GuidedDayAudioStep } from "@/components/GuidedDay/steps/GuidedDayAudioS
 import { GuidedDayCompletedStep } from "@/components/GuidedDay/steps/GuidedDayCompletedStep";
 import { GuidedDayMessageStep } from "@/components/GuidedDay/steps/GuidedDayMessageStep";
 import { GuidedDayMusicStep } from "@/components/GuidedDay/steps/GuidedDayMusicStep";
+import { OnboardingPrimerDia } from "@/components/Onboarding/OnboardingPrimerDia";
 import { useGuidedDay } from "@/hooks/useGuidedDay";
+import { useOnboarding } from "@/hooks/useOnboarding";
 import { usePayment } from "@/hooks/usePayment";
 import { useIonAlert } from "@ionic/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 
 const GuidedDayPage: React.FC = () => {
@@ -28,6 +30,21 @@ const GuidedDayPage: React.FC = () => {
     completeStep,
     saveMusicPreferences,
   } = useGuidedDay();
+
+  // Cuando se llega acá desde el onboarding, al terminar se muestra la pantalla
+  // 7 ("Tu primer día ha comenzado") en vez del cierre normal.
+  const { getFirstGuidedDayPending, setFirstGuidedDayPending } = useOnboarding();
+  const [firstRun, setFirstRun] = useState(false);
+
+  useEffect(() => {
+    getFirstGuidedDayPending().then(setFirstRun);
+  }, [getFirstGuidedDayPending]);
+
+  const finishFirstRun = async () => {
+    await setFirstGuidedDayPending(false);
+    setFirstRun(false);
+    history.replace("/home");
+  };
 
   // When reviewing or starting fresh, start at Step 1 if completed or at currentStep
   const initialStep = isCompleted ? 1 : currentStep || 1;
@@ -130,12 +147,18 @@ const GuidedDayPage: React.FC = () => {
           />
         )}
 
-        {activeStep === 4 && (
-          <GuidedDayCompletedStep
-            onFinish={handleFinish}
-            onReview={handleReview}
-          />
-        )}
+        {activeStep === 4 &&
+          (firstRun ? (
+            <OnboardingPrimerDia
+              onVolver={finishFirstRun}
+              onExplorar={finishFirstRun}
+            />
+          ) : (
+            <GuidedDayCompletedStep
+              onFinish={handleFinish}
+              onReview={handleReview}
+            />
+          ))}
 
         {/* Music Preferences Modal */}
         <MusicPreferencesModal
