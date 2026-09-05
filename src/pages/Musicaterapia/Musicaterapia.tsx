@@ -4,7 +4,6 @@ import { AppLayout } from "@/components/layout";
 import { CategorySlider } from "@/components/Musicaterapia/CategorySlider";
 import { FavoritesList } from "@/components/Musicaterapia/FavoritesList";
 import { TrackList } from "@/components/Musicaterapia/TrackList";
-import { TipCard } from "@/components/Shared/Onboarding/TipCard";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useBackButton } from "@/hooks/useBackButton";
@@ -89,8 +88,6 @@ const Musicaterapia: React.FC = () => {
 
         {/* Content */}
         <div className="px-4 py-6 flex-1">
-          <TipCard tipKey="musicaterapia" className="mb-4" />
-
           <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4 h-full flex flex-col min-h-0">
             <TabsList className="w-full grid grid-cols-2 bg-muted/50">
               <TabsTrigger value="clips" className="gap-2">

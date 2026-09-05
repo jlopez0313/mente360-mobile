@@ -5,7 +5,6 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { AppLayout } from "@/components/layout";
 
 import { CommunityCard } from "@/components/Comunidades/CommunityCard";
-import { TipCard } from "@/components/Shared/Onboarding/TipCard";
 
 const Comunidades = () => {
   const comunidades = useLiveQuery(() => db.comunidades.toArray(), []);
@@ -34,8 +33,6 @@ const Comunidades = () => {
 
         {/* Communities List */}
         <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
-          <TipCard tipKey="comunidades" />
-
           {comunidades?.map((community) => (
             <CommunityCard key={community.id} community={community} />
           ))}

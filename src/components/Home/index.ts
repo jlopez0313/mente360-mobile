@@ -7,7 +7,6 @@ export { EneatipoModal } from "./modals/EneatipoModal";
 export { NightAudioModal } from "./modals/NightAudioModal";
 export { SOSModal } from "./modals/SOSModal";
 export { WeeklyTaskModal } from "./modals/WeeklyTaskModal";
-export { PrimerosPasos } from "./PrimerosPasos";
 export { TaskProgress } from "./TaskProgress";
 export { WeeklyCalendar } from "./WeeklyCalendar";
 export { RosarioCard } from "./RosarioCard";

@@ -1,5 +1,4 @@
 import { AppLayout } from "@/components/layout";
-import { TipCard } from "@/components/Shared/Onboarding/TipCard";
 import Diario, { FeedbackManana } from "@/database/diario";
 import { useBackButton } from "@/hooks/useBackButton";
 import { useDiario } from "@/hooks/useDiario";
@@ -45,8 +44,6 @@ const DiarioPage: React.FC = () => {
           <p className="text-sm text-muted-foreground mb-6">
             Tus cierres de día, ordenados por fecha.
           </p>
-
-          <TipCard tipKey="diario" className="mb-6" />
 
           {entries.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center">

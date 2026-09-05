@@ -2,7 +2,6 @@ import { Lista as ChatComponent } from "@/components/Chat/Chat/Lista";
 import { Contactos as ContactosComponent } from "@/components/Chat/Contactos/Contactos";
 import { Lista as GruposComponent } from "@/components/Chat/Grupos/Lista/Lista";
 import { AppLayout } from "@/components/layout";
-import { TipCard } from "@/components/Shared/Onboarding/TipCard";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { destroy } from "@/helpers/musicControls";
@@ -63,8 +62,6 @@ const Lista: React.FC = () => {
 
         {/* Tabs */}
         <div className="px-4 py-6 flex-1 overflow-y-auto">
-          <TipCard tipKey="chat" className="mb-4" />
-
           <Tabs value={activeTab} onValueChange={onSetTab}>
             <TabsList className="w-full mb-4">
               <TabsTrigger value="chats" className="relative flex-1 gap-1 text-xs px-2">

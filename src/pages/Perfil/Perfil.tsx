@@ -1,7 +1,6 @@
 import Avatar from "@/assets/images/load-avatar.png";
 import { MusicPreferencesModal } from "@/components/GuidedDay/MusicPreferencesModal";
 import { AppLayout } from "@/components/layout";
-import { TipCard } from "@/components/Shared/Onboarding/TipCard";
 import { Button } from "@/components/ui/button";
 import {
   ArrowLeft,
@@ -196,8 +195,6 @@ const Perfil: React.FC = () => {
 
             {/* Personal Info Section */}
             <div className="px-4 mt-6">
-              <TipCard tipKey="perfil" className="mb-4" />
-
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-display font-semibold text-lg text-foreground">
                   Información personal

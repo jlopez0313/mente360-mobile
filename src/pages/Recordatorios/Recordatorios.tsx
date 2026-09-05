@@ -5,7 +5,6 @@ import { AppLayout } from "@/components/layout";
 import { enneagramTypes, mockUser } from "@/lib/mockData";
 import { useEffect, useState } from "react";
 
-import { TipCard } from "@/components/Shared/Onboarding/TipCard";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -255,7 +254,6 @@ export default function Recordatorios() {
 
           {/* Reminders Section */}
           <div className="px-4 mt-6">
-            <TipCard tipKey="recordatorios" className="mb-4" />
 
             <div className="space-y-3">
               {reminders.map((reminder) => (
